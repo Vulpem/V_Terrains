@@ -7,7 +7,6 @@
 #include "ComponentTransform.h"
 #include "ComponentLight.h"
 #include "ComponentCar.h"
-#include "ComponentScript.h"
 
 #include "ModuleGOManager.h"
 #include "LayerSystem.h"
@@ -15,8 +14,6 @@
 #include "ModuleInput.h"
 #include "ModuleResourceManager.h"
 #include "ModuleCamera3D.h"
-
-#include "ModuleScripting.h"
 
 #include "SDL/include/SDL_scancode.h"
 
@@ -127,11 +124,6 @@ void Hierarchy::Draw()
 			}
 			parent_to_set = child_to_set = nullptr;
 		}
-		else if (App->scripting->setting_go_var_name != "")
-		{
-			if (App->scripting->to_set_var != nullptr)
-				App->scripting->to_set_var->SetGOVar(nullptr);
-		}
 		else
 		{
 			App->editor->UnselectAll();
@@ -191,17 +183,6 @@ void Hierarchy::DisplayGameObjectsChilds(const std::vector<GameObject*>* childs)
 					break;
 				}
 				setting_parent = false;
-			}
-			else if (App->scripting->setting_go_var_name != "")
-			{
-				if (App->scripting->to_set_var != nullptr)
-				{
-					App->scripting->to_set_var->SetGOVar(*object);
-				}
-				else
-				{
-					App->scripting->setting_go_var_name = "";
-				}
 			}
 			else if (App->editor->assign_wheel != -1)
 			{

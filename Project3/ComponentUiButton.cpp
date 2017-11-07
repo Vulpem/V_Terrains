@@ -13,8 +13,6 @@
 
 // Only for Vertical Slice 3
 #include "SDL\include\SDL_scancode.h"
-#include "ComponentAudioSource.h"
-#include "ModuleAudio.h"
 
 ComponentUiButton::ComponentUiButton(ComponentType type, GameObject * game_object) : Component(type, game_object)
 {

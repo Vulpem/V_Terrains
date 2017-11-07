@@ -172,27 +172,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkDefaultIOHookBlocking.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkDefaultLowLevelIODispatcher.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\akfilehelpers.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkFileLocationBase.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkFilePackage.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkFilePackageLowLevelIO.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkFilePackageLUT.h" />
-    <ClInclude Include="AK\include\IO_DefaultInterface\AkMultipleFileLocation.h" />
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="AnimationImporter.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Assets.h" />
-    <ClInclude Include="AudioEvent.h" />
     <ClInclude Include="AutoProfile.h" />
     <ClInclude Include="CameraWindow.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentAnimation.h" />
-    <ClInclude Include="ComponentAudioListener.h" />
     <ClInclude Include="ComponentBone.h" />
-    <ClInclude Include="ComponentAudioSource.h" />
     <ClInclude Include="ComponentCamera.h" />
     <ClInclude Include="ComponentCanvas.h" />
     <ClInclude Include="ComponentCar.h" />
@@ -203,7 +192,6 @@
     <ClInclude Include="ComponentMesh.h" />
     <ClInclude Include="ComponentParticleSystem.h" />
     <ClInclude Include="ComponentRectTransform.h" />
-    <ClInclude Include="ComponentScript.h" />
     <ClInclude Include="ComponentSprite.h" />
     <ClInclude Include="ComponentTransform.h" />
     <ClInclude Include="ComponentUiButton.h" />
@@ -245,7 +233,6 @@
     <ClInclude Include="md5.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="ModuleLighting.h" />
-    <ClInclude Include="ModuleScripting.h" />
     <ClInclude Include="OpenGLFunc.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="RaceTimer.h" />
@@ -253,15 +240,12 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceFileAnimation.h" />
     <ClInclude Include="ResourceFileBone.h" />
-    <ClInclude Include="ResourceFileAudio.h" />
     <ClInclude Include="ResourceFileMaterial.h" />
     <ClInclude Include="ResourceFilePrefab.h" />
     <ClInclude Include="ResourceFileRenderTexture.h" />
-    <ClInclude Include="ResourceScriptsLibrary.h" />
     <ClInclude Include="ShaderEditorWindow.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Skybox.h" />
-    <ClInclude Include="SoundBank.h" />
     <ClInclude Include="TerrainWindow.h" />
     <ClInclude Include="TestWindow.h" />
     <ClInclude Include="TextureImporter.h" />
@@ -335,7 +319,6 @@
     <ClInclude Include="ModulePhysics3D.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
     <ClInclude Include="Module.h" />
-    <ClInclude Include="ModuleAudio.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleResourceManager.h" />
     <ClInclude Include="ModuleSceneIntro.h" />
@@ -363,26 +346,17 @@
     <ClInclude Include="Wheel.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowOptions.h" />
-    <ClInclude Include="Wwise_Library.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationImporter.cpp" />
-    <ClCompile Include="AK\include\IO_DefaultInterface\AkDefaultIOHookBlocking.cpp" />
-    <ClCompile Include="AK\include\IO_DefaultInterface\AkDefaultLowLevelIODispatcher.cpp" />
-    <ClCompile Include="AK\include\IO_DefaultInterface\AkFileLocationBase.cpp" />
-    <ClCompile Include="AK\include\IO_DefaultInterface\AkFilePackage.cpp" />
-    <ClCompile Include="AK\include\IO_DefaultInterface\AkFilePackageLUT.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Assets.cpp" />
-    <ClCompile Include="AudioEvent.cpp" />
     <ClCompile Include="AutoProfile.cpp" />
     <ClCompile Include="CameraWindow.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentAnimation.cpp" />
-    <ClCompile Include="ComponentAudioListener.cpp" />
     <ClCompile Include="ComponentBone.cpp" />
-    <ClCompile Include="ComponentAudioSource.cpp" />
     <ClCompile Include="ComponentCamera.cpp" />
     <ClCompile Include="ComponentCanvas.cpp" />
     <ClCompile Include="ComponentCar.cpp" />
@@ -393,7 +367,6 @@
     <ClCompile Include="ComponentMesh.cpp" />
     <ClCompile Include="ComponentParticleSystem.cpp" />
     <ClCompile Include="ComponentRectTransform.cpp" />
-    <ClCompile Include="ComponentScript.cpp" />
     <ClCompile Include="ComponentSprite.cpp" />
     <ClCompile Include="ComponentTransform.cpp" />
     <ClCompile Include="ComponentUiButton.cpp" />
@@ -430,22 +403,18 @@
     <ClCompile Include="MaterialCreatorWindow.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleLighting.cpp" />
-    <ClCompile Include="ModuleScripting.cpp" />
     <ClCompile Include="OpenGLFunc.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="RaceTimer.cpp" />
     <ClCompile Include="RenderTexEditorWindow.cpp" />
     <ClCompile Include="ResourceFileAnimation.cpp" />
     <ClCompile Include="ResourceFileBone.cpp" />
-    <ClCompile Include="ResourceFileAudio.cpp" />
     <ClCompile Include="ResourceFileMaterial.cpp" />
     <ClCompile Include="ResourceFilePrefab.cpp" />
     <ClCompile Include="ResourceFileRenderTexture.cpp" />
-    <ClCompile Include="ResourceScriptsLibrary.cpp" />
     <ClCompile Include="ShaderEditorWindow.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="SoundBank.cpp" />
     <ClCompile Include="TerrainWindow.cpp" />
     <ClCompile Include="TestWindow.cpp" />
     <ClCompile Include="TextureImporter.cpp" />
@@ -486,7 +455,6 @@
     <ClCompile Include="MathGeoLib\include\Math\TransformOps.cpp" />
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp" />
     <ClCompile Include="MeshImporter.cpp" />
-    <ClCompile Include="ModuleAudio.cpp" />
     <ClCompile Include="ModuleCamera3D.cpp" />
     <ClCompile Include="ModuleFileSystem.cpp" />
     <ClCompile Include="ModuleGOManager.cpp" />
@@ -516,11 +484,8 @@
     <ClCompile Include="Wheel.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowOptions.cpp" />
-    <ClCompile Include="Wwise_Library.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AK\include\IO_DefaultInterface\AkFilePackageLowLevelIO.inl" />
-    <None Include="AK\include\IO_DefaultInterface\AkMultipleFileLocation.inl" />
     <None Include="ListIterator.snippet" />
     <None Include="MathGeoLib\include\Geometry\KDTree.inl" />
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_AVX.inl" />

@@ -44,7 +44,7 @@ void Inspector::Draw()
 			selected_GO->SetAllActive(is_active);
 		//Name
 		ImGui::SameLine();
-		ImGui::InputText("###goname", selected_GO->name._Myptr(), selected_GO->name.capacity());
+		ImGui::InputText("###goname", (char*)selected_GO->name.data(), selected_GO->name.capacity());
 
 		//Static
 		/*ImGui::Text("Static:");
@@ -133,7 +133,6 @@ void Inspector::Draw()
 			if (ImGui::Selectable("Add Light"))				selected_GO->AddComponent(C_LIGHT);
 			if (ImGui::Selectable("Add Sprite"))			selected_GO->AddComponent(C_SPRITE);
 			if (ImGui::Selectable("Add ParticleSystem"))	selected_GO->AddComponent(C_PARTICLE_SYSTEM);
-			if (ImGui::Selectable("Add Script"))			selected_GO->AddComponent(C_SCRIPT);
 
 			if (ImGui::BeginMenu("Physics"))
 			{
@@ -150,13 +149,6 @@ void Inspector::Draw()
 				if (ImGui::Selectable("Add UI Text"))			selected_GO->AddComponent(C_UI_TEXT);
 				if (ImGui::Selectable("Add UI Button"))			selected_GO->AddComponent(C_UI_BUTTON);
 				if (ImGui::Selectable("Add UI Grid"))			selected_GO->AddComponent(C_GRID);
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Audio"))
-			{
-				if (ImGui::Selectable("Add Audio Source"))		selected_GO->AddComponent(C_AUDIO_SOURCE);
-				if (ImGui::Selectable("Add Audio Listener"))	selected_GO->AddComponent(C_AUDIO_LISTENER);
 				ImGui::EndMenu();
 			}
 			ImGui::EndPopup();

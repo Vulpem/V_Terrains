@@ -17,7 +17,6 @@
 #include "ComponentCamera.h"
 #include "ComponentCar.h"
 #include "ComponentCollider.h"
-#include "ComponentScript.h"
 
 #include "PhysBody3D.h"
 #include "Primitive.h"
@@ -382,8 +381,6 @@ bool ModulePhysics3D::CleanUp()
 
 void ModulePhysics3D::UpdateTriggerList()
 {
-	ComponentScript *script = nullptr;
-
 	for (std::list<TriggerState*>::iterator it = triggers.begin(); it != triggers.end();)
 	{
 		PhysBody3D *body = (*it)->body;
@@ -406,13 +403,6 @@ void ModulePhysics3D::UpdateTriggerList()
 			{
 				if (!(*it)->last_frame_check)
 				{
-					script = body->IsCar() ?
-						(ComponentScript*)body->GetCar()->GetGameObject()->GetComponent(C_SCRIPT) :
-						(ComponentScript*)body->GetCollider()->GetGameObject()->GetComponent(C_SCRIPT);
-
-					// Call script
-					if (script) script->OnCollision(body);
-
 					delete (*it);
 					it = triggers.erase(it);
 				}
@@ -488,29 +478,6 @@ bool ModulePhysics3D::CheckTriggerType(PhysBody3D *body)
 
 void ModulePhysics3D::OnCollision(PhysBody3D *bodyA, PhysBody3D *bodyB)
 {
-	ComponentScript* script = nullptr;
-
-	// BodyA
-	if (bodyA->IsTrigger() && CheckTriggerType(bodyA))
-	{
-		script = bodyA->IsCar() ?
-			(ComponentScript*)bodyA->GetCar()->GetGameObject()->GetComponent(C_SCRIPT) :
-			(ComponentScript*)bodyA->GetCollider()->GetGameObject()->GetComponent(C_SCRIPT);
-
-		// Call script
-		if(script) script->OnCollision(bodyB);
-	}
-
-	// BodyB
-	if (bodyB->IsTrigger() && CheckTriggerType(bodyB))
-	{
-		script = bodyB->IsCar() ?
-			(ComponentScript*)bodyB->GetCar()->GetGameObject()->GetComponent(C_SCRIPT) :
-			(ComponentScript*)bodyB->GetCollider()->GetGameObject()->GetComponent(C_SCRIPT);
-
-		// Call script
-		if (script) script->OnCollision(bodyA);
-	}
 }
 
 void ModulePhysics3D::OnPlay()

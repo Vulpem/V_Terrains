@@ -22,11 +22,9 @@
 #include "RenderTexEditorWindow.h"
 #include "ResourceFileAnimation.h"
 #include "ResourceFileBone.h"
-#include "ResourceFileAudio.h"
 #include "ResourceFileMesh.h"
 #include "ResourceFileTexture.h"
 #include "ResourceFilePrefab.h"
-#include "ResourceScriptsLibrary.h"
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -483,17 +481,9 @@ ResourceFile * ModuleResourceManager::LoadResource(const string &path, ResourceF
 			rc_file = new ResourceFileBone(path, uuid);
 			rc_file->Load();
 			break;
-		case RES_SOUNDBANK:
-			rc_file = new ResourceFileAudio(type, path, uuid);
-			rc_file->Load();
-			break;
 		case RES_PREFAB:
 			rc_file = new ResourceFilePrefab(type, path, uuid);
 			rc_file->Load(); //This load doesn't actually do his job. Needs to call another load method after this.
-			break;
-		case RES_SCRIPTS_LIBRARY:
-			rc_file = new ResourceScriptsLibrary(type, path, uuid);
-			rc_file->Load();
 			break;
 		}
 

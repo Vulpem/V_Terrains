@@ -9,8 +9,6 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ComponentLight.h"
-#include "ComponentAudioSource.h"
-#include "ComponentAudioListener.h"
 #include "ComponentCollider.h"
 #include "ComponentCar.h"
 #include "ComponentRectTransform.h"
@@ -24,7 +22,6 @@
 
 #include "MeshImporter.h"
 #include "RaycastHit.h"
-#include "ComponentScript.h"
 #include "ComponentLight.h"
 #include "ComponentAnimation.h"
 #include "ComponentBone.h"
@@ -431,17 +428,6 @@ Component* GameObject::AddComponent(ComponentType type)
 	case C_CAR:
 		if (transform)
 			item = new ComponentCar(this);
-		break;
-	case C_AUDIO_SOURCE:
-		if (transform)
-			item = new ComponentAudioSource(type, this);
-		break;
-	case C_AUDIO_LISTENER:
-		if (transform)
-			item = new ComponentAudioListener(type, this);
-		break;
-	case C_SCRIPT:
-		item = new ComponentScript(type, this);
 		break;
 	case C_RECT_TRANSFORM:
 		if (GetComponent(type) == nullptr) // Only one rect transform component for gameobject
