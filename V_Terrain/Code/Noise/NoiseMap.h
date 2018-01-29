@@ -27,6 +27,8 @@ namespace VTerrain
         uint Width();
         uint Heigth();
 
+        void SetMaxWaste(uint nFloats) { _m_maxMemWaste = nFloats; }
+
         utils::Row<float> operator[] (uint index) { return utils::Row<float>(m_data + (index * m_width)); }
         utils::Row<float> operator[] (uint index) const { return utils::Row<float>(m_data + (index * m_width)); }
         NoiseMap operator= (const NoiseMap& cpy) { Set(cpy.m_data, cpy.m_width, cpy.m_heigth); return *this; }
