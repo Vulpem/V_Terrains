@@ -61,6 +61,12 @@
     <Filter Include="Sources\GameObjects\Components">
       <UniqueIdentifier>{9d923719-6b71-4311-98ed-23082a954ebd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Terrains">
+      <UniqueIdentifier>{f1893366-4ee5-4852-b09e-30723e890294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrains\Terrain">
+      <UniqueIdentifier>{89f9796c-5414-4f13-8fa7-b2b7f163ff2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -423,6 +429,9 @@
     <ClInclude Include="R_Shader.h">
       <Filter>Sources\ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleTerrainTests.h">
+      <Filter>Terrains\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -631,6 +640,9 @@
     </ClCompile>
     <ClCompile Include="Billboard.cpp">
       <Filter>Sources\GameObjects\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTerrainTests.cpp">
+      <Filter>Terrains\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

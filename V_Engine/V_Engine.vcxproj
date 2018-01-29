@@ -14,7 +14,7 @@
     <ProjectGuid>{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}</ProjectGuid>
     <RootNamespace>SDLGame</RootNamespace>
     <ProjectName>V_Engine_Project</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -50,8 +50,7 @@
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)V_Terrain\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -99,6 +98,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Mesh_RenderInfo.h" />
     <ClInclude Include="ModuleResourceManager.h" />
+    <ClInclude Include="ModuleTerrainTests.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="PugiXml\src\pugiconfig.hpp" />
     <ClInclude Include="PugiXml\src\pugixml.hpp" />
@@ -259,6 +259,7 @@
     <ClCompile Include="ModuleGOmanager.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleResourceManager.cpp" />
+    <ClCompile Include="ModuleTerrainTests.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="PhysBody3D.cpp" />
@@ -287,6 +288,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="PugiXml\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\V_Terrain\V_Terrain.vcxproj">
+      <Project>{02111310-9cfd-4744-8412-d466e6f60bd1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

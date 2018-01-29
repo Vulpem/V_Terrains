@@ -9,9 +9,6 @@ namespace VTerrain
 {
     namespace utils
     {
-#define RELEASE(n) { if(n != nullptr) { delete n; n = nullptr;} }
-#define RELEASE_AR(n) { if(n != nullptr) { delete[] n; n = nullptr;} }
-
         template <typename T>
         T Clamp(T a, T min, T max) { return (a > max ? max : (a < min ? min : a)); }
 
@@ -20,6 +17,19 @@ namespace VTerrain
 
         template <typename T>
         T Max(T a, T b) { return (a > b ? a : b); }
+
+        template<typename T>
+        class Row
+        {
+            T* m_ptr;
+        public:
+            Row(T* ptr) : m_ptr(ptr) {};
+            T& operator[] (uint index) { return m_ptr[index]; }
+            T& operator[] (uint index) const { return m_ptr[index]; }
+        };
+
+#define Row(t)
+
     }
 }
 #endif // !__GLOBALS__

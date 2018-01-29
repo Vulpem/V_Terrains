@@ -15,6 +15,7 @@
 #include "ModuleFileSystem.h"
 #include "ModuleImporter.h"
 #include "ModuleResourceManager.h"
+#include "ModuleTerrainTests.h"
 
 #include "Timers.h"
 
@@ -42,6 +43,8 @@ Application::Application()
 
 	timers = new TimerManager();
 
+    terrain = new ModuleTerrain(this);
+
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
 	// They will CleanUp() in reverse order
@@ -59,6 +62,7 @@ Application::Application()
 	AddModule(importer);
 	AddModule(resources);
 	AddModule(GO);
+    AddModule(terrain);
 
 	// Renderer last!
 	AddModule(renderer3D);
