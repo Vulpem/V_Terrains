@@ -18,7 +18,7 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-    VTerrain::NoiseMap m_noiseMap;
+    VTerrain::PerlinNoise::NoiseMap m_noiseMap;
 };
 
 #endif

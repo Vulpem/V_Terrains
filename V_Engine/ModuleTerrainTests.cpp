@@ -29,7 +29,8 @@ bool ModuleTerrain::Start()
     uint w = 10;
     uint h = w;
 
-    m_noiseMap = VTerrain::GenNoiseMap(w, h, 0, 0);
+    m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(w, h, 0, 0);
+
     for (uint y = 0; y < h; y++)
     {
         for (uint x = 0; x < w; x++)

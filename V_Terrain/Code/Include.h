@@ -3,11 +3,12 @@
 
 #include "Utils\Globals.h"
 
-#include "Noise\NoiseMap.h"
+#include "Noise\PerlinNoise.h"
 
 namespace VTerrain
 {
-    NoiseMap GenNoiseMap(unsigned int width, unsigned int heigth, unsigned int offsetX, unsigned int offsetY);
-};
+   //Global Funcs
+
+}
 
 #endif // !__VTERRAIN_INCLUDE__
