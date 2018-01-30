@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="Code\Include.h" />
     <ClInclude Include="Code\Noise\PerlinNoise.h" />
+    <ClInclude Include="Code\Utils\GenImage.h" />
     <ClInclude Include="Code\Utils\Globals.h" />
     <ClInclude Include="Code\Utils\IncludeSTD.h" />
   </ItemGroup>
@@ -131,6 +132,7 @@
     <ClCompile Include="Code\Include.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />
     <ClCompile Include="Code\Noise\PerlinNoise.cpp" />
+    <ClCompile Include="Code\Utils\GenImage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

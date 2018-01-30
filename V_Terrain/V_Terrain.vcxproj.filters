@@ -33,6 +33,9 @@
     <ClInclude Include="Code\Include.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Utils\GenImage.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -43,6 +46,9 @@
     </ClCompile>
     <ClCompile Include="Code\Noise\NoiseMap.cpp">
       <Filter>Source Files\Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Utils\GenImage.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -49,6 +49,7 @@ namespace VTerrain
             void Set(std::vector<float> data, uint width, uint heigth);
             uint Width();
             uint Heigth();
+            const std::vector<float>& Data() const { return m_data; }
 
             Row operator[] (uint x) { return Row(m_data, m_width, x); }
             CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }

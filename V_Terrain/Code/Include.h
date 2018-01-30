@@ -4,6 +4,7 @@
 #include "Utils\Globals.h"
 
 #include "Noise\PerlinNoise.h"
+#include "Utils\GenImage.h"
 
 namespace VTerrain
 {

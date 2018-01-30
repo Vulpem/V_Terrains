@@ -26,7 +26,7 @@ bool ModuleTerrain::Start()
 {
 	bool ret = true;
 
-    uint w = 10;
+    uint w = 255;
     uint h = w;
 
     m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(w, h, 0, 0);
@@ -39,6 +39,7 @@ bool ModuleTerrain::Start()
         }
     }
 
+    m_heightmapBuffer = VTerrain::GenImage::BlackAndWhite(m_noiseMap.Data(), m_noiseMap.Width(), m_noiseMap.Heigth(), true);
 
 	return ret;
 }
@@ -47,6 +48,18 @@ bool ModuleTerrain::Start()
 update_status ModuleTerrain::PreUpdate()
 {
 	return UPDATE_CONTINUE;
+}
+
+update_status ModuleTerrain::Update()
+{
+    ImGui::SetNextWindowPos(ImVec2(300.f, 50.f));
+    if (ImGui::Begin("TerrainTests"))
+    {
+        float width = ImGui::GetWindowWidth() - 50;
+        ImGui::Image((void*)m_heightmapBuffer, ImVec2(width, width));
+        ImGui::End();
+    }
+    return UPDATE_CONTINUE;
 }
 
 // PostUpdate present buffer to screen
@@ -58,6 +71,6 @@ update_status ModuleTerrain::PostUpdate()
 // Called before quitting
 bool ModuleTerrain::CleanUp()
 {
-
+    VTerrain::GenImage::FreeImage(m_heightmapBuffer);
 	return true;
 }

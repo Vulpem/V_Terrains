@@ -4,7 +4,7 @@
 #include "Module.h"
 #include "Globals.h"
 
-#include "Include.h"
+#include "../V_Terrain/Code/Include.h"
 
 class ModuleTerrain : public Module
 {
@@ -14,11 +14,14 @@ public:
 
 	bool Init();
 	bool Start();
-	update_status PreUpdate();
-	update_status PostUpdate();
+	update_status PreUpdate() override;
+    update_status Update() override;
+	update_status PostUpdate() override;
 	bool CleanUp();
 
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;
+
+    int m_heightmapBuffer = 0;
 };
 
 #endif
