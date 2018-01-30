@@ -26,7 +26,7 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(uint x, uint y, float scale)
     {
-        return x + y * 100;
+        return float(x + y * 100u);
     }
 
     PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(uint width, uint heigth, uint offsetX, uint offsetY)
@@ -36,7 +36,7 @@ namespace VTerrain
         {
             for (uint x = 0; x < width; x++)
             {
-                ret[y][x] = GetValue(offsetX + x, offsetY + y);
+                ret[x][y] = GetValue(offsetX + x, offsetY + y);
             }
         }
         return ret;

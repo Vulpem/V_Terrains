@@ -8,6 +8,7 @@ namespace VTerrain
     class PerlinNoise
     {
     public:
+#pragma region NoiseMap
         /*
         Contains a 2D array of width and heigth.
         Can be accesed using [y][x] operator
@@ -32,7 +33,7 @@ namespace VTerrain
                 const uint m_x;
             public:
                 CRow(const std::vector<float>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
-                const float& const operator[] (uint y) const { return m_ptr[y*m_w + m_x]; }
+                float operator[] (uint y) const { return m_ptr[y*m_w + m_x]; }
             };
 
         private:
@@ -52,7 +53,7 @@ namespace VTerrain
             Row operator[] (uint x) { return Row(m_data, m_width, x); }
             CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }
         };
-
+#pragma endregion
 
     public:
         PerlinNoise();
