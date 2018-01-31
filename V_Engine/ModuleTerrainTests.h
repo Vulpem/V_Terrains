@@ -23,6 +23,7 @@ public:
 
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;
 
+    //NoiseGeneration
     int m_heightmapBuffer = 0;
 
     float m_frequency;

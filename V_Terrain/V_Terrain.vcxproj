@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Code\Include.h" />
+    <ClInclude Include="Code\Mesh\MeshGenerator.h" />
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />
     <ClInclude Include="Code\Noise\PerlinNoise.h" />
     <ClInclude Include="Code\Utils\GenImage.h" />
@@ -131,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Include.cpp" />
+    <ClCompile Include="Code\Mesh\MeshGenerator.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />
     <ClCompile Include="Code\Noise\PerlinNoise.cpp" />
     <ClCompile Include="Code\Utils\GenImage.cpp" />

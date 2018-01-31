@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Utils/Globals.h"
-#include "../Utils/IncludeSTD.h"
 
 #include "Extern/SivPerlinNoise.h"
 

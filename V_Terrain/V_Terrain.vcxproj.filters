@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Noise\Extern">
       <UniqueIdentifier>{6b56be24-40b7-4605-8088-6d7c834e0de5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Mesh">
+      <UniqueIdentifier>{cfa59f21-af19-4cb2-bd55-df43306fef47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Utils\Globals.h">
@@ -42,6 +45,9 @@
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h">
       <Filter>Source Files\Noise\Extern</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Mesh\MeshGenerator.h">
+      <Filter>Source Files\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -55,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="Code\Utils\GenImage.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Mesh\MeshGenerator.cpp">
+      <Filter>Source Files\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
