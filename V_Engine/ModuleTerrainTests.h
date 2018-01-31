@@ -6,6 +6,8 @@
 
 #include "../V_Terrain/Code/Include.h"
 
+#include "Math.h"
+
 class ModuleTerrain : public Module
 {
 public:
@@ -22,6 +24,13 @@ public:
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;
 
     int m_heightmapBuffer = 0;
+
+    float m_frequency;
+    int m_octaves;
+    std::vector<VTerrain::PerlinNoise::NoiseData> m_layers;
+
+    float2 m_size;
+    float2 m_offset;
 };
 
 #endif

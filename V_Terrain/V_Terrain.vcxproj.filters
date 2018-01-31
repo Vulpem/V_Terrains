@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{4d64fb45-620a-4093-9a96-6e27dbe33ec1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Noise\Extern">
+      <UniqueIdentifier>{6b56be24-40b7-4605-8088-6d7c834e0de5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Utils\Globals.h">
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="Code\Utils\GenImage.h">
       <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h">
+      <Filter>Source Files\Noise\Extern</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

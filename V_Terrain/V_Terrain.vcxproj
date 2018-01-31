@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Code\Include.h" />
+    <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />
     <ClInclude Include="Code\Noise\PerlinNoise.h" />
     <ClInclude Include="Code\Utils\GenImage.h" />
     <ClInclude Include="Code\Utils\Globals.h" />

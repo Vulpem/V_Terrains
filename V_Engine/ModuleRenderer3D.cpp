@@ -80,8 +80,8 @@ bool ModuleRenderer3D::Init()
 		}
 
 		//Check for error
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR)
+        GLenum error;
+		while ((error = glGetError() )!= GL_NO_ERROR)
 		{
 			LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
 			ret = false;
@@ -149,27 +149,28 @@ bool ModuleRenderer3D::Init()
 
 	}
 
+    //Initialize Projection Matrix
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    //Initialize Modelview Matrix
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    //Check for error
+    GLenum error;
+    while ((error = glGetError()) != GL_NO_ERROR)
+    {
+        LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
+        ret = false;
+    }
+
 	return ret;
 }
 
 bool ModuleRenderer3D::Start()
 {
 	bool ret = true;
-	//Initialize Projection Matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	//Initialize Modelview Matrix
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	//Check for error
-	
-	while (GLenum error = glGetError() != GL_NO_ERROR)
-	{
-		LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
-		ret = false;
-	}
 
 	return ret;
 }

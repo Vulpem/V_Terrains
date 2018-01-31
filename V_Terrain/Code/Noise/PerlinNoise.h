@@ -3,6 +3,8 @@
 #include "../Utils/Globals.h"
 #include "../Utils/IncludeSTD.h"
 
+#include "Extern/SivPerlinNoise.h"
+
 namespace VTerrain
 {
     class PerlinNoise
@@ -50,9 +52,19 @@ namespace VTerrain
             uint Width();
             uint Heigth();
             const std::vector<float>& Data() const { return m_data; }
+            std::vector<float>& Data() { return m_data; }
 
             Row operator[] (uint x) { return Row(m_data, m_width, x); }
             CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }
+        };
+
+        class NoiseData
+        {
+        public:
+            NoiseData(float frequency, int octaves, float strength) : m_frequency(frequency), m_octaves(octaves), m_strength(strength) {}
+            float m_frequency;
+            int m_octaves;
+            float m_strength;
         };
 #pragma endregion
 
@@ -60,20 +72,11 @@ namespace VTerrain
         PerlinNoise();
 
         static void SetSeed(uint seed);
-        static float GetValue(uint X, uint Y, float scale = 1.f);
-        static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint heigth, uint offsetX, uint offsetY);
+        static float GetValue(int x, int y, int width, int height, const std::vector<NoiseData>& layers);
+        static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint height, int offsetX, int offsetY, const std::vector<NoiseData>& layers);
 
     private:
-        float Fade(float t);
-        float Lerp(float t, float a, float b);
-        float Grad(float hash, float x, float y, float z);
-
-        static std::vector<int>& P() { return m_instance.m_permutationVec; }
-
-
         static PerlinNoise m_instance;
-
-        uint m_seed;
-        std::vector<int> m_permutationVec;
+        siv::SivPerlinNoise m_perlin;
     };
 }
