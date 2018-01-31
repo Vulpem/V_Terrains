@@ -19,31 +19,23 @@ namespace VTerrain
         m_instance.m_perlin.reseed(seed);
     }
 
-    float PerlinNoise::GetValue(int x, int y, int width, int height, const std::vector<NoiseData>& layers)
+    float PerlinNoise::GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency)
     {
-        float ret = 0.0f;
-        for (int n = 0; n < layers.size(); n++)
-        {
-            const NoiseData& d = layers[n];
-            ret += (1 - m_instance.m_perlin.octaveNoise0_1(x / (width / utils::Clamp(d.m_frequency, 0.1f, 64.0f)), y / (height / utils::Clamp(d.m_frequency, 0.1f, 64.0f)), utils::Clamp(d.m_octaves, 1, 16))) * d.m_strength;
-        }
-
-        return ret;
+        frequency = utils::Clamp(frequency, 0.1f, 64.0f);
+        octaves = utils::Clamp(octaves, 1, 16);
+        return m_instance.m_perlin.octaveNoise0_1(x / (width / frequency), y / (height / frequency), octaves, lacunarity, persistency);
     }
 
-    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(uint width, uint height, int offsetX, int offsetY, const std::vector<NoiseData>& layers)
+    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency)
     {
         PerlinNoise::NoiseMap ret(width, height);
-        if (layers.size() > 0)
-        {
             for (int y = 0; y < height; ++y)
             {
                 for (int x = 0; x < width; ++x)
                 {
-                    ret.Data()[x + y * width] = GetValue(x + offsetX, y + offsetY, width, height, layers);
+                    ret.Data()[x + y * width] = GetValue(x + offsetX, y + offsetY, width, height, frequency, octaves, lacunarity, persistency);
                 }
             }
-        }
         return ret;
     }
 }

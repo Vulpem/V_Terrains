@@ -57,23 +57,14 @@ namespace VTerrain
             Row operator[] (uint x) { return Row(m_data, m_width, x); }
             CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }
         };
-
-        class NoiseData
-        {
-        public:
-            NoiseData(float frequency, int octaves, float strength) : m_frequency(frequency), m_octaves(octaves), m_strength(strength) {}
-            float m_frequency;
-            int m_octaves;
-            float m_strength;
-        };
 #pragma endregion
 
     public:
         PerlinNoise();
 
         static void SetSeed(uint seed);
-        static float GetValue(int x, int y, int width, int height, const std::vector<NoiseData>& layers);
-        static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint height, int offsetX, int offsetY, const std::vector<NoiseData>& layers);
+        static float GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency);
+        static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency);
 
     private:
         static PerlinNoise m_instance;

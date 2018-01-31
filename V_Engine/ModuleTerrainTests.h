@@ -27,10 +27,14 @@ public:
 
     float m_frequency;
     int m_octaves;
-    std::vector<VTerrain::PerlinNoise::NoiseData> m_layers;
+    float m_lacunarity;
+    float m_persistance;
 
     float2 m_size;
     float2 m_offset;
+
+    bool m_simplifyRender;
+    float m_simplifyRenderStep;
 };
 
 #endif

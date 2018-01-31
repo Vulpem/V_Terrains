@@ -116,7 +116,7 @@ namespace siv
                         Grad(p[BB + 1], x - 1, y - 1, z - 1))));
         }
 
-        double octaveNoise(double x, std::int32_t octaves) const
+        double octaveNoise(double x, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
             double result = 0.0;
             double amp = 1.0;
@@ -124,14 +124,14 @@ namespace siv
             for (std::int32_t i = 0; i < octaves; ++i)
             {
                 result += noise(x) * amp;
-                x *= 2.0;
-                amp *= 0.5;
+                x *= lacunarity;
+                amp *= persistance;
             }
 
             return result;
         }
 
-        double octaveNoise(double x, double y, std::int32_t octaves) const
+        double octaveNoise(double x, double y, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
             double result = 0.0;
             double amp = 1.0;
@@ -139,15 +139,15 @@ namespace siv
             for (std::int32_t i = 0; i < octaves; ++i)
             {
                 result += noise(x, y) * amp;
-                x *= 2.0;
-                y *= 2.0;
-                amp *= 0.5;
+                x *= lacunarity;
+                y *= lacunarity;
+                amp *= persistance;
             }
 
             return result;
         }
 
-        double octaveNoise(double x, double y, double z, std::int32_t octaves) const
+        double octaveNoise(double x, double y, double z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
             double result = 0.0;
             double amp = 1.0;
@@ -155,10 +155,10 @@ namespace siv
             for (std::int32_t i = 0; i < octaves; ++i)
             {
                 result += noise(x, y, z) * amp;
-                x *= 2.0;
-                y *= 2.0;
-                z *= 2.0;
-                amp *= 0.5;
+                x *= lacunarity;
+                y *= lacunarity;
+                z *= lacunarity;
+                amp *= persistance;
             }
 
             return result;
@@ -179,19 +179,19 @@ namespace siv
             return noise(x, y, z) * 0.5 + 0.5;
         }
 
-        double octaveNoise0_1(double x, std::int32_t octaves) const
+        double octaveNoise0_1(double x, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
-            return octaveNoise(x, octaves) * 0.5 + 0.5;
+            return octaveNoise(x, octaves, lacunarity, persistance) * 0.5 + 0.5;
         }
 
-        double octaveNoise0_1(double x, double y, std::int32_t octaves) const
+        double octaveNoise0_1(double x, double y, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
-            return octaveNoise(x, y, octaves) * 0.5 + 0.5;
+            return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5 + 0.5;
         }
 
-        double octaveNoise0_1(double x, double y, double z, std::int32_t octaves) const
+        double octaveNoise0_1(double x, double y, double z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
-            return octaveNoise(x, y, z, octaves) * 0.5 + 0.5;
+            return octaveNoise(x, y, z, octaves, lacunarity, persistance) * 0.5 + 0.5;
         }
     };
 }
