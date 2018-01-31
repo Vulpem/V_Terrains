@@ -64,16 +64,16 @@ namespace siv
             reseed(seed);
         }
 
-        void reseed(std::uint32_t seed)
+        void reseed(std::int32_t seed)
         {
-            for (size_t i = 0; i < 256; ++i)
+            for (int32_t i = 0; i < 256; ++i)
             {
                 p[i] = i;
             }
 
             std::shuffle(std::begin(p), std::begin(p) + 256, std::default_random_engine(seed));
 
-            for (size_t i = 0; i < 256; ++i)
+            for (int32_t i = 0; i < 256; ++i)
             {
                 p[256 + i] = p[i];
             }

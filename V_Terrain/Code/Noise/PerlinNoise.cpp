@@ -19,7 +19,7 @@ namespace VTerrain
         m_instance.m_perlin.reseed(seed);
     }
 
-    float PerlinNoise::GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency)
+    double PerlinNoise::GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency)
     {
         frequency = utils::Clamp(frequency, 0.1f, 64.0f);
         octaves = utils::Clamp(octaves, 1, 16);
@@ -29,9 +29,9 @@ namespace VTerrain
     PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency)
     {
         PerlinNoise::NoiseMap ret(width, height);
-            for (int y = 0; y < height; ++y)
+            for (uint y = 0; y < height; ++y)
             {
-                for (int x = 0; x < width; ++x)
+                for (uint x = 0; x < width; ++x)
                 {
                     ret.Data()[x + y * width] = GetValue(x + offsetX, y + offsetY, width, height, frequency, octaves, lacunarity, persistency);
                 }

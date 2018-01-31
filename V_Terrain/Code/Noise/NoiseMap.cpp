@@ -19,7 +19,7 @@ namespace VTerrain
         {
         }
 
-        void PerlinNoise::NoiseMap::Set(std::vector<float> data, uint width, uint heigth)
+        void PerlinNoise::NoiseMap::Set(std::vector<double> data, uint width, uint heigth)
         {
             m_width = width;
             m_heigth = heigth;

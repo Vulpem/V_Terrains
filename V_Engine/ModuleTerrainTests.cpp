@@ -53,22 +53,36 @@ update_status ModuleTerrain::Update()
     if (ImGui::Begin("TerrainTests"))
     {
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { regen = true; }
+
         if (ImGui::DragFloat2("Offset", &m_offset[0], 1.f)) { regen = true; }
         ImGui::Separator();
-        if (ImGui::SliderFloat("Frequency", &m_frequency, 0.1f, 64.f)) { regen = true; }
-        if (ImGui::SliderInt("Octaves", &m_octaves, 1, 16)) { regen = true; }
-        if (ImGui::SliderFloat("Lacunarity", &m_lacunarity, 0.1f, 20.f)) { regen = true; }
-        if (ImGui::SliderFloat("Persistance", &m_persistance, 0.01f, 1.f)) { regen = true; }
+
+        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.1f, 64.f)) { regen = true; }
+        if (ImGui::DragFloat("Frequency", &m_frequency, 0.1f, 0.1f, 64.f)) { regen = true; }
         ImGui::Separator();
+
+        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 16)) { regen = true; }
+        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 16)) { regen = true; }
+        ImGui::Separator();
+
+        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.1f, 20.f)) { regen = true; }
+        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.1f, 0.1f, 20.f)) { regen = true; }
+        ImGui::Separator();
+
+        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.01f, 1.f)) { regen = true; }
+        if (ImGui::DragFloat("Persistance", &m_persistance, 0.1f, 0.01f, 1.f)) { regen = true; }
+        ImGui::Separator();
+
         if (ImGui::Checkbox("Simplify render", &m_simplifyRender)) { regen = true; }
         if (ImGui::SliderFloat("Simplify render step", &m_simplifyRenderStep, 0.01f, 1.f)) { regen = true; }
+        ImGui::NewLine();
 
         float width = ImGui::GetWindowWidth() - 50;
         ImGui::Image((void*)m_heightmapBuffer, ImVec2(width, width));
         ImGui::End();
     }
 
-    if (App->input->GetKey(SDL_SCANCODE_KP_2) == KEY_REPEAT) { m_offset.y += 1; regen = true; }
+    if (App->input->GetKey(SDL_SCANCODE_KP_5) == KEY_REPEAT) { m_offset.y += 1; regen = true; }
     if (App->input->GetKey(SDL_SCANCODE_KP_8) == KEY_REPEAT) { m_offset.y -= 1; regen = true;}
     if (App->input->GetKey(SDL_SCANCODE_KP_6) == KEY_REPEAT) { m_offset.x += 1; regen = true;}
     if (App->input->GetKey(SDL_SCANCODE_KP_4) == KEY_REPEAT) { m_offset.x -= 1; regen = true;}

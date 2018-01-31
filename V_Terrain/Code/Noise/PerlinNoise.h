@@ -19,39 +19,39 @@ namespace VTerrain
         public:
             class Row
             {
-                std::vector<float>& m_ptr;
+                std::vector<double>& m_ptr;
                 uint m_w;
                 uint m_x;
             public:
-                Row(std::vector<float>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
-                float& operator[] (uint y) { return m_ptr[y*m_w + m_x]; }
+                Row(std::vector<double>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
+                double& operator[] (uint y) { return m_ptr[y*m_w + m_x]; }
             };
 
             class CRow
             {
-                const std::vector<float>& m_ptr;
+                const std::vector<double>& m_ptr;
                 const uint m_w;
                 const uint m_x;
             public:
-                CRow(const std::vector<float>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
-                float operator[] (uint y) const { return m_ptr[y*m_w + m_x]; }
+                CRow(const std::vector<double>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
+                double operator[] (uint y) const { return m_ptr[y*m_w + m_x]; }
             };
 
         private:
             uint m_heigth;
             uint m_width;
-            std::vector<float> m_data;
+            std::vector<double> m_data;
 
         public:
             NoiseMap();
             NoiseMap(const uint w, const uint h);
             ~NoiseMap();
 
-            void Set(std::vector<float> data, uint width, uint heigth);
+            void Set(std::vector<double> data, uint width, uint heigth);
             uint Width();
             uint Heigth();
-            const std::vector<float>& Data() const { return m_data; }
-            std::vector<float>& Data() { return m_data; }
+            const std::vector<double>& Data() const { return m_data; }
+            std::vector<double>& Data() { return m_data; }
 
             Row operator[] (uint x) { return Row(m_data, m_width, x); }
             CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }
@@ -62,7 +62,7 @@ namespace VTerrain
         PerlinNoise();
 
         static void SetSeed(uint seed);
-        static float GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency);
+        static double GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency);
         static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency);
 
     private:
