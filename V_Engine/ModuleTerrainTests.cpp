@@ -93,6 +93,8 @@ update_status ModuleTerrain::Update()
         GenMap();
     }
 
+    m_mesh.Render();
+
     return UPDATE_CONTINUE;
 }
 

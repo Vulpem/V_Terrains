@@ -38,8 +38,9 @@ namespace VTerrain
         class Mesh
         {
         public:
-            uint m_dataBuff = -1;
-            uint m_indicesBuff = -1;
+            uint m_dataBuff;
+            uint m_indicesBuff;
+            uint m_nIndices = 0u;
             bool used = false;
            
             void Generate(const MeshData& meshData);

@@ -54,7 +54,7 @@ namespace VTerrain
             for (uint x = 0; x < map.Width(); x++)
             {
                 AddVertex(topLeftX + x, map[x + y * map.Width()], topLeftY - y);
-                AddUV(x / static_cast<float>(map.Width()), y / static_cast<float>(map.Width()));
+                AddUV(x / static_cast<float>(map.Width()-1), y / static_cast<float>(map.Height()-1));
 
                 if (x < map.Width() - 1 && y < map.Height() - 1)
                 {
@@ -110,6 +110,8 @@ namespace VTerrain
             FreeMesh();
         }
         used = true;
+        m_nIndices = meshData.m_indices.size();
+
         //Generating data buffer
         glGenBuffers(1, (GLuint*) &(m_dataBuff));
         glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
@@ -117,7 +119,7 @@ namespace VTerrain
 
         glGenBuffers(1, (GLuint*) &(m_indicesBuff));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * meshData.m_indices.size(), meshData.m_indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices, meshData.m_indices.data(), GL_STATIC_DRAW);
 
     }
 
@@ -128,9 +130,44 @@ namespace VTerrain
             glDeleteBuffers(1, &m_dataBuff);
             glDeleteBuffers(1, &m_indicesBuff);
             used = false;
+            m_nIndices = 0;
         }
     }
     void MeshGenerator::Mesh::Render()
     {
+        if (used)
+        {
+            glEnableClientState(GL_VERTEX_ARRAY);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glEnableClientState(GL_NORMAL_ARRAY);
+
+            glMatrixMode(GL_MODELVIEW);
+            glPushMatrix();
+            glLoadIdentity();
+
+            glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
+            glVertexPointer(3, GL_DOUBLE, 5 * sizeof(double), (GLvoid*)0);
+            glNormalPointer(GL_DOUBLE, 5 * sizeof(double), (GLvoid*)(3 * sizeof(double)));
+            glTexCoordPointer(2, GL_DOUBLE, 6 * sizeof(double), (GLvoid*)(6 * sizeof(double)));
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
+            //glDrawElements(GL_TRIANGLES, m_nIndices, GL_UNSIGNED_INT, NULL);
+
+            GLenum error = glGetError();
+            if (error != GL_NO_ERROR)
+            {
+                char* err = (char*)glewGetErrorString(error);
+            }
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            glPopMatrix();
+
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glDisableClientState(GL_VERTEX_ARRAY);
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glDisableClientState(GL_NORMAL_ARRAY);
+        }
     }
 }
