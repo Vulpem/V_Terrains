@@ -10,26 +10,43 @@ namespace VTerrain
     {
     public:
 #pragma region Mesh
-        class Mesh
+        class MeshData
         {
-            std::vector<float> m_vertices;
-            std::vector<uint> indices;
+        public:
+            MeshData();
+            ~MeshData();
+            
+            void Generate(const PerlinNoise::NoiseMap& map);
+            void CompressData();
+
+        private:
+            void AddVertex(double x, double y, double z);
+            void AddUV(double x, double y);
+            void AddNormal(double x, double y, double z);
+
+            void AddTri(uint a, uint b, uint c);
 
         public:
-            Mesh();
-            ~Mesh();
+            std::vector<double> m_vertices;
+            std::vector<double> m_UVs;
+            std::vector<double> m_normals;
+            std::vector<double> m_data;
 
-            void AddTri(std::vector<float> Tri);
+            std::vector<uint> m_indices;
+        };
+
+        class Mesh
+        {
+        public:
+            uint m_dataBuff = -1;
+            uint m_indicesBuff = -1;
+            bool used = false;
+           
+            void Generate(const MeshData& meshData);
+            void FreeMesh();
+
+            void Render();
         };
 #pragma endregion
-
-    public:
-        MeshGenerator();
-
-        static Mesh GenerateMesh(const PerlinNoise::NoiseMap& map);
-
-        MeshGenerator& Instance() { return m_instance; }
-    private:
-        static MeshGenerator m_instance;
     };
 }

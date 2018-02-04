@@ -16,29 +16,8 @@ namespace VTerrain
         */
         class NoiseMap
         {
-        public:
-            class Row
-            {
-                std::vector<double>& m_ptr;
-                uint m_w;
-                uint m_x;
-            public:
-                Row(std::vector<double>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
-                double& operator[] (uint y) { return m_ptr[y*m_w + m_x]; }
-            };
-
-            class CRow
-            {
-                const std::vector<double>& m_ptr;
-                const uint m_w;
-                const uint m_x;
-            public:
-                CRow(const std::vector<double>& ptr, const uint width, const uint x) : m_ptr(ptr), m_w(width), m_x(x) {};
-                double operator[] (uint y) const { return m_ptr[y*m_w + m_x]; }
-            };
-
         private:
-            uint m_heigth;
+            uint m_height;
             uint m_width;
             std::vector<double> m_data;
 
@@ -48,13 +27,13 @@ namespace VTerrain
             ~NoiseMap();
 
             void Set(std::vector<double> data, uint width, uint heigth);
-            uint Width();
-            uint Heigth();
+            uint Width() const;
+            uint Height() const;
             const std::vector<double>& Data() const { return m_data; }
             std::vector<double>& Data() { return m_data; }
 
-            Row operator[] (uint x) { return Row(m_data, m_width, x); }
-            CRow operator[] (uint x) const { return CRow(m_data, m_width, x); }
+            double& operator[] (uint x) { return m_data[x]; }
+            double operator[] (uint x) const { return m_data[x]; }
         };
 #pragma endregion
 

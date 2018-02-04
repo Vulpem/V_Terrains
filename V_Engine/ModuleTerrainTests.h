@@ -21,7 +21,10 @@ public:
 	update_status PostUpdate() override;
 	bool CleanUp();
 
+    void GenMap();
+
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;
+    VTerrain::MeshGenerator::Mesh m_mesh;
 
     //NoiseGeneration
     uint32_t seed;
