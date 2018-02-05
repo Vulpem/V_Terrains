@@ -175,11 +175,20 @@ namespace VTerrain
             if (projectionLoc != -1)
             { glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projectionMatrix); }
 
-            float col[] ={ 0.5f, 0.5f, 0.5f };
+            float col[] ={ 0.5f, 0.5f, 0.5f, 1.0f };
             //Ambient color
             GLint ambientColorLoc = glGetUniformLocation(m_shaderProgram, "ambient_color");
             if (ambientColorLoc != -1)
             { glUniform4fv(ambientColorLoc, 1, col); }
+
+            float materialCol[] = { 1.0f,1.0f,1.0f,1.0f };
+            //Material color
+            GLint materialColorLoc = glGetUniformLocation(m_shaderProgram, "material_color");
+            if (materialColorLoc != -1)
+            {
+                glUniform4fv(materialColorLoc, 1, materialCol);
+            }
+            
 
             float dir[] = { 0.2f,0.2f,0.2f };
             //Global light direction
