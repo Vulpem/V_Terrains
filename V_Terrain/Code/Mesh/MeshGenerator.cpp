@@ -41,10 +41,15 @@ namespace VTerrain
 
     void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
     {
-        m_vertices.reserve(map.Width()*map.Height() * 3);
-        m_UVs.reserve(map.Width()*map.Height() * 2);
-        m_normals.reserve(map.Width()*map.Height() * 3);
-        m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6);
+        m_vertices.clear();
+        m_UVs.clear();
+        m_normals.clear();
+        m_indices.clear();
+
+        m_vertices.reserve(map.Width()*map.Height() * 3 + 1);
+        m_UVs.reserve(map.Width()*map.Height() * 2 + 1);
+        m_normals.reserve(map.Width()*map.Height() * 3 + 1);
+        m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
 
         //Subtracting 1 if Width is odd
         float topLeftX = (map.Width() - (map.Width() % 2 != 0) ) / -2.f;
@@ -59,7 +64,7 @@ namespace VTerrain
 
                 if (x < map.Width() - 1 && y < map.Height() - 1)
                 {
-                    uint index = m_vertices.size() - 3;
+                    uint index = (m_vertices.size()/3)-1;
                     AddTri(index, index + map.Width() + 1, index + map.Width());
                     AddTri(index + map.Width() + 1, index, index + 1);
                 }
@@ -70,8 +75,8 @@ namespace VTerrain
     }
     void MeshGenerator::MeshData::CompressData()
     {
-
-        m_data.reserve(m_vertices.size() * (3 + 3 + 2));
+        m_data.clear();
+        m_data.reserve(m_vertices.size() * (3 + 3 + 2) + 1);
 
         for (uint n = 0; n < m_vertices.size() / 3; n++)
         {
@@ -87,9 +92,9 @@ namespace VTerrain
             }
             else
             {
-                m_data.push_back(0.);
-                m_data.push_back(0.);
-                m_data.push_back(0.);
+                m_data.push_back(0.f);
+                m_data.push_back(1.f);
+                m_data.push_back(0.f);
             }
 
             if (n < m_UVs.size())
@@ -99,8 +104,8 @@ namespace VTerrain
             }
             else
             {
-                m_data.push_back(0.);
-                m_data.push_back(0.);
+                m_data.push_back(0.f);
+                m_data.push_back(0.f);
             }
         }
     }
@@ -109,22 +114,22 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::Generate(const MeshData & meshData)
     {
-        if (used)
+        if (!used)
         {
-            FreeMesh();
+            glGenBuffers(1, (GLuint*) &(m_dataBuff));
+            glGenBuffers(1, (GLuint*) &(m_indicesBuff));
+            used = true;
         }
-        used = true;
+        
         m_nIndices = meshData.m_indices.size();
-
-        //Generating data buffer
-        glGenBuffers(1, (GLuint*) &(m_dataBuff));
+       
         glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshData.m_data.size(), meshData.m_data.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glGenBuffers(1, (GLuint*) &(m_indicesBuff));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices, meshData.m_indices.data(), GL_STATIC_DRAW);
-
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void MeshGenerator::Mesh::FreeMesh()
@@ -137,7 +142,7 @@ namespace VTerrain
             m_nIndices = 0;
         }
     }
-    void MeshGenerator::Mesh::Render()
+    void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix)
     {
         if (used)
         {
@@ -150,6 +155,38 @@ namespace VTerrain
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
             glLoadIdentity();
+
+            // ------ Setting uniforms -------------------------
+            //Model Matrix
+            float identity[] = { 1,0,0,0,
+                                 0,1,0,0,
+                                 0,0,1,0,
+                                 0,0,0,1 };
+            GLint modelLoc = glGetUniformLocation(m_shaderProgram, "model_matrix");
+            if (modelLoc != -1) { glUniformMatrix4fv(modelLoc, 1, GL_FALSE, identity); }
+
+            //View matrix
+            GLint viewLoc = glGetUniformLocation(m_shaderProgram, "view_matrix");
+            if (viewLoc != -1)
+            { glUniformMatrix4fv(viewLoc, 1, GL_FALSE, viewMatrix); }
+
+            //Projection Matrix
+            GLint projectionLoc = glGetUniformLocation(m_shaderProgram, "projection_matrix");
+            if (projectionLoc != -1)
+            { glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projectionMatrix); }
+
+            float col[] ={ 0.5f, 0.5f, 0.5f };
+            //Ambient color
+            GLint ambientColorLoc = glGetUniformLocation(m_shaderProgram, "ambient_color");
+            if (ambientColorLoc != -1)
+            { glUniform4fv(ambientColorLoc, 1, col); }
+
+            float dir[] = { 0.2f,0.2f,0.2f };
+            //Global light direction
+            GLint globalLightDirLoc = glGetUniformLocation(m_shaderProgram, "global_light_direction");
+            if (globalLightDirLoc != -1)
+            { glUniform3fv(globalLightDirLoc, 1, dir); }
+
 
             glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);

@@ -1,6 +1,10 @@
 #include "Application.h"
 #include "ModuleTerrainTests.h"
 
+#include "ModuleRenderer3D.h"
+#include "ModuleCamera3D.h"
+#include "ViewPort.h"
+
 #include "ModuleInput.h"
 #include "imGUI\imgui.h"
 
@@ -96,8 +100,8 @@ update_status ModuleTerrain::Update()
     {
         GenMap();
     }
-
-    m_mesh.Render();
+    
+    m_mesh.Render(App->camera->GetDefaultCam()->GetViewMatrix().ptr(), App->camera->GetDefaultCam()->GetProjectionMatrix().ptr());
 
     return UPDATE_CONTINUE;
 }
