@@ -41,10 +41,10 @@ namespace VTerrain
         PerlinNoise();
 
         static void SetSeed(uint seed);
-        static double GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency);
-        static PerlinNoise::NoiseMap GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency);
-
+        static PerlinNoise::NoiseMap GenNoiseMap(int offsetX, int offsetY);
     private:
+        static double GetValue(int x, int y);
+
         static PerlinNoise m_instance;
         siv::SivPerlinNoise m_perlin;
     };

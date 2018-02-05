@@ -4,6 +4,7 @@
 typedef unsigned int uint;
 
 #include "IncludeSTD.h"
+#include "../TerrainConfig.h"
 
 namespace VTerrain
 {

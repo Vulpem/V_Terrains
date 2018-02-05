@@ -39,6 +39,7 @@ public:
     float2 m_size;
     float2 m_offset;
 
+    float m_maxHeight;
     bool m_simplifyRender;
     float m_simplifyRenderStep;
 

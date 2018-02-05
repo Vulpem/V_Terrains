@@ -20,6 +20,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_persistance (0.25f)
     , m_simplifyRender(false)
     , m_simplifyRenderStep(0.2f)
+    , m_maxHeight(15.f)
 {
 	moduleName = "ModuleTerrainTests";
 }
@@ -61,6 +62,8 @@ update_status ModuleTerrain::Update()
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
     {
+        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { regen = true; }
+
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { regen = true; }
 
         if (ImGui::DragFloat2("Offset", &m_offset[0], 1.f)) { regen = true; }
@@ -121,7 +124,17 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::GenMap()
 {
-    m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_size.x, m_size.y, m_offset.x, m_offset.y, m_frequency, m_octaves, m_lacunarity, m_persistance);
+    VTerrain::Config::chunkHeight = m_size.x;
+    VTerrain::Config::chunkWidth = m_size.y;
+    VTerrain::Config::maxHeight = m_maxHeight;
+
+    VTerrain::Config::Noise::frequency = m_frequency;
+    VTerrain::Config::Noise::octaves = m_octaves;
+    VTerrain::Config::Noise::lacunarity = m_lacunarity;
+    VTerrain::Config::Noise::persistency = m_persistance;
+
+
+    m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offset.x, m_offset.y);
 
     VTerrain::MeshGenerator::MeshData meshData;
     meshData.Generate(m_noiseMap);

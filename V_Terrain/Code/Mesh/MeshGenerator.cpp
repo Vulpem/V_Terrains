@@ -59,7 +59,7 @@ namespace VTerrain
         {
             for (uint x = 0; x < map.Width(); x++)
             {
-                AddVertex(topLeftX + x, map[x + y * map.Width()], topLeftY - y);
+                AddVertex(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y);
                 AddUV(x / static_cast<float>(map.Width()-1), y / static_cast<float>(map.Height()-1));
 
                 if (x < map.Width() - 1 && y < map.Height() - 1)

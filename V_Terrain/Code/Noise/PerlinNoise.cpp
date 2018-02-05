@@ -11,6 +11,7 @@ namespace VTerrain
 
     PerlinNoise::PerlinNoise()
     {
+        //TODO
         SetSeed(12345);//static_cast<uint>(time(NULL)));
     }
 
@@ -19,23 +20,26 @@ namespace VTerrain
         m_instance.m_perlin.reseed(seed);
     }
 
-    double PerlinNoise::GetValue(int x, int y, int width, int height, float frequency, int octaves, float lacunarity, float persistency)
+    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(int offsetX, int offsetY)
     {
-        frequency = utils::Clamp(frequency, 0.1f, 64.0f);
-        octaves = utils::Clamp(octaves, 1, 16);
-        return m_instance.m_perlin.octaveNoise0_1(x / (width / frequency), y / (height / frequency), octaves, lacunarity, persistency);
+        PerlinNoise::NoiseMap ret(Config::chunkWidth, Config::chunkHeight);
+        Config::Noise::frequency = utils::Clamp(Config::Noise::frequency, 0.1f, 64.0f);
+        Config::Noise::octaves = utils::Clamp(Config::Noise::octaves, 1u, 16u);
+
+        for (uint y = 0; y < Config::chunkHeight; ++y)
+        {
+            for (uint x = 0; x < Config::chunkWidth; ++x)
+            {
+                ret.Data()[x + y * Config::chunkWidth] = GetValue(x + offsetX * Config::chunkWidth, y + offsetY * Config::chunkHeight);
+            }
+        }
+        return ret;
     }
 
-    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(uint width, uint height, int offsetX, int offsetY, float frequency, int octaves, float lacunarity, float persistency)
+    double PerlinNoise::GetValue(int x, int y)
     {
-        PerlinNoise::NoiseMap ret(width, height);
-            for (uint y = 0; y < height; ++y)
-            {
-                for (uint x = 0; x < width; ++x)
-                {
-                    ret.Data()[x + y * width] = GetValue(x + offsetX, y + offsetY, width, height, frequency, octaves, lacunarity, persistency);
-                }
-            }
-        return ret;
+        float dx = static_cast<float>(Config::chunkWidth) / Config::Noise::frequency;
+        float dy = static_cast<float>(Config::chunkHeight) / Config::Noise::frequency;
+        return m_instance.m_perlin.octaveNoise0_1(x / dx, y / dy, Config::Noise::octaves, Config::Noise::lacunarity, Config::Noise::persistency);
     }
 }
