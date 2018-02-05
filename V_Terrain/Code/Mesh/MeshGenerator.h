@@ -20,17 +20,17 @@ namespace VTerrain
             void CompressData();
 
         private:
-            void AddVertex(double x, double y, double z);
-            void AddUV(double x, double y);
-            void AddNormal(double x, double y, double z);
+            void AddVertex(float x, float y, float z);
+            void AddUV(float x, float y);
+            void AddNormal(float x, float y, float z);
 
             void AddTri(uint a, uint b, uint c);
 
         public:
-            std::vector<double> m_vertices;
-            std::vector<double> m_UVs;
-            std::vector<double> m_normals;
-            std::vector<double> m_data;
+            std::vector<float> m_vertices;
+            std::vector<float> m_UVs;
+            std::vector<float> m_normals;
+            std::vector<float> m_data;
 
             std::vector<uint> m_indices;
         };
@@ -42,6 +42,8 @@ namespace VTerrain
             uint m_indicesBuff;
             uint m_nIndices = 0u;
             bool used = false;
+
+            static uint m_shaderProgram;
            
             void Generate(const MeshData& meshData);
             void FreeMesh();

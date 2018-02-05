@@ -7,11 +7,12 @@
 #include "Mesh\MeshGenerator.h"
 
 #include "Utils\GenImage.h"
+#include "Utils\Shaders.h"
 
 namespace VTerrain
 {
    //Global Funcs
-
+    void Init();
 }
 
 #endif // !__VTERRAIN_INCLUDE__

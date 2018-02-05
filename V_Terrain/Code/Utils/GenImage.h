@@ -7,7 +7,7 @@ namespace VTerrain
     class GenImage
     {
     public:
-        static uint FromRGB(std::vector<float> color, unsigned int w, unsigned int h, bool normalize = false);
-        static bool FreeImage(uint buffer);
+        static uint FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h);
+        static void FreeImage(uint& buffer);
     };
 }

@@ -29,7 +29,7 @@ public:
     //NoiseGeneration
     uint32_t seed;
 
-    int m_heightmapBuffer = 0;
+    uint m_heightmapBuffer = 0;
 
     float m_frequency;
     int m_octaves;
@@ -41,6 +41,8 @@ public:
 
     bool m_simplifyRender;
     float m_simplifyRenderStep;
+
+    uint m_shaderProgram;
 };
 
 #endif

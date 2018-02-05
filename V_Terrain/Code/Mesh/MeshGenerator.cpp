@@ -19,20 +19,20 @@ namespace VTerrain
         m_indices.push_back(c);
     }
 
-    void MeshGenerator::MeshData::AddVertex(double x, double y, double z)
+    void MeshGenerator::MeshData::AddVertex(float x, float y, float z)
     {
         m_vertices.push_back(x);
         m_vertices.push_back(y);
         m_vertices.push_back(z);
     }
 
-    void MeshGenerator::MeshData::AddUV(double x, double y)
+    void MeshGenerator::MeshData::AddUV(float x, float y)
     {
         m_UVs.push_back(x);
         m_UVs.push_back(y);
     }
 
-    void MeshGenerator::MeshData::AddNormal(double x, double y, double z)
+    void MeshGenerator::MeshData::AddNormal(float x, float y, float z)
     {
         m_normals.push_back(x);
         m_normals.push_back(y);
@@ -46,8 +46,9 @@ namespace VTerrain
         m_normals.reserve(map.Width()*map.Height() * 3);
         m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6);
 
-        float topLeftX = (map.Width() - 1) / 2.f;
-        float topLeftY = (map.Height() - 1) / 2.f;
+        //Subtracting 1 if Width is odd
+        float topLeftX = (map.Width() - (map.Width() % 2 != 0) ) / -2.f;
+        float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
 
         for (uint y = 0; y < map.Height(); y++)
         {
@@ -58,7 +59,7 @@ namespace VTerrain
 
                 if (x < map.Width() - 1 && y < map.Height() - 1)
                 {
-                    uint index = m_indices.size() - 1;
+                    uint index = m_vertices.size() - 3;
                     AddTri(index, index + map.Width() + 1, index + map.Width());
                     AddTri(index + map.Width() + 1, index, index + 1);
                 }
@@ -69,6 +70,7 @@ namespace VTerrain
     }
     void MeshGenerator::MeshData::CompressData()
     {
+
         m_data.reserve(m_vertices.size() * (3 + 3 + 2));
 
         for (uint n = 0; n < m_vertices.size() / 3; n++)
@@ -103,6 +105,8 @@ namespace VTerrain
         }
     }
 
+    uint MeshGenerator::Mesh::m_shaderProgram = 0;
+
     void MeshGenerator::Mesh::Generate(const MeshData & meshData)
     {
         if (used)
@@ -115,7 +119,7 @@ namespace VTerrain
         //Generating data buffer
         glGenBuffers(1, (GLuint*) &(m_dataBuff));
         glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(double) * meshData.m_data.size(), meshData.m_data.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshData.m_data.size(), meshData.m_data.data(), GL_STATIC_DRAW);
 
         glGenBuffers(1, (GLuint*) &(m_indicesBuff));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
@@ -137,6 +141,8 @@ namespace VTerrain
     {
         if (used)
         {
+            glUseProgram(m_shaderProgram);
+
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glEnableClientState(GL_NORMAL_ARRAY);
@@ -146,12 +152,19 @@ namespace VTerrain
             glLoadIdentity();
 
             glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
-            glVertexPointer(3, GL_DOUBLE, 5 * sizeof(double), (GLvoid*)0);
-            glNormalPointer(GL_DOUBLE, 5 * sizeof(double), (GLvoid*)(3 * sizeof(double)));
-            glTexCoordPointer(2, GL_DOUBLE, 6 * sizeof(double), (GLvoid*)(6 * sizeof(double)));
-
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
-            //glDrawElements(GL_TRIANGLES, m_nIndices, GL_UNSIGNED_INT, NULL);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)0);
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
+
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(6 * sizeof(float)));
+            glEnableVertexAttribArray(2);
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glDrawElements(GL_TRIANGLES, m_nIndices, GL_UNSIGNED_INT, (void*)0);
 
             GLenum error = glGetError();
             if (error != GL_NO_ERROR)
@@ -168,6 +181,8 @@ namespace VTerrain
             glDisableClientState(GL_VERTEX_ARRAY);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisableClientState(GL_NORMAL_ARRAY);
+
+            glUseProgram(0);
         }
     }
 }

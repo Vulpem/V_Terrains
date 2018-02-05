@@ -34,9 +34,13 @@ bool ModuleTerrain::Init()
 bool ModuleTerrain::Start()
 {
 	bool ret = true;
+    VTerrain::Init();
+
     std::vector<float> tmp = { 0.f,0.f,0.f };
     m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, 1, 1);
     GenMap();
+
+    VTerrain::Shaders::CompileShader(nullptr, nullptr, m_shaderProgram);
 
 	return ret;
 }

@@ -48,6 +48,9 @@
     <ClInclude Include="Code\Mesh\MeshGenerator.h">
       <Filter>Source Files\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Utils\Shaders.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="Code\Mesh\MeshGenerator.cpp">
       <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Utils\Shaders.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
