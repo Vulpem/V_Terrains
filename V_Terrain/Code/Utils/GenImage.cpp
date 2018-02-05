@@ -25,7 +25,7 @@ namespace VTerrain
 
     void GenImage::FreeImage(uint& buffer)
     {
-        glDeleteBuffers(1, &buffer);
+        glDeleteTextures(1, &buffer);
         buffer = 0;
     }
 }
