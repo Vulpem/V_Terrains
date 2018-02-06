@@ -5,6 +5,7 @@ typedef unsigned int uint;
 
 #include "IncludeSTD.h"
 #include "../TerrainConfig.h"
+#include "Vec3.h"
 
 namespace VTerrain
 {

@@ -20,16 +20,16 @@ namespace VTerrain
             void CompressData();
 
         private:
-            void AddVertex(float x, float y, float z);
-            void AddUV(float x, float y);
-            void AddNormal(float x, float y, float z);
+            void AddVertex(const Vec3<float>& v);
+            void AddUV(const Vec2<float>& uv);
+            void AddNormal(const Vec3<float>& n);
 
             void AddTri(uint a, uint b, uint c);
 
         public:
-            std::vector<float> m_vertices;
-            std::vector<float> m_UVs;
-            std::vector<float> m_normals;
+            std::vector<Vec3<float>> m_vertices;
+            std::vector<Vec2<float>> m_UVs;
+            std::vector<Vec3<float>> m_normals;
             std::vector<float> m_data;
 
             std::vector<uint> m_indices;

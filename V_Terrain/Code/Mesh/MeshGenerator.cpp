@@ -19,24 +19,19 @@ namespace VTerrain
         m_indices.push_back(c);
     }
 
-    void MeshGenerator::MeshData::AddVertex(float x, float y, float z)
+    void MeshGenerator::MeshData::AddVertex(const Vec3<float>& v)
     {
-        m_vertices.push_back(x);
-        m_vertices.push_back(y);
-        m_vertices.push_back(z);
+        m_vertices.push_back(v);
     }
 
-    void MeshGenerator::MeshData::AddUV(float x, float y)
+    void MeshGenerator::MeshData::AddUV(const Vec2<float>& uv)
     {
-        m_UVs.push_back(x);
-        m_UVs.push_back(y);
+        m_UVs.push_back(uv);
     }
 
-    void MeshGenerator::MeshData::AddNormal(float x, float y, float z)
+    void MeshGenerator::MeshData::AddNormal(const Vec3<float>& n)
     {
-        m_normals.push_back(x);
-        m_normals.push_back(y);
-        m_normals.push_back(z);
+        m_normals.push_back(n);
     }
 
     void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
@@ -59,31 +54,23 @@ namespace VTerrain
         {
             for (uint x = 0; x < map.Width(); x++)
             {
-                AddVertex(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y);
-                AddUV(x / static_cast<float>(map.Width()-1), y / static_cast<float>(map.Height()-1));
+                AddVertex(Vec3<float>(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
+                AddUV(Vec2<float>(x / static_cast<float>(map.Width()-1), y / static_cast<float>(map.Height()-1)));
 
                 if (x < map.Width() - 1 && y < map.Height() - 1)
                 {
-                    uint index = (m_vertices.size()/3)-1;
+                    uint index = (m_vertices.size())-1;
                     AddTri(index, index + map.Width() + 1, index + map.Width());
                     AddTri(index + map.Width() + 1, index, index + 1);
 
 					if (x > 2 && y > 2)
 					{
-						index = index - map.Width();
-						float central[3] = { m_vertices[index*3],m_vertices[index * 3 + 1],m_vertices[index * 3 + 2] };
-						uint i = index - map.Width();
-						float top[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
-						i = index + map.Width();
-						float bottom[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
-						i = index - 1;
-						float right[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
-						i = index + 1;
-						float left[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
-
-						//float normal[3];
-						utils::Swap(top[1], top[2]);
-						utils::Swap(bottom[1], bottom[2]);
+						index = m_vertices.size()- 1 - map.Width();
+						Vec3<float> central = m_vertices[index];
+						Vec3<float> top = m_vertices[index - map.Width()];
+						Vec3<float> bottom = m_vertices[index + map.Width()];
+						Vec3<float> right = m_vertices[index + 1];
+						Vec3<float> left = m_vertices[index - 1];
 					}
                 }
             }
@@ -96,17 +83,17 @@ namespace VTerrain
         m_data.clear();
         m_data.reserve(m_vertices.size() * (3 + 3 + 2) + 1);
 
-        for (uint n = 0; n < m_vertices.size() / 3; n++)
+        for (uint n = 0; n < m_vertices.size(); n++)
         {
-            m_data.push_back(m_vertices[n * 3 + 0]);
-            m_data.push_back(m_vertices[n * 3 + 1]);
-            m_data.push_back(m_vertices[n * 3 + 2]);
+            m_data.push_back(m_vertices[n].x);
+			m_data.push_back(m_vertices[n].y);
+			m_data.push_back(m_vertices[n].z);
 
             if (n < m_normals.size())
             {
-                m_data.push_back(m_normals[n * 3 + 0]);
-                m_data.push_back(m_normals[n * 3 + 1]);
-                m_data.push_back(m_normals[n * 3 + 2]);
+                m_data.push_back(m_normals[n].x);
+				m_data.push_back(m_normals[n].y);
+				m_data.push_back(m_normals[n].z);
             }
             else
             {
@@ -117,8 +104,8 @@ namespace VTerrain
 
             if (n < m_UVs.size())
             {
-                m_data.push_back(m_UVs[n * 2 + 0]);
-                m_data.push_back(m_UVs[n * 2 + 1]);
+                m_data.push_back(m_UVs[n].x);
+				m_data.push_back(m_UVs[n].y);
             }
             else
             {
