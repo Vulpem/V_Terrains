@@ -34,50 +34,69 @@ namespace VTerrain
         m_normals.push_back(n);
     }
 
-    void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
-    {
-        m_vertices.clear();
-        m_UVs.clear();
-        m_normals.clear();
-        m_indices.clear();
+	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
+	{
+		m_vertices.clear();
+		m_UVs.clear();
+		m_normals.clear();
+		m_indices.clear();
 
-        m_vertices.reserve(map.Width()*map.Height() * 3 + 1);
-        m_UVs.reserve(map.Width()*map.Height() * 2 + 1);
-        m_normals.reserve(map.Width()*map.Height() * 3 + 1);
-        m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
+		m_vertices.reserve(map.Width()*map.Height() * 3 + 1);
+		m_UVs.reserve(map.Width()*map.Height() * 2 + 1);
+		m_normals.reserve(map.Width()*map.Height() * 3 + 1);
+		m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
 
-        //Subtracting 1 if Width is odd
-        float topLeftX = (map.Width() - (map.Width() % 2 != 0) ) / -2.f;
-        float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
+		//Subtracting 1 if Width is odd
+		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / -2.f;
+		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
+		
+		for (uint y = 0; y < map.Height(); y++)
+		{
+			for (uint x = 0; x < map.Width(); x++)
+			{
+				bool addedNorm = false;
+				AddVertex(Vec3<float>(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
+				AddUV(Vec2<float>((float)x / (float)(map.Width() - 1), (float)y / (float)(map.Height() - 1)));
 
-        for (uint y = 0; y < map.Height(); y++)
-        {
-            for (uint x = 0; x < map.Width(); x++)
-            {
-                AddVertex(Vec3<float>(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
-                AddUV(Vec2<float>(x / static_cast<float>(map.Width()-1), y / static_cast<float>(map.Height()-1)));
-
-                if (x < map.Width() - 1 && y < map.Height() - 1)
-                {
-                    uint index = (m_vertices.size())-1;
-                    AddTri(index, index + map.Width() + 1, index + map.Width());
-                    AddTri(index + map.Width() + 1, index, index + 1);
+				if (x < map.Width() - 1 && y < map.Height() - 1)
+				{
+					uint index = (m_vertices.size()) - 1;
+					AddTri(index, index + map.Width() + 1, index + map.Width());
+					AddTri(index + map.Width() + 1, index, index + 1);
 
 					if (x > 2 && y > 2)
 					{
-						index = m_vertices.size()- 1 - map.Width();
+						index = m_vertices.size() - 1 - map.Width();
 						Vec3<float> central = m_vertices[index];
-						Vec3<float> top = m_vertices[index - map.Width()];
-						Vec3<float> bottom = m_vertices[index + map.Width()];
-						Vec3<float> right = m_vertices[index + 1];
-						Vec3<float> left = m_vertices[index - 1];
-					}
-                }
-            }
-        }
+						Vec3<float> top = central - m_vertices[index - map.Width()];
+						top.Normalize();
+						Vec3<float> bottom = central - m_vertices[index + map.Width()];
+						bottom.Normalize();
+						Vec3<float> right = central - m_vertices[index + 1];
+						right.Normalize();
+						Vec3<float> left = central - m_vertices[index - 1];
+						left.Normalize();
 
-        CompressData();
-    }
+						Vec3<float> a = (top + bottom);
+						Vec3<float> b = (right + left);
+
+						Vec3<float> norm(a + b);
+						norm.Normalize();
+						AddNormal(norm);
+						addedNorm = true;
+					}
+				}
+				if (addedNorm == false)
+				{
+					Vec3<float> n(x, 50, y);
+					n.Normalize();
+					AddNormal(n);
+				}
+			}
+		}
+
+		CompressData();
+	}
     void MeshGenerator::MeshData::CompressData()
     {
         m_data.clear();
@@ -85,15 +104,15 @@ namespace VTerrain
 
         for (uint n = 0; n < m_vertices.size(); n++)
         {
-            m_data.push_back(m_vertices[n].x);
-			m_data.push_back(m_vertices[n].y);
-			m_data.push_back(m_vertices[n].z);
+            m_data.push_back(m_vertices[n].x());
+			m_data.push_back(m_vertices[n].y());
+			m_data.push_back(m_vertices[n].z());
 
             if (n < m_normals.size())
             {
-                m_data.push_back(m_normals[n].x);
-				m_data.push_back(m_normals[n].y);
-				m_data.push_back(m_normals[n].z);
+                m_data.push_back(m_normals[n].x());
+				m_data.push_back(m_normals[n].y());
+				m_data.push_back(m_normals[n].z());
             }
             else
             {
@@ -104,8 +123,8 @@ namespace VTerrain
 
             if (n < m_UVs.size())
             {
-                m_data.push_back(m_UVs[n].x);
-				m_data.push_back(m_UVs[n].y);
+                m_data.push_back(m_UVs[n].x());
+				m_data.push_back(m_UVs[n].y());
             }
             else
             {
@@ -195,11 +214,12 @@ namespace VTerrain
             }
             
 
-            float dir[] = { 0.2f,0.2f,0.2f };
+            Vec3<float> dir( 0.2f,0.2f,0.2f );
+			dir.Normalize();
             //Global light direction
             GLint globalLightDirLoc = glGetUniformLocation(m_shaderProgram, "global_light_direction");
             if (globalLightDirLoc != -1)
-            { glUniform3fv(globalLightDirLoc, 1, dir); }
+            { glUniform3fv(globalLightDirLoc, 1, dir.Data()); }
 
 
             glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
