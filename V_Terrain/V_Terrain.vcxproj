@@ -131,12 +131,14 @@
     <ClInclude Include="Code\Utils\Globals.h" />
     <ClInclude Include="Code\Utils\IncludeSTD.h" />
     <ClInclude Include="Code\Utils\Shaders.h" />
+    <ClInclude Include="Code\Utils\Vec3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Include.cpp" />
     <ClCompile Include="Code\Mesh\MeshGenerator.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />
     <ClCompile Include="Code\Noise\PerlinNoise.cpp" />
+    <ClCompile Include="Code\TerrainConfig.cpp" />
     <ClCompile Include="Code\Utils\GenImage.cpp" />
     <ClCompile Include="Code\Utils\Shaders.cpp" />
   </ItemGroup>
