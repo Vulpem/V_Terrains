@@ -47,6 +47,48 @@ bool ModuleTerrain::Start()
 
     VTerrain::Shaders::CompileShader(nullptr, nullptr, m_shaderProgram);
 
+    std::vector<float> img;
+    for (uint y = 0; y < m_size.y; y++)
+    {
+        for (uint x = 0; x < m_size.x; x++)
+        {
+            const float val1 = 0.2f;
+            const float val2 = 0.9f;
+            const uint squareSize = 4;
+            if (x % squareSize > squareSize/2-1)
+            {
+                if (y % squareSize > squareSize/2-1)
+                {
+                    img.push_back(val1);
+                    img.push_back(val1);
+                    img.push_back(val1);
+                }
+                else
+                {
+                    img.push_back(val2);
+                    img.push_back(val2);
+                    img.push_back(val2);
+                }
+            }
+            else
+            {
+                if (y % squareSize > squareSize/2-1)
+                {
+                    img.push_back(val2);
+                    img.push_back(val2);
+                    img.push_back(val2);
+                }
+                else
+                {
+                    img.push_back(val1);
+                    img.push_back(val1);
+                    img.push_back(val1);
+                }
+            }
+        }
+    }
+    VTerrain::Config::TMP::debugTexBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
+
 	return ret;
 }
 

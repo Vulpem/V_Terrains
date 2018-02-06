@@ -182,6 +182,10 @@ namespace VTerrain
             glPushMatrix();
             glLoadIdentity();
 
+            glEnable(GL_TEXTURE_2D);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, Config::TMP::debugTexBuf);
+
             // ------ Setting uniforms -------------------------
             //Model Matrix
             float identity[] = { 1,0,0,0,

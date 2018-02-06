@@ -11,4 +11,6 @@ namespace VTerrain
 	unsigned int Config::Noise::octaves = 5u;
 	float Config::Noise::lacunarity = 3.f;
 	float Config::Noise::persistency = 0.4f;
+
+    unsigned int Config::TMP::debugTexBuf = 0;
 }

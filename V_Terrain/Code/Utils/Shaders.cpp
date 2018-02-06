@@ -47,7 +47,7 @@ namespace VTerrain
         "void main()\n"
         "{\n"
 		//TMP
-        "color = ourColor;// * texture(ourTexture, TexCoord);\n"
+        "color = ourColor * texture(ourTexture, TexCoord);\n"
         "}\n"
     );
 

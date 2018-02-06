@@ -18,6 +18,12 @@ namespace VTerrain
 			static float lacunarity;
 			static float persistency;
         };
+
+        class TMP
+        {
+        public:
+            static unsigned int debugTexBuf;
+        };
    };
 }
 #endif
