@@ -44,6 +44,9 @@ public:
     float m_simplifyRenderStep;
 
     uint m_shaderProgram;
+
+    float m_globalLightDir = 0.f;
+    float m_globalLightHeight = 0.f;
 };
 
 #endif

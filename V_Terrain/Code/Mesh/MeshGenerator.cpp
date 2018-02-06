@@ -216,7 +216,7 @@ namespace VTerrain
             }
             
 
-            Vec3<float> dir( 0.2f,0.2f,0.2f );
+            Vec3<float> dir( Config::globalLight[0], Config::globalLight[1], Config::globalLight[2]);
 			dir.Normalize();
             //Global light direction
             GLint globalLightDirLoc = glGetUniformLocation(m_shaderProgram, "global_light_direction");

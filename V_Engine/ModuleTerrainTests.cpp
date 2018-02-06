@@ -62,6 +62,19 @@ update_status ModuleTerrain::Update()
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
     {
+        if (ImGui::SliderFloat("LightDir", &m_globalLightDir, -360, 360)
+            || ImGui::SliderFloat("LightHeight", &m_globalLightHeight, -90, 90))
+        {
+            float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
+            Quat rot = Quat::FromEulerYZX(m_globalLightHeight* DEGTORAD, m_globalLightDir*DEGTORAD, 0.f);
+            tmp = rot * tmp;
+            VTerrain::Config::globalLight[0] = tmp.x;
+            VTerrain::Config::globalLight[1] = tmp.y;
+            VTerrain::Config::globalLight[2] = tmp.z;
+        }
+
+        ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
+
         if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { regen = true; }
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { regen = true; }
