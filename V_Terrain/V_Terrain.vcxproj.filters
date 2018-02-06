@@ -54,6 +54,9 @@
     <ClInclude Include="Code\TerrainConfig.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Utils\Vec3.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="Code\Utils\Shaders.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\TerrainConfig.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

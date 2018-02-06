@@ -67,6 +67,24 @@ namespace VTerrain
                     uint index = (m_vertices.size()/3)-1;
                     AddTri(index, index + map.Width() + 1, index + map.Width());
                     AddTri(index + map.Width() + 1, index, index + 1);
+
+					if (x > 2 && y > 2)
+					{
+						index = index - map.Width();
+						float central[3] = { m_vertices[index*3],m_vertices[index * 3 + 1],m_vertices[index * 3 + 2] };
+						uint i = index - map.Width();
+						float top[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
+						i = index + map.Width();
+						float bottom[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
+						i = index - 1;
+						float right[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
+						i = index + 1;
+						float left[3] = { m_vertices[i * 3],m_vertices[i * 3 + 1],m_vertices[i * 3 + 2] };
+
+						//float normal[3];
+						utils::Swap(top[1], top[2]);
+						utils::Swap(bottom[1], bottom[2]);
+					}
                 }
             }
         }

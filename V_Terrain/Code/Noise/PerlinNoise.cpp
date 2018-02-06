@@ -36,10 +36,10 @@ namespace VTerrain
         return ret;
     }
 
-    double PerlinNoise::GetValue(int x, int y)
+    float PerlinNoise::GetValue(int x, int y)
     {
         float dx = static_cast<float>(Config::chunkWidth) / Config::Noise::frequency;
         float dy = static_cast<float>(Config::chunkHeight) / Config::Noise::frequency;
-        return m_instance.m_perlin.octaveNoise0_1(x / dx, y / dy, Config::Noise::octaves, Config::Noise::lacunarity, Config::Noise::persistency);
+        return (float)m_instance.m_perlin.octaveNoise0_1(x / dx, y / dy, Config::Noise::octaves, Config::Noise::lacunarity, Config::Noise::persistency);
     }
 }

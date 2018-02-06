@@ -19,21 +19,21 @@ namespace VTerrain
         private:
             uint m_height;
             uint m_width;
-            std::vector<double> m_data;
+            std::vector<float> m_data;
 
         public:
             NoiseMap();
             NoiseMap(const uint w, const uint h);
             ~NoiseMap();
 
-            void Set(std::vector<double> data, uint width, uint heigth);
+            void Set(std::vector<float> data, uint width, uint heigth);
             uint Width() const;
             uint Height() const;
-            const std::vector<double>& Data() const { return m_data; }
-            std::vector<double>& Data() { return m_data; }
+            const std::vector<float>& Data() const { return m_data; }
+            std::vector<float>& Data() { return m_data; }
 
-            double& operator[] (uint x) { return m_data[x]; }
-            double operator[] (uint x) const { return m_data[x]; }
+			float& operator[] (uint x) { return m_data[x]; }
+			float operator[] (uint x) const { return m_data[x]; }
         };
 #pragma endregion
 
@@ -43,7 +43,7 @@ namespace VTerrain
         static void SetSeed(uint seed);
         static PerlinNoise::NoiseMap GenNoiseMap(int offsetX, int offsetY);
     private:
-        static double GetValue(int x, int y);
+        static float GetValue(int x, int y);
 
         static PerlinNoise m_instance;
         siv::SivPerlinNoise m_perlin;

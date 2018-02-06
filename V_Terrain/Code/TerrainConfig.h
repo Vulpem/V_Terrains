@@ -3,18 +3,20 @@
 
 namespace VTerrain
 {
-    namespace Config
+    class Config
     {
-        static float maxHeight = 15.f;
-        static unsigned int chunkWidth = 50u;
-        static unsigned int chunkHeight = 50u;
+	public:
+        static float maxHeight;
+        static unsigned int chunkWidth ;
+        static unsigned int chunkHeight;
 
-        namespace Noise
+        class Noise
         {
-            static float frequency = 10.f;
-            static unsigned int octaves = 5u;
-            static float lacunarity = 3.f;
-            static float persistency = 0.4f;
+		public:
+			static float frequency;
+			static unsigned int octaves;
+			static float lacunarity;
+			static float persistency;
         };
    };
 }
