@@ -5,6 +5,7 @@ namespace VTerrain
 	float Config::maxHeight = 15.f;
 	unsigned int Config::chunkWidth = 50u;
 	unsigned int Config::chunkHeight = 50u;
+	float Config::globalLight[3] = { 0.2f, 0.2f, 0.2f };
 
 	float Config::Noise::frequency = 10.f;
 	unsigned int Config::Noise::octaves = 5u;

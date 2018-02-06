@@ -77,10 +77,12 @@ namespace VTerrain
 						Vec3<float> left = central - m_vertices[index - 1];
 						left.Normalize();
 
-						Vec3<float> a = (top + bottom);
-						Vec3<float> b = (right + left);
+						Vec3<float> y = (top - bottom);
+						y.Normalize();
+						Vec3<float> x = (right - left);
+						x.Normalize();
 
-						Vec3<float> norm(a + b);
+						Vec3<float> norm(y.y(), y.x() + x.y(), x.z());
 						norm.Normalize();
 						AddNormal(norm);
 						addedNorm = true;
