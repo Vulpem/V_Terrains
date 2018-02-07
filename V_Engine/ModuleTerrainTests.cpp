@@ -209,34 +209,4 @@ void ModuleTerrain::GenMap()
     VTerrain::Config::Noise::octaves = m_octaves;
     VTerrain::Config::Noise::lacunarity = m_lacunarity;
     VTerrain::Config::Noise::persistency = m_persistance;
-
-    /*m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offset.x, m_offset.y);
-
-    VTerrain::MeshGenerator::MeshData meshData;
-    meshData.Generate(m_noiseMap);
-
-    m_mesh.Generate(meshData);
-    
-    VTerrain::GenImage::FreeImage(m_heightmapBuffer);
-
-    std::vector<float> tmp;
-    tmp.resize(m_size.x * m_size.y * 3);
-    for (int n = 0; n < m_noiseMap.Data().size(); n++)
-    {
-        float val = m_noiseMap.Data()[n];
-        if (m_simplifyRender)
-        {
-            for (float d = 1 - m_simplifyRenderStep; d >= -1.f; d -= m_simplifyRenderStep)
-            {
-                if (val >= d && val < d + m_simplifyRenderStep)
-                {
-                    val = Max(d + m_simplifyRenderStep, 0.f); break;
-                }
-            }
-        }
-        tmp[n * 3 + 0] = val;
-        tmp[n * 3 + 1] = val;
-        tmp[n * 3 + 2] = val;
-    }
-    m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, m_noiseMap.Width(), m_noiseMap.Height());*/
 }

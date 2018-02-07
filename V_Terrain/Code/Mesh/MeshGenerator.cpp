@@ -67,7 +67,6 @@ namespace VTerrain
                 const Vec3<float> right =  central - Vec3<float>(topLeftX - x + 1, map[x + 1 + y * map.Width()] * Config::maxHeight,   topLeftY - y);
                 const Vec3<float> left =   central - Vec3<float>(topLeftX - x - 1, map[x - 1 + y * map.Width()] * Config::maxHeight,   topLeftY - y);
 
-
                 Vec3<float> norm =
                     top.Cross(left)
                     + left.Cross(bottom)
