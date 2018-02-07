@@ -21,8 +21,7 @@ namespace VTerrain
             class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
         T Clamp(T a, T min, T max) { return (a > max ? max : (a < min ? min : a)); }
 
-		template <typename T,
-			class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+		template <typename T>
 			void Swap(T& a, T& b) { T c = a; a = b; b = c; }
 
         template <typename T,

@@ -18,14 +18,17 @@ namespace VTerrain
 
     void ChunkManager::Chunk::Regenerate(uint LOD, int offsetX, int offsetY)
     {
-        m_offsetX = offsetX;
-        m_offsetY = offsetY;
-        m_LOD = LOD;
+		if (LOD != m_LOD)
+		{
+			m_offsetX = offsetX;
+			m_offsetY = offsetY;
+			m_LOD = LOD;
 
-        VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offsetX, m_offsetY);
-        VTerrain::MeshGenerator::MeshData meshData;
-        meshData.Generate(m_noiseMap);
-        m_mesh.Generate(meshData);
+			VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offsetX, m_offsetY);
+			VTerrain::MeshGenerator::MeshData meshData;
+			meshData.Generate(m_noiseMap);
+			m_mesh.Generate(meshData);
+		}
     }
 
     void ChunkManager::Chunk::Free()
@@ -100,6 +103,12 @@ namespace VTerrain
                 it->second.pop_front();
 
                 if (m_instance.m_lastChunkChecked >= Config::GetMaxChunks()) { m_instance.m_lastChunkChecked = 0; }
+
+				int n = FindChunk(offset);
+				if (n >= 0)
+				{
+					utils::Swap<Chunk>(m_instance.m_instance.m_chunks[n], m_instance.m_chunks[m_instance.m_lastChunkChecked]);
+				}
                 m_instance.m_chunks[m_instance.m_lastChunkChecked++].Regenerate(LOD, offset.x(), offset.y());                
                 return;
             }

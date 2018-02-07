@@ -55,13 +55,12 @@ bool ModuleTerrain::Start()
         {
             const float val1 = 0.1f;
             const float val2 = 0.9f;
-			const float val3 = 0.5f;
             const uint squareSize = 2;
 			if (x < 1 || y < 1 || x >= m_size.x - 1 || y >= m_size.y - 1)
 			{
-				img.push_back(val3);
-				img.push_back(val3);
-				img.push_back(val3);
+				img.push_back(val1);
+				img.push_back(val1);
+				img.push_back(val2);
 			}
 			else
 			{
