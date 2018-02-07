@@ -45,44 +45,38 @@ namespace VTerrain
 		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
 		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
 		
-		for (uint y = 0; y < map.Height(); y++)
+		for (uint y = 1; y < map.Height() - 1; y++)
 		{
-			for (uint x = 0; x < map.Width(); x++)
-			{
-				bool addedNorm = false;
-				AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
-				AddUV(Vec2<float>((float)x / (float)(map.Width() - 1), (float)y / (float)(map.Height() - 1)));
+            for (uint x = 1; x < map.Width() - 1; x++)
+            {
+                bool addedNorm = false;
+                AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
+                Vec2<float> a((float)(x - 1) / (float)(map.Width() - 1), (float)(y - 1) / (float)(map.Height() - 2));
+                AddUV(Vec2<float>((float)(x - 1) / (float)(map.Width() - 3), (float)(y - 1) / (float)(map.Height() - 3)));
 
-				if (x < map.Width() - 1 && y < map.Height() - 1)
-				{
-					const uint index = (m_vertices.size()) - 1;
-					AddTri(index, index + map.Width(), index + map.Width() + 1);
-					AddTri(index + map.Width() + 1, index + 1, index);
-				}
-                if (x > 1 && y > 1)
+                if (x < map.Width() - 2 && y < map.Height() - 2)
                 {
-                    const uint index = m_vertices.size() - 1 - map.Width();
-                    const Vec3<float> central = m_vertices[index];
-                    const Vec3<float> top = central - m_vertices[index - map.Width()];
-                    const Vec3<float> bottom = central - m_vertices[index + map.Width()];
-                    const Vec3<float> right = central - m_vertices[index + 1];
-                    const Vec3<float> left = central - m_vertices[index - 1];
-
-
-                    Vec3<float> norm =
-                        top.Cross(left)
-                        + left.Cross(bottom)
-                        + bottom.Cross(right)
-                        + right.Cross(top);
-                    norm.Normalize();
-
-                    AddNormal(norm);
+                    const uint index = (m_vertices.size()) - 1;
+                    AddTri(index, index + map.Width() - 2, index + map.Width() + 1 - 2);
+                    AddTri(index + map.Width() + 1 - 2, index + 1, index);
                 }
-                else
-                {
-                    AddNormal(Vec3<float>(0.f, 1.f, 0.f));
-                }
-			}
+
+                const Vec3<float> central(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y);
+                const Vec3<float> top =    central - Vec3<float>(topLeftX - x,     map[x + (y + 1) * map.Width()] * Config::maxHeight, topLeftY - (y + 1));
+                const Vec3<float> bottom = central - Vec3<float>(topLeftX - x,     map[x + (y - 1) * map.Width()] * Config::maxHeight, topLeftY - (y - 1));
+                const Vec3<float> right =  central - Vec3<float>(topLeftX - x + 1, map[x + 1 + y * map.Width()] * Config::maxHeight,   topLeftY - y);
+                const Vec3<float> left =   central - Vec3<float>(topLeftX - x - 1, map[x - 1 + y * map.Width()] * Config::maxHeight,   topLeftY - y);
+
+
+                Vec3<float> norm =
+                    top.Cross(left)
+                    + left.Cross(bottom)
+                    + bottom.Cross(right)
+                    + right.Cross(top);
+                norm.Normalize();
+
+                AddNormal(norm);
+            }
 		}
 
 		CompressData();

@@ -12,46 +12,33 @@ namespace VTerrain
               m_width(w + 2)
             , m_height(h + 2)
         {
-            m_data.resize(w*h);
+            m_data.resize(m_width*m_height);
         }
 
         PerlinNoise::NoiseMap::~NoiseMap()
         {
         }
 
-        void PerlinNoise::NoiseMap::Set(std::vector<float> data, uint width, uint heigth)
+        void PerlinNoise::NoiseMap::Set(std::vector<float> data, uint width, uint height)
         {
             m_width = width + 2;
-            m_height = heigth + 2;
+            m_height = height + 2;
             m_data = data;
         }
 
-        uint PerlinNoise::NoiseMap::RealWidth() const
+        void PerlinNoise::NoiseMap::Init(uint width, uint height)
         {
-            return m_width;
-        }
-
-        uint PerlinNoise::NoiseMap::RealHeight() const
-        {
-            return m_height;
+            m_width = width + 2;
+            m_height = height + 2;
         }
 
         uint PerlinNoise::NoiseMap::Width() const
         {
-            return m_width - 2;
+            return m_width;
         }
 
         uint PerlinNoise::NoiseMap::Height() const
         {
-            return m_height - 2;
-        }
-        float & PerlinNoise::NoiseMap::operator[](int index)
-        {
-            //TODONOW
-            const int W = static_cast<int>(m_width);
-            const int y = floorf((float)index / (float)W);
-            const int x = index - y * W + y * 2;
-            const int i = y*(W-2) + x;
-            return m_data[0];
+            return m_height;
         }
 }

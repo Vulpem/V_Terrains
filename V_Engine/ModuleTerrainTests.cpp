@@ -201,9 +201,8 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::GenMap()
 {
-    //TMP
-    VTerrain::Config::chunkHeight = 6;// m_size.x;
-    VTerrain::Config::chunkWidth = 6;// m_size.y;
+    VTerrain::Config::chunkHeight = m_size.x;
+    VTerrain::Config::chunkWidth = m_size.y;
     VTerrain::Config::maxHeight = m_maxHeight;
 
     VTerrain::Config::Noise::frequency = m_frequency;
