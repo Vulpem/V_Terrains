@@ -62,11 +62,11 @@ namespace VTerrain
                 {
                     if (x == 0 && y == 0)
                     {
-                        AddChunkToRegen(1, off.x() + x, off.y() + y);
+                        AddChunkToRegen(1, Vec2<int>(off.x() + x, off.y() + y));
                     }
                     else
                     {
-                        AddChunkToRegen(2, off.x() + x, off.y() + y);
+                        AddChunkToRegen(2, Vec2<int>(off.x() + x, off.y() + y));
                     }
                 }
             }
@@ -97,7 +97,8 @@ namespace VTerrain
             {
                 const Vec2<int> offset = it->second.front();
                 const uint LOD = it->first;
-                it->second.pop();
+                it->second.pop_front();
+
                 if (m_instance.m_lastChunkChecked >= Config::GetMaxChunks()) { m_instance.m_lastChunkChecked = 0; }
                 m_instance.m_chunks[m_instance.m_lastChunkChecked++].Regenerate(LOD, offset.x(), offset.y());                
                 return;
@@ -105,9 +106,10 @@ namespace VTerrain
         }
     }
 
-    void ChunkManager::AddChunkToRegen(uint LOD, int offX, int offY)
+    void ChunkManager::AddChunkToRegen(uint LOD, Vec2<int> pos)
     {
-        m_instance.m_chunkstoRegen[LOD].push(Vec2<int>(offX, offY));
+		RemoveRegenDuplicates(pos);
+        m_instance.m_chunkstoRegen[LOD].push_back(pos);
     }
 
     bool ChunkManager::ChunksToRegen()
@@ -121,4 +123,29 @@ namespace VTerrain
         }
         return false;
     }
+
+	int ChunkManager::FindChunk(Vec2<int> pos)
+	{
+		int n = 0;
+		for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+		{
+			if (it->GetPos() == pos) { return n; }
+			n++;
+		}
+		return -1;
+	}
+	void ChunkManager::RemoveRegenDuplicates(Vec2<int> pos)
+	{
+		for (auto list : m_instance.m_chunkstoRegen)
+		{
+			for(auto chunkIt = list.second.begin(); chunkIt != list.second.end(); chunkIt++)
+			{
+				if (*chunkIt == pos)
+				{
+					list.second.erase(chunkIt);
+					return;
+				}
+			}
+		}
+	}
 }
