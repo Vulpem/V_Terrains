@@ -38,7 +38,7 @@ namespace VTerrain
 
     void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix)
     {
-        if (m_mesh.used)
+        if (IsUsed())
         {
             m_mesh.Render(viewMatrix, projectionMatrix, Vec3<int>(m_offsetX * Config::chunkWidth,0u,m_offsetY * Config::chunkHeight));
         }
@@ -53,9 +53,11 @@ namespace VTerrain
 
     void ChunkManager::Update(int posX, int posY)
     {
+        const int W = static_cast<int>(Config::chunkWidth);
+        const int H = static_cast<int>(Config::chunkHeight);
         Vec2<int> off(
-            floor((posX - (Config::chunkWidth / 2) + (Config::chunkWidth % 2 != 0)) / Config::chunkWidth + 1),
-            floor((posY - (Config::chunkHeight / 2) + (Config::chunkWidth % 2 != 0)) / Config::chunkHeight) + 1);
+            floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W + 1),
+            floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1);
         if (off != m_instance.m_lastOffPos)
         {
             m_instance.m_lastOffPos = off;
@@ -138,7 +140,7 @@ namespace VTerrain
 		int n = 0;
 		for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
 		{
-			if (it->GetPos() == pos) { return n; }
+			if (it->GetPos() == pos && it->IsUsed()) { return n; }
 			n++;
 		}
 		return -1;

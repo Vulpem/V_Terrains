@@ -36,9 +36,9 @@ namespace VTerrain
 
 	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
 	{
-		m_vertices.reserve(map.Width()*map.Height() * 3 + 1);
-		m_UVs.reserve(map.Width()*map.Height() * 2 + 1);
-		m_normals.reserve(map.Width()*map.Height() * 3 + 1);
+		m_vertices.reserve(map.Width()*map.Height() + 1);
+		m_UVs.reserve(map.Width()*map.Height() + 1);
+		m_normals.reserve(map.Width()*map.Height() + 1);
 		m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
 
 		//Subtracting 1 if Width is odd
@@ -55,41 +55,33 @@ namespace VTerrain
 
 				if (x < map.Width() - 1 && y < map.Height() - 1)
 				{
-					uint index = (m_vertices.size()) - 1;
+					const uint index = (m_vertices.size()) - 1;
 					AddTri(index, index + map.Width(), index + map.Width() + 1);
 					AddTri(index + map.Width() + 1, index + 1, index);
-
-					if (x > 2 && y > 2)
-					{
-						index = m_vertices.size() - 1 - map.Width();
-						Vec3<float> central = m_vertices[index];
-
-						Vec3<float> top = central - m_vertices[index - map.Width()];
-
-						Vec3<float> bottom = central - m_vertices[index + map.Width()];
-
-						Vec3<float> right = central - m_vertices[index + 1];
-
-						Vec3<float> left = central - m_vertices[index - 1];
-
-
-						Vec3<float> norm =
-							top.Cross(left)
-							+ left.Cross(bottom)
-							+ bottom.Cross(right)
-							+ right.Cross(top);
-						norm.Normalize();
-
-						AddNormal(norm);
-						addedNorm = true;
-					}
 				}
-				if (addedNorm == false)
-				{
-					Vec3<float> n(x, 50, y);
-					n.Normalize();
-					AddNormal(n);
-				}
+                if (x > 1 && y > 1)
+                {
+                    const uint index = m_vertices.size() - 1 - map.Width();
+                    const Vec3<float> central = m_vertices[index];
+                    const Vec3<float> top = central - m_vertices[index - map.Width()];
+                    const Vec3<float> bottom = central - m_vertices[index + map.Width()];
+                    const Vec3<float> right = central - m_vertices[index + 1];
+                    const Vec3<float> left = central - m_vertices[index - 1];
+
+
+                    Vec3<float> norm =
+                        top.Cross(left)
+                        + left.Cross(bottom)
+                        + bottom.Cross(right)
+                        + right.Cross(top);
+                    norm.Normalize();
+
+                    AddNormal(norm);
+                }
+                else
+                {
+                    AddNormal(Vec3<float>(0.f, 1.f, 0.f));
+                }
 			}
 		}
 

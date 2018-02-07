@@ -27,13 +27,15 @@ namespace VTerrain
             ~NoiseMap();
 
             void Set(std::vector<float> data, uint width, uint heigth);
+            uint RealWidth() const;
+            uint RealHeight() const;
             uint Width() const;
             uint Height() const;
             const std::vector<float>& Data() const { return m_data; }
             std::vector<float>& Data() { return m_data; }
 
-			float& operator[] (uint x) { return m_data[x]; }
-			float operator[] (uint x) const { return m_data[x]; }
+            float& operator[] (int x);
+			float operator[] (int x) const { return m_data[x]; }
         };
 #pragma endregion
 

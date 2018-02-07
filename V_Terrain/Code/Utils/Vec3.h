@@ -36,7 +36,7 @@ namespace VTerrain
 			d[1] = d[1] / len;
 			d[2] = d[2] / len;
 		}
-		Vec3 Cross(Vec3 a)
+		Vec3 Cross(Vec3 a) const
 		{
 			return Vec3(
 				d[1] * a.d[2] - d[2] * a.d[1],

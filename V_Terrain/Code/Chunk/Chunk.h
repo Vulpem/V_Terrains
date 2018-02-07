@@ -20,6 +20,7 @@ namespace VTerrain
             void Draw(const float* viewMatrix, const float* projectionMatrix);
 			Vec2<int> GetPos() { return Vec2<int>(m_offsetX, m_offsetY); }
 			uint GetLOD() { return m_LOD; }
+            bool IsUsed() { return m_mesh.used; }
 
         private:
             MeshGenerator::Mesh m_mesh;
