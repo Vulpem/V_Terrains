@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Mesh">
       <UniqueIdentifier>{cfa59f21-af19-4cb2-bd55-df43306fef47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Chunk">
+      <UniqueIdentifier>{7b59f095-b33d-499b-a29e-ba5b62857831}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Utils\Globals.h">
@@ -57,6 +60,9 @@
     <ClInclude Include="Code\Utils\Vec3.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Chunk\Chunk.h">
+      <Filter>Source Files\Chunk</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -79,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="Code\TerrainConfig.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Chunk\Chunk.cpp">
+      <Filter>Source Files\Chunk</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

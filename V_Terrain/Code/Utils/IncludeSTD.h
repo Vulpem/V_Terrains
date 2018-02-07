@@ -7,5 +7,7 @@
 #include <list>
 #include <map>
 #include <unordered_map>
+#include <queue>
+#include <stack>
 #include <memory>
 #include <functional>

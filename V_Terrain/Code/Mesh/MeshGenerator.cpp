@@ -36,18 +36,13 @@ namespace VTerrain
 
 	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
 	{
-		m_vertices.clear();
-		m_UVs.clear();
-		m_normals.clear();
-		m_indices.clear();
-
 		m_vertices.reserve(map.Width()*map.Height() * 3 + 1);
 		m_UVs.reserve(map.Width()*map.Height() * 2 + 1);
 		m_normals.reserve(map.Width()*map.Height() * 3 + 1);
 		m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
 
 		//Subtracting 1 if Width is odd
-		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / -2.f;
+		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
 		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
 		
 		for (uint y = 0; y < map.Height(); y++)
@@ -55,14 +50,14 @@ namespace VTerrain
 			for (uint x = 0; x < map.Width(); x++)
 			{
 				bool addedNorm = false;
-				AddVertex(Vec3<float>(topLeftX + x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
+				AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
 				AddUV(Vec2<float>((float)x / (float)(map.Width() - 1), (float)y / (float)(map.Height() - 1)));
 
 				if (x < map.Width() - 1 && y < map.Height() - 1)
 				{
 					uint index = (m_vertices.size()) - 1;
-					AddTri(index, index + map.Width() + 1, index + map.Width());
-					AddTri(index + map.Width() + 1, index, index + 1);
+					AddTri(index, index + map.Width(), index + map.Width() + 1);
+					AddTri(index + map.Width() + 1, index + 1, index);
 
 					if (x > 2 && y > 2)
 					{
@@ -168,7 +163,7 @@ namespace VTerrain
             m_nIndices = 0;
         }
     }
-    void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix)
+    void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset)
     {
         if (used)
         {
@@ -204,6 +199,13 @@ namespace VTerrain
             GLint projectionLoc = glGetUniformLocation(m_shaderProgram, "projection_matrix");
             if (projectionLoc != -1)
             { glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projectionMatrix); }
+
+            GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "position_offset");
+            if (offsetLoc != -1)
+            {
+                float tmp[3] = { offset.x(), offset.y(), offset.z() };
+                glUniform3fv(offsetLoc, 1, tmp);
+            }
 
             float col[] ={ 0.5f, 0.5f, 0.5f, 1.0f };
             //Ambient color

@@ -17,6 +17,7 @@ namespace VTerrain
         "uniform mat4 model_matrix;\n"
         "uniform mat4 view_matrix;\n"
         "uniform mat4 projection_matrix;\n"
+        "uniform vec3 position_offset;\n"
         "uniform vec4 material_color;\n"
         "uniform vec3 global_light_direction;\n"
         "uniform vec4 ambient_color;\n"
@@ -24,7 +25,7 @@ namespace VTerrain
         "void main()\n"
         "{\n"
         "	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
-        "	gl_Position = transform * vec4(position, 1.0f);\n"
+        "	gl_Position = transform * vec4(position + position_offset, 1.0f);\n"
         "		vec3 norm = mat3(model_matrix) * normal;\n"
         "		float light_intensity = dot(global_light_direction, norm);\n"
         "		light_intensity = max(light_intensity,ambient_color.x);\n"
@@ -131,9 +132,9 @@ namespace VTerrain
             shaderProgram = program;
         }
         else
-
         {
             ret += "Error Compiling shader";
+            assert(true);
         }
 
         glDetachShader(shaderProgram, vertexShader);

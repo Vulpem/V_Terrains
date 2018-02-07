@@ -7,8 +7,14 @@ namespace VTerrain
     {
 	public:
         static float maxHeight;
-        static unsigned int chunkWidth ;
+        static unsigned int chunkWidth;
         static unsigned int chunkHeight;
+        static void SetMaxChunks(unsigned int maxChunks);
+        static unsigned int GetMaxChunks() { return maxChunks; }
+    private:
+        static unsigned int maxChunks;
+    public:
+
 		static float globalLight[3];
         class Noise
         {

@@ -51,6 +51,11 @@ void Camera::PreUpdate()
 	frustum.Update();
 }
 
+float3 Camera::GetPosition()
+{
+    return object->GetTransform()->GetGlobalPos();
+}
+
 void Camera::Draw()
 {
 	if (object->HiddenFromOutliner() == false)

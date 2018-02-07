@@ -48,7 +48,7 @@ namespace VTerrain
             void Generate(const MeshData& meshData);
             void FreeMesh();
 
-            void Render(const float* viewMatrix, const float* projectionMatrix);
+            void Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset);
         };
 #pragma endregion
     };

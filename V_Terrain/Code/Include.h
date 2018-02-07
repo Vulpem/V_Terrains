@@ -5,6 +5,7 @@
 
 #include "Noise\PerlinNoise.h"
 #include "Mesh\MeshGenerator.h"
+#include "Chunk\Chunk.h"
 
 #include "Utils\GenImage.h"
 #include "Utils\Shaders.h"

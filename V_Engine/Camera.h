@@ -37,6 +37,7 @@ public:
 	const math::Frustum* GetFrustum() const { return &frustum; }
 
 	static Type GetType() { return Type::C_camera; }
+    float3 GetPosition();
 
 	void Draw();
 	void DrawFrustum();

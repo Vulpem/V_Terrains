@@ -8,6 +8,7 @@
 #include "ModuleInput.h"
 #include "imGUI\imgui.h"
 
+
 #include "OpenGL.h"
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
@@ -100,6 +101,10 @@ update_status ModuleTerrain::PreUpdate()
 
 update_status ModuleTerrain::Update()
 {
+    float3 pos = App->camera->GetDefaultCam()->GetPosition();
+    VTerrain::ChunkManager::Update(pos.x, pos.z);
+    VTerrain::ChunkManager::Render(App->camera->GetDefaultCam()->GetViewMatrix().ptr(), App->camera->GetDefaultCam()->GetProjectionMatrix().ptr());
+
     ImGui::SetNextWindowPos(ImVec2(300.f, 50.f));
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
@@ -149,6 +154,8 @@ update_status ModuleTerrain::Update()
         ImGui::End();
     }
 
+
+    /*
     if (App->input->GetKey(SDL_SCANCODE_KP_5) == KEY_REPEAT) { m_offset.y += 1; regen = true; }
     if (App->input->GetKey(SDL_SCANCODE_KP_8) == KEY_REPEAT) { m_offset.y -= 1; regen = true;}
     if (App->input->GetKey(SDL_SCANCODE_KP_6) == KEY_REPEAT) { m_offset.x += 1; regen = true;}
@@ -160,7 +167,7 @@ update_status ModuleTerrain::Update()
     }
     
     m_mesh.Render(App->camera->GetDefaultCam()->GetViewMatrix().ptr(), App->camera->GetDefaultCam()->GetProjectionMatrix().ptr());
-
+    */
     return UPDATE_CONTINUE;
 }
 
@@ -188,8 +195,7 @@ void ModuleTerrain::GenMap()
     VTerrain::Config::Noise::lacunarity = m_lacunarity;
     VTerrain::Config::Noise::persistency = m_persistance;
 
-
-    m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offset.x, m_offset.y);
+    /*m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(m_offset.x, m_offset.y);
 
     VTerrain::MeshGenerator::MeshData meshData;
     meshData.Generate(m_noiseMap);
@@ -217,5 +223,5 @@ void ModuleTerrain::GenMap()
         tmp[n * 3 + 1] = val;
         tmp[n * 3 + 2] = val;
     }
-    m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, m_noiseMap.Width(), m_noiseMap.Height());
+    m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, m_noiseMap.Width(), m_noiseMap.Height());*/
 }
