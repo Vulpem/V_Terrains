@@ -12,6 +12,8 @@ namespace VTerrain
 		Vec3(T _x = 0, T _y = 0, T _z = 0) : d{ _x, _y, _z } {}
 		T d[3];
 
+		const T* Data() const { return d; }
+
 		T& x() { return d[0]; }
 		T x() const { return d[0]; }
 		T& y() { return d[1]; }
@@ -34,7 +36,14 @@ namespace VTerrain
 			d[1] = d[1] / len;
 			d[2] = d[2] / len;
 		}
-		const T* Data() const { return d; }
+		Vec3 Cross(Vec3 a)
+		{
+			return Vec3(
+				d[1] * a.d[2] - d[2] * a.d[1],
+				d[2] * a.d[0] - d[0] * a.d[2],
+				d[0] * a.d[1] - d[1] * a.d[0]
+			);
+		}
     };
 
 	template <typename T,
@@ -44,6 +53,8 @@ namespace VTerrain
 	public:
 		Vec2(T _x = 0, T _y = 0) : d{ _x, _y } {}
 		T d[2];
+
+		const T* Data() const { return d; }
 
 		T& x() { return d[0]; }
 		T x() const { return d[0]; }
@@ -64,6 +75,5 @@ namespace VTerrain
 			d[0] = d[0] / len;
 			d[1] = d[1] / len;
 		}
-		const T* Data() const { return d; }
 	};
 }

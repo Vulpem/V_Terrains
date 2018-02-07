@@ -47,6 +47,9 @@ public:
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
+
+	uint m_squaredPatternBuf = 0;
+	bool m_showDebugPattern = true;
 };
 
 #endif

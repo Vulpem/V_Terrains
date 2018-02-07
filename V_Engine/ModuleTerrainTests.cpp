@@ -53,42 +53,53 @@ bool ModuleTerrain::Start()
     {
         for (uint x = 0; x < m_size.x; x++)
         {
-            const float val1 = 0.2f;
+            const float val1 = 0.1f;
             const float val2 = 0.9f;
+			const float val3 = 0.5f;
             const uint squareSize = 4;
-            if (x % squareSize > squareSize/2-1)
-            {
-                if (y % squareSize > squareSize/2-1)
-                {
-                    img.push_back(val1);
-                    img.push_back(val1);
-                    img.push_back(val1);
-                }
-                else
-                {
-                    img.push_back(val2);
-                    img.push_back(val2);
-                    img.push_back(val2);
-                }
-            }
-            else
-            {
-                if (y % squareSize > squareSize/2-1)
-                {
-                    img.push_back(val2);
-                    img.push_back(val2);
-                    img.push_back(val2);
-                }
-                else
-                {
-                    img.push_back(val1);
-                    img.push_back(val1);
-                    img.push_back(val1);
-                }
-            }
+			if (x < 1 || y < 1 || x >= m_size.x - 1 || y >= m_size.y - 1)
+			{
+				img.push_back(val3);
+				img.push_back(val3);
+				img.push_back(val3);
+			}
+			else
+			{
+				if (x % squareSize > squareSize / 2 - 1)
+				{
+					if (y % squareSize > squareSize / 2 - 1)
+					{
+						img.push_back(val1);
+						img.push_back(val1);
+						img.push_back(val1);
+					}
+					else
+					{
+						img.push_back(val2);
+						img.push_back(val2);
+						img.push_back(val2);
+					}
+				}
+				else
+				{
+					if (y % squareSize > squareSize / 2 - 1)
+					{
+						img.push_back(val2);
+						img.push_back(val2);
+						img.push_back(val2);
+					}
+					else
+					{
+						img.push_back(val1);
+						img.push_back(val1);
+						img.push_back(val1);
+					}
+				}
+			}
         }
     }
-    VTerrain::Config::TMP::debugTexBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
+	m_squaredPatternBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
+	VTerrain::Config::TMP::debugTexBuf = m_squaredPatternBuf;
 
 	return ret;
 }
@@ -109,16 +120,21 @@ update_status ModuleTerrain::Update()
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
     {
-        if (ImGui::SliderFloat("LightDir", &m_globalLightDir, -360, 360)
-            || ImGui::SliderFloat("LightHeight", &m_globalLightHeight, -90, 90))
-        {
-            float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
-            Quat rot = Quat::FromEulerYZX(m_globalLightHeight* DEGTORAD, m_globalLightDir*DEGTORAD, 0.f);
-            tmp = rot * tmp;
-            VTerrain::Config::globalLight[0] = tmp.x;
-            VTerrain::Config::globalLight[1] = tmp.y;
-            VTerrain::Config::globalLight[2] = tmp.z;
-        }
+		if (ImGui::Checkbox("DebugSquaredPattern", &m_showDebugPattern))
+		{
+			if (m_showDebugPattern) { VTerrain::Config::TMP::debugTexBuf = m_squaredPatternBuf; }
+			else { VTerrain::Config::TMP::debugTexBuf = 0; }
+		}
+		if (ImGui::SliderFloat("LightDir", &m_globalLightDir, -360, 360)
+			|| ImGui::SliderFloat("LightHeight", &m_globalLightHeight, -90, 90))
+		{
+			float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
+			Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight*DEGTORAD, 0.f);
+			tmp = rot * tmp;
+			VTerrain::Config::globalLight[0] = tmp.x;
+			VTerrain::Config::globalLight[1] = tmp.y;
+			VTerrain::Config::globalLight[2] = tmp.z;
+		}
 
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
 

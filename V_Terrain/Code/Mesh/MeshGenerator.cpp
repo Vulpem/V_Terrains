@@ -63,22 +63,23 @@ namespace VTerrain
 					{
 						index = m_vertices.size() - 1 - map.Width();
 						Vec3<float> central = m_vertices[index];
+
 						Vec3<float> top = central - m_vertices[index - map.Width()];
-						top.Normalize();
+
 						Vec3<float> bottom = central - m_vertices[index + map.Width()];
-						bottom.Normalize();
+
 						Vec3<float> right = central - m_vertices[index + 1];
-						right.Normalize();
+
 						Vec3<float> left = central - m_vertices[index - 1];
-						left.Normalize();
 
-						Vec3<float> y = (top - bottom);
-						y.Normalize();
-						Vec3<float> x = (right - left);
-						x.Normalize();
 
-						Vec3<float> norm(y.y(), y.x() + x.y(), x.z());
+						Vec3<float> norm =
+							top.Cross(left)
+							+ left.Cross(bottom)
+							+ bottom.Cross(right)
+							+ right.Cross(top);
 						norm.Normalize();
+
 						AddNormal(norm);
 						addedNorm = true;
 					}
