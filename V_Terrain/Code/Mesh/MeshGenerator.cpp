@@ -56,7 +56,6 @@ namespace VTerrain
             for (uint x = 1; x < map.Width() - 1; x++)
             {
                 AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
-                Vec2<float> a((float)(x - 1) / (float)(map.Width() - 1), (float)(y - 1) / (float)(map.Height() - 2));
                 AddUV(Vec2<float>((float)(x - 1) / (float)(map.Width() - 3), (float)(y - 1) / (float)(map.Height() - 3)));
 
                 if (x < map.Width() - 2 && y < map.Height() - 2)
