@@ -41,7 +41,7 @@ namespace VTerrain
             uint m_dataBuff;
             uint m_indicesBuff;
             uint m_nIndices = 0u;
-            bool used = false;
+            bool m_used = false;
 
             static uint m_shaderProgram;
            

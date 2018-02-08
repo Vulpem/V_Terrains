@@ -68,6 +68,8 @@ namespace VTerrain
 		Vec2 operator/ (T a) const { return Vec2(d[0] / a, d[1] / a); }
         bool operator== (Vec2 a) const { return (d[0] == a.d[0] && d[1] == a.d[1]); }
         bool operator!= (Vec2 a) const { return !(*this == a); }
+        bool operator< (Vec2 a) const { return (d[0] < a.d[0] ? true : (d[0] == a.d[0] ? (d[1] < a.d[1]) : false)); }
+        bool operator> (Vec2 a) const { return (d[0] > a.d[0] ? true : (d[0] == a.d[0] ? (d[1] > a.d[1]) : false)); }
 		float Length() const { return sqrt(d[0]*d[0] + d[1]*d[1]); }
 		void Normalize()
 		{

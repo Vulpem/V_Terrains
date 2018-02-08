@@ -4,6 +4,8 @@
 
 #include "../Mesh/MeshGenerator.h"
 
+#include <mutex>
+
 namespace VTerrain
 {
     class ChunkManager
@@ -14,18 +16,21 @@ namespace VTerrain
         public:
             Chunk();
 
-            void Regenerate(uint LOD);
-            void Regenerate(uint LOD, int offsetX, int offsetY);
+            void Regenerate(uint gen, uint LOD);
+            void Regenerate(uint gen, uint LOD, Vec2<int> offset);
             void Free();
             void Draw(const float* viewMatrix, const float* projectionMatrix);
-			Vec2<int> GetPos() { return Vec2<int>(m_offsetX, m_offsetY); }
+			Vec2<int> GetPos() { return m_offset; }
 			uint GetLOD() { return m_LOD; }
-            bool IsUsed() { return m_mesh.used; }
+            uint GetGen() { return m_generation; }
+            bool IsUsed() { return m_mesh.m_used; }
 
+            std::mutex m_mutex;
         private:
+            uint m_generation;
+
             MeshGenerator::Mesh m_mesh;
-            int m_offsetX;
-            int m_offsetY;
+            Vec2<int> m_offset;
             uint m_LOD;
         };
 
@@ -35,19 +40,18 @@ namespace VTerrain
         static void Update(int posX, int posY);
         static void Render(const float* viewMatrix, const float* projectionMatrix);
         
-        static void SetMaxChunks(uint maxChunks);
     private:
+        static void FreeChunk();
         static void RegenChunk();
-        static void AddChunkToRegen(uint LOD, Vec2<int> pos);
-		static bool ChunksToRegen();
-			
-		static int FindChunk(Vec2<int> pos);
-		static void RemoveRegenDuplicates(Vec2<int> pos);
+        static void AddChunkToRegen(uint gen, uint LOD, Vec2<int> pos);		
 
-        std::vector<Chunk> m_chunks;
-        uint m_lastChunkChecked;
-        std::map<uint, std::list<Vec2<int>>> m_chunkstoRegen;
+        static bool IsVisible(Vec2<int> pos);
+		static bool IsLoaded(Vec2<int> pos);
+
+        std::map<Vec2<int>, Chunk> m_chunks;
+        std::map<uint, std::list<std::pair<Vec2<int>, uint>>> m_chunkstoRegen;
         Vec2<int> m_lastOffPos;
+        uint m_chunkGeneration;
 
         static ChunkManager m_instance;
     };

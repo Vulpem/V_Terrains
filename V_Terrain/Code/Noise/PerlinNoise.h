@@ -42,7 +42,7 @@ namespace VTerrain
         PerlinNoise();
 
         static void SetSeed(uint seed);
-        static PerlinNoise::NoiseMap GenNoiseMap(int offsetX, int offsetY);
+        static PerlinNoise::NoiseMap GenNoiseMap(Vec2<int> offset);
     private:
         static float GetValue(int x, int y);
 

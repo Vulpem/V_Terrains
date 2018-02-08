@@ -121,11 +121,11 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::Generate(const MeshData & meshData)
     {
-        if (!used)
+        if (!m_used)
         {
             glGenBuffers(1, (GLuint*) &(m_dataBuff));
             glGenBuffers(1, (GLuint*) &(m_indicesBuff));
-            used = true;
+            m_used = true;
         }
         
         m_nIndices = meshData.m_indices.size();
@@ -141,17 +141,17 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::FreeMesh()
     {
-        if (used)
+        if (m_used)
         {
             glDeleteBuffers(1, &m_dataBuff);
             glDeleteBuffers(1, &m_indicesBuff);
-            used = false;
+            m_used = false;
             m_nIndices = 0;
         }
     }
     void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset)
     {
-        if (used)
+        if (m_used)
         {
             glUseProgram(m_shaderProgram);
 
