@@ -10,14 +10,14 @@ namespace VTerrain
         , m_offset(0,0)
     {}
 
-    void ChunkManager::Chunk::Regenerate(uint LOD)
+    void ChunkManager::Chunk::Regenerate(uint LOD, bool force)
     {
-        Regenerate(LOD, m_offset);
+        Regenerate(LOD, m_offset, force);
     }
 
-    void ChunkManager::Chunk::Regenerate(uint LOD, Vec2<int> offset)
+    void ChunkManager::Chunk::Regenerate(uint LOD, Vec2<int> offset, bool force)
     {
-		if (LOD != m_LOD)
+		if (LOD != m_LOD || force == true)
 		{
             m_offset = offset;
 			m_LOD = LOD;
@@ -61,16 +61,11 @@ namespace VTerrain
             floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
+        
         if (off != m_instance.m_lastOffPos || m_instance.m_chunks.empty() == true)
         {
             m_instance.m_lastOffPos = off;
-            for (int y = -1; y <= 1; y++)
-            {
-                for (int x = -1; x <= 1; x++)
-                {
-                    AddChunkToRegen(1, Vec2<int>(off.x() + x, off.y() + y));
-                }
-            }
+            AddChunksToRegen(off);
         }
 
         RegenChunk();
@@ -88,6 +83,25 @@ namespace VTerrain
         }
     }
 
+    void ChunkManager::CleanChunks()
+    {
+        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        {
+            it->second.Free();
+        }
+        m_instance.m_chunks.clear();
+        m_instance.m_chunkstoRegen.clear();
+        AddChunksToRegen(m_instance.m_lastOffPos);
+    }
+
+    void ChunkManager::RegenAll()
+    {
+        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        {
+            AddChunkToForceRegen(it->second.GetLOD(), it->second.GetPos());
+        }
+    }
+
     void ChunkManager::FreeChunk()
     {
         m_instance.m_chunks.erase(GetFurthestChunk());
@@ -95,6 +109,18 @@ namespace VTerrain
 
     void ChunkManager::RegenChunk()
     {
+        for (auto it = m_instance.m_chunkstoForceRegen.begin(); it != m_instance.m_chunkstoForceRegen.end(); it++)
+        {
+            if (it->second.empty() == false)
+            {
+                const Vec2<int> offset = it->second.front();
+                const uint LOD = it->first;
+                m_instance.m_chunks[offset].Regenerate(LOD, offset, true);
+                it->second.pop_front();
+                return;
+            }
+        }
+
         for (auto it = m_instance.m_chunkstoRegen.begin(); it != m_instance.m_chunkstoRegen.end(); it++)
         {
             if (it->second.empty() == false)
@@ -109,9 +135,26 @@ namespace VTerrain
         }
     }
 
+    void ChunkManager::AddChunksToRegen(Vec2<int> pos)
+    {
+        //TODO configurable
+        for (int y = -1; y <= 1; y++)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                AddChunkToRegen(1, Vec2<int>(pos.x() + x, pos.y() + y));
+            }
+        }
+    }
+
     void ChunkManager::AddChunkToRegen(uint LOD, Vec2<int> pos)
     {
         m_instance.m_chunkstoRegen[LOD].push_back(pos);
+    }
+
+    void ChunkManager::AddChunkToForceRegen(uint LOD, Vec2<int> pos)
+    {
+        m_instance.m_chunkstoForceRegen[LOD].push_back(pos);
     }
 
     bool ChunkManager::IsVisible(Vec2<int> pos)
@@ -127,6 +170,7 @@ namespace VTerrain
 
     Vec2<int> ChunkManager::GetFurthestChunk()
     {
+        //TODO optimize
         float maxDist = 0.f;
         Vec2<int> ret;
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)

@@ -16,8 +16,8 @@ namespace VTerrain
         public:
             Chunk();
 
-            void Regenerate(uint LOD);
-            void Regenerate(uint LOD, Vec2<int> offset);
+            void Regenerate(uint LOD, bool force = false);
+            void Regenerate(uint LOD, Vec2<int> offset, bool force = false);
             void Free();
             void Draw(const float* viewMatrix, const float* projectionMatrix);
 			Vec2<int> GetPos() { return m_offset; }
@@ -38,11 +38,16 @@ namespace VTerrain
         static ChunkManager& Instance() { return m_instance; }
         static void Update(int posX, int posY);
         static void Render(const float* viewMatrix, const float* projectionMatrix);
-        
+        static void CleanChunks();
+        static void RegenAll();
+
     private:
         static void FreeChunk();
         static void RegenChunk();
-        static void AddChunkToRegen(uint LOD, Vec2<int> pos);		
+
+        static void AddChunksToRegen(Vec2<int> pos);
+        static void AddChunkToRegen(uint LOD, Vec2<int> pos);	
+        static void AddChunkToForceRegen(uint LOD, Vec2<int> pos);
 
         static bool IsVisible(Vec2<int> pos);
 		static bool IsLoaded(Vec2<int> pos);
@@ -50,6 +55,7 @@ namespace VTerrain
 
         std::map<Vec2<int>, Chunk> m_chunks;
         std::map<uint, std::list<Vec2<int>>> m_chunkstoRegen;
+        std::map<uint, std::list<Vec2<int>>> m_chunkstoForceRegen;
         Vec2<int> m_lastOffPos;
         Vec2<int> m_currentChunk;
 
