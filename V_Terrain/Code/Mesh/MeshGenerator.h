@@ -27,6 +27,7 @@ namespace VTerrain
             uint m_nVertices = 0;
             uint m_nUVs = 0;
             uint m_nNormals = 0;
+            uint m_nIndices = 0;
 
         public:
             std::vector<float> m_data;

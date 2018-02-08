@@ -14,9 +14,9 @@ namespace VTerrain
 
     void MeshGenerator::MeshData::AddTri(uint a, uint b, uint c)
     {
-        m_indices.push_back(a);
-        m_indices.push_back(b);
-        m_indices.push_back(c);
+        m_indices[m_nIndices++] = a;
+        m_indices[m_nIndices++] = b;
+        m_indices[m_nIndices++] = c;
     }
 
     void MeshGenerator::MeshData::AddVertex(const Vec3<float>& v)
@@ -44,19 +44,17 @@ namespace VTerrain
 
 	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
 	{
-        m_data.resize(map.Width()*map.Height() * 8 + 1);
-		m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
+        m_data.resize((map.Width()-2)*(map.Height()-2) * 8);
+		m_indices.resize((map.Width() - 3)*(map.Height() - 3) * 6);
 
 		//Subtracting 1 if Width is odd
 		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
 		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
-		
-        //100 ms
+
 		for (uint y = 1; y < map.Height() - 1; y++)
 		{
             for (uint x = 1; x < map.Width() - 1; x++)
             {
-                bool addedNorm = false;
                 AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
                 Vec2<float> a((float)(x - 1) / (float)(map.Width() - 1), (float)(y - 1) / (float)(map.Height() - 2));
                 AddUV(Vec2<float>((float)(x - 1) / (float)(map.Width() - 3), (float)(y - 1) / (float)(map.Height() - 3)));
