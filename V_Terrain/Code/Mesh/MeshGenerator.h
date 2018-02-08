@@ -17,7 +17,6 @@ namespace VTerrain
             ~MeshData();
             
             void Generate(const PerlinNoise::NoiseMap& map);
-            void CompressData();
 
         private:
             void AddVertex(const Vec3<float>& v);
@@ -25,11 +24,11 @@ namespace VTerrain
             void AddNormal(const Vec3<float>& n);
 
             void AddTri(uint a, uint b, uint c);
+            uint m_nVertices = 0;
+            uint m_nUVs = 0;
+            uint m_nNormals = 0;
 
         public:
-            std::vector<Vec3<float>> m_vertices;
-            std::vector<Vec2<float>> m_UVs;
-            std::vector<Vec3<float>> m_normals;
             std::vector<float> m_data;
 
             std::vector<uint> m_indices;

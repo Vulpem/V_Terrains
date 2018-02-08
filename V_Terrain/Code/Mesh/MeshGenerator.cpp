@@ -21,24 +21,30 @@ namespace VTerrain
 
     void MeshGenerator::MeshData::AddVertex(const Vec3<float>& v)
     {
-        m_vertices.push_back(v);
+        m_data[m_nVertices * 8 + 0] = v.x();
+        m_data[m_nVertices * 8 + 1] = v.y();
+        m_data[m_nVertices * 8 + 2] = v.z();
+        m_nVertices++;
     }
 
     void MeshGenerator::MeshData::AddUV(const Vec2<float>& uv)
     {
-        m_UVs.push_back(uv);
+        m_data[m_nUVs * 8 + 6 + 0] = uv.x();
+        m_data[m_nUVs * 8 + 6 + 1] = uv.y();
+        m_nUVs++;
     }
 
     void MeshGenerator::MeshData::AddNormal(const Vec3<float>& n)
     {
-        m_normals.push_back(n);
+        m_data[m_nNormals * 8 + 3 + 0] = n.x();
+        m_data[m_nNormals * 8 + 3 + 1] = n.y();
+        m_data[m_nNormals * 8 + 3 + 2] = n.z();
+        m_nNormals++;
     }
 
 	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
 	{
-		m_vertices.reserve(map.Width()*map.Height() + 1);
-		m_UVs.reserve(map.Width()*map.Height() + 1);
-		m_normals.reserve(map.Width()*map.Height() + 1);
+        m_data.resize(map.Width()*map.Height() * 8 + 1);
 		m_indices.reserve((map.Width() - 1)*(map.Height() - 1) * 6 + 1);
 
 		//Subtracting 1 if Width is odd
@@ -57,7 +63,7 @@ namespace VTerrain
 
                 if (x < map.Width() - 2 && y < map.Height() - 2)
                 {
-                    const uint index = (m_vertices.size()) - 1;
+                    const uint index = m_nVertices - 1;
                     AddTri(index, index + map.Width() - 2, index + map.Width() + 1 - 2);
                     AddTri(index + map.Width() + 1 - 2, index + 1, index);
                 }
@@ -78,45 +84,7 @@ namespace VTerrain
                 AddNormal(norm);
             }
 		}
-
-		CompressData(); //90 ms
 	}
-    void MeshGenerator::MeshData::CompressData()
-    {
-        m_data.clear();
-        m_data.reserve(m_vertices.size() * (3 + 3 + 2) + 1);
-
-        for (uint n = 0; n < m_vertices.size(); n++)
-        {
-            m_data.push_back(m_vertices[n].x());
-			m_data.push_back(m_vertices[n].y());
-			m_data.push_back(m_vertices[n].z());
-
-            if (n < m_normals.size())
-            {
-                m_data.push_back(m_normals[n].x());
-				m_data.push_back(m_normals[n].y());
-				m_data.push_back(m_normals[n].z());
-            }
-            else
-            {
-                m_data.push_back(0.f);
-                m_data.push_back(1.f);
-                m_data.push_back(0.f);
-            }
-
-            if (n < m_UVs.size())
-            {
-                m_data.push_back(m_UVs[n].x());
-				m_data.push_back(m_UVs[n].y());
-            }
-            else
-            {
-                m_data.push_back(0.f);
-                m_data.push_back(0.f);
-            }
-        }
-    }
 
     uint MeshGenerator::Mesh::m_shaderProgram = 0;
 
