@@ -8,17 +8,15 @@ namespace VTerrain
     ChunkManager::Chunk::Chunk() :
         m_LOD(0u)
         , m_offset(0,0)
-        , m_generation(0u)
     {}
 
-    void ChunkManager::Chunk::Regenerate(uint gen, uint LOD)
+    void ChunkManager::Chunk::Regenerate(uint LOD)
     {
-        Regenerate(gen, LOD, m_offset);
+        Regenerate(LOD, m_offset);
     }
 
-    void ChunkManager::Chunk::Regenerate(uint gen, uint LOD, Vec2<int> offset)
+    void ChunkManager::Chunk::Regenerate(uint LOD, Vec2<int> offset)
     {
-        m_generation = utils::Max(m_generation, gen);
 		if (LOD != m_LOD)
 		{
             m_offset = offset;
@@ -44,10 +42,14 @@ namespace VTerrain
         }
     }
 
+    float ChunkManager::Chunk::DistanceToSqr(Vec2<int> chunkIndex)
+    {
+        return (m_offset - chunkIndex).LengthSqr();
+    }
+
     ChunkManager::ChunkManager() :
-        m_lastOffPos(-1000, -1000)
-        , m_oldestGeneration(0u)
-        , m_chunkGeneration(0u)
+        m_lastOffPos(0, 0)
+        , m_currentChunk(0, 0)
     {
     }
 
@@ -59,17 +61,16 @@ namespace VTerrain
             floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
-        if (off != m_instance.m_lastOffPos)
+        if (off != m_instance.m_lastOffPos || m_instance.m_chunks.empty() == true)
         {
             m_instance.m_lastOffPos = off;
             for (int y = -1; y <= 1; y++)
             {
                 for (int x = -1; x <= 1; x++)
                 {
-                    AddChunkToRegen(m_instance.m_chunkGeneration, 1, Vec2<int>(off.x() + x, off.y() + y));
+                    AddChunkToRegen(1, Vec2<int>(off.x() + x, off.y() + y));
                 }
             }
-            m_instance.m_chunkGeneration++;
         }
 
         RegenChunk();
@@ -89,7 +90,7 @@ namespace VTerrain
 
     void ChunkManager::FreeChunk()
     {
-        m_instance.m_chunks.erase(GetOldestChunk());
+        m_instance.m_chunks.erase(GetFurthestChunk());
     }
 
     void ChunkManager::RegenChunk()
@@ -98,22 +99,19 @@ namespace VTerrain
         {
             if (it->second.empty() == false)
             {
-                const uint gen = it->second.front().second;
-                const Vec2<int> offset = it->second.front().first;
-                if (IsLoaded(offset) == false || gen > m_instance.m_chunks[offset].GetGen())
-                {
+                const Vec2<int> offset = it->second.front();
                     const uint LOD = it->first;
-                    m_instance.m_chunks[offset].Regenerate(gen, LOD, offset);
+                    m_instance.m_chunks[offset].Regenerate(LOD, offset);
+                    it->second.pop_front();
                     return;
-                }
-                it->second.pop_front();
+               
             }
         }
     }
 
-    void ChunkManager::AddChunkToRegen(uint gen, uint LOD, Vec2<int> pos)
+    void ChunkManager::AddChunkToRegen(uint LOD, Vec2<int> pos)
     {
-        m_instance.m_chunkstoRegen[LOD].push_back(std::pair<Vec2<int>,uint>(pos, gen));
+        m_instance.m_chunkstoRegen[LOD].push_back(pos);
     }
 
     bool ChunkManager::IsVisible(Vec2<int> pos)
@@ -127,23 +125,19 @@ namespace VTerrain
         return m_instance.m_chunks.find(pos) != m_instance.m_chunks.end();
 	}
 
-    Vec2<int> ChunkManager::GetOldestChunk()
+    Vec2<int> ChunkManager::GetFurthestChunk()
     {
+        float maxDist = 0.f;
         Vec2<int> ret;
-        uint gen = -1;
-        for (auto chunk = m_instance.m_chunks.begin(); chunk != m_instance.m_chunks.end(); chunk++)
+        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            if(gen > chunk->second.GetGen() || gen == UINT_MAX)
+            const float dist = it->second.DistanceToSqr(m_instance.m_lastOffPos);
+            if (dist > maxDist)
             {
-                if (gen == m_instance.m_oldestGeneration)
-                {
-                    return chunk->second.GetPos();
-                }
-                gen = chunk->second.GetGen();
-                ret = chunk->second.GetPos();
+                maxDist = dist;
+                ret = it->second.GetPos();
             }
         }
-        m_instance.m_oldestGeneration = gen;
         return ret;
     }
 }

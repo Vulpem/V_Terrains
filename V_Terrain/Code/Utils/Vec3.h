@@ -28,6 +28,7 @@ namespace VTerrain
 		Vec3 operator/ (T a) const { return Vec3(d[0] / a, d[1] / a, d[2] / a); }
         bool operator== (Vec3 a) const { return (d[0] == a.d[0] && d[1] == a.d[1] && d[2] == a.d[2]); }
         bool operator!= (Vec3 a) const { return !(*this == a); }
+        float LengthSqr() const { return (d[0] * d[0] + d[1] * d[1] + d[2] * d[2]); }
 		float Length() const { return sqrt(d[0]*d[0] + d[1]*d[1] + d[2] * d[2]); }
 		void Normalize()
 		{
@@ -70,6 +71,7 @@ namespace VTerrain
         bool operator!= (Vec2 a) const { return !(*this == a); }
         bool operator< (Vec2 a) const { return (d[0] < a.d[0] ? true : (d[0] == a.d[0] ? (d[1] < a.d[1]) : false)); }
         bool operator> (Vec2 a) const { return (d[0] > a.d[0] ? true : (d[0] == a.d[0] ? (d[1] > a.d[1]) : false)); }
+        float LengthSqr() const { return (d[0] * d[0] + d[1] * d[1]); }
 		float Length() const { return sqrt(d[0]*d[0] + d[1]*d[1]); }
 		void Normalize()
 		{
