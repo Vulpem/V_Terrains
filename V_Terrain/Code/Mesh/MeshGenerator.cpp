@@ -45,6 +45,7 @@ namespace VTerrain
 		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
 		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
 		
+        //100 ms
 		for (uint y = 1; y < map.Height() - 1; y++)
 		{
             for (uint x = 1; x < map.Width() - 1; x++)
@@ -78,7 +79,7 @@ namespace VTerrain
             }
 		}
 
-		CompressData();
+		CompressData(); //90 ms
 	}
     void MeshGenerator::MeshData::CompressData()
     {

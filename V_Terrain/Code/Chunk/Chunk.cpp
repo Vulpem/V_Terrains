@@ -22,9 +22,9 @@ namespace VTerrain
             m_offset = offset;
 			m_LOD = LOD;
 
-			VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset);
+			VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset); //46/60ms
 			VTerrain::MeshGenerator::MeshData meshData;
-			meshData.Generate(m_noiseMap);
+			meshData.Generate(m_noiseMap); //251/150ms
 			m_mesh.Generate(meshData);
 		}
     }
