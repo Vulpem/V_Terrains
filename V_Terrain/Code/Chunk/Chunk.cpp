@@ -8,6 +8,7 @@ namespace VTerrain
     ChunkManager::Chunk::Chunk() :
         m_LOD(0u)
         , m_offset(0,0)
+        , m_generation(0u)
     {}
 
     void ChunkManager::Chunk::Regenerate(uint gen, uint LOD)
@@ -45,6 +46,8 @@ namespace VTerrain
 
     ChunkManager::ChunkManager() :
         m_lastOffPos(-1000, -1000)
+        , m_oldestGeneration(0u)
+        , m_chunkGeneration(0u)
     {
     }
 
@@ -70,6 +73,10 @@ namespace VTerrain
         }
 
         RegenChunk();
+        if (m_instance.m_chunks.size() > Config::GetMaxChunks())
+        {
+            FreeChunk();
+        }
     }
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix)
@@ -82,6 +89,7 @@ namespace VTerrain
 
     void ChunkManager::FreeChunk()
     {
+        m_instance.m_chunks.erase(GetOldestChunk());
     }
 
     void ChunkManager::RegenChunk()
@@ -105,7 +113,7 @@ namespace VTerrain
 
     void ChunkManager::AddChunkToRegen(uint gen, uint LOD, Vec2<int> pos)
     {
-        m_instance.m_chunkstoRegen[LOD].push_back({ pos, gen });
+        m_instance.m_chunkstoRegen[LOD].push_back(std::pair<Vec2<int>,uint>(pos, gen));
     }
 
     bool ChunkManager::IsVisible(Vec2<int> pos)
@@ -118,4 +126,24 @@ namespace VTerrain
 	{
         return m_instance.m_chunks.find(pos) != m_instance.m_chunks.end();
 	}
+
+    Vec2<int> ChunkManager::GetOldestChunk()
+    {
+        Vec2<int> ret;
+        uint gen = -1;
+        for (auto chunk = m_instance.m_chunks.begin(); chunk != m_instance.m_chunks.end(); chunk++)
+        {
+            if(gen > chunk->second.GetGen() || gen == UINT_MAX)
+            {
+                if (gen == m_instance.m_oldestGeneration)
+                {
+                    return chunk->second.GetPos();
+                }
+                gen = chunk->second.GetGen();
+                ret = chunk->second.GetPos();
+            }
+        }
+        m_instance.m_oldestGeneration = gen;
+        return ret;
+    }
 }

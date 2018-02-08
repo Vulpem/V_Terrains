@@ -47,11 +47,13 @@ namespace VTerrain
 
         static bool IsVisible(Vec2<int> pos);
 		static bool IsLoaded(Vec2<int> pos);
+        static Vec2<int> GetOldestChunk();
 
         std::map<Vec2<int>, Chunk> m_chunks;
         std::map<uint, std::list<std::pair<Vec2<int>, uint>>> m_chunkstoRegen;
         Vec2<int> m_lastOffPos;
         uint m_chunkGeneration;
+        uint m_oldestGeneration;
 
         static ChunkManager m_instance;
     };
