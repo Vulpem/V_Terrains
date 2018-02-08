@@ -56,8 +56,9 @@ namespace VTerrain
         const int W = static_cast<int>(Config::chunkWidth);
         const int H = static_cast<int>(Config::chunkHeight);
         Vec2<int> off(
-            floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W + 1),
-            floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1);
+            floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
+            floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
+        );
         if (off != m_instance.m_lastOffPos)
         {
             m_instance.m_lastOffPos = off;

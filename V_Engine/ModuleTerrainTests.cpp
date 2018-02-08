@@ -119,6 +119,14 @@ update_status ModuleTerrain::Update()
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
     {
+        const int W = static_cast<int>(VTerrain::Config::chunkWidth);
+        const int H = static_cast<int>(VTerrain::Config::chunkHeight);
+        int p[2] = {
+            floor((pos.x - floor(W / 2.f) + (W % 2 != 0)) / W + 1),
+            floor((pos.z - floor(H / 2.f) + (H % 2 != 0)) / H + 1)
+        };
+        ImGui::DragInt2("CurrentChunk", p);
+
 		if (ImGui::Checkbox("DebugSquaredPattern", &m_showDebugPattern))
 		{
 			if (m_showDebugPattern) { VTerrain::Config::TMP::debugTexBuf = m_squaredPatternBuf; }
@@ -168,21 +176,6 @@ update_status ModuleTerrain::Update()
         ImGui::Image((void*)m_heightmapBuffer, ImVec2(width, width));
         ImGui::End();
     }
-
-
-    /*
-    if (App->input->GetKey(SDL_SCANCODE_KP_5) == KEY_REPEAT) { m_offset.y += 1; regen = true; }
-    if (App->input->GetKey(SDL_SCANCODE_KP_8) == KEY_REPEAT) { m_offset.y -= 1; regen = true;}
-    if (App->input->GetKey(SDL_SCANCODE_KP_6) == KEY_REPEAT) { m_offset.x += 1; regen = true;}
-    if (App->input->GetKey(SDL_SCANCODE_KP_4) == KEY_REPEAT) { m_offset.x -= 1; regen = true;}
-
-    if (regen)
-    {
-        GenMap();
-    }
-    
-    m_mesh.Render(App->camera->GetDefaultCam()->GetViewMatrix().ptr(), App->camera->GetDefaultCam()->GetProjectionMatrix().ptr());
-    */
     return UPDATE_CONTINUE;
 }
 
