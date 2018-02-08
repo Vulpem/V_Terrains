@@ -38,8 +38,8 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)
     {
-        float dx = static_cast<float>(Config::chunkWidth) / Config::Noise::frequency;
-        float dy = static_cast<float>(Config::chunkHeight) / Config::Noise::frequency;
+        const float dx = (Config::chunkWidth) / Config::Noise::frequency;
+        const float dy = (Config::chunkHeight) / Config::Noise::frequency;
         return (float)m_instance.m_perlin.octaveNoise0_1(x / dx, y / dy, Config::Noise::octaves, Config::Noise::lacunarity, Config::Noise::persistency);
     }
 }
