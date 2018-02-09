@@ -113,9 +113,8 @@ update_status ModuleTerrain::Update()
 {
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
     VTerrain::ChunkManager::Update(pos.x, pos.z);
-    VTerrain::ChunkManager::Render(App->camera->GetDefaultCam()->GetViewMatrix().ptr(), App->camera->GetDefaultCam()->GetProjectionMatrix().ptr());
 
-    ImGui::SetNextWindowPos(ImVec2(300.f, 50.f));
+    ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
     bool regen = false;
     if (ImGui::Begin("TerrainTests"))
     {
@@ -190,6 +189,11 @@ bool ModuleTerrain::CleanUp()
 {
     VTerrain::GenImage::FreeImage(m_heightmapBuffer);
 	return true;
+}
+
+void ModuleTerrain::Render(const viewPort & port)
+{
+	VTerrain::ChunkManager::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
 }
 
 void ModuleTerrain::GenMap()

@@ -21,6 +21,8 @@ public:
 	update_status PostUpdate() override;
 	bool CleanUp();
 
+	void Render(const viewPort& port) override;
+
     void GenMap();
 
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;

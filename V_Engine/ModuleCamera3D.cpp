@@ -220,7 +220,7 @@ void ModuleCamera3D::MoveWithKeys()
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * Time.dt);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * 10.f * Time.dt);
 		}
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
@@ -231,7 +231,7 @@ void ModuleCamera3D::MoveWithKeys()
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed* Time.dt);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed*  10.f * Time.dt);
 		}
 	}
 

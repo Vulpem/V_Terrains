@@ -72,7 +72,7 @@ private:
 	float2 viewPortMin;
 	float2 viewPortMax;
 	uint singleViewPort = 0;
-	uint multipleViewPorts[4] = { 0,0,0,0 };
+	uint multipleViewPorts[2] = { 0,0 };
 
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;

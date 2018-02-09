@@ -55,8 +55,6 @@ bool ModuleEditor::Start()
 	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 	multipleViewPorts[1] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam());
-	multipleViewPorts[2] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam());
-	multipleViewPorts[3] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam());
 
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
@@ -123,12 +121,12 @@ update_status ModuleEditor::PostUpdate()
 
 	ret = MenuBar();
 	Editor();
-	Console();
-	PlayButtons();
-	Outliner();
-	AttributeWindow();
-	SaveLoadPopups();
-
+	//Console();
+	//PlayButtons();
+	//Outliner();
+	//AttributeWindow();
+	//SaveLoadPopups();
+	
 	return ret;
 }
 
@@ -171,9 +169,9 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 {
 	screenW = width;
 	screenH = heigth;
-	viewPortMax.x = screenW - 330;
-	viewPortMax.y = screenH - 200;
-	viewPortMin.x = 300;
+	viewPortMax.x = screenW;
+	viewPortMax.y = screenH;
+	viewPortMin.x = 350;
 	viewPortMin.y = 20;
 
 	//Setting the single viewPort data
@@ -183,24 +181,13 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	port->size.y = viewPortMax.y - viewPortMin.y;
 
 	//Setting the multiple viewPort data
-	float2 size((viewPortMax.x - viewPortMin.x) / 2, (viewPortMax.y - viewPortMin.y) / 2);
+	float2 size((viewPortMax.x - viewPortMin.x), (viewPortMax.y - viewPortMin.y) / 2);
 	port = App->renderer3D->FindViewPort(multipleViewPorts[0]);
 	port->pos = viewPortMin;
 	port->size = size;
 
 	port = App->renderer3D->FindViewPort(multipleViewPorts[1]);
 	port->pos = viewPortMin;
-	port->pos.x += size.x;
-	port->size = size;
-
-	port = App->renderer3D->FindViewPort(multipleViewPorts[2]);
-	port->pos = viewPortMin;
-	port->pos.y += size.y;
-	port->size = size;
-
-	port = App->renderer3D->FindViewPort(multipleViewPorts[3]);
-	port->pos = viewPortMin;
-	port->pos.x += size.x;
 	port->pos.y += size.y;
 	port->size = size;
 }
@@ -423,8 +410,8 @@ void ModuleEditor::PlayButtons()
 
 void ModuleEditor::Editor()
 {
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20) / 2));
-		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 2));
+		ImGui::SetNextWindowPos(ImVec2(0, (screenH - 20) / 2 + 50));
+		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/2 - 30));
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -662,7 +649,7 @@ void ModuleEditor::AttributeWindow()
 void ModuleEditor::SwitchViewPorts()
 {
 	App->renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
-	for (int n = 0; n < 4; n++)
+	for (int n = 0; n < 2; n++)
 	{
 		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
 	}
