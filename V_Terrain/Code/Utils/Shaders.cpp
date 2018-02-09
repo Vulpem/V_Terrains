@@ -1,6 +1,7 @@
 #include "Shaders.h"
 
 #include "../ExternalLibs/Glew/include/glew.h"
+#include <iostream>
 
 namespace VTerrain
 {
@@ -11,14 +12,14 @@ namespace VTerrain
         "layout (location = 1) in vec3 normal;\n"
         "layout (location = 2) in vec2 texCoord;\n"
         "\n"
-        "out vec4 ourColor;\n"
         "out vec2 TexCoord;\n"
+		"out vec3 pos;\n"
+		"out float lightIntensity;\n"
         "\n"
         "uniform mat4 model_matrix;\n"
         "uniform mat4 view_matrix;\n"
         "uniform mat4 projection_matrix;\n"
         "uniform vec3 position_offset;\n"
-        "uniform vec4 material_color;\n"
         "uniform vec3 global_light_direction;\n"
         "uniform vec4 ambient_color;\n"
         "\n"
@@ -27,10 +28,9 @@ namespace VTerrain
         "	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
         "	gl_Position = transform * vec4(position + position_offset, 1.0f);\n"
         "		vec3 norm = mat3(model_matrix) * normal;\n"
-        "		float light_intensity = dot(global_light_direction, norm);\n"
-        "		light_intensity = max(light_intensity,ambient_color.x);\n"
-        "		ourColor = material_color * light_intensity;\n"
-        "		ourColor.w = material_color.w;\n"
+        "		lightIntensity = dot(global_light_direction, norm);\n"
+        "		lightIntensity = max(lightIntensity,ambient_color.x);\n"
+		"       pos = position + position_offset;\n"
         "	TexCoord = texCoord;\n"
         "}\n"
     );
@@ -38,8 +38,9 @@ namespace VTerrain
     std::string Shaders::m_defaultFragmentShader = std::string(
         "#version 330 core\n"
         "\n"
-        "in vec4 ourColor;\n"
         "in vec2 TexCoord;\n"
+		"in vec3 pos;\n"
+		"in float lightIntensity;\n"
         "\n"
         "out vec4 color;\n"
         "\n"
@@ -47,7 +48,9 @@ namespace VTerrain
         "\n"
         "void main()\n"
         "{\n"
-        "color = ourColor * texture(ourTexture, TexCoord);\n"
+		"       float val = (ceil(pos.y / 10)/10) * lightIntensity;\n"
+		"       vec4 mat = vec4(val,val,val, 1);\n"
+        "       color = mat * texture(ourTexture, TexCoord);\n"
         "}\n"
     );
 
@@ -133,7 +136,8 @@ namespace VTerrain
         else
         {
             ret += "Error Compiling shader";
-            assert(true);
+			
+            assert(false);
         }
 
         glDetachShader(shaderProgram, vertexShader);

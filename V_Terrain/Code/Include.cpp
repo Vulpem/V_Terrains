@@ -6,6 +6,6 @@ namespace VTerrain
 {
     void Init()
     {
-        VTerrain::Shaders::CompileShader(nullptr, NULL, MeshGenerator::Mesh::m_shaderProgram);
+        VTerrain::Shaders::CompileShader(nullptr, nullptr, MeshGenerator::Mesh::m_shaderProgram);
     }
 }

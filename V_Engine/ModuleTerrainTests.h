@@ -24,12 +24,16 @@ public:
 	void Render(const viewPort& port) override;
 
     void GenMap();
+	void WantRegen();
 
     VTerrain::PerlinNoise::NoiseMap m_noiseMap;
     VTerrain::MeshGenerator::Mesh m_mesh;
 
     //NoiseGeneration
     uint32_t seed;
+
+	bool m_wantRegen;
+	Timer m_regenTimer;
 
     uint m_heightmapBuffer = 0;
 

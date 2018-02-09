@@ -23,31 +23,16 @@ bool ModuleCamera3D::Start()
 	bool ret = true;
 	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
+	defaultCamera->SetFarPlane(4000);
 	defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 1000, 0);
 	topView->GetTransform()->SetLocalRot(90, 0, 0);
 	topView->GetTransform()->allowRotation = false;
-	topView->GetComponent<Camera>().front()->SetFarPlane(2000);
+	topView->GetComponent<Camera>().front()->SetFarPlane(4000);
 	topView->GetComponent<Camera>().front()->SwitchViewType();
 	topView->HideFromOutliner();
-
-	frontView = App->GO->CreateCamera("FrontView");
-	frontView->GetTransform()->SetLocalPos(0, 0, -1000);
-	frontView->GetTransform()->SetLocalRot(0, 0, 0);
-	frontView->GetTransform()->allowRotation = false;
-	frontView->GetComponent<Camera>().front()->SetFarPlane(2000);
-	frontView->GetComponent<Camera>().front()->SwitchViewType();
-	frontView->HideFromOutliner();
-
-	rightView = App->GO->CreateCamera("RightView");
-	rightView->GetTransform()->SetLocalPos(-1000, 0, 0);
-	rightView->GetTransform()->SetLocalRot(0, 90, 0);
-	rightView->GetTransform()->allowRotation = false;
-	rightView->GetComponent<Camera>().front()->SetFarPlane(2000);
-	rightView->GetComponent<Camera>().front()->SwitchViewType();
-	rightView->HideFromOutliner();
 
 	return ret;
 }

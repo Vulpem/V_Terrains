@@ -14,14 +14,14 @@
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
     , m_offset(0.f, 0.f)
-    , m_size(75, 75)
-    , m_frequency(10.f)
-    , m_octaves(5)
-    , m_lacunarity(2.f)
-    , m_persistance (0.25f)
+    , m_size(128, 128)
+    , m_frequency(0.8f)
+    , m_octaves(8)
+    , m_lacunarity(2.0f)
+    , m_persistance (0.4f)
     , m_simplifyRender(false)
     , m_simplifyRenderStep(0.2f)
-    , m_maxHeight(15.f)
+    , m_maxHeight(100.f)
 {
 	moduleName = "ModuleTerrainTests";
 }
@@ -46,7 +46,7 @@ bool ModuleTerrain::Start()
     m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, 1, 1);
     GenMap();
 
-    VTerrain::Shaders::CompileShader(nullptr, nullptr, m_shaderProgram);
+    
 
     std::vector<float> img;
     for (uint y = 0; y < m_size.y; y++)
@@ -62,6 +62,13 @@ bool ModuleTerrain::Start()
 				img.push_back(val1);
 				img.push_back(val2);
 			}
+			else
+			{
+				img.push_back(val2);
+				img.push_back(val2);
+				img.push_back(val2);
+			}
+			/*
 			else
 			{
 				if (x % squareSize > squareSize / 2 - 1)
@@ -94,7 +101,7 @@ bool ModuleTerrain::Start()
 						img.push_back(val1);
 					}
 				}
-			}
+			}*/
         }
     }
 	m_squaredPatternBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
@@ -115,7 +122,7 @@ update_status ModuleTerrain::Update()
     VTerrain::ChunkManager::Update(pos.x, pos.z);
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
-    bool regen = false;
+
     if (ImGui::Begin("TerrainTests"))
     {
         const int W = static_cast<int>(VTerrain::Config::chunkWidth);
@@ -144,37 +151,45 @@ update_status ModuleTerrain::Update()
 
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
 
-        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { regen = true; }
+        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { WantRegen(); }
 
-        if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { regen = true; }
+        if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
 
-        if (ImGui::DragFloat2("Offset", &m_offset[0], 1.f)) { regen = true; }
+        if (ImGui::DragFloat2("Offset", &m_offset[0], 1.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.1f, 64.f)) { regen = true; }
-        if (ImGui::DragFloat("Frequency", &m_frequency, 0.1f, 0.1f, 64.f)) { regen = true; }
+        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.1f, 20.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Frequency", &m_frequency, 0.1f, 0.1f, 64.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 16)) { regen = true; }
-        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 16)) { regen = true; }
+        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 16)) { WantRegen(); }
+        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 16)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.1f, 20.f)) { regen = true; }
-        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.1f, 0.1f, 20.f)) { regen = true; }
+        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.1f, 20.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.1f, 0.1f, 20.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.01f, 1.f)) { regen = true; }
-        if (ImGui::DragFloat("Persistance", &m_persistance, 0.1f, 0.01f, 1.f)) { regen = true; }
+        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.01f, 1.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Persistance", &m_persistance, 0.1f, 0.01f, 1.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::Checkbox("Simplify render", &m_simplifyRender)) { regen = true; }
-        if (ImGui::SliderFloat("Simplify render step", &m_simplifyRenderStep, 0.01f, 1.f)) { regen = true; }
+        if (ImGui::Checkbox("Simplify render", &m_simplifyRender)) { WantRegen(); }
+        if (ImGui::SliderFloat("Simplify render step", &m_simplifyRenderStep, 0.01f, 1.f)) { WantRegen(); }
         ImGui::NewLine();
 
         float width = ImGui::GetWindowWidth() - 50;
         ImGui::Image((void*)m_heightmapBuffer, ImVec2(width, width));
         ImGui::End();
     }
+
+	if (m_wantRegen && m_regenTimer.Read() > 2000.0f)
+	{
+		m_regenTimer.Stop();
+		m_wantRegen = false;
+		GenMap();
+		VTerrain::ChunkManager::RegenAll();
+	}
     return UPDATE_CONTINUE;
 }
 
@@ -206,4 +221,10 @@ void ModuleTerrain::GenMap()
     VTerrain::Config::Noise::octaves = m_octaves;
     VTerrain::Config::Noise::lacunarity = m_lacunarity;
     VTerrain::Config::Noise::persistency = m_persistance;
+}
+
+void ModuleTerrain::WantRegen()
+{
+	m_wantRegen = true;
+	m_regenTimer.Start();
 }
