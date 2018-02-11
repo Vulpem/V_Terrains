@@ -68,40 +68,6 @@ bool ModuleTerrain::Start()
 				img.push_back(val2);
 				img.push_back(val2);
 			}
-			/*
-			else
-			{
-				if (x % squareSize > squareSize / 2 - 1)
-				{
-					if (y % squareSize > squareSize / 2 - 1)
-					{
-						img.push_back(val1);
-						img.push_back(val1);
-						img.push_back(val1);
-					}
-					else
-					{
-						img.push_back(val2);
-						img.push_back(val2);
-						img.push_back(val2);
-					}
-				}
-				else
-				{
-					if (y % squareSize > squareSize / 2 - 1)
-					{
-						img.push_back(val2);
-						img.push_back(val2);
-						img.push_back(val2);
-					}
-					else
-					{
-						img.push_back(val1);
-						img.push_back(val1);
-						img.push_back(val1);
-					}
-				}
-			}*/
         }
     }
 	m_squaredPatternBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
@@ -132,6 +98,13 @@ update_status ModuleTerrain::Update()
             floor((pos.z - floor(H / 2.f) + (H % 2 != 0)) / H + 1)
         };
         ImGui::DragInt2("CurrentChunk", p);
+
+        int tmpLOD = VTerrain::Config::TMP::LOD;
+        if (ImGui::SliderInt("LOD", &tmpLOD, 0, 6))
+        {
+            VTerrain::Config::TMP::LOD = tmpLOD;
+        }
+
 
 		if (ImGui::Checkbox("DebugSquaredPattern", &m_showDebugPattern))
 		{

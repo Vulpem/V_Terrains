@@ -103,24 +103,24 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::GenerateIndices(uint width, uint height, uint LOD)
     {
+        //width = height = 8;
         std::vector<uint> indices((width)*(height) * 6);
         uint n = 0;
         uint i = 0;
         uint step = pow(2, LOD);
         for (uint y = 0; y < height + 1; y += step)
         {
+            i = (width + 1)*y;
             for (uint x = 0; x < width + 1; x += step)
             {
                 if (x < width && y < height)
                 {
                     indices[n++] = i;
-                    indices[n++] = i * step + (width + 1) * step;
-                    indices[n++] = i * step + (width + 1) * step + step;
+                    indices[n++] = i + (width + 1) * step;
+                    indices[n++] = i + (width + 1) * step + step;
                     indices[n++] = i + (width + 1) * step + step;
                     indices[n++] = i + step;
                     indices[n++] = i;
-                    //    AddTri(n, n + width, n + width + 1);
-                    //    AddTri(n + width + 1, n + 1, n);
                 }
                 i += step;
             }

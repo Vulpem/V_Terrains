@@ -38,6 +38,7 @@ namespace VTerrain
         {
         public:
             static unsigned int debugTexBuf;
+            static unsigned int LOD;
         };
    };
 }

@@ -90,7 +90,10 @@ namespace VTerrain
     {
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            it->second.Draw(viewMatrix, projectionMatrix, it->first, (it->first != m_instance.m_lastOffPos && false));
+            //TODO set LOD
+            //(m_instance.m_lastOffPos - it->first).Length();
+
+            it->second.Draw(viewMatrix, projectionMatrix, it->first, Config::TMP::LOD);
         }
     }
 

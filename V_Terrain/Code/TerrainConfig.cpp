@@ -20,7 +20,7 @@ namespace VTerrain
 	unsigned int Config::chunkWidth = 128u;
 	unsigned int Config::chunkHeight = 128u;
     unsigned int Config::maxChunks = 64;
-    unsigned int Config::nLODs = 4;
+    unsigned int Config::nLODs = 6;
 
 	float Config::globalLight[3] = { 0.2f, 0.2f, 0.2f };
 
@@ -30,5 +30,6 @@ namespace VTerrain
 	float Config::Noise::persistency = 0.4f;
 
     unsigned int Config::TMP::debugTexBuf = 0;
+    unsigned int Config::TMP::LOD = 0;
 
 }
