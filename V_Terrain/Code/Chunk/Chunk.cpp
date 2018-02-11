@@ -24,9 +24,9 @@ namespace VTerrain
 
     void ChunkManager::Chunk::Regenerate(Vec2<int> offset)
     {
-        VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset); //46/60ms
+        VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset);
         VTerrain::MeshGenerator::MeshData meshData;
-        meshData.GenerateData(m_noiseMap); //251/150ms
+        meshData.GenerateData(m_noiseMap);
         m_mesh.Generate(meshData);
         m_maxLOD = 0;
     }

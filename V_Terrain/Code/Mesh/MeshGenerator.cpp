@@ -103,41 +103,27 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::GenerateIndices(uint width, uint height, uint LOD)
     {
-        //Number of LODs is too high
-        assert(pow(2, Config::nLODs-1) <= Config::chunkWidth);
-        assert(pow(2, Config::nLODs-1) <= Config::chunkHeight);
-
         std::vector<uint> indices((width)*(height) * 6);
         uint n = 0;
         uint i = 0;
         uint step = pow(2, LOD);
-        for (uint y = 0; y < height + 1; y += step)
+        for (uint y = 0; y < height; y += step)
         {
             i = (width + 1)*y;
-            for (uint x = 0; x < width + 1; x += step)
+            for (uint x = 0; x < width; x += step)
             {
-                const uint b = (width + 1)*(y + 1)-1;
-                const uint c = (width + 1)*(y + 1);
-                const uint d = (width + 1)*(y + 2) - 1;
-
-                if (x < width && y < height)
+                if (x < width - 1 && y < height - 1)
                 {
                     indices[n++] = i;
-                    indices[n++] = i + (width + 1) * step;
-                    indices[n++] = i + (width + 1) * step + step;
+                    indices[n++] = i + (width + 1) * utils::Min(step, height - y);
+                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, width - x);
 
-                    indices[n++] = i + (width + 1) * step + step;
-                    indices[n++] = i + step;
+                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, width - x);
+                    indices[n++] = i + utils::Min(step, width - x);
                     indices[n++] = i;
                 }
                 i += step;
             }
-        }
-
-        std::vector<Vec3<uint>> tmp;
-        for (int a = 0; a < n; a += 3)
-        {
-            tmp.push_back(Vec3<uint>(indices[a], indices[a + 1], indices[a + 2]));
         }
 
         m_nIndices[LOD] = n;
