@@ -103,7 +103,10 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::GenerateIndices(uint width, uint height, uint LOD)
     {
-        //width = height = 8;
+        //Number of LODs is too high
+        assert(pow(2, Config::nLODs-1) <= Config::chunkWidth);
+        assert(pow(2, Config::nLODs-1) <= Config::chunkHeight);
+
         std::vector<uint> indices((width)*(height) * 6);
         uint n = 0;
         uint i = 0;
@@ -113,11 +116,16 @@ namespace VTerrain
             i = (width + 1)*y;
             for (uint x = 0; x < width + 1; x += step)
             {
+                const uint b = (width + 1)*(y + 1)-1;
+                const uint c = (width + 1)*(y + 1);
+                const uint d = (width + 1)*(y + 2) - 1;
+
                 if (x < width && y < height)
                 {
                     indices[n++] = i;
                     indices[n++] = i + (width + 1) * step;
                     indices[n++] = i + (width + 1) * step + step;
+
                     indices[n++] = i + (width + 1) * step + step;
                     indices[n++] = i + step;
                     indices[n++] = i;

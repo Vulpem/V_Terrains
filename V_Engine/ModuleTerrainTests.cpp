@@ -100,7 +100,7 @@ update_status ModuleTerrain::Update()
         ImGui::DragInt2("CurrentChunk", p);
 
         int tmpLOD = VTerrain::Config::TMP::LOD;
-        if (ImGui::SliderInt("LOD", &tmpLOD, 0, 6))
+        if (ImGui::SliderInt("LOD", &tmpLOD, 0,VTerrain::Config::nLODs - 1))
         {
             VTerrain::Config::TMP::LOD = tmpLOD;
         }

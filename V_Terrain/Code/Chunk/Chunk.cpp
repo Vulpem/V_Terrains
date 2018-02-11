@@ -19,7 +19,8 @@ namespace VTerrain
 
     ChunkManager::Chunk::Chunk() :
         m_maxLOD(UINT_MAX)
-    {}
+    {
+    }
 
     void ChunkManager::Chunk::Regenerate(Vec2<int> offset)
     {
