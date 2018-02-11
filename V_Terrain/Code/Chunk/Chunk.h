@@ -28,21 +28,16 @@ namespace VTerrain
         public:
             Chunk();
 
-            void Regenerate(uint LOD, bool force = false);
-            void Regenerate(uint LOD, Vec2<int> offset, bool force = false);
+            void Regenerate(Vec2<int> offset);
             void Free();
-            void Draw(const float* viewMatrix, const float* projectionMatrix);
-			Vec2<int> GetPos() { return m_offset; }
-			uint GetLOD() { return m_LOD; }
-            bool IsUsed() { return m_mesh.m_used; }
-            float DistanceToSqr(Vec2<int> chunkIndex);
+            void Draw(const float* viewMatrix, const float* projectionMatrix, Vec2<int> pos, uint LOD = 0);
+            bool IsLODReady(uint LOD);
 
-            std::mutex m_mutex;
         private:
+            std::thread m_RegenThread;
+            uint m_maxLOD;
 
             MeshGenerator::Mesh m_mesh;
-            Vec2<int> m_offset;
-            uint m_LOD;
         };
 
         ChunkManager();
@@ -58,18 +53,20 @@ namespace VTerrain
         static void RegenChunk();
 
         static void AddChunksToRegen(Vec2<int> pos);
-        static void AddChunkToRegen(uint LOD, Vec2<int> pos);	
-        static void AddChunkToForceRegen(uint LOD, Vec2<int> pos);
+        static void AddChunkToRegen(Vec2<int> pos);	
+        static void AddChunkToForceRegen(Vec2<int> pos);
 
         static bool IsVisible(Vec2<int> pos);
 		static bool IsLoaded(Vec2<int> pos);
         static Vec2<int> GetFurthestChunk();
 
         std::map<Vec2<int>, Chunk> m_chunks;
-        std::map<uint, std::list<Vec2<int>>> m_chunkstoRegen;
-        std::map<uint, std::list<Vec2<int>>> m_chunkstoForceRegen;
+        std::queue<Vec2<int>> m_chunkstoRegen;
+        std::queue<Vec2<int>> m_chunkstoForceRegen;
         Vec2<int> m_lastOffPos;
         Vec2<int> m_currentChunk;
+
+        bool m_firstFrame;
 
         static ChunkManager m_instance;
     };

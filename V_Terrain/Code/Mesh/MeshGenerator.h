@@ -28,39 +28,36 @@ namespace VTerrain
             MeshData();
             ~MeshData();
             
-            void Generate(const PerlinNoise::NoiseMap& map);
-
+            void GenerateData(const PerlinNoise::NoiseMap& map);
         private:
             void AddVertex(const Vec3<float>& v);
             void AddUV(const Vec2<float>& uv);
             void AddNormal(const Vec3<float>& n);
 
-            void AddTri(uint a, uint b, uint c);
             uint m_nVertices = 0;
             uint m_nUVs = 0;
             uint m_nNormals = 0;
-            uint m_nIndices = 0;
 
         public:
             std::vector<float> m_data;
-
-            std::vector<uint> m_indices;
         };
 
         class Mesh
         {
         public:
-            uint m_dataBuff;
-            uint m_indicesBuff;
-            uint m_nIndices = 0u;
-            bool m_used = false;
-
-            static uint m_shaderProgram;
-           
             void Generate(const MeshData& meshData);
+            static void GenerateIndices(uint width, uint height, uint LOD);
+
             void FreeMesh();
 
-            void Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset);
+            void Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset, uint LOD);
+       
+            uint m_dataBuff;
+            static uint m_shaderProgram;
+        private:
+            bool m_bufferGenerated = false;
+            static std::map<uint, uint> m_indicesBuff;
+            static std::map<uint, uint> m_nIndices;
         };
 #pragma endregion
     };

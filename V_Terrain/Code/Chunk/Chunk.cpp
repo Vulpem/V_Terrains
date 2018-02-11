@@ -18,27 +18,16 @@ namespace VTerrain
     ChunkManager ChunkManager::m_instance = ChunkManager();
 
     ChunkManager::Chunk::Chunk() :
-        m_LOD(0u)
-        , m_offset(0,0)
+        m_maxLOD(UINT_MAX)
     {}
 
-    void ChunkManager::Chunk::Regenerate(uint LOD, bool force)
+    void ChunkManager::Chunk::Regenerate(Vec2<int> offset)
     {
-        Regenerate(LOD, m_offset, force);
-    }
-
-    void ChunkManager::Chunk::Regenerate(uint LOD, Vec2<int> offset, bool force)
-    {
-		if (LOD != m_LOD || force == true)
-		{
-            m_offset = offset;
-			m_LOD = LOD;
-
-			VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset); //46/60ms
-			VTerrain::MeshGenerator::MeshData meshData;
-			meshData.Generate(m_noiseMap); //251/150ms
-			m_mesh.Generate(meshData);
-		}
+        VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset); //46/60ms
+        VTerrain::MeshGenerator::MeshData meshData;
+        meshData.GenerateData(m_noiseMap); //251/150ms
+        m_mesh.Generate(meshData);
+        m_maxLOD = 0;
     }
 
     void ChunkManager::Chunk::Free()
@@ -46,22 +35,23 @@ namespace VTerrain
         m_mesh.FreeMesh();
     }
 
-    void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix)
+    void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, Vec2<int> pos, uint LOD)
     {
-        if (IsUsed())
+        if (IsLODReady(LOD))
         {
-            m_mesh.Render(viewMatrix, projectionMatrix, Vec3<int>(m_offset.x() * Config::chunkWidth,0u,m_offset.y() * Config::chunkHeight));
+            m_mesh.Render(viewMatrix, projectionMatrix, Vec3<int>(pos.x() * (Config::chunkWidth - 1),0u, pos.y() * (Config::chunkHeight - 1)), LOD);
         }
     }
 
-    float ChunkManager::Chunk::DistanceToSqr(Vec2<int> chunkIndex)
+    bool ChunkManager::Chunk::IsLODReady(uint LOD)
     {
-        return (m_offset - chunkIndex).LengthSqr();
+        return (LOD >= m_maxLOD);
     }
 
     ChunkManager::ChunkManager() :
         m_lastOffPos(0, 0)
         , m_currentChunk(0, 0)
+        , m_firstFrame(true)
     {
     }
 
@@ -74,16 +64,25 @@ namespace VTerrain
             floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
         
-        if (off != m_instance.m_lastOffPos || m_instance.m_chunks.empty() == true)
+        if (off != m_instance.m_lastOffPos || m_instance.m_firstFrame)
         {
             m_instance.m_lastOffPos = off;
             AddChunksToRegen(off);
         }
 
         RegenChunk();
-        if (m_instance.m_chunks.size() > Config::GetMaxChunks())
+        if (m_instance.m_chunks.size() > Config::maxChunks)
         {
             FreeChunk();
+        }
+
+        if (m_instance.m_firstFrame)
+        {
+            for (int n = 0; n < Config::nLODs; n++)
+            {
+                MeshGenerator::Mesh::GenerateIndices(Config::chunkWidth, Config::chunkHeight, n);
+            }
+            m_instance.m_firstFrame = false;
         }
     }
 
@@ -91,7 +90,7 @@ namespace VTerrain
     {
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            it->second.Draw(viewMatrix, projectionMatrix);
+            it->second.Draw(viewMatrix, projectionMatrix, it->first, (it->first != m_instance.m_lastOffPos && false));
         }
     }
 
@@ -102,7 +101,8 @@ namespace VTerrain
             it->second.Free();
         }
         m_instance.m_chunks.clear();
-        m_instance.m_chunkstoRegen.clear();
+        while (m_instance.m_chunkstoRegen.empty() == false) { m_instance.m_chunkstoRegen.pop(); }
+        while (m_instance.m_chunkstoForceRegen.empty() == false) { m_instance.m_chunkstoForceRegen.pop(); }
         AddChunksToRegen(m_instance.m_lastOffPos);
     }
 
@@ -110,7 +110,7 @@ namespace VTerrain
     {
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            AddChunkToForceRegen(it->second.GetLOD(), it->second.GetPos());
+            AddChunkToForceRegen(it->first);
         }
     }
 
@@ -121,29 +121,25 @@ namespace VTerrain
 
     void ChunkManager::RegenChunk()
     {
-        for (auto it = m_instance.m_chunkstoForceRegen.begin(); it != m_instance.m_chunkstoForceRegen.end(); it++)
+        Vec2<int> pos;
+        bool found = false;
+        if (m_instance.m_chunkstoForceRegen.empty() == false)
         {
-            if (it->second.empty() == false)
-            {
-                const Vec2<int> offset = it->second.front();
-                const uint LOD = it->first;
-                m_instance.m_chunks[offset].Regenerate(LOD, offset, true);
-                it->second.pop_front();
-                return;
-            }
+            pos = m_instance.m_chunkstoForceRegen.front();
+            m_instance.m_chunkstoForceRegen.pop();
+            found = true;
         }
 
-        for (auto it = m_instance.m_chunkstoRegen.begin(); it != m_instance.m_chunkstoRegen.end(); it++)
+        if (found == false && m_instance.m_chunkstoRegen.empty() == false)
         {
-            if (it->second.empty() == false)
-            {
-                const Vec2<int> offset = it->second.front();
-                    const uint LOD = it->first;
-                    m_instance.m_chunks[offset].Regenerate(LOD, offset);
-                    it->second.pop_front();
-                    return;
-               
-            }
+            pos = m_instance.m_chunkstoRegen.front();
+            m_instance.m_chunkstoRegen.pop();
+            found = (m_instance.m_chunks.find(pos) == m_instance.m_chunks.end());
+        }
+
+        if (found)
+        {
+            m_instance.m_chunks[pos].Regenerate(pos);
         }
     }
 
@@ -154,19 +150,19 @@ namespace VTerrain
         {
             for (int x = -2; x <= 2; x++)
             {
-                AddChunkToRegen(1, Vec2<int>(pos.x() + x, pos.y() + y));
+                AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
             }
         }
     }
 
-    void ChunkManager::AddChunkToRegen(uint LOD, Vec2<int> pos)
+    void ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
-        m_instance.m_chunkstoRegen[LOD].push_back(pos);
+        m_instance.m_chunkstoRegen.push(pos);
     }
 
-    void ChunkManager::AddChunkToForceRegen(uint LOD, Vec2<int> pos)
+    void ChunkManager::AddChunkToForceRegen(Vec2<int> pos)
     {
-        m_instance.m_chunkstoForceRegen[LOD].push_back(pos);
+        m_instance.m_chunkstoForceRegen.push(pos);
     }
 
     bool ChunkManager::IsVisible(Vec2<int> pos)
@@ -187,11 +183,11 @@ namespace VTerrain
         Vec2<int> ret;
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            const float dist = it->second.DistanceToSqr(m_instance.m_lastOffPos);
+            const float dist = (it->first - m_instance.m_lastOffPos).LengthSqr();
             if (dist > maxDist)
             {
                 maxDist = dist;
-                ret = it->second.GetPos();
+                ret = it->first;
             }
         }
         return ret;

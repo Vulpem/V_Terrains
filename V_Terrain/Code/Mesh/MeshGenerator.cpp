@@ -24,13 +24,6 @@ namespace VTerrain
     {
     }
 
-    void MeshGenerator::MeshData::AddTri(uint a, uint b, uint c)
-    {
-        m_indices[m_nIndices++] = a;
-        m_indices[m_nIndices++] = b;
-        m_indices[m_nIndices++] = c;
-    }
-
     void MeshGenerator::MeshData::AddVertex(const Vec3<float>& v)
     {
         m_data[m_nVertices * 8 + 0] = v.x();
@@ -54,10 +47,9 @@ namespace VTerrain
         m_nNormals++;
     }
 
-	void MeshGenerator::MeshData::Generate(const PerlinNoise::NoiseMap & map)
+	void MeshGenerator::MeshData::GenerateData(const PerlinNoise::NoiseMap & map)
 	{
         m_data.resize((map.Width()-2)*(map.Height()-2) * 8);
-		m_indices.resize((map.Width() - 3)*(map.Height() - 3) * 6);
 
 		//Subtracting 1 if Width is odd
 		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
@@ -69,13 +61,6 @@ namespace VTerrain
             {
                 AddVertex(Vec3<float>(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y));
                 AddUV(Vec2<float>((float)(x - 1) / (float)(map.Width() - 3), (float)(y - 1) / (float)(map.Height() - 3)));
-
-                if (x < map.Width() - 2 && y < map.Height() - 2)
-                {
-                    const uint index = m_nVertices - 1;
-                    AddTri(index, index + map.Width() - 2, index + map.Width() + 1 - 2);
-                    AddTri(index + map.Width() + 1 - 2, index + 1, index);
-                }
 
                 const Vec3<float> central(topLeftX - x, map[x + y * map.Width()] * Config::maxHeight, topLeftY - y);
                 const Vec3<float> top =    central - Vec3<float>(topLeftX - x,     map[x + (y + 1) * map.Width()] * Config::maxHeight, topLeftY - (y + 1));
@@ -95,51 +80,85 @@ namespace VTerrain
 		}
 	}
 
+    
+
+
+
+    std::map<uint, uint> MeshGenerator::Mesh::m_indicesBuff;
+    std::map<uint, uint> MeshGenerator::Mesh::m_nIndices;
     uint MeshGenerator::Mesh::m_shaderProgram = 0;
 
     void MeshGenerator::Mesh::Generate(const MeshData & meshData)
     {
-        if (!m_used)
+        if (m_bufferGenerated == false)
         {
             glGenBuffers(1, (GLuint*) &(m_dataBuff));
-            glGenBuffers(1, (GLuint*) &(m_indicesBuff));
-            m_used = true;
+            m_bufferGenerated = true;
         }
-        
-        m_nIndices = meshData.m_indices.size();
        
         glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * meshData.m_data.size(), meshData.m_data.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices, meshData.m_indices.data(), GL_STATIC_DRAW);
+    void MeshGenerator::Mesh::GenerateIndices(uint width, uint height, uint LOD)
+    {
+        std::vector<uint> indices((width)*(height) * 6);
+        uint n = 0;
+        uint i = 0;
+        uint step = pow(2, LOD);
+        for (uint y = 0; y < height + 1; y += step)
+        {
+            for (uint x = 0; x < width + 1; x += step)
+            {
+                if (x < width && y < height)
+                {
+                    indices[n++] = i;
+                    indices[n++] = i * step + (width + 1) * step;
+                    indices[n++] = i * step + (width + 1) * step + step;
+                    indices[n++] = i + (width + 1) * step + step;
+                    indices[n++] = i + step;
+                    indices[n++] = i;
+                    //    AddTri(n, n + width, n + width + 1);
+                    //    AddTri(n + width + 1, n + 1, n);
+                }
+                i += step;
+            }
+        }
+
+        std::vector<Vec3<uint>> tmp;
+        for (int a = 0; a < n; a += 3)
+        {
+            tmp.push_back(Vec3<uint>(indices[a], indices[a + 1], indices[a + 2]));
+        }
+
+        m_nIndices[LOD] = n;
+        if (m_indicesBuff.find(LOD) == m_indicesBuff.end())
+        {
+            glGenBuffers(1, &m_indicesBuff[LOD]);
+        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff[LOD]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices[LOD], indices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void MeshGenerator::Mesh::FreeMesh()
     {
-        if (m_used)
+        if (m_bufferGenerated)
         {
             glDeleteBuffers(1, &m_dataBuff);
-            glDeleteBuffers(1, &m_indicesBuff);
-            m_used = false;
-            m_nIndices = 0;
+            m_bufferGenerated = false;
         }
     }
-    void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset)
+    void MeshGenerator::Mesh::Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset, uint LOD)
     {
-        if (m_used)
+        if (m_bufferGenerated)
         {
             glUseProgram(m_shaderProgram);
 
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glEnableClientState(GL_NORMAL_ARRAY);
-
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-            glLoadIdentity();
 
             glEnable(GL_TEXTURE_2D);
             glActiveTexture(GL_TEXTURE0);
@@ -195,7 +214,7 @@ namespace VTerrain
 
 
             glBindBuffer(GL_ARRAY_BUFFER, m_dataBuff);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff[LOD]);
 
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)0);
             glEnableVertexAttribArray(0);
@@ -207,13 +226,7 @@ namespace VTerrain
             glEnableVertexAttribArray(2);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDrawElements(GL_TRIANGLES, m_nIndices, GL_UNSIGNED_INT, (void*)0);
-
-            GLenum error = glGetError();
-            if (error != GL_NO_ERROR)
-            {
-                char* err = (char*)glewGetErrorString(error);
-            }
+            glDrawElements(GL_TRIANGLES, m_nIndices[LOD], GL_UNSIGNED_INT, (void*)0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
