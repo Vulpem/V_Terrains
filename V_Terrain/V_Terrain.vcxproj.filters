@@ -63,6 +63,9 @@
     <ClInclude Include="Code\Chunk\Chunk.h">
       <Filter>Source Files\Chunk</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Chunk\ChunkFactory.h">
+      <Filter>Source Files\Chunk</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Code\Chunk\Chunk.cpp">
+      <Filter>Source Files\Chunk</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Chunk\ChunkFactory.cpp">
       <Filter>Source Files\Chunk</Filter>
     </ClCompile>
   </ItemGroup>

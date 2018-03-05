@@ -15,6 +15,7 @@
 #include "../Utils/Globals.h"
 
 #include "../Mesh/MeshGenerator.h"
+#include "ChunkFactory.h"
 
 #include <mutex>
 
@@ -28,16 +29,16 @@ namespace VTerrain
         public:
             Chunk();
 
-            void Regenerate(Vec2<int> offset);
+            void Regenerate(ChunkFactory::GeneratedChunk base);
             void Free();
-            void Draw(const float* viewMatrix, const float* projectionMatrix, Vec2<int> pos, uint LOD = 0);
+            void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0);
             bool IsLODReady(uint LOD);
+            Vec2<int> GetPos() { return m_pos; }
 
         private:
-            std::thread m_RegenThread;
-            uint m_maxLOD;
-
-            MeshGenerator::Mesh m_mesh;
+            Vec2<int> m_pos;
+            uint m_minLOD;
+            uint m_buf_heightmap;
         };
 
         ChunkManager();
@@ -49,22 +50,20 @@ namespace VTerrain
         static void RegenAll();
 
     private:
-        static void FreeChunk();
-        static void RegenChunk();
-
         static void AddChunksToRegen(Vec2<int> pos);
         static void AddChunkToRegen(Vec2<int> pos);	
         static void AddChunkToForceRegen(Vec2<int> pos);
 
-        static bool IsVisible(Vec2<int> pos);
+        static Chunk& GetChunk(Vec2<int> pos);
 		static bool IsLoaded(Vec2<int> pos);
         static Vec2<int> GetFurthestChunk();
 
-        std::map<Vec2<int>, Chunk> m_chunks;
-        std::queue<Vec2<int>> m_chunkstoRegen;
-        std::queue<Vec2<int>> m_chunkstoForceRegen;
+        std::vector<Chunk> m_chunks;
+
         Vec2<int> m_lastOffPos;
         Vec2<int> m_currentChunk;
+
+        ChunkFactory m_factory;
 
         bool m_firstFrame;
 

@@ -52,8 +52,8 @@ namespace VTerrain
         m_data.resize((map.Width()-2)*(map.Height()-2) * 8);
 
 		//Subtracting 1 if Width is odd
-		float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
-		float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
+		const float topLeftX = (map.Width() - (map.Width() % 2 != 0)) / 2.f;
+        const float topLeftY = (map.Height() - (map.Height() % 2 != 0)) / 2.f;
 
 		for (uint y = 1; y < map.Height() - 1; y++)
 		{

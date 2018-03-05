@@ -11,6 +11,7 @@
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #include "Chunk.h"
+#include "../Utils/GenImage.h"
 #include <math.h>
 
 namespace VTerrain
@@ -18,35 +19,40 @@ namespace VTerrain
     ChunkManager ChunkManager::m_instance = ChunkManager();
 
     ChunkManager::Chunk::Chunk() :
-        m_maxLOD(UINT_MAX)
+        m_minLOD(UINT_MAX)
+        , m_buf_heightmap(0u)
     {
     }
 
-    void ChunkManager::Chunk::Regenerate(Vec2<int> offset)
+    void ChunkManager::Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
     {
-        VTerrain::PerlinNoise::NoiseMap m_noiseMap = VTerrain::PerlinNoise::GenNoiseMap(offset);
-        VTerrain::MeshGenerator::MeshData meshData;
-        meshData.GenerateData(m_noiseMap);
-        m_mesh.Generate(meshData);
-        m_maxLOD = 0;
+        m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
+        m_minLOD = base.m_LOD;
+        m_pos = base.m_pos;
     }
 
     void ChunkManager::Chunk::Free()
     {
-        m_mesh.FreeMesh();
+        GenImage::FreeImage(m_buf_heightmap);
+        m_minLOD = UINT_MAX;
     }
 
-    void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, Vec2<int> pos, uint LOD)
+    void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD)
     {
-        if (IsLODReady(LOD))
+        if (m_minLOD != UINT_MAX)
         {
-            m_mesh.Render(viewMatrix, projectionMatrix, Vec3<int>(pos.x() * (Config::chunkWidth - 1),0u, pos.y() * (Config::chunkHeight - 1)), LOD);
+            uint drawLOD = LOD;
+            if (IsLODReady(LOD) == false)
+            {
+                drawLOD = m_minLOD;
+            }
+            m_mesh.Render(viewMatrix, projectionMatrix, Vec3<int>(pos.x() * (Config::chunkWidth - 1), 0u, pos.y() * (Config::chunkHeight - 1)), LOD);
         }
     }
 
     bool ChunkManager::Chunk::IsLODReady(uint LOD)
     {
-        return (LOD >= m_maxLOD);
+        return (LOD >= m_minLOD);
     }
 
     ChunkManager::ChunkManager() :
@@ -71,12 +77,6 @@ namespace VTerrain
             AddChunksToRegen(off);
         }
 
-        RegenChunk();
-        if (m_instance.m_chunks.size() > Config::maxChunks)
-        {
-            FreeChunk();
-        }
-
         if (m_instance.m_firstFrame)
         {
             for (int n = 0; n < Config::nLODs; n++)
@@ -93,8 +93,7 @@ namespace VTerrain
         {
             //TODO set LOD
             //(m_instance.m_lastOffPos - it->first).Length();
-
-            it->second.Draw(viewMatrix, projectionMatrix, it->first, Config::TMP::LOD);
+            it->Draw(viewMatrix, projectionMatrix, Config::TMP::LOD);
         }
     }
 
@@ -102,11 +101,8 @@ namespace VTerrain
     {
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            it->second.Free();
+            it->Free();
         }
-        m_instance.m_chunks.clear();
-        while (m_instance.m_chunkstoRegen.empty() == false) { m_instance.m_chunkstoRegen.pop(); }
-        while (m_instance.m_chunkstoForceRegen.empty() == false) { m_instance.m_chunkstoForceRegen.pop(); }
         AddChunksToRegen(m_instance.m_lastOffPos);
     }
 
@@ -114,36 +110,7 @@ namespace VTerrain
     {
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            AddChunkToForceRegen(it->first);
-        }
-    }
-
-    void ChunkManager::FreeChunk()
-    {
-        m_instance.m_chunks.erase(GetFurthestChunk());
-    }
-
-    void ChunkManager::RegenChunk()
-    {
-        Vec2<int> pos;
-        bool found = false;
-        if (m_instance.m_chunkstoForceRegen.empty() == false)
-        {
-            pos = m_instance.m_chunkstoForceRegen.front();
-            m_instance.m_chunkstoForceRegen.pop();
-            found = true;
-        }
-
-        if (found == false && m_instance.m_chunkstoRegen.empty() == false)
-        {
-            pos = m_instance.m_chunkstoRegen.front();
-            m_instance.m_chunkstoRegen.pop();
-            found = (m_instance.m_chunks.find(pos) == m_instance.m_chunks.end());
-        }
-
-        if (found)
-        {
-            m_instance.m_chunks[pos].Regenerate(pos);
+            AddChunkToForceRegen(it->GetPos());
         }
     }
 
@@ -161,23 +128,41 @@ namespace VTerrain
 
     void ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
-        m_instance.m_chunkstoRegen.push(pos);
+        if (IsLoaded(pos) == false)
+        {
+            m_instance.m_factory.PushChunkRequest(pos);
+        }
     }
 
     void ChunkManager::AddChunkToForceRegen(Vec2<int> pos)
     {
-        m_instance.m_chunkstoForceRegen.push(pos);
+        m_instance.m_factory.PushChunkRequest(pos);
     }
 
-    bool ChunkManager::IsVisible(Vec2<int> pos)
+    ChunkManager::Chunk & ChunkManager::GetChunk(Vec2<int> pos)
     {
-        //TODO
-        return false;
+        for (std::vector<Chunk>::iterator it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        {
+            if (it->GetPos() == pos)
+            {
+                return *it;
+            }
+        }
+        assert(false);
+        Chunk a;
+        return a;
     }
 
     bool ChunkManager::IsLoaded(Vec2<int> pos)
 	{
-        return m_instance.m_chunks.find(pos) != m_instance.m_chunks.end();
+        for (std::vector<Chunk>::iterator it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        {
+            if (it->GetPos() == pos)
+            {
+                return true;
+            }
+        }
+        return false;
 	}
 
     Vec2<int> ChunkManager::GetFurthestChunk()
@@ -187,11 +172,11 @@ namespace VTerrain
         Vec2<int> ret;
         for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
         {
-            const float dist = (it->first - m_instance.m_lastOffPos).LengthSqr();
+            const float dist = (it->GetPos() - m_instance.m_lastOffPos).LengthSqr();
             if (dist > maxDist)
             {
                 maxDist = dist;
-                ret = it->first;
+                ret = it->GetPos();
             }
         }
         return ret;
