@@ -34,8 +34,8 @@ namespace VTerrain
         std::vector<float> data;
         data.resize((Config::chunkWidth + 1) * (Config::chunkHeight + 1) * 5);
 
-        const float topLeftX = (Config::chunkWidth - (Config::chunkWidth % 2 != 0)) / -2.f;
-        const float topLeftY = (Config::chunkHeight - (Config::chunkHeight % 2 != 0)) / -2.f;
+        const float topLeftX = (Config::chunkWidth * Config::quadSize - (Config::chunkWidth % 2 != 0)) / -2.f;
+        const float topLeftY = (Config::chunkHeight * Config::quadSize - (Config::chunkHeight % 2 != 0)) / -2.f;
         uint n = 0;
 
         std::vector<Vec2<float>> UVs;
@@ -44,9 +44,9 @@ namespace VTerrain
         {
             for (int x = 0; x < Config::chunkWidth + 1; x++)
             {
-                data[n + 0] = topLeftX + x;;
+                data[n + 0] = topLeftX + x * Config::quadSize;
                 data[n + 1] = 0.f;
-                data[n + 2] = topLeftY + y;
+                data[n + 2] = topLeftY + y * Config::quadSize;
                 data[n + 3] = (float)(x) / (float)(Config::chunkWidth);
                 data[n + 4] = (float)(y) / (float)(Config::chunkHeight);
                 n += 5;

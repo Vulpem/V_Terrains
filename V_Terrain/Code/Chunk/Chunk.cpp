@@ -85,7 +85,7 @@ namespace VTerrain
             GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "position_offset");
             if (offsetLoc != -1)
             {
-                float tmp[3] = { m_pos.x() * (float)Config::chunkWidth, 0.f, m_pos.y() * (float)Config::chunkHeight };
+                float tmp[3] = { m_pos.x() * ((float)Config::chunkWidth * Config::quadSize), 0.f, m_pos.y() * ((float)Config::chunkHeight * Config::quadSize) };
                 glUniform3fv(offsetLoc, 1, tmp);
             }
 
@@ -170,8 +170,8 @@ namespace VTerrain
 
     void ChunkManager::Update(int posX, int posY)
     {
-        const int W = static_cast<int>(Config::chunkWidth);
-        const int H = static_cast<int>(Config::chunkHeight);
+        const int W = static_cast<int>(Config::chunkWidth * Config::quadSize);
+        const int H = static_cast<int>(Config::chunkHeight * Config::quadSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
@@ -217,9 +217,9 @@ namespace VTerrain
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
         //TODO configurable
-        for (int y = -2; y <= 2; y++)
+        for (int y = -4; y <= 4; y++)
         {
-            for (int x = -2; x <= 2; x++)
+            for (int x = -4; x <= 4; x++)
             {
                 AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
             }
