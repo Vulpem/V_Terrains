@@ -90,9 +90,9 @@ namespace VTerrain
 
             uint current = 0;
 
-            for (uint y = 1; y < result.m_size.y() - 1; y++)
+            for (uint y = 1; y < noiseMap.Height() - 1; y++)
             {
-                for (uint x = 1; x < result.m_size.x() - 1; x++)
+                for (uint x = 1; x < noiseMap.Width() - 1; x++)
                 {
                     const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
                     const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y + 1));
@@ -109,9 +109,12 @@ namespace VTerrain
                     norm.Normalize();
 
                     result[current + 0] = noiseMap[x + y * noiseMap.Width()];
-                    result[current + 1] = norm.x();
+                    result[current + 1] = result[current + 0];
+                    result[current + 2] = result[current + 0];
+                    result[current + 3] = 1;
+                    /*result[current + 1] = norm.x();
                     result[current + 2] = norm.y();
-                    result[current + 3] = norm.z();
+                    result[current + 3] = norm.z();*/
 
                     current += 4;
                 }

@@ -80,10 +80,10 @@ namespace VTerrain
                 {
                     indices[n++] = i;
                     indices[n++] = i + (width + 1) * utils::Min(step, height - y);
-                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, width - x);
+                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, (width + 1) - x);
 
-                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, width - x);
-                    indices[n++] = i + utils::Min(step, width - x);
+                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, (width + 1) - x);
+                    indices[n++] = i + utils::Min(step, (width + 1) - x);
                     indices[n++] = i;
                 }
                 i += step;
