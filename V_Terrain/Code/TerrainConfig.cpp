@@ -17,9 +17,9 @@
 namespace VTerrain
 {
 	float Config::maxHeight = 1000.f;
-	unsigned int Config::chunkWidth = 128u;
-	unsigned int Config::chunkHeight = 128u;
-    unsigned int Config::maxChunks = 256u;
+	unsigned int Config::chunkWidth = 64u;
+	unsigned int Config::chunkHeight = 64u;
+    unsigned int Config::maxChunks = 512u;
     unsigned int Config::nLODs = 8;
     float Config::quadSize = 6.f;
 

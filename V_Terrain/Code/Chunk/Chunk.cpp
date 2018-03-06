@@ -217,9 +217,9 @@ namespace VTerrain
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
         //TODO configurable
-        for (int y = -4; y <= 4; y++)
+        for (int y = -6; y <= 6; y++)
         {
-            for (int x = -4; x <= 4; x++)
+            for (int x = -6; x <= 6; x++)
             {
                 AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
             }
