@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "V_Engine_Project", "V_Engine\V_Engine.vcxproj", "{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Project3\3D Physics.vcxproj", "{E1E1AC2E-8971-4936-9170-6874858A2263}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "V_Terrain", "V_Terrain\V_Terrain.vcxproj", "{02111310-9CFD-4744-8412-D466E6F60BD1}"
 EndProject
 Global
@@ -35,18 +33,6 @@ Global
 		{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}.Release|x64.ActiveCfg = Release|Win32
 		{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}.Release|x86.ActiveCfg = Release|Win32
 		{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}.Release|x86.Build.0 = Release|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug Library|x64.ActiveCfg = Debug Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug Library|x86.ActiveCfg = Debug Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug Library|x86.Build.0 = Debug Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug|x64.ActiveCfg = Debug|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug|x86.ActiveCfg = Debug|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Debug|x86.Build.0 = Debug|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release Library|x64.ActiveCfg = Release Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release Library|x86.ActiveCfg = Release Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release Library|x86.Build.0 = Release Library|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release|x64.ActiveCfg = Release|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release|x86.ActiveCfg = Release|Win32
-		{E1E1AC2E-8971-4936-9170-6874858A2263}.Release|x86.Build.0 = Release|Win32
 		{02111310-9CFD-4744-8412-D466E6F60BD1}.Debug Library|x64.ActiveCfg = Debug|x64
 		{02111310-9CFD-4744-8412-D466E6F60BD1}.Debug Library|x64.Build.0 = Debug|x64
 		{02111310-9CFD-4744-8412-D466E6F60BD1}.Debug Library|x86.ActiveCfg = Debug|Win32
