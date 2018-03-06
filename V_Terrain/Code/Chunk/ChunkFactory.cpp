@@ -26,9 +26,21 @@ namespace VTerrain
         m_requests.empty();
     }
 
+    bool ChunkFactory::IsRequested(Vec2<int> p)
+    {
+        for (auto it : m_requests)
+        {
+            if ((it) == p)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void ChunkFactory::PushChunkRequest(RequestedChunk request)
     {
-        m_requests.push(request);
+        m_requests.push_back(request);
     }
 
     ChunkFactory::GeneratedChunk ChunkFactory::PopGeneratedChunk()
@@ -40,13 +52,13 @@ namespace VTerrain
 
     bool ChunkFactory::HasGeneratedChunks()
     {
-        return false;
+        return (!m_results.empty());
     }
 
     ChunkFactory::RequestedChunk ChunkFactory::PopChunkRequest()
     {
-        const RequestedChunk ret = m_requests.front();
-        m_requests.pop();
+        const RequestedChunk ret = *m_requests.begin();
+        m_requests.erase(m_requests.begin());
         return ret;
     }
 
@@ -62,49 +74,51 @@ namespace VTerrain
 
     void ChunkFactory::GenerateChunk()
     {
-        RequestedChunk request = PopChunkRequest();
-        GeneratedChunk result;
-        VTerrain::PerlinNoise::NoiseMap noiseMap = VTerrain::PerlinNoise::GenNoiseMap(request.pos);
-
-        result.m_pos = request.pos;
-        result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };
-        result.m_LOD = 0;
-        result.m_data.resize(result.m_size.x() * result.m_size.y());
-
-        const float topLeftX = (noiseMap.Width() - (noiseMap.Width() % 2 != 0)) / 2.f;
-        const float topLeftY = (noiseMap.Height() - (noiseMap.Height() % 2 != 0)) / 2.f;
-
-        uint current = 0;
-
-        for (uint y = 1; y < result.m_size.y() - 1; y++)
+        if (HasRequestedChunks())
         {
-            for (uint x = 1; x < result.m_size.x() - 1; x++)
+            RequestedChunk request = PopChunkRequest();
+            GeneratedChunk result;
+            VTerrain::PerlinNoise::NoiseMap noiseMap = VTerrain::PerlinNoise::GenNoiseMap(request.pos);
+
+            result.m_pos = request.pos;
+            result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };
+            result.m_LOD = 0;
+            result.m_data.resize(result.m_size.x() * result.m_size.y() * 4);
+
+            const float topLeftX = (noiseMap.Width() - (noiseMap.Width() % 2 != 0)) / 2.f;
+            const float topLeftY = (noiseMap.Height() - (noiseMap.Height() % 2 != 0)) / 2.f;
+
+            uint current = 0;
+
+            for (uint y = 1; y < result.m_size.y() - 1; y++)
             {
-                const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
-                const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y + 1));
-                const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y - 1));
-                const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
-                const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
+                for (uint x = 1; x < result.m_size.x() - 1; x++)
+                {
+                    const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
+                    const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y + 1));
+                    const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y - 1));
+                    const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
+                    const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
 
-                Vec3<float> norm =
-                    top.Cross(left)
-                    + left.Cross(bottom)
-                    + bottom.Cross(right)
-                    + right.Cross(top);
+                    Vec3<float> norm =
+                        top.Cross(left)
+                        + left.Cross(bottom)
+                        + bottom.Cross(right)
+                        + right.Cross(top);
 
-                norm.Normalize();
+                    norm.Normalize();
 
-                result[current + 0] = noiseMap[x + y * noiseMap.Width()];
+                    result[current + 0] = noiseMap[x + y * noiseMap.Width()];
+                    result[current + 1] = norm.x();
+                    result[current + 2] = norm.y();
+                    result[current + 3] = norm.z();
 
-                result[current + 1] = norm.x();
-                result[current + 2] = norm.y();
-                result[current + 3] = norm.z();
-
-                current += 4;
+                    current += 4;
+                }
             }
-        }
 
-        m_results.push(result);
+            m_results.push(result);
+        }
     }
 
     void ChunkFactory::ThreadLoop()

@@ -124,7 +124,7 @@ update_status ModuleTerrain::Update()
 
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
 
-        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { WantRegen(); }
+        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { VTerrain::Config::maxHeight = m_maxHeight; }
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
 
@@ -161,7 +161,7 @@ update_status ModuleTerrain::Update()
 		m_regenTimer.Stop();
 		m_wantRegen = false;
 		GenMap();
-		VTerrain::ChunkManager::RegenAll();
+		VTerrain::ChunkManager::CleanChunks();
 	}
     return UPDATE_CONTINUE;
 }
@@ -188,7 +188,7 @@ void ModuleTerrain::GenMap()
 {
     VTerrain::Config::chunkHeight = m_size.x;
     VTerrain::Config::chunkWidth = m_size.y;
-    VTerrain::Config::maxHeight = m_maxHeight;
+   
 
     VTerrain::Config::Noise::frequency = m_frequency;
     VTerrain::Config::Noise::octaves = m_octaves;

@@ -22,42 +22,27 @@ namespace VTerrain
     {
     public:
 #pragma region Mesh
-        class MeshData
-        {
-        public:
-            MeshData();
-            ~MeshData();
-            
-            void GenerateData(const PerlinNoise::NoiseMap& map);
-        private:
-            void AddVertex(const Vec3<float>& v);
-            void AddUV(const Vec2<float>& uv);
-            void AddNormal(const Vec3<float>& n);
-
-            uint m_nVertices = 0;
-            uint m_nUVs = 0;
-            uint m_nNormals = 0;
-
-        public:
-            std::vector<float> m_data;
-        };
-
         class Mesh
         {
         public:
-            void Generate(const MeshData& meshData);
-            static void GenerateIndices(uint width, uint height, uint LOD);
+            static void Generate();
+            static void Free();
 
-            void FreeMesh();
+            static uint GetMeshBuf() { return m_dataBuff; }
+            static uint GetIndicesBuf(uint LOD) { return m_indicesBuff[LOD]; }
+            static uint GetNumIndices(uint LOD) { return m_nIndices[LOD]; }
 
-            void Render(const float* viewMatrix, const float* projectionMatrix, const Vec3<int>& offset, uint LOD);
-       
-            uint m_dataBuff;
-            static uint m_shaderProgram;
         private:
+            static void GenerateMesh();
+            static void GenerateIndices(uint LOD);
+
+            static void FreeMesh();
+            static void FreeLOD(uint lod);
+
             bool m_bufferGenerated = false;
             static std::map<uint, uint> m_indicesBuff;
             static std::map<uint, uint> m_nIndices;
+            static uint m_dataBuff;
         };
 #pragma endregion
     };

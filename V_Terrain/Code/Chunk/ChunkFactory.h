@@ -26,6 +26,8 @@ namespace VTerrain
             RequestedChunk(int x, int y) : pos(x, y) {}
             RequestedChunk(Vec2<int> p) : pos(p) {}
             Vec2<int> pos;
+            bool operator== (const RequestedChunk& p) { return pos == p.pos; }
+            bool operator== (const Vec2<int>& p) { return pos == p; }
         };
 
         struct GeneratedChunk
@@ -41,6 +43,7 @@ namespace VTerrain
 
         void ThreadLoop();
         void EmptyQueue();
+        bool IsRequested(Vec2<int> p);
 
         void PushChunkRequest(RequestedChunk request);
         GeneratedChunk PopGeneratedChunk();
@@ -52,7 +55,7 @@ namespace VTerrain
         
         void GenerateChunk();
 
-        std::queue<RequestedChunk> m_requests;
+        std::list<RequestedChunk> m_requests;
         std::queue<GeneratedChunk> m_results;
     };
 }

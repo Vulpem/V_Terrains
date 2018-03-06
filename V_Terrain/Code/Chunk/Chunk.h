@@ -33,8 +33,10 @@ namespace VTerrain
             void Free();
             void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0);
             bool IsLODReady(uint LOD);
+            bool IsLoaded();
             Vec2<int> GetPos() { return m_pos; }
 
+            static uint m_shaderProgram;
         private:
             Vec2<int> m_pos;
             uint m_minLOD;
@@ -47,16 +49,14 @@ namespace VTerrain
         static void Update(int posX, int posY);
         static void Render(const float* viewMatrix, const float* projectionMatrix);
         static void CleanChunks();
-        static void RegenAll();
 
     private:
         static void AddChunksToRegen(Vec2<int> pos);
         static void AddChunkToRegen(Vec2<int> pos);	
-        static void AddChunkToForceRegen(Vec2<int> pos);
 
         static Chunk& GetChunk(Vec2<int> pos);
 		static bool IsLoaded(Vec2<int> pos);
-        static Vec2<int> GetFurthestChunk();
+        static Chunk& GetFurthestChunk();
 
         std::vector<Chunk> m_chunks;
 
