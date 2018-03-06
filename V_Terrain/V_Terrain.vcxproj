@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Code\Chunk\Chunk.h" />
+    <ClInclude Include="Code\Chunk\ChunkFactory.h" />
     <ClInclude Include="Code\Include.h" />
     <ClInclude Include="Code\Mesh\MeshGenerator.h" />
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />
@@ -141,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Chunk\Chunk.cpp" />
+    <ClCompile Include="Code\Chunk\ChunkFactory.cpp" />
     <ClCompile Include="Code\Include.cpp" />
     <ClCompile Include="Code\Mesh\MeshGenerator.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />

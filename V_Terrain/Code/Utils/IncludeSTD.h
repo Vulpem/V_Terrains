@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #include <vector>
 #include <list>
@@ -23,3 +24,5 @@
 #include <stack>
 #include <memory>
 #include <functional>
+#include <set>
+#include <unordered_set>

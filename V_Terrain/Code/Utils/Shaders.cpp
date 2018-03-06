@@ -21,12 +21,11 @@ namespace VTerrain
         "#version 330 core\n"
         "\n"
         "layout (location = 0) in vec3 position;\n"
-        "layout (location = 1) in vec3 normal;\n"
-        "layout (location = 2) in vec2 texCoord;\n"
+        "layout (location = 1) in vec2 texCoord;\n"
         "\n"
-        "out vec2 TexCoord;\n"
 		"out vec3 pos;\n"
 		"out float lightIntensity;\n"
+        "out vec2 TexCoord;\n"
         "\n"
         "uniform mat4 model_matrix;\n"
         "uniform mat4 view_matrix;\n"
@@ -34,15 +33,18 @@ namespace VTerrain
         "uniform vec3 position_offset;\n"
         "uniform vec3 global_light_direction;\n"
         "uniform vec4 ambient_color;\n"
+        "uniform float max_height;\n"
+        "\n"
+        "uniform sampler2D heightmap;\n"
         "\n"
         "void main()\n"
         "{\n"
         "	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
-        "	gl_Position = transform * vec4(position + position_offset, 1.0f);\n"
-        "		vec3 norm = mat3(model_matrix) * normal;\n"
-        "		lightIntensity = dot(global_light_direction, norm);\n"
-        "		lightIntensity = max(lightIntensity,ambient_color.x);\n"
-		"       pos = position + position_offset;\n"
+        "   vec4 height = texture(heightmap, texCoord);\n"
+        "	gl_Position = transform * (vec4(position + position_offset, 1.0f) + vec4(0, height.x * max_height, 0, 0));\n"
+        "	vec3 norm = mat3(model_matrix) * height.yzw;\n"
+        "	lightIntensity = max(dot(global_light_direction, norm),ambient_color.x);\n"
+		"   pos = position + position_offset;\n"
         "	TexCoord = texCoord;\n"
         "}\n"
     );
@@ -50,19 +52,19 @@ namespace VTerrain
     std::string Shaders::m_defaultFragmentShader = std::string(
         "#version 330 core\n"
         "\n"
-        "in vec2 TexCoord;\n"
 		"in vec3 pos;\n"
 		"in float lightIntensity;\n"
+        "in vec2 TexCoord;\n"
         "\n"
         "out vec4 color;\n"
         "\n"
-        "uniform sampler2D ourTexture;\n"
+        "uniform sampler2D heightmap;\n"
         "\n"
         "void main()\n"
         "{\n"
 		"       float val = (ceil(pos.y / 10)/10) * lightIntensity;\n"
 		"       vec4 mat = vec4(val,val,val, 1);\n"
-        "       color = mat * texture(ourTexture, TexCoord);\n"
+        "       color = /*mat * */texture(heightmap, TexCoord);\n"
         "}\n"
     );
 
@@ -148,7 +150,7 @@ namespace VTerrain
         else
         {
             ret += "Error Compiling shader";
-			
+            
             assert(false);
         }
 
