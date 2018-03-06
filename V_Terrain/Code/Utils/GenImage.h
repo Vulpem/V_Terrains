@@ -22,5 +22,7 @@ namespace VTerrain
         static uint FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h);
         static uint FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h);
         static void FreeImage(uint& buffer);
+    private:
+        static void SetParams();
     };
 }

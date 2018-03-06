@@ -13,21 +13,50 @@
 #include "ChunkFactory.h"
 #include "../Noise/PerlinNoise.h"
 
-#include <math.h>
-
 namespace VTerrain
 {
     ChunkFactory::ChunkFactory()
+		: m_runningThread(false)
+		, m_wantToStopThread(false)
+		, m_mut_requests()
+		, m_mut_results()
+		, m_mut_wantToStopThread()
+		, m_thread()
     {
+        LaunchThread();
     }
+
+	ChunkFactory::~ChunkFactory()
+	{
+		StopThread();
+		m_thread.join();
+	}
+
+	void ChunkFactory::LaunchThread()
+	{
+		std::unique_lock<std::mutex> lock(m_mut_wantToStopThread);
+		if (m_runningThread == false)
+		{
+			m_thread = std::thread(&ChunkFactory::ThreadLoop, this);
+			m_runningThread = true;
+		}
+	}
+
+	void ChunkFactory::StopThread()
+	{
+		std::unique_lock<std::mutex> lock(m_mut_wantToStopThread);
+		m_wantToStopThread = true;
+	}
 
     void ChunkFactory::EmptyQueue()
     {
-        m_requests.empty();
+		std::unique_lock<std::mutex> lock(m_mut_requests);
+        m_requests.clear();
     }
 
     bool ChunkFactory::IsRequested(Vec2<int> p)
     {
+		std::unique_lock<std::mutex> lock(m_mut_requests);
         for (auto it : m_requests)
         {
             if ((it) == p)
@@ -40,11 +69,13 @@ namespace VTerrain
 
     void ChunkFactory::PushChunkRequest(RequestedChunk request)
     {
+		std::unique_lock<std::mutex> lock(m_mut_requests);
         m_requests.push_back(request);
     }
 
     ChunkFactory::GeneratedChunk ChunkFactory::PopGeneratedChunk()
     {
+		std::unique_lock<std::mutex> lock(m_mut_results);
         const GeneratedChunk ret = m_results.front();
         m_results.pop();
         return ret;
@@ -52,11 +83,13 @@ namespace VTerrain
 
     bool ChunkFactory::HasGeneratedChunks()
     {
+		std::unique_lock<std::mutex> lock(m_mut_results);
         return (!m_results.empty());
     }
 
     ChunkFactory::RequestedChunk ChunkFactory::PopChunkRequest()
     {
+		std::unique_lock<std::mutex> lock(m_mut_requests);
         const RequestedChunk ret = *m_requests.begin();
         m_requests.erase(m_requests.begin());
         return ret;
@@ -64,11 +97,13 @@ namespace VTerrain
 
     void ChunkFactory::PushGeneratedChunk(const GeneratedChunk & generated)
     {
+		std::unique_lock<std::mutex> lock(m_mut_results);
         m_results.push(generated);
     }
 
     bool ChunkFactory::HasRequestedChunks()
     {
+		std::unique_lock<std::mutex> lock(m_mut_requests);
         return (!m_requests.empty());
     }
 
@@ -90,9 +125,9 @@ namespace VTerrain
 
             uint current = 0;
 
-            for (uint y = 1; y < noiseMap.Height() - 1; y++)
+            for (uint y = noiseMap.Height() - 2; y >= 1 ; y--)
             {
-                for (uint x = 1; x < noiseMap.Width() - 1; x++)
+                for (uint x = noiseMap.Width() - 2; x >= 1 ; x--)
                 {
                     const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
                     const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y + 1));
@@ -109,12 +144,10 @@ namespace VTerrain
                     norm.Normalize();
 
                     result[current + 0] = noiseMap[x + y * noiseMap.Width()];
-                    result[current + 1] = result[current + 0];
-                    result[current + 2] = result[current + 0];
-                    result[current + 3] = 1;
-                    /*result[current + 1] = norm.x();
+
+                    result[current + 1] = norm.x();
                     result[current + 2] = norm.y();
-                    result[current + 3] = norm.z();*/
+                    result[current + 3] = norm.z();
 
                     current += 4;
                 }
@@ -126,6 +159,18 @@ namespace VTerrain
 
     void ChunkFactory::ThreadLoop()
     {
-        GenerateChunk();
+		while (true)
+		{
+			{
+				std::unique_lock<std::mutex> lock(m_mut_wantToStopThread);
+				if (m_wantToStopThread)
+				{
+					m_runningThread = false;
+					return;
+				}
+			}
+
+			GenerateChunk();
+		}
     }
 }

@@ -36,14 +36,14 @@ namespace VTerrain
         Config::Noise::frequency = utils::Clamp(Config::Noise::frequency, 0.1f, 64.0f);
         Config::Noise::octaves = utils::Clamp(Config::Noise::octaves, 1u, 16u);
 
-        const uint startX = offset.x() * (Config::chunkWidth + 1);
-        const uint startY = offset.y() * (Config::chunkHeight + 1);
+        const uint startX = -offset.x() * (Config::chunkWidth) - 1;
+        const uint startY = -offset.y() * (Config::chunkHeight) - 1;
 
         for (int y = 0; y < static_cast<int>(ret.Height()); y++)
         {
             for (int x = 0; x < static_cast<int>(ret.Width()); x++)
             {
-                ret[x + y * ret.Width()] = GetValue(x - startX, y - startY);
+                ret[x + y * ret.Width()] = GetValue(x + startX, y + startY);
             }
         }
         return ret;

@@ -40,15 +40,15 @@ namespace VTerrain
 
         std::vector<Vec2<float>> UVs;
 
-        for (int y = 0; y <= Config::chunkHeight; y++)
+        for (int y = 0; y < Config::chunkHeight + 1; y++)
         {
-            for (int x = 0; x <= Config::chunkWidth; x++)
+            for (int x = 0; x < Config::chunkWidth + 1; x++)
             {
                 data[n + 0] = topLeftX + x;;
                 data[n + 1] = 0.f;
                 data[n + 2] = topLeftY + y;
                 data[n + 3] = (float)(x) / (float)(Config::chunkWidth);
-                data[n + 4] = (float)(y) / (float)(Config::chunkWidth);
+                data[n + 4] = (float)(y) / (float)(Config::chunkHeight);
                 n += 5;
             }
         }
@@ -65,25 +65,25 @@ namespace VTerrain
 
     void MeshGenerator::Mesh::GenerateIndices(uint LOD)
     {
-        const uint width = Config::chunkWidth;
-        const uint height = Config::chunkHeight;
-        std::vector<uint> indices((width)*(height) * 6);
+        const uint width = Config::chunkWidth + 1;
+        const uint height = Config::chunkHeight + 1;
+        std::vector<uint> indices(width*height * 6);
         uint n = 0;
         uint i = 0;
         uint step = pow(2, LOD);
         for (uint y = 0; y < height; y += step)
         {
-            i = (width + 1)*y;
+            i = (width)*y;
             for (uint x = 0; x < width; x += step)
             {
                 if (x < width - 1 && y < height - 1)
                 {
                     indices[n++] = i;
-                    indices[n++] = i + (width + 1) * utils::Min(step, height - y);
-                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, (width + 1) - x);
+                    indices[n++] = i + (width) * utils::Min(step, height - y);
+                    indices[n++] = i + (width) * utils::Min(step, height - y) + utils::Min(step, width - x);
 
-                    indices[n++] = i + (width + 1) * utils::Min(step, height - y) + utils::Min(step, (width + 1) - x);
-                    indices[n++] = i + utils::Min(step, (width + 1) - x);
+                    indices[n++] = i + (width) * utils::Min(step, height - y) + utils::Min(step, width - x);
+                    indices[n++] = i + utils::Min(step, width - x);
                     indices[n++] = i;
                 }
                 i += step;

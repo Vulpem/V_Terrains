@@ -13,11 +13,7 @@
 #pragma once
 
 #include "../Utils/Globals.h"
-
-#include "../Mesh/MeshGenerator.h"
 #include "ChunkFactory.h"
-
-#include <mutex>
 
 namespace VTerrain
 {

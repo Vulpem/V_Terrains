@@ -15,6 +15,7 @@
 #include "../Utils/Globals.h"
 
 #include <mutex>
+#include <thread>
 
 namespace VTerrain
 {
@@ -23,7 +24,7 @@ namespace VTerrain
     public:
         struct RequestedChunk
         {
-            RequestedChunk(int x, int y) : pos(x, y) {}
+            RequestedChunk(int x = 0, int y = 0) : pos(x, y) {}
             RequestedChunk(Vec2<int> p) : pos(p) {}
             Vec2<int> pos;
             bool operator== (const RequestedChunk& p) { return pos == p.pos; }
@@ -32,6 +33,7 @@ namespace VTerrain
 
         struct GeneratedChunk
         {
+			GeneratedChunk() = default;
             Vec2<int> m_pos;
             Vec2<uint> m_size;
             uint m_LOD;
@@ -39,9 +41,15 @@ namespace VTerrain
             float& operator[] (int n) { return m_data[n]; }
         };
 
-        ChunkFactory();
+		ChunkFactory();
+		~ChunkFactory();
 
-        void ThreadLoop();
+		ChunkFactory(const ChunkFactory&) {};
+        ChunkFactory& operator=(const ChunkFactory&) {};
+
+		void LaunchThread();
+		void StopThread();
+
         void EmptyQueue();
         bool IsRequested(Vec2<int> p);
 
@@ -53,9 +61,17 @@ namespace VTerrain
         void PushGeneratedChunk(const GeneratedChunk& generated);
         bool HasRequestedChunks();
         
+		void ThreadLoop();
         void GenerateChunk();
 
         std::list<RequestedChunk> m_requests;
+		std::mutex m_mut_requests;
         std::queue<GeneratedChunk> m_results;
+		std::mutex m_mut_results;
+
+		std::thread m_thread;
+		bool m_runningThread;
+		bool m_wantToStopThread;
+		std::mutex m_mut_wantToStopThread;
     };
 }

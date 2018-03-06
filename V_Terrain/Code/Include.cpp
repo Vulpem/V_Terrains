@@ -13,6 +13,7 @@
 #include "Include.h"
 
 #include "Noise\PerlinNoise.h"
+#include "Utils\Shaders.h"
 
 namespace VTerrain
 {

@@ -15,8 +15,6 @@
 #include "../ExternalLibs/Glew/include/glew.h"
 #include "../Mesh/MeshGenerator.h"
 
-#include <math.h>
-
 namespace VTerrain
 {
     ChunkManager ChunkManager::m_instance = ChunkManager();
@@ -87,7 +85,7 @@ namespace VTerrain
             GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "position_offset");
             if (offsetLoc != -1)
             {
-                float tmp[3] = { m_pos.x() * (int)Config::chunkWidth, 0.f, m_pos.y() * (int)Config::chunkHeight };
+                float tmp[3] = { m_pos.x() * (float)Config::chunkWidth, 0.f, m_pos.y() * (float)Config::chunkHeight };
                 glUniform3fv(offsetLoc, 1, tmp);
             }
 
@@ -123,13 +121,14 @@ namespace VTerrain
                 glUniform1f(maxHeightLoc, Config::maxHeight);
             }
 
-
             glBindBuffer(GL_ARRAY_BUFFER, MeshGenerator::Mesh::GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshGenerator::Mesh::GetIndicesBuf(LOD));
 
+            //Vertices
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
             glEnableVertexAttribArray(0);
 
+            //UVs
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
             glEnableVertexAttribArray(1);
 
@@ -159,10 +158,12 @@ namespace VTerrain
         return (m_minLOD != UINT_MAX);
     }
 
-    ChunkManager::ChunkManager() :
-        m_lastOffPos(0, 0)
+    ChunkManager::ChunkManager()
+		: m_chunks()
+		, m_lastOffPos(0, 0)
         , m_currentChunk(0, 0)
         , m_firstFrame(true)
+		, m_factory()
     {
         m_chunks.resize(Config::maxChunks);
     }
@@ -172,11 +173,10 @@ namespace VTerrain
         const int W = static_cast<int>(Config::chunkWidth);
         const int H = static_cast<int>(Config::chunkHeight);
         Vec2<int> off(
-            floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
-            floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
+			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
+            (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
         
-        m_instance.m_factory.ThreadLoop();
         while (m_instance.m_factory.HasGeneratedChunks())
         {
             GetFurthestChunk().Regenerate(m_instance.m_factory.PopGeneratedChunk());

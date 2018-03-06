@@ -43,35 +43,8 @@ bool ModuleTerrain::Start()
     VTerrain::Init();
 
     std::vector<float> tmp = { 0.f,0.f,0.f };
-    m_heightmapBuffer = VTerrain::GenImage::FromRGB(tmp, 1, 1);
+   
     GenMap();
-
-    
-
-    std::vector<float> img;
-    for (uint y = 0; y < m_size.y; y++)
-    {
-        for (uint x = 0; x < m_size.x; x++)
-        {
-            const float val1 = 0.1f;
-            const float val2 = 0.9f;
-            const uint squareSize = 2;
-			if (x < 1 || y < 1 || x >= m_size.x - 1 || y >= m_size.y - 1)
-			{
-				img.push_back(val1);
-				img.push_back(val1);
-				img.push_back(val2);
-			}
-			else
-			{
-				img.push_back(val2);
-				img.push_back(val2);
-				img.push_back(val2);
-			}
-        }
-    }
-	m_squaredPatternBuf = VTerrain::GenImage::FromRGB(img, m_size.x, m_size.y);
-	VTerrain::Config::TMP::debugTexBuf = m_squaredPatternBuf;
 
 	return ret;
 }
@@ -111,9 +84,12 @@ update_status ModuleTerrain::Update()
 			if (m_showDebugPattern) { VTerrain::Config::TMP::debugTexBuf = m_squaredPatternBuf; }
 			else { VTerrain::Config::TMP::debugTexBuf = 0; }
 		}
-		if (ImGui::SliderFloat("LightDir", &m_globalLightDir, -360, 360)
-			|| ImGui::SliderFloat("LightHeight", &m_globalLightHeight, -90, 90))
-		{
+        bool lightDirChanged = false;
+        if (ImGui::SliderFloat("LightDir", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
+        if (ImGui::SliderFloat("LightHeight", &m_globalLightHeight, -90, 90)) { lightDirChanged = true; }
+		
+        if(lightDirChanged)
+        {
 			float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
 			Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight*DEGTORAD, 0.f);
 			tmp = rot * tmp;
@@ -124,7 +100,7 @@ update_status ModuleTerrain::Update()
 
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
 
-        if (ImGui::DragFloat("MaxHeight", &m_maxHeight, 0.1f, 0.1f, 64.f)) { VTerrain::Config::maxHeight = m_maxHeight; }
+        if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 2000.f, "%.3f", 3.f)) { VTerrain::Config::maxHeight = m_maxHeight; }
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
 
@@ -175,7 +151,6 @@ update_status ModuleTerrain::PostUpdate()
 // Called before quitting
 bool ModuleTerrain::CleanUp()
 {
-    VTerrain::GenImage::FreeImage(m_heightmapBuffer);
 	return true;
 }
 
