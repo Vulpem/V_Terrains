@@ -85,7 +85,7 @@ namespace VTerrain
 		float Length() const { return sqrt(d[0]*d[0] + d[1]*d[1]); }
 		void Normalize()
 		{
-			const float len =Length();
+			const float len = Length();
 			d[0] = d[0] / len;
 			d[1] = d[1] / len;
 		}

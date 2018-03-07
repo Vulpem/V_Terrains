@@ -50,9 +50,10 @@ namespace VTerrain
         ChunkFactory& operator=(const ChunkFactory&) {};
 
 		void LaunchThread();
+		bool IsThreadRunning() { return m_runningThread; }
 		void StopThread();
 
-        void EmptyQueue();
+        void ClearRequests();
         bool IsRequested(Vec2<int> p);
 
         void PushChunkRequest(RequestedChunk request);

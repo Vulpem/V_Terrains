@@ -20,11 +20,6 @@ namespace VTerrain
 {
 	class NoiseMap
 	{
-	private:
-		uint m_height;
-		uint m_width;
-		std::vector<float> m_data;
-
 	public:
 		NoiseMap();
 		NoiseMap(const uint w, const uint h);
@@ -39,5 +34,10 @@ namespace VTerrain
 
 		float& operator[] (int x) { return m_data[x]; };
 		float operator[] (int x) const { return m_data[x]; }
+
+	private:
+		uint m_height;
+		uint m_width;
+		std::vector<float> m_data;
 	};
 }

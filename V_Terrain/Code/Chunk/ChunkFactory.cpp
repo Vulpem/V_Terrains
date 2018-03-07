@@ -49,7 +49,7 @@ namespace VTerrain
 		m_wantToStopThread = true;
 	}
 
-    void ChunkFactory::EmptyQueue()
+    void ChunkFactory::ClearRequests()
     {
 		std::unique_lock<std::mutex> lock(m_mut_requests);
         m_requests.clear();
