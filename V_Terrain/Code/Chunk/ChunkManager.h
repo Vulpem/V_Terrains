@@ -10,17 +10,39 @@
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-#ifndef __VTERRAIN_INCLUDE__
-#define __VTERRAIN_INCLUDE__
+#pragma once
 
-#include "Chunk/ChunkManager.h"
+#include "../Globals.h"
+#include "Chunk.h"
+#include "ChunkFactory.h"
+#include "ChunkMesh.h"
 
 namespace VTerrain
 {
-	extern ChunkManager chunkManager;
+    class ChunkManager
+    {
+    public:
+        ChunkManager();
 
-   //Global Funcs
-    void Init();
+        void Update(int posX, int posY);
+        void Render(const float* viewMatrix, const float* projectionMatrix);
+        void CleanChunks();
+
+    private:
+        void AddChunksToRegen(Vec2<int> pos);
+        void AddChunkToRegen(Vec2<int> pos);	
+
+        Chunk& GetChunk(Vec2<int> pos);
+		bool IsLoaded(Vec2<int> pos);
+        Chunk& GetFurthestChunk();
+
+        std::vector<Chunk> m_chunks;
+
+        Vec2<int> m_lastOffPos;
+        Vec2<int> m_currentChunk;
+
+        ChunkFactory m_factory;
+
+        bool m_firstFrame;
+    };
 }
-
-#endif // !__VTERRAIN_INCLUDE__

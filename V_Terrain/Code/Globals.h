@@ -15,9 +15,9 @@
 
 typedef unsigned int uint;
 
-#include "IncludeSTD.h"
-#include "../TerrainConfig.h"
-#include "Vec3.h"
+#include "utils/IncludeSTD.h"
+#include "TerrainConfig.h"
+#include "utils/Vec3.h"
 
 namespace VTerrain
 {

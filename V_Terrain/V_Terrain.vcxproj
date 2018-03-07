@@ -129,13 +129,14 @@
   <ItemGroup>
     <ClInclude Include="Code\Chunk\Chunk.h" />
     <ClInclude Include="Code\Chunk\ChunkFactory.h" />
+    <ClInclude Include="Code\Chunk\ChunkManager.h" />
+    <ClInclude Include="Code\Chunk\ChunkMesh.h" />
+    <ClInclude Include="Code\Globals.h" />
     <ClInclude Include="Code\Include.h" />
-    <ClInclude Include="Code\Mesh\MeshGenerator.h" />
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />
     <ClInclude Include="Code\Noise\PerlinNoise.h" />
     <ClInclude Include="Code\TerrainConfig.h" />
     <ClInclude Include="Code\Utils\GenImage.h" />
-    <ClInclude Include="Code\Utils\Globals.h" />
     <ClInclude Include="Code\Utils\IncludeSTD.h" />
     <ClInclude Include="Code\Utils\Shaders.h" />
     <ClInclude Include="Code\Utils\Vec3.h" />
@@ -143,8 +144,9 @@
   <ItemGroup>
     <ClCompile Include="Code\Chunk\Chunk.cpp" />
     <ClCompile Include="Code\Chunk\ChunkFactory.cpp" />
+    <ClCompile Include="Code\Chunk\ChunkManager.cpp" />
+    <ClCompile Include="Code\Chunk\ChunkMesh.cpp" />
     <ClCompile Include="Code\Include.cpp" />
-    <ClCompile Include="Code\Mesh\MeshGenerator.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />
     <ClCompile Include="Code\Noise\PerlinNoise.cpp" />
     <ClCompile Include="Code\Utils\GenImage.cpp" />

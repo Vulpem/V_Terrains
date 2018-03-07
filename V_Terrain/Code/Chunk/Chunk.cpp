@@ -13,33 +13,33 @@
 #include "Chunk.h"
 #include "../Utils/GenImage.h"
 #include "../ExternalLibs/Glew/include/glew.h"
-#include "../Mesh/MeshGenerator.h"
+#include "ChunkMesh.h"
 
 namespace VTerrain
 {
-    uint ChunkManager::Chunk::m_shaderProgram = 0u;
-	Mesh ChunkManager::Chunk::m_mesh = Mesh();
+    uint Chunk::m_shaderProgram = 0u;
+	Mesh Chunk::m_mesh = Mesh();
 
-    ChunkManager::Chunk::Chunk() :
+     Chunk::Chunk() :
         m_minLOD(UINT_MAX)
         , m_buf_heightmap(0u)
     {
     }
 
-    void ChunkManager::Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
+    void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
     {
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
         m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
     }
 
-    void ChunkManager::Chunk::Free()
+    void  Chunk::Free()
     {
         GenImage::FreeImage(m_buf_heightmap);
         m_minLOD = UINT_MAX;
     }
 
-    void ChunkManager::Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD)
+    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD)
     {
         if (IsLoaded())
         {
@@ -153,138 +153,13 @@ namespace VTerrain
         }
     }
 
-    bool ChunkManager::Chunk::IsLODReady(uint LOD)
+    bool  Chunk::IsLODReady(uint LOD)
     {
         return (LOD >= m_minLOD);
     }
 
-    bool ChunkManager::Chunk::IsLoaded()
+    bool  Chunk::IsLoaded()
     {
         return (m_minLOD != UINT_MAX);
-    }
-
-    ChunkManager::ChunkManager()
-		: m_chunks()
-		, m_lastOffPos(0, 0)
-        , m_currentChunk(0, 0)
-        , m_firstFrame(true)
-		, m_factory()
-    {
-        m_chunks.resize(config.maxChunks);
-    }
-
-    void ChunkManager::Update(int posX, int posY)
-    {
-        const int W = static_cast<int>(config.chunkWidth * config.quadSize);
-        const int H = static_cast<int>(config.chunkHeight * config.quadSize);
-        Vec2<int> off(
-			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
-            (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
-        );
-        
-        while (m_factory.HasGeneratedChunks())
-        {
-            GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
-        }
-
-        if (off != m_lastOffPos || m_firstFrame)
-        {
-            m_lastOffPos = off;
-            AddChunksToRegen(off);
-        }
-
-        if (m_firstFrame)
-        {
-            Chunk::m_mesh.Generate();
-            m_firstFrame = false;
-        }
-    }
-
-    void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix)
-    {
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            //TODO set LOD
-            //(m_lastOffPos - it->first).Length();
-            it->Draw(viewMatrix, projectionMatrix, config.tmp.LOD);
-        }
-    }
-
-    void ChunkManager::CleanChunks()
-    {
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            it->Free();
-        }
-        AddChunksToRegen(m_lastOffPos);
-    }
-
-    void ChunkManager::AddChunksToRegen(Vec2<int> pos)
-    {
-        //TODO configurable
-        for (int y = -6; y <= 6; y++)
-        {
-            for (int x = -6; x <= 6; x++)
-            {
-                AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
-            }
-        }
-    }
-
-    void ChunkManager::AddChunkToRegen(Vec2<int> pos)
-    {
-        if (IsLoaded(pos) == false && m_factory.IsRequested(pos) == false)
-        {
-            m_factory.PushChunkRequest(pos);
-        }
-    }
-
-    ChunkManager::Chunk & ChunkManager::GetChunk(Vec2<int> pos)
-    {
-        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            if (it->GetPos() == pos)
-            {
-                return *it;
-            }
-        }
-        assert(false);
-        Chunk a;
-        return a;
-    }
-
-    bool ChunkManager::IsLoaded(Vec2<int> pos)
-	{
-        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            if (it->IsLoaded() && it->GetPos() == pos)
-            {
-                return true;
-            }
-        }
-        return false;
-	}
-
-    ChunkManager::Chunk& ChunkManager::GetFurthestChunk()
-    {
-        //TODO optimize
-        Chunk* ret = nullptr;
-        float maxDist = 0.f;
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            if (it->IsLoaded() == false)
-            {
-                return *it;
-            }
-
-            const float dist = (it->GetPos() - m_lastOffPos).LengthSqr();
-            if (dist > maxDist)
-            {
-                maxDist = dist;
-                ret = &(*it);
-            }
-        }
-        assert(ret != nullptr);
-        return *ret;
     }
 }

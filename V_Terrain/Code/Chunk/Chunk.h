@@ -12,56 +12,29 @@
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
-#include "../Utils/Globals.h"
+#include "../Globals.h"
 #include "ChunkFactory.h"
-#include "../Mesh/MeshGenerator.h"
+#include "ChunkMesh.h"
 
 namespace VTerrain
 {
-    class ChunkManager
-    {
-    public:
-        class Chunk
-        {
-        public:
-            Chunk();
+	class Chunk
+	{
+	public:
+		Chunk();
 
-            void Regenerate(ChunkFactory::GeneratedChunk base);
-            void Free();
-            void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0);
-            bool IsLODReady(uint LOD);
-            bool IsLoaded();
-            Vec2<int> GetPos() { return m_pos; }
+		void Regenerate(ChunkFactory::GeneratedChunk base);
+		void Free();
+		void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0);
+		bool IsLODReady(uint LOD);
+		bool IsLoaded();
+		Vec2<int> GetPos() { return m_pos; }
 
-            static uint m_shaderProgram;
-			static Mesh m_mesh;
-        private:
-            Vec2<int> m_pos;
-            uint m_minLOD;
-            uint m_buf_heightmap;
-        };
-
-        ChunkManager();
-
-        void Update(int posX, int posY);
-        void Render(const float* viewMatrix, const float* projectionMatrix);
-        void CleanChunks();
-
-    private:
-        void AddChunksToRegen(Vec2<int> pos);
-        void AddChunkToRegen(Vec2<int> pos);	
-
-        Chunk& GetChunk(Vec2<int> pos);
-		bool IsLoaded(Vec2<int> pos);
-        Chunk& GetFurthestChunk();
-
-        std::vector<Chunk> m_chunks;
-
-        Vec2<int> m_lastOffPos;
-        Vec2<int> m_currentChunk;
-
-        ChunkFactory m_factory;
-
-        bool m_firstFrame;
-    };
+		static uint m_shaderProgram;
+		static Mesh m_mesh;
+	private:
+		Vec2<int> m_pos;
+		uint m_minLOD;
+		uint m_buf_heightmap;
+	};
 }
