@@ -19,14 +19,18 @@ namespace VTerrain
 	class Mesh
         {
         public:
+            Mesh();
+            ~Mesh();
+
             void Generate();
             void Free();
 
             uint GetMeshBuf() { return m_dataBuff; }
             uint GetIndicesBuf(uint LOD) { return m_indicesBuff[LOD]; }
             uint GetNumIndices(uint LOD) { return m_nIndices[LOD]; }
-
+            bool IsGenerated() { return m_generated; }
         private:
+
             void GenerateMesh();
             void GenerateIndices(uint LOD);
 
@@ -37,5 +41,6 @@ namespace VTerrain
             std::map<uint, uint> m_indicesBuff;
             std::map<uint, uint> m_nIndices;
             uint m_dataBuff;
+            bool m_generated;
         };
 }

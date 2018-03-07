@@ -59,10 +59,11 @@ namespace VTerrain
         void PushChunkRequest(RequestedChunk request);
         GeneratedChunk PopGeneratedChunk();
         bool HasGeneratedChunks();
+        bool HasRequestedChunks();
     private:
         RequestedChunk PopChunkRequest();
         void PushGeneratedChunk(const GeneratedChunk& generated);
-        bool HasRequestedChunks();
+
         
 		void ThreadLoop();
         void GenerateChunk();

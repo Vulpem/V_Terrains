@@ -23,6 +23,7 @@ namespace VTerrain
     {
     public:
         ChunkManager();
+        ~ChunkManager();
 
         void Update(int posX, int posY);
         void Render(const float* viewMatrix, const float* projectionMatrix);
@@ -42,7 +43,5 @@ namespace VTerrain
         Vec2<int> m_currentChunk;
 
         ChunkFactory m_factory;
-
-        bool m_firstFrame;
     };
 }

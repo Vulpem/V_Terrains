@@ -16,6 +16,15 @@
 
 namespace VTerrain
 {
+    Mesh::Mesh()
+        : m_generated(false)
+    {
+    }
+    Mesh::~Mesh()
+    {
+        Free();
+    }
+
     void Mesh::Generate()
     {
         GenerateMesh();
@@ -23,6 +32,7 @@ namespace VTerrain
         {
             GenerateIndices(lod);
         }
+        m_generated = true;
     }
 
     void Mesh::GenerateMesh()
@@ -118,10 +128,14 @@ namespace VTerrain
 
     void Mesh::Free()
     {
-        FreeMesh();
-        while (m_indicesBuff.size() > 0)
+        if (m_generated)
         {
-            FreeLOD(m_nIndices.begin()->first);
+            FreeMesh();
+            while (m_indicesBuff.size() > 0)
+            {
+                FreeLOD(m_nIndices.begin()->first);
+            }
+            m_generated = false;
         }
     }
 }

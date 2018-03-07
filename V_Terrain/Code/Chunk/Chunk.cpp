@@ -30,6 +30,10 @@ namespace VTerrain
 
     void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
     {
+        if (m_mesh.IsGenerated() == false)
+        {
+            m_mesh.Generate();
+        }
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
         m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
@@ -49,6 +53,10 @@ namespace VTerrain
             if (IsLODReady(LOD) == false)
             {
                 drawLOD = m_minLOD;
+            }
+            if (drawLOD >= config.nLODs)
+            {
+                drawLOD = config.nLODs - 1;
             }
 
             glUseProgram(m_shaderProgram);
@@ -129,7 +137,7 @@ namespace VTerrain
 			}
 
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(LOD));
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
 
             //Vertices
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
@@ -140,7 +148,7 @@ namespace VTerrain
             glEnableVertexAttribArray(1);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(LOD), GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(drawLOD), GL_UNSIGNED_INT, (void*)0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);

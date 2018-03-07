@@ -22,11 +22,15 @@ namespace VTerrain
     ChunkManager::ChunkManager()
 		: m_chunks()
 		, m_lastOffPos(0, 0)
-        , m_currentChunk(0, 0)
-        , m_firstFrame(true)
+        , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
     {
         m_chunks.resize(config.maxChunks);
+    }
+
+    ChunkManager::~ChunkManager()
+    {
+        Chunk::m_mesh.Free();
     }
 
     void ChunkManager::Update(int posX, int posY)
@@ -38,21 +42,23 @@ namespace VTerrain
             (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
         
+
         while (m_factory.HasGeneratedChunks())
         {
             GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
         }
 
-        if (off != m_lastOffPos || m_firstFrame)
+        if (m_factory.HasRequestedChunks() == false)
+        {
+            int dist = 0;
+            //Generate chunks when stopped
+            //TODO
+        }
+
+        if (off != m_lastOffPos)
         {
             m_lastOffPos = off;
             AddChunksToRegen(off);
-        }
-
-        if (m_firstFrame)
-        {
-            Chunk::m_mesh.Generate();
-            m_firstFrame = false;
         }
     }
 
@@ -60,9 +66,8 @@ namespace VTerrain
     {
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
-            //TODO set LOD
-            //(m_lastOffPos - it->first).Length();
-            it->Draw(viewMatrix, projectionMatrix, config.tmp.LOD);
+            //TODO improve set LOD
+            it->Draw(viewMatrix, projectionMatrix, (m_lastOffPos - it->GetPos()).Length() / 2);
         }
     }
 
@@ -94,6 +99,7 @@ namespace VTerrain
             m_factory.PushChunkRequest(pos);
         }
     }
+
 
     Chunk & ChunkManager::GetChunk(Vec2<int> pos)
     {
