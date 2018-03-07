@@ -86,9 +86,6 @@
     <ClCompile Include="Code\Utils\Shaders.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Code\TerrainConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Chunk\Chunk.cpp">
       <Filter>Source Files\Chunk</Filter>
     </ClCompile>

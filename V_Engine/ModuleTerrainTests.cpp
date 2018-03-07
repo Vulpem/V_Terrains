@@ -59,21 +59,21 @@ update_status ModuleTerrain::PreUpdate()
 update_status ModuleTerrain::Update()
 {
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
-    VTerrain::ChunkManager::Update(pos.x, pos.z);
+	VTerrain::chunkManager.Update(pos.x, pos.z);
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
     if (ImGui::Begin("TerrainTests"))
     {
-        const int W = static_cast<int>(VTerrain::Config::chunkWidth);
-        const int H = static_cast<int>(VTerrain::Config::chunkHeight);
+        const int W = static_cast<int>(VTerrain::config.chunkWidth);
+        const int H = static_cast<int>(VTerrain::config.chunkHeight);
         int p[2] = {
             floor((pos.x - floor(W / 2.f) + (W % 2 != 0)) / W + 1),
             floor((pos.z - floor(H / 2.f) + (H % 2 != 0)) / H + 1)
         };
         ImGui::DragInt2("CurrentChunk", p);
 
-        int tmpLOD = VTerrain::Config::TMP::LOD;
+        int tmpLOD = VTerrain::config..tmp.LOD;
         if (ImGui::SliderInt("LOD", &tmpLOD, 0,VTerrain::Config::nLODs - 1))
         {
             VTerrain::Config::TMP::LOD = tmpLOD;

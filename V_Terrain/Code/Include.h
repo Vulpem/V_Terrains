@@ -13,14 +13,15 @@
 #ifndef __VTERRAIN_INCLUDE__
 #define __VTERRAIN_INCLUDE__
 
-#include "Utils\Globals.h"
-
 #include "Chunk\Chunk.h"
+#include "Utils\Globals.h"
 
 namespace VTerrain
 {
    //Global Funcs
     void Init();
+
+	ChunkManager chunkManager;
 }
 
 #endif // !__VTERRAIN_INCLUDE__

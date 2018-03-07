@@ -18,32 +18,26 @@
 
 namespace VTerrain
 {
-    class MeshGenerator
-    {
-    public:
-#pragma region Mesh
-        class Mesh
+	class Mesh
         {
         public:
-            static void Generate();
-            static void Free();
+            void Generate();
+            void Free();
 
-            static uint GetMeshBuf() { return m_dataBuff; }
-            static uint GetIndicesBuf(uint LOD) { return m_indicesBuff[LOD]; }
-            static uint GetNumIndices(uint LOD) { return m_nIndices[LOD]; }
+            uint GetMeshBuf() { return m_dataBuff; }
+            uint GetIndicesBuf(uint LOD) { return m_indicesBuff[LOD]; }
+            uint GetNumIndices(uint LOD) { return m_nIndices[LOD]; }
 
         private:
-            static void GenerateMesh();
-            static void GenerateIndices(uint LOD);
+            void GenerateMesh();
+            void GenerateIndices(uint LOD);
 
-            static void FreeMesh();
-            static void FreeLOD(uint lod);
+            void FreeMesh();
+            void FreeLOD(uint lod);
 
             bool m_bufferGenerated = false;
-            static std::map<uint, uint> m_indicesBuff;
-            static std::map<uint, uint> m_nIndices;
-            static uint m_dataBuff;
+            std::map<uint, uint> m_indicesBuff;
+            std::map<uint, uint> m_nIndices;
+            uint m_dataBuff;
         };
-#pragma endregion
-    };
 }

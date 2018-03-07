@@ -113,7 +113,7 @@ namespace VTerrain
         {
             RequestedChunk request = PopChunkRequest();
             GeneratedChunk result;
-            VTerrain::PerlinNoise::NoiseMap noiseMap = VTerrain::PerlinNoise::GenNoiseMap(request.pos);
+            VTerrain::PerlinNoise::NoiseMap noiseMap = m_noiseGenerator.GenNoiseMap(request.pos);
 
             result.m_pos = request.pos;
             result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };
@@ -129,11 +129,11 @@ namespace VTerrain
             {
                 for (uint x = noiseMap.Width() - 2; x >= 1 ; x--)
                 {
-                    const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
-                    const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y + 1));
-                    const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()] * Config::maxHeight, topLeftY - (y - 1));
-                    const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
-                    const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()] * Config::maxHeight, topLeftY - y);
+                    const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
+                    const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * config.maxHeight, topLeftY - (y + 1));
+                    const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()] * config.maxHeight, topLeftY - (y - 1));
+                    const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
+                    const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
 
                     Vec3<float> norm =
                         top.Cross(left)

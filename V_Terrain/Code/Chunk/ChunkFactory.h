@@ -13,6 +13,7 @@
 #pragma once
 
 #include "../Utils/Globals.h"
+#include "../Noise/PerlinNoise.h"
 
 #include <mutex>
 #include <thread>
@@ -63,6 +64,8 @@ namespace VTerrain
         
 		void ThreadLoop();
         void GenerateChunk();
+
+		PerlinNoise m_noiseGenerator;
 
         std::list<RequestedChunk> m_requests;
 		std::mutex m_mut_requests;

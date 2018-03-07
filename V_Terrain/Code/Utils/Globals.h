@@ -18,9 +18,12 @@ typedef unsigned int uint;
 #include "IncludeSTD.h"
 #include "../TerrainConfig.h"
 #include "Vec3.h"
+#include "../TerrainConfig.h"
 
 namespace VTerrain
 {
+	Config config;
+
     namespace utils
     {
         static constexpr float PI = 3.14159265359f;

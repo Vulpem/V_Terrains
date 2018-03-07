@@ -53,12 +53,11 @@ namespace VTerrain
     public:
         PerlinNoise();
 
-        static void SetSeed(uint seed);
-        static PerlinNoise::NoiseMap GenNoiseMap(Vec2<int> offset);
+        void SetSeed(uint seed);
+        PerlinNoise::NoiseMap GenNoiseMap(Vec2<int> offset);
     private:
-        static float GetValue(int x, int y);
+        float GetValue(int x, int y);
 
-        static PerlinNoise m_instance;
         siv::SivPerlinNoise m_perlin;
     };
 }

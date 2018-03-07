@@ -14,6 +14,7 @@
 
 #include "../Utils/Globals.h"
 #include "ChunkFactory.h"
+#include "../Mesh/MeshGenerator.h"
 
 namespace VTerrain
 {
@@ -33,6 +34,7 @@ namespace VTerrain
             Vec2<int> GetPos() { return m_pos; }
 
             static uint m_shaderProgram;
+			static Mesh m_mesh;
         private:
             Vec2<int> m_pos;
             uint m_minLOD;
@@ -41,18 +43,17 @@ namespace VTerrain
 
         ChunkManager();
 
-        static ChunkManager& Instance() { return m_instance; }
-        static void Update(int posX, int posY);
-        static void Render(const float* viewMatrix, const float* projectionMatrix);
-        static void CleanChunks();
+        void Update(int posX, int posY);
+        void Render(const float* viewMatrix, const float* projectionMatrix);
+        void CleanChunks();
 
     private:
-        static void AddChunksToRegen(Vec2<int> pos);
-        static void AddChunkToRegen(Vec2<int> pos);	
+        void AddChunksToRegen(Vec2<int> pos);
+        void AddChunkToRegen(Vec2<int> pos);	
 
-        static Chunk& GetChunk(Vec2<int> pos);
-		static bool IsLoaded(Vec2<int> pos);
-        static Chunk& GetFurthestChunk();
+        Chunk& GetChunk(Vec2<int> pos);
+		bool IsLoaded(Vec2<int> pos);
+        Chunk& GetFurthestChunk();
 
         std::vector<Chunk> m_chunks;
 
@@ -62,7 +63,5 @@ namespace VTerrain
         ChunkFactory m_factory;
 
         bool m_firstFrame;
-
-        static ChunkManager m_instance;
     };
 }

@@ -17,9 +17,8 @@
 
 namespace VTerrain
 {
-    ChunkManager ChunkManager::m_instance = ChunkManager();
-
     uint ChunkManager::Chunk::m_shaderProgram = 0u;
+	Mesh ChunkManager::Chunk::m_mesh = Mesh();
 
     ChunkManager::Chunk::Chunk() :
         m_minLOD(UINT_MAX)
@@ -85,7 +84,7 @@ namespace VTerrain
             GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "position_offset");
             if (offsetLoc != -1)
             {
-                float tmp[3] = { m_pos.x() * ((float)Config::chunkWidth * Config::quadSize), 0.f, m_pos.y() * ((float)Config::chunkHeight * Config::quadSize) };
+                float tmp[3] = { m_pos.x() * ((float)config.chunkWidth * config.quadSize), 0.f, m_pos.y() * ((float)config.chunkHeight * config.quadSize) };
                 glUniform3fv(offsetLoc, 1, tmp);
             }
 
@@ -106,7 +105,7 @@ namespace VTerrain
             }
 
 
-            Vec3<float> dir(Config::globalLight[0], Config::globalLight[1], Config::globalLight[2]);
+            Vec3<float> dir(config.globalLight[0], config.globalLight[1], config.globalLight[2]);
             dir.Normalize();
             //Global light direction
             GLint globalLightDirLoc = glGetUniformLocation(m_shaderProgram, "global_light_direction");
@@ -118,17 +117,17 @@ namespace VTerrain
             GLint maxHeightLoc = glGetUniformLocation(m_shaderProgram, "max_height");
             if (maxHeightLoc != -1)
             {
-                glUniform1f(maxHeightLoc, Config::maxHeight);
+                glUniform1f(maxHeightLoc, config.maxHeight);
             }
 
 			GLint fogDistanceLoc = glGetUniformLocation(m_shaderProgram, "fog_distance");
 			if (fogDistanceLoc != -1)
 			{
-				glUniform1f(fogDistanceLoc, Config::fogDistance);
+				glUniform1f(fogDistanceLoc, config.fogDistance);
 			}
 
-            glBindBuffer(GL_ARRAY_BUFFER, MeshGenerator::Mesh::GetMeshBuf());
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshGenerator::Mesh::GetIndicesBuf(LOD));
+            glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(LOD));
 
             //Vertices
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
@@ -139,7 +138,7 @@ namespace VTerrain
             glEnableVertexAttribArray(1);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDrawElements(GL_TRIANGLES, MeshGenerator::Mesh::GetNumIndices(LOD), GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(LOD), GL_UNSIGNED_INT, (void*)0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -171,53 +170,53 @@ namespace VTerrain
         , m_firstFrame(true)
 		, m_factory()
     {
-        m_chunks.resize(Config::maxChunks);
+        m_chunks.resize(config.maxChunks);
     }
 
     void ChunkManager::Update(int posX, int posY)
     {
-        const int W = static_cast<int>(Config::chunkWidth * Config::quadSize);
-        const int H = static_cast<int>(Config::chunkHeight * Config::quadSize);
+        const int W = static_cast<int>(config.chunkWidth * config.quadSize);
+        const int H = static_cast<int>(config.chunkHeight * config.quadSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
         
-        while (m_instance.m_factory.HasGeneratedChunks())
+        while (m_factory.HasGeneratedChunks())
         {
-            GetFurthestChunk().Regenerate(m_instance.m_factory.PopGeneratedChunk());
+            GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
         }
 
-        if (off != m_instance.m_lastOffPos || m_instance.m_firstFrame)
+        if (off != m_lastOffPos || m_firstFrame)
         {
-            m_instance.m_lastOffPos = off;
+            m_lastOffPos = off;
             AddChunksToRegen(off);
         }
 
-        if (m_instance.m_firstFrame)
+        if (m_firstFrame)
         {
-            MeshGenerator::Mesh::Generate();
-            m_instance.m_firstFrame = false;
+            Chunk::m_mesh.Generate();
+            m_firstFrame = false;
         }
     }
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix)
     {
-        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             //TODO set LOD
-            //(m_instance.m_lastOffPos - it->first).Length();
-            it->Draw(viewMatrix, projectionMatrix, Config::TMP::LOD);
+            //(m_lastOffPos - it->first).Length();
+            it->Draw(viewMatrix, projectionMatrix, config.tmp.LOD);
         }
     }
 
     void ChunkManager::CleanChunks()
     {
-        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             it->Free();
         }
-        AddChunksToRegen(m_instance.m_lastOffPos);
+        AddChunksToRegen(m_lastOffPos);
     }
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
@@ -234,15 +233,15 @@ namespace VTerrain
 
     void ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
-        if (IsLoaded(pos) == false && m_instance.m_factory.IsRequested(pos) == false)
+        if (IsLoaded(pos) == false && m_factory.IsRequested(pos) == false)
         {
-            m_instance.m_factory.PushChunkRequest(pos);
+            m_factory.PushChunkRequest(pos);
         }
     }
 
     ChunkManager::Chunk & ChunkManager::GetChunk(Vec2<int> pos)
     {
-        for (std::vector<Chunk>::iterator it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             if (it->GetPos() == pos)
             {
@@ -256,7 +255,7 @@ namespace VTerrain
 
     bool ChunkManager::IsLoaded(Vec2<int> pos)
 	{
-        for (std::vector<Chunk>::iterator it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             if (it->IsLoaded() && it->GetPos() == pos)
             {
@@ -271,14 +270,14 @@ namespace VTerrain
         //TODO optimize
         Chunk* ret = nullptr;
         float maxDist = 0.f;
-        for (auto it = m_instance.m_chunks.begin(); it != m_instance.m_chunks.end(); it++)
+        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             if (it->IsLoaded() == false)
             {
                 return *it;
             }
 
-            const float dist = (it->GetPos() - m_instance.m_lastOffPos).LengthSqr();
+            const float dist = (it->GetPos() - m_lastOffPos).LengthSqr();
             if (dist > maxDist)
             {
                 maxDist = dist;

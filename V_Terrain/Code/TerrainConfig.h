@@ -15,33 +15,32 @@
 
 namespace VTerrain
 {
-    class Config
+    struct Config
     {
 	public:
-        static float maxHeight;
-        static unsigned int chunkWidth;
-        static unsigned int chunkHeight;
-        static unsigned int maxChunks;
-        static unsigned int nLODs;
-        static float quadSize;
-		static float fogDistance;
+        float maxHeight = 1000.f;
+        unsigned int chunkWidth = 64u;
+        unsigned int chunkHeight = 64u;
+        unsigned int maxChunks = 512u;
+        unsigned int nLODs = 6;
+        float quadSize = 6.f;
+		float fogDistance = 10000.f;
 
-		static float globalLight[3];
+		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
         class Noise
         {
 		public:
-			static float frequency;
-			static unsigned int octaves;
-			static float lacunarity;
-			static float persistency;
-        };
+			float frequency = 0.8f;
+			unsigned int octaves = 8u;
+			float lacunarity = 2.f;
+			float persistency = 0.4f;
+        } noise;
 
         class TMP
         {
         public:
-            static unsigned int debugTexBuf;
-            static unsigned int LOD;
-        };
+            unsigned int LOD = 0;;
+        } tmp;
    };
 }
 #endif
