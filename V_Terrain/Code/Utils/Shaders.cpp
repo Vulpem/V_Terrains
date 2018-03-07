@@ -24,28 +24,29 @@ namespace VTerrain
         "layout (location = 1) in vec2 texCoord;\n"
         "\n"
 		"out vec3 pos;\n"
+		"out vec3 norm;\n"
 		"out float lightIntensity;\n"
-        "out vec2 TexCoord;\n"
         "\n"
         "uniform mat4 model_matrix;\n"
         "uniform mat4 view_matrix;\n"
         "uniform mat4 projection_matrix;\n"
+		"\n"
         "uniform vec3 position_offset;\n"
+		"uniform float max_height;\n"
+		"\n"
         "uniform vec3 global_light_direction;\n"
         "uniform vec4 ambient_color;\n"
-        "uniform float max_height;\n"
         "\n"
         "uniform sampler2D heightmap;\n"
         "\n"
         "void main()\n"
         "{\n"
         "	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
-        "   vec4 height = texture(heightmap, texCoord);\n"
-        "	gl_Position = transform * (vec4(position + position_offset, 1.0f) + vec4(0, height.x * max_height, 0, 0));\n"
-        "	vec3 norm = mat3(model_matrix) * height.yzw;\n"
+        "   vec4 heightMapVal = texture(heightmap, texCoord);\n"
+		"   pos = position + position_offset + vec3(0, heightMapVal.x * max_height, 0);"
+		"	gl_Position = transform * vec4(pos,1);\n"
+        "	norm = mat3(model_matrix) * heightMapVal.yzw;\n"
         "	lightIntensity = max(dot(global_light_direction, norm),ambient_color.x);\n"
-		"   pos = position + position_offset;\n"
-        "	TexCoord = texCoord;\n"
         "}\n"
     );
 
@@ -53,18 +54,19 @@ namespace VTerrain
         "#version 330 core\n"
         "\n"
 		"in vec3 pos;\n"
+		"in vec4 heightMapVal;\n"
 		"in float lightIntensity;\n"
-        "in vec2 TexCoord;\n"
-        "\n"
-        "out vec4 color;\n"
-        "\n"
+		"\n"
+		"uniform float max_height;\n"
+		"\n"
         "uniform sampler2D heightmap;\n"
+		"\n"
+		"out vec4 color;\n"
         "\n"
         "void main()\n"
         "{\n"
-		"       float val = (ceil(pos.y / 10)/10) * lightIntensity;\n"
-		"       vec4 mat = vec4(val,val,val, 1);\n"
-        "       color = /*mat * */texture(heightmap, TexCoord);\n"
+		"       float val = lightIntensity * (pos.y / max_height);\n"
+		"       color = vec4(val,val,val, 1);\n"
         "}\n"
     );
 
@@ -79,7 +81,7 @@ namespace VTerrain
         GLuint vertexShader;
         if (vertexBuf == nullptr)
         {
-            ret += "- No vertex shader found. Using default vertex shader.\n";
+            ret += "- Default vertex\n";
             vertexBuf = m_defaultVertexShader.c_str();
         }
 
@@ -94,17 +96,19 @@ namespace VTerrain
             glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
             ret += infoLog;
             ret += '\n';
+			assert(false);
         }
         else
         {
             ret += "Compilation succesfull\n";
         }
+		ret.clear();
 
         ret += "\n------ Fragment shader ------\n";
         GLuint fragmentShader;
         if (fragmentBuf == nullptr)
         {
-            ret += "- No fragment shader found. Using default fragment shader.\n";
+            ret += "- Default fragment\n";
             fragmentBuf = m_defaultFragmentShader.c_str();
         }
 
@@ -119,6 +123,7 @@ namespace VTerrain
             glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
             ret += infoLog;
             ret += '\n';
+			assert(false);
         }
         else
         {
