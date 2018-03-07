@@ -9,18 +9,19 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __VTERRAIN_INCLUDE__
 #define __VTERRAIN_INCLUDE__
 
-#include "Utils\Globals.h"
-
-#include "Chunk\Chunk.h"
+#include "TerrainConfig.h"
 
 namespace VTerrain
 {
    //Global Funcs
     void Init();
+	void Update(int posX, int posY);
+	void Render(const float * viewMatrix, const float * projectionMatrix);
+	void CleanChunks();
 }
 
 #endif // !__VTERRAIN_INCLUDE__

@@ -9,16 +9,34 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "Include.h"
 
-#include "Noise\PerlinNoise.h"
-#include "Utils\Shaders.h"
+#include "Utils/Shaders.h"
+#include "Chunk/ChunkManager.h"
 
 namespace VTerrain
 {
+	Config VTerrain::config = Config();
+	ChunkManager chunkManager = ChunkManager();
+
     void Init()
     {
-        VTerrain::Shaders::CompileShader(nullptr, nullptr, ChunkManager::Chunk::m_shaderProgram);
+        VTerrain::Shaders::CompileShader(nullptr, nullptr, Chunk::m_shaderProgram);
     }
+
+	void Update(int posX, int posY)
+	{
+		chunkManager.Update(posX, posY);
+	}
+
+	void Render(const float * viewMatrix, const float * projectionMatrix)
+	{
+		chunkManager.Render(viewMatrix, projectionMatrix);
+	}
+
+	void CleanChunks()
+	{
+		chunkManager.CleanChunks();
+	}
 }

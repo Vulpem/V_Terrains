@@ -9,14 +9,14 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "GenImage.h"
 
 #include "../ExternalLibs/Glew/include/glew.h"
 
 namespace VTerrain
 {
-    uint GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
+	unsigned int GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
     {
         unsigned int ret = 0;
         glEnable(GL_TEXTURE_2D);
@@ -32,7 +32,7 @@ namespace VTerrain
         return ret;
     }
 
-    uint GenImage::FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h)
+	unsigned int GenImage::FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h)
     {
         unsigned int ret = 0;
         glEnable(GL_TEXTURE_2D);
@@ -48,7 +48,7 @@ namespace VTerrain
         return ret;
     }
 
-    void GenImage::FreeImage(uint& buffer)
+    void GenImage::FreeImage(unsigned int& buffer)
     {
         glDeleteTextures(1, &buffer);
         buffer = 0;

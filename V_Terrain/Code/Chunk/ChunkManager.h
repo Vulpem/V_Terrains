@@ -14,21 +14,35 @@
 
 #include "../Globals.h"
 
-#include "NoiseMap.h"
-#include "Extern/SivPerlinNoise.h"
+#include "Chunk.h"
+#include "ChunkFactory.h"
 
 namespace VTerrain
 {
-    class PerlinNoise
+    class ChunkManager
     {
     public:
-        PerlinNoise();
+        ChunkManager();
 
-        void SetSeed(uint seed);
-        NoiseMap GenNoiseMap(Vec2<int> offset);
+        void Update(int posX, int posY);
+        void Render(const float* viewMatrix, const float* projectionMatrix);
+        void CleanChunks();
+
     private:
-        float GetValue(int x, int y);
+        void AddChunksToRegen(Vec2<int> pos);
+        void AddChunkToRegen(Vec2<int> pos);	
 
-        siv::SivPerlinNoise m_perlin;
+        Chunk& GetChunk(Vec2<int> pos);
+		bool IsLoaded(Vec2<int> pos);
+        Chunk& GetFurthestChunk();
+
+        std::vector<Chunk> m_chunks;
+
+        Vec2<int> m_lastOffPos;
+        Vec2<int> m_currentChunk;
+
+        ChunkFactory m_factory;
+
+        bool m_firstFrame;
     };
 }

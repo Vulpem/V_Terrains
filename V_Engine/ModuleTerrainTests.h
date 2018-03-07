@@ -32,8 +32,6 @@ public:
 	bool m_wantRegen;
 	Timer m_regenTimer;
 
-    uint m_heightmapBuffer = 0;
-
     float m_frequency;
     int m_octaves;
     float m_lacunarity;
@@ -44,16 +42,11 @@ public:
 
     float m_maxHeight;
 	float m_fogDistance;
-    bool m_simplifyRender;
-    float m_simplifyRenderStep;
 
     uint m_shaderProgram;
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
-
-	uint m_squaredPatternBuf = 0;
-	bool m_showDebugPattern = true;
 };
 
 #endif

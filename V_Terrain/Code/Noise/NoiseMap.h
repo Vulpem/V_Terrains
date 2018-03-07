@@ -14,21 +14,30 @@
 
 #include "../Globals.h"
 
-#include "NoiseMap.h"
 #include "Extern/SivPerlinNoise.h"
 
 namespace VTerrain
 {
-    class PerlinNoise
-    {
-    public:
-        PerlinNoise();
+	class NoiseMap
+	{
+	private:
+		uint m_height;
+		uint m_width;
+		std::vector<float> m_data;
 
-        void SetSeed(uint seed);
-        NoiseMap GenNoiseMap(Vec2<int> offset);
-    private:
-        float GetValue(int x, int y);
+	public:
+		NoiseMap();
+		NoiseMap(const uint w, const uint h);
+		~NoiseMap();
 
-        siv::SivPerlinNoise m_perlin;
-    };
+		void Set(std::vector<float> data, uint width, uint height);
+		void Init(uint width, uint height);
+		uint Width() const;
+		uint Height() const;
+		const std::vector<float>& Data() const { return m_data; }
+		std::vector<float>& Data() { return m_data; }
+
+		float& operator[] (int x) { return m_data[x]; };
+		float operator[] (int x) const { return m_data[x]; }
+	};
 }

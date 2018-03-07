@@ -9,7 +9,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "PerlinNoise.h"
 #include <time.h>
 #include <random>
@@ -17,7 +17,6 @@
 
 namespace VTerrain
 {
-    PerlinNoise PerlinNoise::m_instance = PerlinNoise();
 
     PerlinNoise::PerlinNoise()
     {
@@ -27,17 +26,17 @@ namespace VTerrain
 
     void PerlinNoise::SetSeed(uint seed)
     {
-        m_instance.m_perlin.reseed(seed);
+        m_perlin.reseed(seed);
     }
 
-    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)
+    NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)
     {
-        PerlinNoise::NoiseMap ret(Config::chunkWidth + 3, Config::chunkHeight + 3);
-        Config::Noise::frequency = utils::Clamp(Config::Noise::frequency, 0.1f, 64.0f);
-        Config::Noise::octaves = utils::Clamp(Config::Noise::octaves, 1u, 16u);
+        NoiseMap ret(config.chunkWidth + 3, config.chunkHeight + 3);
+        config.noise.frequency = utils::Clamp(config.noise.frequency, 0.1f, 64.0f);
+        config.noise.octaves = utils::Clamp(config.noise.octaves, 1u, 16u);
 
-        const uint startX = -offset.x() * (Config::chunkWidth) - 1;
-        const uint startY = -offset.y() * (Config::chunkHeight) - 1;
+        const uint startX = -offset.x() * (config.chunkWidth) - 1;
+        const uint startY = -offset.y() * (config.chunkHeight) - 1;
 
         for (int y = 0; y < static_cast<int>(ret.Height()); y++)
         {
@@ -51,8 +50,8 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)
     {
-        const float dx = (Config::chunkWidth) / Config::Noise::frequency;
-        const float dy = (Config::chunkHeight) / Config::Noise::frequency;
-        return (float)m_instance.m_perlin.octaveNoise0_1(x / dx, y / dy, Config::Noise::octaves, Config::Noise::lacunarity, Config::Noise::persistency);
+        const float dx = (config.chunkWidth) / config.noise.frequency;
+        const float dy = (config.chunkHeight) / config.noise.frequency;
+        return (float)m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency);
     }
 }

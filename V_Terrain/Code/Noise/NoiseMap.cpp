@@ -9,47 +9,47 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-#include "PerlinNoise.h"
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+#include "NoiseMap.h"
 
 namespace VTerrain
 {
-        PerlinNoise::PerlinNoise::NoiseMap::NoiseMap() :
+        NoiseMap::NoiseMap() :
               m_width(0u)
             , m_height(0u)
         {
         }
 
-        PerlinNoise::NoiseMap::NoiseMap(const uint w, const uint h) :
+        NoiseMap::NoiseMap(const uint w, const uint h) :
               m_width(w)
             , m_height(h)
         {
             m_data.resize(m_width*m_height);
         }
 
-        PerlinNoise::NoiseMap::~NoiseMap()
+        NoiseMap::~NoiseMap()
         {
         }
 
-        void PerlinNoise::NoiseMap::Set(std::vector<float> data, uint width, uint height)
+        void NoiseMap::Set(std::vector<float> data, uint width, uint height)
         {
             m_width = width;
             m_height = height;
             m_data = data;
         }
 
-        void PerlinNoise::NoiseMap::Init(uint width, uint height)
+        void NoiseMap::Init(uint width, uint height)
         {
             m_width = width;
             m_height = height;
         }
 
-        uint PerlinNoise::NoiseMap::Width() const
+        uint NoiseMap::Width() const
         {
             return m_width;
         }
 
-        uint PerlinNoise::NoiseMap::Height() const
+        uint NoiseMap::Height() const
         {
             return m_height;
         }

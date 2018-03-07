@@ -9,39 +9,40 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __V__TERRAIN__CONFIG__
 #define __V__TERRAIN__CONFIG__
 
 namespace VTerrain
 {
-    class Config
+    struct Config
     {
 	public:
-        static float maxHeight;
-        static unsigned int chunkWidth;
-        static unsigned int chunkHeight;
-        static unsigned int maxChunks;
-        static unsigned int nLODs;
-        static float quadSize;
-		static float fogDistance;
+        float maxHeight = 1000.f;
+        unsigned int chunkWidth = 64u;
+        unsigned int chunkHeight = 64u;
+        unsigned int maxChunks = 512u;
+        unsigned int nLODs = 6;
+        float quadSize = 6.f;
+		float fogDistance = 10000.f;
 
-		static float globalLight[3];
+		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
         class Noise
         {
 		public:
-			static float frequency;
-			static unsigned int octaves;
-			static float lacunarity;
-			static float persistency;
-        };
+			float frequency = 0.8f;
+			unsigned int octaves = 8u;
+			float lacunarity = 2.f;
+			float persistency = 0.4f;
+        } noise;
 
         class TMP
         {
         public:
-            static unsigned int debugTexBuf;
-            static unsigned int LOD;
-        };
+            unsigned int LOD = 0;;
+        } tmp;
    };
+
+	extern Config config;
 }
 #endif

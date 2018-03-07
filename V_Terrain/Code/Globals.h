@@ -9,15 +9,15 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __GLOBALS_V_
 #define __GLOBALS_V_
 
 typedef unsigned int uint;
 
-#include "IncludeSTD.h"
-#include "../TerrainConfig.h"
-#include "Vec3.h"
+#include "utils/IncludeSTD.h"
+#include "TerrainConfig.h"
+#include "utils/Vec3.h"
 
 namespace VTerrain
 {
