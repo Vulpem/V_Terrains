@@ -14,8 +14,6 @@
 
 #include "../Globals.h"
 
-#include "../Noise/PerlinNoise.h"
-
 namespace VTerrain
 {
 	class Mesh

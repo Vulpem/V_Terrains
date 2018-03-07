@@ -13,9 +13,9 @@
 #pragma once
 
 #include "../Globals.h"
+
 #include "Chunk.h"
 #include "ChunkFactory.h"
-#include "ChunkMesh.h"
 
 namespace VTerrain
 {

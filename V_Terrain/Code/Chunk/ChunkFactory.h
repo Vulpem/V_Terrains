@@ -13,6 +13,7 @@
 #pragma once
 
 #include "../Globals.h"
+
 #include "../Noise/PerlinNoise.h"
 
 #include <mutex>
