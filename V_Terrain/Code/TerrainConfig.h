@@ -24,6 +24,7 @@ namespace VTerrain
         static unsigned int maxChunks;
         static unsigned int nLODs;
         static float quadSize;
+		static float fogDistance;
 
 		static float globalLight[3];
         class Noise

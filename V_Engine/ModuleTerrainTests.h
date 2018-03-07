@@ -43,6 +43,7 @@ public:
     float2 m_offset;
 
     float m_maxHeight;
+	float m_fogDistance;
     bool m_simplifyRender;
     float m_simplifyRenderStep;
 

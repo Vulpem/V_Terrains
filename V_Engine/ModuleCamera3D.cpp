@@ -21,9 +21,12 @@ bool ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
 	bool ret = true;
+	camSpeed = 200.f;
+	camSprintMultiplier = 10.f;
+
 	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
-	defaultCamera->SetFarPlane(50000);
+	defaultCamera->SetFarPlane(30000);
 	defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");

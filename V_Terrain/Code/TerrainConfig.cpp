@@ -22,6 +22,7 @@ namespace VTerrain
     unsigned int Config::maxChunks = 512u;
     unsigned int Config::nLODs = 8;
     float Config::quadSize = 6.f;
+	float Config::fogDistance = 10000.f;
 
 	float Config::globalLight[3] = { 0.2f, 0.2f, 0.2f };
 

@@ -121,6 +121,12 @@ namespace VTerrain
                 glUniform1f(maxHeightLoc, Config::maxHeight);
             }
 
+			GLint fogDistanceLoc = glGetUniformLocation(m_shaderProgram, "fog_distance");
+			if (fogDistanceLoc != -1)
+			{
+				glUniform1f(fogDistanceLoc, Config::fogDistance);
+			}
+
             glBindBuffer(GL_ARRAY_BUFFER, MeshGenerator::Mesh::GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshGenerator::Mesh::GetIndicesBuf(LOD));
 

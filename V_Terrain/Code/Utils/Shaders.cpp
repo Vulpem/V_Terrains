@@ -26,6 +26,7 @@ namespace VTerrain
 		"out vec3 pos;\n"
 		"out vec3 norm;\n"
 		"out float lightIntensity;\n"
+		"out float dist;\n"
         "\n"
         "uniform mat4 model_matrix;\n"
         "uniform mat4 view_matrix;\n"
@@ -44,9 +45,11 @@ namespace VTerrain
         "	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
         "   vec4 heightMapVal = texture(heightmap, texCoord);\n"
 		"   pos = position + position_offset + vec3(0, heightMapVal.x * max_height, 0);"
-		"	gl_Position = transform * vec4(pos,1);\n"
+		"   vec4 outPos = transform * vec4(pos,1);\n"
+		"	gl_Position = outPos;\n"
         "	norm = mat3(model_matrix) * heightMapVal.yzw;\n"
         "	lightIntensity = max(dot(global_light_direction, norm),ambient_color.x);\n"
+		"   dist = distance(vec3(0,0,0), outPos.xyz);\n"
         "}\n"
     );
 
@@ -56,8 +59,10 @@ namespace VTerrain
 		"in vec3 pos;\n"
 		"in vec4 heightMapVal;\n"
 		"in float lightIntensity;\n"
+		"in float dist;\n"
 		"\n"
 		"uniform float max_height;\n"
+		"uniform float fog_distance;\n"
 		"\n"
         "uniform sampler2D heightmap;\n"
 		"\n"
@@ -65,8 +70,8 @@ namespace VTerrain
         "\n"
         "void main()\n"
         "{\n"
-		"       float val = lightIntensity * (pos.y / max_height);\n"
-		"       color = vec4(val,val,val, 1);\n"
+		"   float val = max(lightIntensity * (pos.y / max_height), min(pow(dist, 2)/pow(fog_distance,2), 0.6f));\n"
+		"   color = vec4(val,val,val, 1);\n"	
         "}\n"
     );
 

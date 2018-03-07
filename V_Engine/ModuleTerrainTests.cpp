@@ -22,6 +22,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_simplifyRender(false)
     , m_simplifyRenderStep(0.2f)
     , m_maxHeight(1000.f)
+	, m_fogDistance(10000.f)
 {
 	moduleName = "ModuleTerrainTests";
 }
@@ -101,6 +102,8 @@ update_status ModuleTerrain::Update()
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::Config::globalLight);
 
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::Config::maxHeight = m_maxHeight; }
+		if (ImGui::SliderFloat("FogDistance", &m_fogDistance, 0.0f, 100000.f, "%.3f", 4.f)) { VTerrain::Config::fogDistance = m_fogDistance; }
+
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
 
