@@ -134,6 +134,7 @@
     <ClInclude Include="Code\Globals.h" />
     <ClInclude Include="Code\Include.h" />
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />
+    <ClInclude Include="Code\Noise\NoiseMap.h" />
     <ClInclude Include="Code\Noise\PerlinNoise.h" />
     <ClInclude Include="Code\TerrainConfig.h" />
     <ClInclude Include="Code\Utils\GenImage.h" />

@@ -21,8 +21,6 @@ typedef unsigned int uint;
 
 namespace VTerrain
 {
-	extern Config config;
-
     namespace utils
     {
         static constexpr float PI = 3.14159265359f;

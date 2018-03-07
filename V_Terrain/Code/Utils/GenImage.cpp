@@ -16,7 +16,7 @@
 
 namespace VTerrain
 {
-    uint GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
+	unsigned int GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
     {
         unsigned int ret = 0;
         glEnable(GL_TEXTURE_2D);
@@ -32,7 +32,7 @@ namespace VTerrain
         return ret;
     }
 
-    uint GenImage::FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h)
+	unsigned int GenImage::FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h)
     {
         unsigned int ret = 0;
         glEnable(GL_TEXTURE_2D);
@@ -48,7 +48,7 @@ namespace VTerrain
         return ret;
     }
 
-    void GenImage::FreeImage(uint& buffer)
+    void GenImage::FreeImage(unsigned int& buffer)
     {
         glDeleteTextures(1, &buffer);
         buffer = 0;

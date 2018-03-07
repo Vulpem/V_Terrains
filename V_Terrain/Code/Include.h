@@ -13,14 +13,15 @@
 #ifndef __VTERRAIN_INCLUDE__
 #define __VTERRAIN_INCLUDE__
 
-#include "Chunk/ChunkManager.h"
+#include "TerrainConfig.h"
 
 namespace VTerrain
 {
-	extern ChunkManager chunkManager;
-
    //Global Funcs
     void Init();
+	void Update(int posX, int posY);
+	void Render(const float * viewMatrix, const float * projectionMatrix);
+	void CleanChunks();
 }
 
 #endif // !__VTERRAIN_INCLUDE__

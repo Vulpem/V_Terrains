@@ -66,6 +66,9 @@
     <ClInclude Include="Code\Chunk\ChunkManager.h">
       <Filter>Source Files\Chunk</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Noise\NoiseMap.h">
+      <Filter>Source Files\Noise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">

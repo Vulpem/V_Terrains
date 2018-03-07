@@ -12,6 +12,7 @@
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #include "Shaders.h"
 
+#include "../Globals.h"
 #include "../ExternalLibs/Glew/include/glew.h"
 #include <iostream>
 
@@ -75,7 +76,7 @@ namespace VTerrain
         "}\n"
     );
 
-    std::string Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, uint & shaderProgram)
+    std::string Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, unsigned int & shaderProgram)
     {
         std::string ret;
         bool error = false;
@@ -83,7 +84,7 @@ namespace VTerrain
         GLint success;
 
         ret += "\n------ Vertex shader ------\n";
-        GLuint vertexShader;
+        unsigned int vertexShader;
         if (vertexBuf == nullptr)
         {
             ret += "- Default vertex\n";
@@ -110,7 +111,7 @@ namespace VTerrain
 		ret.clear();
 
         ret += "\n------ Fragment shader ------\n";
-        GLuint fragmentShader;
+		unsigned int fragmentShader;
         if (fragmentBuf == nullptr)
         {
             ret += "- Default fragment\n";
@@ -135,7 +136,7 @@ namespace VTerrain
             ret += "Compilation succesfull\n";
         }
 
-        GLuint program;
+		unsigned int program;
         program = glCreateProgram();
 
         glAttachShader(program, vertexShader);
@@ -172,7 +173,7 @@ namespace VTerrain
         return ret;
     }
 
-    void Shaders::FreeShader(uint shaderProgram)
+    void Shaders::FreeShader(unsigned int shaderProgram)
     {
         glDeleteProgram(shaderProgram);
     }

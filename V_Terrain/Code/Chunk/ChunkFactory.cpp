@@ -113,7 +113,7 @@ namespace VTerrain
         {
             RequestedChunk request = PopChunkRequest();
             GeneratedChunk result;
-            VTerrain::PerlinNoise::NoiseMap noiseMap = m_noiseGenerator.GenNoiseMap(request.pos);
+            VTerrain::NoiseMap noiseMap = m_noiseGenerator.GenNoiseMap(request.pos);
 
             result.m_pos = request.pos;
             result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };

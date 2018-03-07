@@ -12,15 +12,15 @@
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
-#include "../Globals.h"
+#include <string>
 
 namespace VTerrain
 {
     class Shaders
     {
     public:
-        static std::string CompileShader(const char* vertexBuf, const char* fragmentBuf, uint & shaderProgram);
-        static void FreeShader(uint shaderProgram);
+        static std::string CompileShader(const char* vertexBuf, const char* fragmentBuf, unsigned int & shaderProgram);
+        static void FreeShader(unsigned int shaderProgram);
 
         static std::string m_defaultVertexShader;
         static std::string m_defaultFragmentShader;

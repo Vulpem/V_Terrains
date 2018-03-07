@@ -57,7 +57,7 @@ update_status ModuleTerrain::PreUpdate()
 update_status ModuleTerrain::Update()
 {
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
-	VTerrain::chunkManager.Update(pos.x, pos.z);
+	VTerrain::Update(pos.x, pos.z);
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
@@ -124,7 +124,7 @@ update_status ModuleTerrain::Update()
 		m_regenTimer.Stop();
 		m_wantRegen = false;
 		GenMap();
-		VTerrain::chunkManager.CleanChunks();
+		VTerrain::CleanChunks();
 	}
     return UPDATE_CONTINUE;
 }
@@ -143,7 +143,7 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::Render(const viewPort & port)
 {
-	VTerrain::chunkManager.Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+	VTerrain::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
 }
 
 void ModuleTerrain::GenMap()

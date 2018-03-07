@@ -29,9 +29,9 @@ namespace VTerrain
         m_perlin.reseed(seed);
     }
 
-    PerlinNoise::NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)
+    NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)
     {
-        PerlinNoise::NoiseMap ret(config.chunkWidth + 3, config.chunkHeight + 3);
+        NoiseMap ret(config.chunkWidth + 3, config.chunkHeight + 3);
         config.noise.frequency = utils::Clamp(config.noise.frequency, 0.1f, 64.0f);
         config.noise.octaves = utils::Clamp(config.noise.octaves, 1u, 16u);
 

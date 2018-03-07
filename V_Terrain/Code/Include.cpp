@@ -12,15 +12,31 @@
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #include "Include.h"
 
-#include "Utils\Shaders.h"
+#include "Utils/Shaders.h"
+#include "Chunk/ChunkManager.h"
 
 namespace VTerrain
 {
 	Config VTerrain::config = Config();
-	ChunkManager VTerrain::chunkManager = ChunkManager();
+	ChunkManager chunkManager = ChunkManager();
 
     void Init()
     {
         VTerrain::Shaders::CompileShader(nullptr, nullptr, Chunk::m_shaderProgram);
     }
+
+	void Update(int posX, int posY)
+	{
+		chunkManager.Update(posX, posY);
+	}
+
+	void Render(const float * viewMatrix, const float * projectionMatrix)
+	{
+		chunkManager.Render(viewMatrix, projectionMatrix);
+	}
+
+	void CleanChunks()
+	{
+		chunkManager.CleanChunks();
+	}
 }

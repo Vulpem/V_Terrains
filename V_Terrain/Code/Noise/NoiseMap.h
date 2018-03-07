@@ -10,39 +10,34 @@
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-#ifndef __V__TERRAIN__CONFIG__
-#define __V__TERRAIN__CONFIG__
+#pragma once
+
+#include "../Globals.h"
+
+#include "Extern/SivPerlinNoise.h"
 
 namespace VTerrain
 {
-    struct Config
-    {
+	class NoiseMap
+	{
+	private:
+		uint m_height;
+		uint m_width;
+		std::vector<float> m_data;
+
 	public:
-        float maxHeight = 1000.f;
-        unsigned int chunkWidth = 64u;
-        unsigned int chunkHeight = 64u;
-        unsigned int maxChunks = 512u;
-        unsigned int nLODs = 6;
-        float quadSize = 6.f;
-		float fogDistance = 10000.f;
+		NoiseMap();
+		NoiseMap(const uint w, const uint h);
+		~NoiseMap();
 
-		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
-        class Noise
-        {
-		public:
-			float frequency = 0.8f;
-			unsigned int octaves = 8u;
-			float lacunarity = 2.f;
-			float persistency = 0.4f;
-        } noise;
+		void Set(std::vector<float> data, uint width, uint height);
+		void Init(uint width, uint height);
+		uint Width() const;
+		uint Height() const;
+		const std::vector<float>& Data() const { return m_data; }
+		std::vector<float>& Data() { return m_data; }
 
-        class TMP
-        {
-        public:
-            unsigned int LOD = 0;;
-        } tmp;
-   };
-
-	extern Config config;
+		float& operator[] (int x) { return m_data[x]; };
+		float operator[] (int x) const { return m_data[x]; }
+	};
 }
-#endif
