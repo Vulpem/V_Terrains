@@ -28,7 +28,6 @@ namespace VTerrain
 		"out lowp float fog;"
         "out lowp vec2 UV;"
         ""
-        "uniform lowp mat4 model_matrix;"
         "uniform lowp mat4 view_matrix;"
         "uniform lowp mat4 projection_matrix;"
 		""
@@ -42,7 +41,7 @@ namespace VTerrain
         ""
         "void main()"
         "{"
-        "	lowp mat4 transform = projection_matrix * view_matrix * model_matrix;"
+        "	lowp mat4 transform = projection_matrix * view_matrix;"
         "   lowp vec4 heightMapVal = texture(heightmap, texCoord);"
 		"   pos = position + position_offset + vec3(0, heightMapVal.x * max_height, 0);"
 		"   pos.y = max(pos.y, water_height);"
@@ -62,7 +61,6 @@ namespace VTerrain
 		"in lowp float fog;"
 		"in lowp vec2 UV;"
 		""
-		"uniform lowp mat4 model_matrix;"
 		"uniform lowp vec3 global_light_direction;"
 		""
 		"uniform lowp float ambient_min;"
@@ -79,8 +77,8 @@ namespace VTerrain
 		"{"
 		""
 		"	lowp vec4 heightmapVal = texture(heightmap, UV);"
-		"	lowp vec3 norm = mat3(model_matrix) * heightmapVal.yzw;"
 		"   lowp float height = heightmapVal.x * max_height;"
+        "   vec3 norm = heightmapVal.yzw;"
 		"	lowp float lightIntensity = max(dot(global_light_direction, norm), ambient_min);"
 		""
 		"   lowp vec3 col;"
@@ -195,7 +193,6 @@ namespace VTerrain
         {
             ret.m_program = program;
 
-            ret.loc_model_matrix = glGetUniformLocation(program, "model_matrix");
             ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
             ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
 

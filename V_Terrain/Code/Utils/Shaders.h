@@ -27,7 +27,6 @@ namespace VTerrain
         unsigned int loc_position;
         unsigned int loc_texCoord;
 
-        unsigned int loc_model_matrix;
         unsigned int loc_view_matrix;
         unsigned int loc_projection_matrix;
 

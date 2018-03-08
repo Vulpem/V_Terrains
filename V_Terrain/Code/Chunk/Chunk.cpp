@@ -78,12 +78,6 @@ namespace VTerrain
             glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
             // ------ Setting uniforms -------------------------
-            //Model Matrix
-            float identity[] = { 1,0,0,0,
-                0,1,0,0,
-                0,0,1,0,
-                0,0,0,1 };
-            glUniformMatrix4fv(m_shader.loc_model_matrix, 1, GL_FALSE, identity);
 
             glUniformMatrix4fv(m_shader.loc_view_matrix, 1, GL_FALSE, viewMatrix);
 
