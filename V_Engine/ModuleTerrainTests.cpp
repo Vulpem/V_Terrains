@@ -83,7 +83,7 @@ update_status ModuleTerrain::Update()
 		
         if(lightDirChanged)
         {
-			float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
+			float3 tmp(1.f, 0.f, 0.f);
 			Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight*DEGTORAD, 0.f);
 			tmp = rot * tmp;
 			VTerrain::config.globalLight[0] = tmp.x;
@@ -95,7 +95,7 @@ update_status ModuleTerrain::Update()
 
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
 		ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
-		ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight, "%.3f", 4.f);
+		ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight);
 
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
@@ -103,20 +103,20 @@ update_status ModuleTerrain::Update()
         if (ImGui::DragFloat2("Offset", &m_offset[0], 1.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.1f, 20.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Frequency", &m_frequency, 0.1f, 0.1f, 64.f)) { WantRegen(); }
+        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.0001f, 2.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Frequency", &m_frequency, 0.01f, 0.0001f, 2.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 16)) { WantRegen(); }
-        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 16)) { WantRegen(); }
+        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 15)) { WantRegen(); }
+        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 15)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.1f, 20.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.1f, 0.1f, 20.f)) { WantRegen(); }
+        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.01f, 8.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.01f, 0.01f, 8.f)) { WantRegen(); }
         ImGui::Separator();
 
-        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.01f, 1.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Persistance", &m_persistance, 0.1f, 0.01f, 1.f)) { WantRegen(); }
+        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
+        if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
 		ImGui::End();
     }
 
@@ -125,7 +125,6 @@ update_status ModuleTerrain::Update()
 		m_regenTimer.Stop();
 		m_wantRegen = false;
 		GenMap();
-		VTerrain::CleanChunks();
 	}
     return UPDATE_CONTINUE;
 }
@@ -157,6 +156,8 @@ void ModuleTerrain::GenMap()
     VTerrain::config.noise.octaves = m_octaves;
     VTerrain::config.noise.lacunarity = m_lacunarity;
     VTerrain::config.noise.persistency = m_persistance;
+
+    VTerrain::CleanChunks();
 }
 
 void ModuleTerrain::WantRegen()

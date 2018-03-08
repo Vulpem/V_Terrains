@@ -78,6 +78,7 @@ namespace VTerrain
         {
             it->Free();
         }
+        m_factory.ClearRequests();
         AddChunksToRegen(m_lastOffPos);
     }
 

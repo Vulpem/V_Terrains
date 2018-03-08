@@ -47,13 +47,22 @@ namespace VTerrain
 			d[1] = d[1] / len;
 			d[2] = d[2] / len;
 		}
+        Vec3<T> Normalized()
+        {
+            const float len = Length();
+            return Vec3<T>(
+                d[0] / len,
+                d[1] / len,
+                d[2] / len
+                );
+        }
 		Vec3 Cross(Vec3 a) const
 		{
-			return Vec3(
-				d[1] * a.d[2] - d[2] * a.d[1],
-				d[2] * a.d[0] - d[0] * a.d[2],
-				d[0] * a.d[1] - d[1] * a.d[0]
-			);
+            return Vec3(
+                d[1] * a.d[2] - d[2] * a.d[1],
+                d[2] * a.d[0] - d[0] * a.d[2],
+                d[0] * a.d[1] - d[1] * a.d[0]
+            );
 		}
     };
 
@@ -89,5 +98,13 @@ namespace VTerrain
 			d[0] = d[0] / len;
 			d[1] = d[1] / len;
 		}
+        Vec2<T> Normalized()
+        {
+            const float len = Length();
+            return Vec2<T>(
+                d[0] / len,
+                d[1] / len
+                );
+        }
 	};
 }
