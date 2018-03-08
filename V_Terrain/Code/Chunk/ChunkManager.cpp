@@ -48,7 +48,7 @@ namespace VTerrain
             GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
         }
 
-        if (off != m_lastOffPos || m_factory.HasRequestedChunks() == false)
+        if (off != m_lastOffPos)
         {
 			m_factory.ClearRequests();
             m_lastOffPos = off;
@@ -84,10 +84,9 @@ namespace VTerrain
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
-		const int minDist = 2;
 		const int maxDist = log2f(config.maxChunks);
 		bool stop = false;
-		for (int dist = 0; stop == false && dist <= maxDist; dist++)
+		for (int dist = 0; dist <= maxDist; dist++)
 		{
 			for (int y = -dist; y <= dist; y++)
 			{
@@ -95,8 +94,7 @@ namespace VTerrain
 				{
 					if (abs(x) + abs(y) == dist)
 					{
-						bool added = AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
-						stop = (added && dist >= minDist);
+						AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
 					}
 				}
 			}
