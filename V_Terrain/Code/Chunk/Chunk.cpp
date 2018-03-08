@@ -34,6 +34,12 @@ namespace VTerrain
         {
             m_mesh.Generate();
         }
+
+		if (m_buf_heightmap != 0)
+		{
+			Free();
+		}
+
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
         m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
@@ -41,7 +47,10 @@ namespace VTerrain
 
     void  Chunk::Free()
     {
-        GenImage::FreeImage(m_buf_heightmap);
+		if (m_buf_heightmap != 0)
+		{
+			GenImage::FreeImage(m_buf_heightmap);
+		}
         m_minLOD = UINT_MAX;
     }
 

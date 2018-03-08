@@ -164,7 +164,7 @@ update_status ModuleInput::PreUpdate()
 		captureMouse = false;
 	}
 
-	if (quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
+	if (quit == true)
 		return UPDATE_STOP;
 
 	return UPDATE_CONTINUE;

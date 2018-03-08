@@ -84,7 +84,7 @@ update_status ModuleTerrain::Update()
         if(lightDirChanged)
         {
 			float3 tmp(1.f, 0.f, 0.f); //cos(m_globalLightDir * DEGTORAD),0 ,sin(m_globalLightDir* DEGTORAD));
-			Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight*DEGTORAD, 0.f);
+			Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight*DEGTORAD, 0.f);
 			tmp = rot * tmp;
 			VTerrain::config.globalLight[0] = tmp.x;
 			VTerrain::config.globalLight[1] = tmp.y;
