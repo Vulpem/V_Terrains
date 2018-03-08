@@ -43,7 +43,7 @@ namespace VTerrain
         "{"
         "	lowp mat4 transform = projection_matrix * view_matrix;"
         "   lowp vec4 heightMapVal = texture(heightmap, texCoord);"
-		"   pos = position + position_offset + vec3(0, heightMapVal.x * max_height, 0);"
+		"   pos = position + position_offset + vec3(0, heightMapVal.w * max_height, 0);"
 		"   pos.y = max(pos.y, water_height);"
 		"   vec4 outPos = transform * vec4(pos,1);"
 		"	gl_Position = outPos;"
@@ -77,16 +77,15 @@ namespace VTerrain
 		"{"
 		""
 		"	lowp vec4 heightmapVal = texture(heightmap, UV);"
-		"   lowp float height = heightmapVal.x * max_height;"
-        "   vec3 norm = heightmapVal.yzw;"
-		"	lowp float lightIntensity = max(dot(global_light_direction, norm), ambient_min);"
+		"   lowp float height = heightmapVal.w * max_height;"
+		"	lowp float lightIntensity = max(dot(global_light_direction, heightmapVal.xyz), ambient_min);"
 		""
 		"   lowp vec3 col;"
 		//Water
 		"	if (height <= water_height + water_height * 0.0001f)"
 		"	{ col = water_color; }"
 		//Steep 2
-		"	else if(norm.y < 0.1f)"
+		"	else if(heightmapVal.y < 0.1f)"
 		"{"
 		"	if (height < (max_height - water_height) * 0.62f + water_height)"
 		"	{"
@@ -98,7 +97,7 @@ namespace VTerrain
 		"	}"
 		"}"
 		//Steep
-		"	else if(norm.y < 0.15f && height > (max_height - water_height) * 0.56f + water_height)"
+		"	else if(heightmapVal.y < 0.15f && height > (max_height - water_height) * 0.56f + water_height)"
 		"   { col = vec3(0.435f, 0.513f, 0.572f); }"
 		//Sand
 		"   else if (height <= water_height + 30)"
