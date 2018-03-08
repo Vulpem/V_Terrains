@@ -65,7 +65,7 @@ namespace VTerrain
 		"uniform lowp mat4 model_matrix;"
 		"uniform lowp vec3 global_light_direction;"
 		""
-		"uniform lowp vec4 ambient_color;"
+		"uniform lowp float ambient_min;"
 		"uniform lowp float max_height;"
 		"uniform lowp float water_height;"
 		"uniform lowp vec3 water_color;"
@@ -81,7 +81,7 @@ namespace VTerrain
 		"	lowp vec4 heightmapVal = texture(heightmap, UV);"
 		"	lowp vec3 norm = mat3(model_matrix) * heightmapVal.yzw;"
 		"   lowp float height = heightmapVal.x * max_height;"
-		"	lowp float lightIntensity = max(dot(global_light_direction, norm), ambient_color.x);"
+		"	lowp float lightIntensity = max(dot(global_light_direction, norm), ambient_min);"
 		""
 		"   lowp vec3 col;"
 		//Water
@@ -117,18 +117,16 @@ namespace VTerrain
         "}"
     );
 
-    std::string Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, unsigned int & shaderProgram)
+    Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf)
     {
-        std::string ret;
         bool error = false;
-        shaderProgram = 0;
         GLint success;
+        Shader ret;
 
-        ret += "\n------ Vertex shader ------\n";
         unsigned int vertexShader;
         if (vertexBuf == nullptr)
         {
-            ret += "- Default vertex\n";
+            ret.m_vert_result += "- Using default vertex\n";
             vertexBuf = m_defaultVertexShader.c_str();
         }
 
@@ -141,21 +139,19 @@ namespace VTerrain
             error = true;
             GLchar infoLog[512];
             glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            ret += infoLog;
-            ret += '\n';
+            ret.m_vert_result += infoLog;
+            ret.m_vert_result += '\n';
 			assert(false);
         }
         else
         {
-            ret += "Compilation succesfull\n";
+            ret.m_vert_result += "Compilation succesfull\n";
         }
-		ret.clear();
 
-        ret += "\n------ Fragment shader ------\n";
 		unsigned int fragmentShader;
         if (fragmentBuf == nullptr)
         {
-            ret += "- Default fragment\n";
+            ret.m_frag_result += "- Using default fragment\n";
             fragmentBuf = m_defaultFragmentShader.c_str();
         }
 
@@ -168,13 +164,13 @@ namespace VTerrain
             error = true;
             GLchar infoLog[512];
             glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            ret += infoLog;
-            ret += '\n';
+            ret.m_frag_result += infoLog;
+            ret.m_frag_result += '\n';
 			assert(false);
         }
         else
         {
-            ret += "Compilation succesfull\n";
+            ret.m_frag_result += "Compilation succesfull\n";
         }
 
 		unsigned int program;
@@ -190,32 +186,48 @@ namespace VTerrain
             error = true;
             GLchar infoLog[512];
             glGetProgramInfoLog(program, 512, NULL, infoLog);
-            ret += "\n------ Shader Program ------\n";
-            ret += infoLog;
-            ret += '\n';
+            ret.m_program_result += "\n------ Shader Program ------\n";
+            ret.m_program_result += infoLog;
+            ret.m_program_result += '\n';
         }
 
         if (program != 0 && error == false)
         {
-            shaderProgram = program;
+            ret.m_program = program;
+
+            ret.loc_model_matrix = glGetUniformLocation(program, "model_matrix");
+            ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
+            ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
+
+            ret.loc_position_offset = glGetUniformLocation(program, "position_offset");
+            ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
+            ret.loc_max_height = glGetUniformLocation(program, "max_height");
+            ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
+            ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
+            ret.loc_water_color = glGetUniformLocation(program, "water_color");
+            ret.loc_water_height = glGetUniformLocation(program, "water_height");
+            ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
+
+            ret.loc_position = 0;
+            ret.loc_texCoord = 1;
         }
         else
         {
-            ret += "Error Compiling shader";
+            ret.m_program_result += "Error Compiling shader";
             
             assert(false);
         }
 
-        glDetachShader(shaderProgram, vertexShader);
-        glDetachShader(shaderProgram, fragmentShader);
+        glDetachShader(program, vertexShader);
+        glDetachShader(program, fragmentShader);
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
         return ret;
     }
 
-    void Shaders::FreeShader(unsigned int shaderProgram)
+    void Shaders::FreeShader(const Shader& shader)
     {
-        glDeleteProgram(shaderProgram);
+        glDeleteProgram(shader.m_program);
     }
 }

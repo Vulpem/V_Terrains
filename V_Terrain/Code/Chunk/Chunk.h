@@ -15,6 +15,7 @@
 #include "../Globals.h"
 #include "ChunkFactory.h"
 #include "ChunkMesh.h"
+#include "../Utils/Shaders.h"
 
 namespace VTerrain
 {
@@ -30,7 +31,7 @@ namespace VTerrain
 		bool IsLoaded();
 		Vec2<int> GetPos() { return m_pos; }
 
-		static uint m_shaderProgram;
+		static Shader m_shader;
 		static Mesh m_mesh;
 	private:
 		Vec2<int> m_pos;

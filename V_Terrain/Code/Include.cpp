@@ -22,7 +22,7 @@ namespace VTerrain
 
     void Init()
     {
-        VTerrain::Shaders::CompileShader(nullptr, nullptr, Chunk::m_shaderProgram);
+        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr);
     }
 
 	void Update(int posX, int posY)

@@ -25,7 +25,8 @@ namespace VTerrain
         unsigned int nLODs = 6;
         float quadSize = 6.f;
 		float fogDistance = 10000.f;
-		float waterHeight = 100.f;
+		float waterHeight = 330.f;
+        float ambientLight = 0.4f;
 
 		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
 		float fogColor[3] = { 0.78f, 0.81f, 0.84f };

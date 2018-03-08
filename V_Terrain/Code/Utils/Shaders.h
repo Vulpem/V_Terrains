@@ -16,11 +16,36 @@
 
 namespace VTerrain
 {
+    struct Shader
+    {
+        std::string m_frag_result;
+        std::string m_vert_result;
+        std::string m_program_result;
+
+        unsigned int m_program;
+
+        unsigned int loc_position;
+        unsigned int loc_texCoord;
+
+        unsigned int loc_model_matrix;
+        unsigned int loc_view_matrix;
+        unsigned int loc_projection_matrix;
+
+        unsigned int loc_position_offset;
+        unsigned int loc_max_height;
+        unsigned int loc_fog_distance;
+        unsigned int loc_water_height;
+        unsigned int loc_global_light_direction;
+        unsigned int loc_ambient_color;
+        unsigned int loc_water_color;
+        unsigned int loc_fog_color;
+    };
+
     class Shaders
     {
     public:
-        static std::string CompileShader(const char* vertexBuf, const char* fragmentBuf, unsigned int & shaderProgram);
-        static void FreeShader(unsigned int shaderProgram);
+        static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf);
+        static void FreeShader(const Shader& shader);
 
         static std::string m_defaultVertexShader;
         static std::string m_defaultFragmentShader;

@@ -19,7 +19,7 @@
 
 namespace VTerrain
 {
-    uint Chunk::m_shaderProgram = 0u;
+    Shader Chunk::m_shader = Shader();
 	Mesh Chunk::m_mesh = Mesh();
 
      Chunk::Chunk() :
@@ -68,7 +68,7 @@ namespace VTerrain
                 drawLOD = config.nLODs - 1;
             }
 
-            glUseProgram(m_shaderProgram);
+            glUseProgram(m_shader.m_program);
 
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -83,85 +83,33 @@ namespace VTerrain
                 0,1,0,0,
                 0,0,1,0,
                 0,0,0,1 };
-            GLint modelLoc = glGetUniformLocation(m_shaderProgram, "model_matrix");
-            if (modelLoc != -1) { glUniformMatrix4fv(modelLoc, 1, GL_FALSE, identity); }
+            glUniformMatrix4fv(m_shader.loc_model_matrix, 1, GL_FALSE, identity);
 
-            //View matrix
-            GLint viewLoc = glGetUniformLocation(m_shaderProgram, "view_matrix");
-            if (viewLoc != -1)
-            {
-                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, viewMatrix);
-            }
+            glUniformMatrix4fv(m_shader.loc_view_matrix, 1, GL_FALSE, viewMatrix);
 
             //Projection Matrix
-            GLint projectionLoc = glGetUniformLocation(m_shaderProgram, "projection_matrix");
-            if (projectionLoc != -1)
-            {
-                glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projectionMatrix);
-            }
+            glUniformMatrix4fv(m_shader.loc_projection_matrix, 1, GL_FALSE, projectionMatrix);
 
-            GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "position_offset");
-            if (offsetLoc != -1)
-            {
-                float tmp[3] = { m_pos.x() * ((float)config.chunkWidth * config.quadSize), 0.f, m_pos.y() * ((float)config.chunkHeight * config.quadSize) };
-                glUniform3fv(offsetLoc, 1, tmp);
-            }
+            const float tmp[3] = { m_pos.x() * ((float)config.chunkWidth * config.quadSize), 0.f, m_pos.y() * ((float)config.chunkHeight * config.quadSize) };
+            glUniform3fv(m_shader.loc_position_offset, 1, tmp);
 
-            float col[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-            //Ambient color
-            GLint ambientColorLoc = glGetUniformLocation(m_shaderProgram, "ambient_color");
-            if (ambientColorLoc != -1)
-            {
-                glUniform4fv(ambientColorLoc, 1, col);
-            }
-
-            float materialCol[] = { 1.0f,1.0f,1.0f,1.0f };
-            //Material color
-            GLint materialColorLoc = glGetUniformLocation(m_shaderProgram, "material_color");
-            if (materialColorLoc != -1)
-            {
-                glUniform4fv(materialColorLoc, 1, materialCol);
-            }
+            glUniform1f(m_shader.loc_ambient_color, config.ambientLight);
 
 
+            //Global light direction
             Vec3<float> dir(config.globalLight[0], config.globalLight[1], config.globalLight[2]);
             dir.Normalize();
-            //Global light direction
-            GLint globalLightDirLoc = glGetUniformLocation(m_shaderProgram, "global_light_direction");
-            if (globalLightDirLoc != -1)
-            {
-                glUniform3fv(globalLightDirLoc, 1, dir.Data());
-            }
+            glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
 
-            GLint maxHeightLoc = glGetUniformLocation(m_shaderProgram, "max_height");
-            if (maxHeightLoc != -1)
-            {
-                glUniform1f(maxHeightLoc, config.maxHeight);
-            }
+            glUniform1f(m_shader.loc_max_height, config.maxHeight);
 
-			GLint fogDistanceLoc = glGetUniformLocation(m_shaderProgram, "fog_distance");
-			if (fogDistanceLoc != -1)
-			{
-				glUniform1f(fogDistanceLoc, config.fogDistance);
-			}
+		    glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
 
-			GLint fogColorLoc = glGetUniformLocation(m_shaderProgram, "fog_color");
-			if (fogColorLoc != -1)
-			{
-				glUniform3fv(fogColorLoc, 1, config.fogColor);
-			}
+			glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
 
-			GLint waterColorLoc = glGetUniformLocation(m_shaderProgram, "water_color");
-			if (waterColorLoc != -1)
-			{
-				glUniform3fv(waterColorLoc, 1, config.waterColor);
-			}
+			glUniform3fv(m_shader.loc_water_color, 1, config.waterColor);
 
-			GLint waterHeightLoc = glGetUniformLocation(m_shaderProgram, "water_height");
-			if (waterHeightLoc != -1)
-			{
-				glUniform1f(waterHeightLoc, config.waterHeight);
-			}
+			glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
