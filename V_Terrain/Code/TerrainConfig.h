@@ -22,7 +22,7 @@ namespace VTerrain
         unsigned int chunkWidth = 64u;
         unsigned int chunkHeight = 64u;
         unsigned int maxChunks = 256u;
-        unsigned int nLODs = 5;
+        unsigned int nLODs = 6;
         float quadSize = 6.f;
 		float fogDistance = 10000.f;
 		float waterHeight = 100.f;
