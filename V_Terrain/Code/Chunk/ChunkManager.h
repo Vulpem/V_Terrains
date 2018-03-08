@@ -31,7 +31,7 @@ namespace VTerrain
 
     private:
         void AddChunksToRegen(Vec2<int> pos);
-        void AddChunkToRegen(Vec2<int> pos);	
+        bool AddChunkToRegen(Vec2<int> pos);	
 
         Chunk& GetChunk(Vec2<int> pos);
 		bool IsLoaded(Vec2<int> pos);

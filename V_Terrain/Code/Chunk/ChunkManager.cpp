@@ -48,15 +48,9 @@ namespace VTerrain
             GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
         }
 
-        if (m_factory.HasRequestedChunks() == false)
+        if (off != m_lastOffPos || m_factory.HasRequestedChunks() == false)
         {
-            int dist = 0;
-            //Generate chunks when stopped
-            //TODO
-        }
-
-        if (off != m_lastOffPos)
-        {
+			m_factory.ClearRequests();
             m_lastOffPos = off;
             AddChunksToRegen(off);
         }
@@ -69,7 +63,7 @@ namespace VTerrain
             //TODO improve set LOD
 			if (config.tmp.LOD == 0)
 			{
-				it->Draw(viewMatrix, projectionMatrix, (m_lastOffPos - it->GetPos()).Length() / 2);
+				it->Draw(viewMatrix, projectionMatrix, (uint)(m_lastOffPos - it->GetPos()).Length() / 2);
 			}
 			else
 			{
@@ -89,22 +83,33 @@ namespace VTerrain
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
-        //TODO configurable
-        for (int y = -6; y <= 6; y++)
-        {
-            for (int x = -6; x <= 6; x++)
-            {
-                AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
-            }
-        }
+		const int minDist = 2;
+		const int maxDist = log2f(config.maxChunks);
+		bool stop = false;
+		for (int dist = 0; stop == false && dist <= maxDist; dist++)
+		{
+			for (int y = -dist; y <= dist; y++)
+			{
+				for (int x = -dist; x <= dist; x++)
+				{
+					if (abs(x) + abs(y) == dist)
+					{
+						bool added = AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
+						stop = (added && dist >= minDist);
+					}
+				}
+			}
+		}
     }
 
-    void ChunkManager::AddChunkToRegen(Vec2<int> pos)
+	bool ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
         if (IsLoaded(pos) == false && m_factory.IsRequested(pos) == false)
         {
             m_factory.PushChunkRequest(pos);
+			return true;
         }
+		return false;
     }
 
 

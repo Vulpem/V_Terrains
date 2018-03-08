@@ -28,7 +28,7 @@ namespace VTerrain
     void Mesh::Generate()
     {
         GenerateMesh();
-        for (int lod = 0; lod < config.nLODs; lod++)
+        for (uint lod = 0; lod < config.nLODs; lod++)
         {
             GenerateIndices(lod);
         }
@@ -46,9 +46,9 @@ namespace VTerrain
 
         std::vector<Vec2<float>> UVs;
 
-        for (int y = 0; y < config.chunkHeight + 1; y++)
+        for (uint y = 0; y < config.chunkHeight + 1; y++)
         {
-            for (int x = 0; x < config.chunkWidth + 1; x++)
+            for (uint x = 0; x < config.chunkWidth + 1; x++)
             {
                 data[n + 0] = topLeftX + x * config.quadSize;
                 data[n + 1] = 0.f;
@@ -73,10 +73,10 @@ namespace VTerrain
     {
         const uint width = config.chunkWidth + 1;
         const uint height = config.chunkHeight + 1;
-        std::vector<uint> indices(width*height * 6);
+        std::vector<uint> indices(width*height * 6u);
         uint n = 0;
         uint i = 0;
-        uint step = pow(2, LOD);
+        uint step = static_cast<uint>(powf(2, LOD));
         for (uint y = 0; y < height; y += step)
         {
             i = (width)*y;
