@@ -94,7 +94,8 @@ update_status ModuleTerrain::Update()
         ImGui::DragFloat3("GlobalLightDirection", VTerrain::config.globalLight);
 
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
-		if (ImGui::SliderFloat("FogDistance", &m_fogDistance, 0.0f, 100000.f, "%.3f", 4.f)) { VTerrain::config.fogDistance = m_fogDistance; }
+		ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
+		ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight, "%.3f", 4.f);
 
 
         if (ImGui::DragFloat2("Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }

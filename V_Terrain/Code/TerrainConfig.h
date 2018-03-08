@@ -25,20 +25,21 @@ namespace VTerrain
         unsigned int nLODs = 5;
         float quadSize = 6.f;
 		float fogDistance = 10000.f;
+		float waterHeight = 100.f;
 
+		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
+		float fogColor[3] = { 0.78f, 0.81f, 0.84f };
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
-        class Noise
+		struct Noise
         {
-		public:
 			float frequency = 0.8f;
 			unsigned int octaves = 8u;
 			float lacunarity = 2.f;
 			float persistency = 0.4f;
         } noise;
 
-        class TMP
+		struct TMP
         {
-        public:
             unsigned int LOD = 0;;
         } tmp;
    };

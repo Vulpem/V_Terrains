@@ -145,6 +145,24 @@ namespace VTerrain
 				glUniform1f(fogDistanceLoc, config.fogDistance);
 			}
 
+			GLint fogColorLoc = glGetUniformLocation(m_shaderProgram, "fog_color");
+			if (fogColorLoc != -1)
+			{
+				glUniform3fv(fogColorLoc, 1, config.fogColor);
+			}
+
+			GLint waterColorLoc = glGetUniformLocation(m_shaderProgram, "water_color");
+			if (waterColorLoc != -1)
+			{
+				glUniform3fv(waterColorLoc, 1, config.waterColor);
+			}
+
+			GLint waterHeightLoc = glGetUniformLocation(m_shaderProgram, "water_height");
+			if (waterHeightLoc != -1)
+			{
+				glUniform1f(waterHeightLoc, config.waterHeight);
+			}
+
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
 
