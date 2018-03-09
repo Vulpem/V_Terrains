@@ -145,9 +145,9 @@ namespace VTerrain
 
                     norm.Normalize();
 
-                    result[current++] = norm.x();
-                    result[current++] = norm.y();
-                    result[current++] = norm.z();
+                    result[current++] = norm.x() * 0.5f + 0.5f;
+                    result[current++] = norm.y() * 0.5f + 0.5f;
+                    result[current++] = norm.z() * 0.5f + 0.5f;
 
                     result[current++] = noiseMap[x + y * noiseMap.Width()];
                 }
