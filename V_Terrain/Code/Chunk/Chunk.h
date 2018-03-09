@@ -26,10 +26,10 @@ namespace VTerrain
 
 		void Regenerate(ChunkFactory::GeneratedChunk base);
 		void Free();
-		void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0);
-		bool IsLODReady(uint LOD);
-		bool IsLoaded();
-		Vec2<int> GetPos() { return m_pos; }
+		void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0) const;
+		bool IsLODReady(uint LOD)  const;
+		bool IsLoaded()  const;
+		Vec2<int> GetPos() const;
 
 		static Shader m_shader;
 		static Mesh m_mesh;

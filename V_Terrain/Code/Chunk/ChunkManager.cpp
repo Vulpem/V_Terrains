@@ -56,7 +56,7 @@ namespace VTerrain
         }
     }
 
-    void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix)
+    void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix) const
     {
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
@@ -84,7 +84,7 @@ namespace VTerrain
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
-		const int maxDist = log2f(config.maxChunks);
+		const int maxDist = static_cast<int>(log2f(static_cast<float>(config.maxChunks)));
 		bool stop = false;
 		for (int dist = 0; dist <= maxDist; dist++)
 		{
@@ -122,13 +122,25 @@ namespace VTerrain
             }
         }
         assert(false);
-        Chunk a;
-        return a;
+        return *m_chunks.begin();
     }
 
-    bool ChunkManager::IsLoaded(Vec2<int> pos)
+	const Chunk & ChunkManager::GetChunk(Vec2<int> pos) const
 	{
-        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
+		for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
+		{
+			if (it->GetPos() == pos)
+			{
+				return *it;
+			}
+		}
+		assert(false);
+		return *m_chunks.cbegin();
+	}
+
+    bool ChunkManager::IsLoaded(Vec2<int> pos) const
+	{
+        for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
         {
             if (it->IsLoaded() && it->GetPos() == pos)
             {

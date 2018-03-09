@@ -31,13 +31,13 @@ namespace VTerrain
 		T& z() { return d[2]; }
 		T z() const { return d[2]; }
 
-		Vec3 operator+ (Vec3 a) const { return Vec3(d[0] + a.d[0], d[1] + a.d[1], d[2] + a.d[2]); }
-		Vec3 operator- (Vec3 a) const { return Vec3(d[0] - a.d[0], d[1] - a.d[1], d[2] - a.d[2]); }
-		Vec3 operator= (Vec3 a) { d[0] = a.d[0]; d[1] = a.d[1]; d[2] = a.d[2]; return *this; }
+		Vec3 operator+ (const Vec3& a) const { return Vec3(d[0] + a.d[0], d[1] + a.d[1], d[2] + a.d[2]); }
+		Vec3 operator- (const Vec3& a) const { return Vec3(d[0] - a.d[0], d[1] - a.d[1], d[2] - a.d[2]); }
+		Vec3 operator= (const Vec3& a) { d[0] = a.d[0]; d[1] = a.d[1]; d[2] = a.d[2]; return *this; }
 		Vec3 operator* (T a) const { return Vec3(d[0]*a, d[1]*a, d[2]*a); }
 		Vec3 operator/ (T a) const { return Vec3(d[0] / a, d[1] / a, d[2] / a); }
-        bool operator== (Vec3 a) const { return (d[0] == a.d[0] && d[1] == a.d[1] && d[2] == a.d[2]); }
-        bool operator!= (Vec3 a) const { return !(*this == a); }
+        bool operator== (const Vec3& a) const { return (d[0] == a.d[0] && d[1] == a.d[1] && d[2] == a.d[2]); }
+        bool operator!= (const Vec3& a) const { return !(*this == a); }
         float LengthSqr() const { return (d[0] * d[0] + d[1] * d[1] + d[2] * d[2]); }
 		float Length() const { return sqrtf(d[0]*d[0] + d[1]*d[1] + d[2] * d[2]); }
 		void Normalize()
@@ -56,7 +56,7 @@ namespace VTerrain
                 d[2] / len
                 );
         }
-		Vec3 Cross(Vec3 a) const
+		Vec3 Cross(const Vec3& a) const
 		{
             return Vec3(
                 d[1] * a.d[2] - d[2] * a.d[1],
@@ -81,15 +81,15 @@ namespace VTerrain
 		T& y() { return d[1]; }
 		T y() const { return d[1]; }
 
-		Vec2 operator+ (Vec2 a) const { return Vec2(d[0] + a.d[0], d[1] + a.d[1]); }
-		Vec2 operator- (Vec2 a) const { return Vec2(d[0] - a.d[0], d[1] - a.d[1]); }
-		Vec2 operator= (Vec2 a) { d[0] = a.d[0]; d[1] = a.d[1]; return *this; }
+		Vec2 operator+ (const Vec2& a) const { return Vec2(d[0] + a.d[0], d[1] + a.d[1]); }
+		Vec2 operator- (const Vec2& a) const { return Vec2(d[0] - a.d[0], d[1] - a.d[1]); }
+		Vec2 operator= (const Vec2& a) { d[0] = a.d[0]; d[1] = a.d[1]; return *this; }
 		Vec2 operator* (T a) const { return Vec2(d[0]*a, d[1]*a); }
 		Vec2 operator/ (T a) const { return Vec2(d[0] / a, d[1] / a); }
-        bool operator== (Vec2 a) const { return (d[0] == a.d[0] && d[1] == a.d[1]); }
-        bool operator!= (Vec2 a) const { return !(*this == a); }
-        bool operator< (Vec2 a) const { return (d[0] < a.d[0] ? true : (d[0] == a.d[0] ? (d[1] < a.d[1]) : false)); }
-        bool operator> (Vec2 a) const { return (d[0] > a.d[0] ? true : (d[0] == a.d[0] ? (d[1] > a.d[1]) : false)); }
+        bool operator== (const Vec2& a) const { return (d[0] == a.d[0] && d[1] == a.d[1]); }
+        bool operator!= (const Vec2& a) const { return !(*this == a); }
+        bool operator< (const Vec2& a) const { return (d[0] < a.d[0] ? true : (d[0] == a.d[0] ? (d[1] < a.d[1]) : false)); }
+        bool operator> (const Vec2& a) const { return (d[0] > a.d[0] ? true : (d[0] == a.d[0] ? (d[1] > a.d[1]) : false)); }
         float LengthSqr() const { return ((d[0] * d[0] + d[1] * d[1])); }
 		float Length() const { return (sqrtf(d[0]*d[0] + d[1]*d[1])); }
 		void Normalize()

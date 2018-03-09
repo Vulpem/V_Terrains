@@ -25,10 +25,10 @@ namespace VTerrain
             void Generate();
             void Free();
 
-            uint GetMeshBuf() { return m_dataBuff; }
-            uint GetIndicesBuf(uint LOD) { return m_indicesBuff[LOD]; }
-            uint GetNumIndices(uint LOD) { return m_nIndices[LOD]; }
-            bool IsGenerated() { return m_generated; }
+            uint GetMeshBuf() const { return m_dataBuff; }
+            uint GetIndicesBuf(uint LOD) const { return m_indicesBuff.at(LOD); }
+            uint GetNumIndices(uint LOD) const { return m_nIndices.at(LOD); }
+            bool IsGenerated() const { return m_generated; }
         private:
 
             void GenerateMesh();

@@ -50,7 +50,7 @@ namespace VTerrain
         ChunkFactory& operator=(const ChunkFactory&) {};
 
 		void LaunchThread();
-		bool IsThreadRunning() { return m_runningThread; }
+		bool IsThreadRunning() const { return m_runningThread; }
 		void StopThread();
 
         void ClearRequests();
@@ -59,10 +59,10 @@ namespace VTerrain
         void PushChunkRequest(RequestedChunk request);
         GeneratedChunk PopGeneratedChunk();
         bool HasGeneratedChunks();
-        bool HasRequestedChunks();
     private:
         RequestedChunk PopChunkRequest();
         void PushGeneratedChunk(const GeneratedChunk& generated);
+		bool HasRequestedChunks();
 
         
 		void ThreadLoop();

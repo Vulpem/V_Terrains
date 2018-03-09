@@ -29,7 +29,7 @@ namespace VTerrain
         m_perlin.reseed(seed);
     }
 
-    NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)
+    NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)  const
     {
         NoiseMap ret(config.chunkWidth + 3, config.chunkHeight + 3);
         config.noise.frequency = utils::Clamp(config.noise.frequency, 0.1f, 64.0f);
@@ -48,7 +48,7 @@ namespace VTerrain
         return ret;
     }
 
-    float PerlinNoise::GetValue(int x, int y)
+    float PerlinNoise::GetValue(int x, int y)  const
     {
         const float dx = (config.chunkWidth) / config.noise.frequency;
         const float dy = (config.chunkHeight) / config.noise.frequency;

@@ -25,8 +25,8 @@ namespace VTerrain
         PerlinNoise();
 
         void SetSeed(uint seed);
-        NoiseMap GenNoiseMap(Vec2<int> offset);
-        float GetValue(int x, int y);
+        NoiseMap GenNoiseMap(Vec2<int> offset) const;
+        float GetValue(int x, int y)  const;
 
 	private:
         siv::SivPerlinNoise m_perlin;

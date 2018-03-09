@@ -54,7 +54,7 @@ namespace VTerrain
         m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD)
+    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD) const
     {
         if (IsLoaded())
         {
@@ -132,13 +132,18 @@ namespace VTerrain
         }
     }
 
-    bool  Chunk::IsLODReady(uint LOD)
+    bool  Chunk::IsLODReady(uint LOD)  const
     {
         return (LOD >= m_minLOD);
     }
 
-    bool  Chunk::IsLoaded()
+    bool  Chunk::IsLoaded() const
     {
         return (m_minLOD != UINT_MAX);
     }
+
+	Vec2<int> Chunk::GetPos() const
+	{
+		return m_pos;
+	}
 }

@@ -76,7 +76,7 @@ namespace VTerrain
         std::vector<uint> indices(width*height * 6u);
         uint n = 0;
         uint i = 0;
-        uint step = static_cast<uint>(powf(2, LOD));
+        uint step = static_cast<uint>(powf(2, static_cast<float>(LOD)));
         for (uint y = 0; y < height; y += step)
         {
             i = (width)*y;

@@ -26,7 +26,7 @@ namespace VTerrain
         ~ChunkManager();
 
         void Update(int posX, int posY);
-        void Render(const float* viewMatrix, const float* projectionMatrix);
+        void Render(const float* viewMatrix, const float* projectionMatrix) const;
         void CleanChunks();
 
     private:
@@ -34,7 +34,8 @@ namespace VTerrain
         bool AddChunkToRegen(Vec2<int> pos);	
 
         Chunk& GetChunk(Vec2<int> pos);
-		bool IsLoaded(Vec2<int> pos);
+		const Chunk& GetChunk(Vec2<int> pos) const;
+		bool IsLoaded(Vec2<int> pos) const;
         Chunk& GetFurthestChunk();
 
         std::vector<Chunk> m_chunks;
