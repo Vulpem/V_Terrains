@@ -29,6 +29,8 @@ namespace VTerrain
         void Render(const float* viewMatrix, const float* projectionMatrix) const;
         void CleanChunks();
 
+        void SetHeightCurve(std::function<float(float)> func);
+        void SetSeed(uint seed);
     private:
         void AddChunksToRegen(Vec2<int> pos);
         bool AddChunkToRegen(Vec2<int> pos);	

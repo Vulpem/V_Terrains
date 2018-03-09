@@ -45,6 +45,8 @@ public:
 
     uint m_shaderProgram;
 
+    int m_curvePow = 1;
+
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
 };

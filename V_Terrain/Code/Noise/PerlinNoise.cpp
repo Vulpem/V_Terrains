@@ -19,9 +19,9 @@ namespace VTerrain
 {
 
     PerlinNoise::PerlinNoise()
+        : m_heightCurve([](float a) { return a; })
     {
-        //TODO
-        SetSeed(12345);//static_cast<uint>(time(NULL)));
+        SetSeed(time(NULL));
     }
 
     void PerlinNoise::SetSeed(uint seed)
@@ -52,6 +52,10 @@ namespace VTerrain
     {
         const float dx = (config.chunkWidth) / config.noise.frequency;
         const float dy = (config.chunkHeight) / config.noise.frequency;
-        return (float)m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency);
+        return m_heightCurve(m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
+    }
+    void PerlinNoise::SetCurve(std::function<float(float)> func)
+    {
+        m_heightCurve = func;
     }
 }

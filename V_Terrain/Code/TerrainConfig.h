@@ -24,7 +24,7 @@ namespace VTerrain
         unsigned int maxChunks = 256u;
         unsigned int nLODs = 6;
         float quadSize = 6.f;
-		float fogDistance = 10000.f;
+		float fogDistance = 5000.f;
 		float waterHeight = 330.f;
         float ambientLight = 0.4f;
 
@@ -42,6 +42,8 @@ namespace VTerrain
 		struct TMP
         {
             unsigned int LOD = 0;;
+            bool renderHeightmap = false;
+            bool renderChunkBorders = false;
         } tmp;
    };
 

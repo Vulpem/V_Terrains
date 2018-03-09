@@ -15,13 +15,17 @@
 
 #include "TerrainConfig.h"
 
+#include <functional>
+
 namespace VTerrain
 {
    //Global Funcs
     void Init();
 	void Update(int posX, int posY);
-	void Render(const float * viewMatrix, const float * projectionMatrix);
+    void Render(const float * viewMatrix, const float * projectionMatrix);
+    void SetHeightCurve(std::function<float(float)> func);
 	void CleanChunks();
+    void SetSeed(unsigned int seed);
 }
 
 #endif // !__VTERRAIN_INCLUDE__

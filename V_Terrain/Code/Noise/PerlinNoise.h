@@ -27,8 +27,10 @@ namespace VTerrain
         void SetSeed(uint seed);
         NoiseMap GenNoiseMap(Vec2<int> offset) const;
         float GetValue(int x, int y)  const;
+        void SetCurve(std::function<float(float)> func);
 
 	private:
         siv::SivPerlinNoise m_perlin;
+        std::function<float(float)> m_heightCurve;
     };
 }

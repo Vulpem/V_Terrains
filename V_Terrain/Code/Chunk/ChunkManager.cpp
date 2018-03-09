@@ -82,6 +82,18 @@ namespace VTerrain
         AddChunksToRegen(m_lastOffPos);
     }
 
+    void ChunkManager::SetHeightCurve(std::function<float(float)> func)
+    {
+        m_factory.SetHeightCurve(func);
+        CleanChunks();
+    }
+
+    void ChunkManager::SetSeed(uint seed)
+    {
+        m_factory.SetSeed(seed);
+        CleanChunks();
+    }
+
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
 		const int maxDist = static_cast<int>(log2f(static_cast<float>(config.maxChunks)));

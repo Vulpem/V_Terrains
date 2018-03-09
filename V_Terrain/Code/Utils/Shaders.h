@@ -38,6 +38,9 @@ namespace VTerrain
         unsigned int loc_ambient_color;
         unsigned int loc_water_color;
         unsigned int loc_fog_color;
+
+        unsigned int loc_render_heightmap;
+        unsigned int loc_render_chunk_borders;
     };
 
     class Shaders

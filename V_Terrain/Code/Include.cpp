@@ -35,8 +35,18 @@ namespace VTerrain
 		chunkManager.Render(viewMatrix, projectionMatrix);
 	}
 
+    void SetHeightCurve(std::function<float(float)> func)
+    {
+        chunkManager.SetHeightCurve(func);
+    }
+
 	void CleanChunks()
 	{
 		chunkManager.CleanChunks();
 	}
+
+    void SetSeed(unsigned int seed)
+    {
+        chunkManager.SetSeed(seed);
+    }
 }

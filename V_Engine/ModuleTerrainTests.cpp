@@ -11,6 +11,8 @@
 
 #include "OpenGL.h"
 
+#include <time.h>
+
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
     , m_offset(0.f, 0.f)
@@ -20,9 +22,15 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_lacunarity(2.0f)
     , m_persistance (0.4f)
     , m_maxHeight(1000.f)
-	, m_fogDistance(10000.f)
+	, m_fogDistance(5000.f)
 {
 	moduleName = "ModuleTerrainTests";
+    VTerrain::SetHeightCurve(
+        [](float x)
+    {
+        return pow(x,2);
+    }
+    );
 }
 
 // Destructor
@@ -63,6 +71,10 @@ update_status ModuleTerrain::Update()
 
     if (ImGui::Begin("TerrainTests"))
     {
+        if (ImGui::Button("Reseed"))
+        {
+            VTerrain::SetSeed(time(NULL));
+        }
         const int W = static_cast<int>(VTerrain::config.chunkWidth);
         const int H = static_cast<int>(VTerrain::config.chunkHeight);
         int p[2] = {
@@ -117,6 +129,53 @@ update_status ModuleTerrain::Update()
 
         if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
         if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
+
+        if (ImGui::BeginMenu("Height Curve"))
+        {
+            ImGui::InputInt("P", &m_curvePow);
+            ImGui::Text("Functions:");
+            ImGui::Separator();
+            if (ImGui::MenuItem(
+                "float func (float x)\n"
+                "{ return x; }"
+            ))
+            {
+                VTerrain::SetHeightCurve([](float x) {return x;});
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem(
+                "float func(float x)\n"
+                "{ return pow(x, P); }"
+            ))
+            {
+                int n = m_curvePow;
+                VTerrain::SetHeightCurve([n](float x) {return pow(x, n);});
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem(
+                "float func(float x)\n"
+                "{\n"
+                "x = x * 2.f - 1.f;\n"
+                "return (pow(x, P) + 1.f) * 0.5f;\n"
+                "}"
+            ))
+            {
+                int n = m_curvePow;
+                VTerrain::SetHeightCurve([n](float x)
+                {
+                    x = x * 2.f - 1.f;
+                    return (pow(x, n) + 1.f) * 0.5f;
+                });
+            }
+
+
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::Checkbox("Chunk Borders", &VTerrain::config.tmp.renderChunkBorders);
+        ImGui::Checkbox("Render Heightmap", &VTerrain::config.tmp.renderHeightmap);
+
 		ImGui::End();
     }
 

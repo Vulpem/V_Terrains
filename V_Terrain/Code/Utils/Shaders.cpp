@@ -68,6 +68,8 @@ namespace VTerrain
 		"uniform lowp float water_height;"
 		"uniform lowp vec3 water_color;"
 		"uniform lowp vec3 fog_color;"
+        "uniform int render_chunk_borders;"
+        "uniform int render_heightmap;"
 		""
 		"uniform lowp sampler2D heightmap;"
 		""
@@ -83,6 +85,8 @@ namespace VTerrain
 		""
 		"   lowp vec3 col;"
 		//Water
+        "   if(render_heightmap == 0)"
+        "{"
 		"	if (height <= water_height + water_height * 0.0001f)"
 		"	{ col = water_color; }"
 		//Steep 2
@@ -109,6 +113,14 @@ namespace VTerrain
 		//Default
 		"   else"
 		"   { col = vec3(0.478f, 0.8f, 0.561f); }"
+        "}"
+        "else"
+        "{"
+        "col = vec3(heightmapVal.w,heightmapVal.w,heightmapVal.w);"
+        "}"
+        "if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))"
+        "{ col = vec3(1.f,1.f,1.f);}"
+        
 		""
 		"   col *= lightIntensity;"
 		"   color = vec4(mix(col, fog_color, fog), 1.f);"
@@ -204,6 +216,9 @@ namespace VTerrain
             ret.loc_water_color = glGetUniformLocation(program, "water_color");
             ret.loc_water_height = glGetUniformLocation(program, "water_height");
             ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
+
+            ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
+            ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
 
             ret.loc_position = 0;
             ret.loc_texCoord = 1;

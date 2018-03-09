@@ -55,20 +55,23 @@ namespace VTerrain
 
         void ClearRequests();
         bool IsRequested(Vec2<int> p);
+        void SetHeightCurve(std::function<float(float)> func);
+        void SetSeed(uint seed);
 
         void PushChunkRequest(RequestedChunk request);
         GeneratedChunk PopGeneratedChunk();
         bool HasGeneratedChunks();
+
     private:
         RequestedChunk PopChunkRequest();
         void PushGeneratedChunk(const GeneratedChunk& generated);
 		bool HasRequestedChunks();
 
-        
 		void ThreadLoop();
         void GenerateChunk();
 
 		PerlinNoise m_noiseGenerator;
+        std::mutex m_mut_noiseGenerator;
 
         std::list<RequestedChunk> m_requests;
 		std::mutex m_mut_requests;

@@ -105,6 +105,11 @@ namespace VTerrain
 
 			glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
+            glUniform1i(m_shader.loc_render_chunk_borders, config.tmp.renderChunkBorders);
+            glUniform1i(m_shader.loc_render_heightmap, config.tmp.renderHeightmap);
+
+
+
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
 
