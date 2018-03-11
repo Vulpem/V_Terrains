@@ -39,6 +39,7 @@ private:
 public:
 	float camSpeed = 30.0f;
 	float camSprintMultiplier = 3.0f;
+    bool m_followCamera = true;
 
 private:
 	Camera* movingCamera = nullptr;

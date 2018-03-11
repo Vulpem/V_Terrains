@@ -74,6 +74,12 @@ update_status ModuleCamera3D::Update()
 		}
 	}
 
+    if (m_followCamera)
+    {
+        math::float3 pos = defaultCameraGO->GetTransform()->GetGlobalPos();
+        topView->GetTransform()->SetGlobalPos(pos.x, topView->GetTransform()->GetGlobalPos().y, pos.z);
+    }
+
 	return UPDATE_CONTINUE;
 }
 

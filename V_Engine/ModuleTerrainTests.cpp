@@ -4,6 +4,8 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ViewPort.h"
+#include "GameObject.h"
+#include "Transform.h"
 
 #include "ModuleInput.h"
 #include "imGUI\imgui.h"
@@ -175,6 +177,12 @@ update_status ModuleTerrain::Update()
 
         ImGui::Checkbox("Chunk Borders", &VTerrain::config.tmp.renderChunkBorders);
         ImGui::Checkbox("Render Heightmap", &VTerrain::config.tmp.renderHeightmap);
+        ImGui::Checkbox("Auto follow cam", &App->camera->m_followCamera);
+        if (ImGui::Button("Reset Camera Height"))
+        {
+            float3 pos = App->camera->GetDefaultCam()->GetPosition();
+            App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+        }
 
 		ImGui::End();
     }
