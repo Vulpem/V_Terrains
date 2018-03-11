@@ -14,7 +14,9 @@
 
 #include "../Globals.h"
 #include "../ExternalLibs/Glew/include/glew.h"
-#include <iostream>
+
+#include <fstream>
+#include <windows.h> 
 
 namespace VTerrain
 {
@@ -129,80 +131,34 @@ namespace VTerrain
 
     Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf)
     {
-        bool error = false;
         GLint success;
         Shader ret;
+        std::string programResult;
 
-        unsigned int vertexShader;
-        if (vertexBuf == nullptr)
-        {
-            ret.m_vert_result += "- Using default vertex\n";
-            vertexBuf = m_defaultVertexShader.c_str();
-        }
+        //TODO customizable
+        unsigned int vertexShader = Compile(OpenFile("vertex.cpp"), GL_VERTEX_SHADER);
+        unsigned int fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER);
 
-        vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexBuf, NULL);
-        glCompileShader(vertexShader);
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if (success == 0)
+        if (fragmentShader != 0 && vertexShader != 0)
         {
-            error = true;
-            GLchar infoLog[512];
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            ret.m_vert_result += infoLog;
-            ret.m_vert_result += '\n';
-			assert(false);
-        }
-        else
-        {
-            ret.m_vert_result += "Compilation succesfull\n";
-        }
+            unsigned int program;
+            program = glCreateProgram();
 
-		unsigned int fragmentShader;
-        if (fragmentBuf == nullptr)
-        {
-            ret.m_frag_result += "- Using default fragment\n";
-            fragmentBuf = m_defaultFragmentShader.c_str();
-        }
+            glAttachShader(program, vertexShader);
+            glAttachShader(program, fragmentShader);
 
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentBuf, NULL);
-        glCompileShader(fragmentShader);
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if (success == 0)
-        {
-            error = true;
-            GLchar infoLog[512];
-            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            ret.m_frag_result += infoLog;
-            ret.m_frag_result += '\n';
-			assert(false);
-        }
-        else
-        {
-            ret.m_frag_result += "Compilation succesfull\n";
-        }
+            glLinkProgram(program);
+            glGetProgramiv(program, GL_LINK_STATUS, &success);
+            if (success == 0)
+            {
+                GLchar infoLog[512];
+                glGetProgramInfoLog(program, 512, NULL, infoLog);
+                programResult += "\n------ Shader Program ------\n";
+                programResult += infoLog;
+                programResult += '\n';
+                assert(false);
+            }
 
-		unsigned int program;
-        program = glCreateProgram();
-
-        glAttachShader(program, vertexShader);
-        glAttachShader(program, fragmentShader);
-
-        glLinkProgram(program);
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if (success == 0)
-        {
-            error = true;
-            GLchar infoLog[512];
-            glGetProgramInfoLog(program, 512, NULL, infoLog);
-            ret.m_program_result += "\n------ Shader Program ------\n";
-            ret.m_program_result += infoLog;
-            ret.m_program_result += '\n';
-        }
-
-        if (program != 0 && error == false)
-        {
             ret.m_program = program;
 
             ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
@@ -222,16 +178,10 @@ namespace VTerrain
 
             ret.loc_position = 0;
             ret.loc_texCoord = 1;
-        }
-        else
-        {
-            ret.m_program_result += "Error Compiling shader";
-            
-            assert(false);
-        }
 
-        glDetachShader(program, vertexShader);
-        glDetachShader(program, fragmentShader);
+            glDetachShader(program, vertexShader);
+            glDetachShader(program, fragmentShader);
+        }
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
@@ -241,5 +191,52 @@ namespace VTerrain
     void Shaders::FreeShader(const Shader& shader)
     {
         glDeleteProgram(shader.m_program);
+    }
+    std::string Shaders::OpenFile(const char * fileDir)
+    {
+        TCHAR pwd[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, pwd);
+
+        std::string dir(pwd);
+        dir += "/../V_Terrain/Code/Shaders/";
+        dir += fileDir;
+        std::string ret;
+        std::ifstream inStream;
+        inStream.open(dir.data());
+        if (inStream.is_open())
+        {
+            while (!inStream.eof())
+            {
+                std::string tmp;
+                std::getline(inStream, tmp);
+                ret += tmp;
+                ret += '\n';
+            }
+            inStream.close();
+        }
+        return ret;
+    }
+
+    unsigned int Shaders::Compile(std::string code, unsigned int type)
+    {
+        unsigned int ret;
+        std::string result;
+        GLint success;
+
+        ret = glCreateShader(type);
+        const char* tmp = code.c_str();
+        glShaderSource(ret, 1, &tmp, NULL);
+        glCompileShader(ret);
+        glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
+        if (success == 0)
+        {
+            GLchar infoLog[512];
+            glGetShaderInfoLog(ret, 512, NULL, infoLog);
+            result += infoLog;
+            result += '\n';
+            assert(false);
+        }
+
+        return ret;
     }
 }

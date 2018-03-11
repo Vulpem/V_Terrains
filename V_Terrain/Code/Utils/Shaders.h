@@ -18,10 +18,6 @@ namespace VTerrain
 {
     struct Shader
     {
-        std::string m_frag_result;
-        std::string m_vert_result;
-        std::string m_program_result;
-
         unsigned int m_program;
 
         unsigned int loc_position;
@@ -51,5 +47,8 @@ namespace VTerrain
 
         static std::string m_defaultVertexShader;
         static std::string m_defaultFragmentShader;
+    private:
+        static std::string OpenFile(const char* fileDir);
+        static unsigned int Compile(std::string code, unsigned int type);
     };
 }
