@@ -45,12 +45,6 @@ bool ModuleEditor::Start()
 {
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
-	//Initializing the strings used to test the editor
-	strcpy(testConsoleInput, "InputTextHere");
-	strcpy(toImport, "");
-
-	selectedGameObject = nullptr;
-
 	App->renderer3D->FindViewPort(0)->active = false;
 
 	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
@@ -59,8 +53,6 @@ bool ModuleEditor::Start()
 
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
-
-	strcpy(sceneName, "");
 
 	return true;
 }
@@ -100,8 +92,6 @@ update_status ModuleEditor::Update()
 		}
 	}
 
-	SelectByViewPort();
-
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
 		multipleViews = !multipleViews;
@@ -134,8 +124,6 @@ update_status ModuleEditor::PostUpdate()
 // Called before quitting
 bool ModuleEditor::CleanUp()
 {
-	ClearConsole();
-
 	ImGui_ImplSdlGL3_Shutdown();
 
 	return true;
@@ -149,11 +137,6 @@ void ModuleEditor::Render(const viewPort & port)
 	{
 		//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
 		ViewPortUI(port);
-
-		App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
-
-		App->renderer3D->DrawLocator(out_pos, float4(0.75f, 0.75f, 0.75f, 1));
-		App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 2, float4(1, 1, 0, 1));
 
 		if (showPlane)
 		{
@@ -197,66 +180,6 @@ void ModuleEditor::HandleInput(SDL_Event* event)
 {
 	ImGui_ImplSdlGL3_ProcessEvent(event);
 }
-
-void ModuleEditor::Log(const char* input)
-{
-	buffer.append(input);
-	scrollToBottom = true;
-}
-
-void ModuleEditor::ClearConsole()
-{
-	buffer.clear();
-	scrollToBottom = true;
-}
-
-void ModuleEditor::SceneTreeGameObject(GameObject* node)
-{
-	if (node->HiddenFromOutliner() == false)
-	{
-		ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-		if (selectedGameObject == node)
-		{
-			node_flags += ImGuiTreeNodeFlags_Selected;
-		}
-		if (node->childs.empty())
-		{
-			node_flags += ImGuiTreeNodeFlags_Leaf;
-		}
-		char name[256];
-		sprintf(name, "%s##%llu", node->GetName(), node->GetUID());
-
-		if (ImGui::TreeNodeEx(name, node_flags))
-		{
-			if (ImGui::IsItemClicked())
-			{
-				SelectGameObject(node);
-			}
-
-			std::vector<GameObject*>::iterator it = node->childs.begin();
-			while (it != node->childs.end())
-			{
-				SceneTreeGameObject((*it));
-				it++;
-			}
-			ImGui::TreePop();
-		}
-	}
-}
-
-void ModuleEditor::SelectGameObject(GameObject* node)
-{
-	if (selectedGameObject)
-	{
-		selectedGameObject->Unselect();
-	}
-	if (node)
-	{
-		node->Select(renderNormals);
-	}
-	selectedGameObject = node;
-}
-
 
 
 // ---- UI with IMGUI viewPort UI -------------------------------------------------------------------
@@ -302,42 +225,6 @@ update_status ModuleEditor::MenuBar()
 		ImGui::EndMainMenuBar();
 	}
 	return ret;
-}
-
-void ModuleEditor::PlayButtons()
-{
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(300.0f, 30.0f));
-
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
-
-	ImGui::Begin("PlayButtons", 0, ImVec2(500, 300), 0.8f, flags);
-
-	if (Time.PlayMode == false)
-	{
-		if (ImGui::Button("Play##PlayButton"))
-		{
-			Time.PlayMode = true;
-			Time.GameRuntime = 0.0f;
-			App->GO->SaveScene("temp");
-		}
-	}
-	else
-	{
-		if (ImGui::Button("Pause##PauseButton"))
-		{
-			Time.Pause = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Stop##StopButton"))
-		{
-			Time.PlayMode = false;
-			Time.Pause = false;
-			Time.gdt = 0.0f;
-			App->GO->LoadScene("temp");
-		}
-	}
-	ImGui::End();
 }
 
 void ModuleEditor::Editor()
@@ -396,81 +283,6 @@ void ModuleEditor::Editor()
 		}
 		ImGui::End();
 }
-
-void ModuleEditor::Console()
-{
-		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
-		ImGui::SetNextWindowSize(ImVec2(screenW - 330.0f, 200.0f));
-
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-		ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f, flags);
-
-		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
-		ImGui::PushStyleColor(0, col);
-
-		ImGui::TextUnformatted(buffer.begin());
-		ImGui::PopStyleColor();
-
-		if (scrollToBottom)
-			ImGui::SetScrollHere(1.0f);
-
-		scrollToBottom = false;
-
-		ImGui::End();
-}
-
-void ModuleEditor::Outliner()
-{
-		ImGui::SetNextWindowPos(ImVec2(0.0f, 50.0f));
-		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 250.0f));
-
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-		ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f, flags);
-
-		std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
-		while (node != App->GO->GetRoot()->childs.end())
-		{
-			SceneTreeGameObject((*node));
-			node++;
-		}
-
-		ImGui::End();
-}
-
-void ModuleEditor::AttributeWindow()
-{
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(330, (screenH-20)/2));
-
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-		ImGui::Begin("Attribute Editor", 0, flags);
-		if (selectedGameObject)
-		{
-			selectedGameObject->DrawOnEditor();
-			ImGui::Separator();
-			if (selectedGameObject->HasComponent(Component::Type::C_transform))
-			{
-				if (ImGui::Button("Look at"))
-				{
-					float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
-					App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
-				}
-				ImGui::NewLine();
-				ImGui::Text("Danger Zone:");
-				if (ImGui::Button("Delete##DeleteGO"))
-				{
-					App->GO->DeleteGameObject(selectedGameObject);
-					selectedGameObject = nullptr;
-				}
-			}
-		}
-		ImGui::End();
-}
-
-
 
 
 void ModuleEditor::SwitchViewPorts()
@@ -538,127 +350,4 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 		ImGui::EndMenuBar();
 	}
 	ImGui::End();
-}
-
-bool ModuleEditor::SaveLoadPopups()
-{
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
-	if (ImGui::BeginPopupModal("New scene"))
-	{
-		selectedGameObject = nullptr;
-		bool close = false;
-		ImGui::Text("Save current scene?");
-		if (ImGui::Button("Yes##saveCurrentButton"))
-		{
-			wantToSave = true;
-			clearAfterSave = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("No##NotSaveCurrentButton"))
-		{
-			App->GO->ClearScene();
-			close = true;
-		}
-		ImGui::SameLine();
-		if (close || ImGui::Button("Cancel##CancelSaveCurrentButton"))
-		{
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
-
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
-	if (ImGui::BeginPopupModal("Save scene"))
-	{
-		bool close = false;
-		ImGui::Text("Scene name:");
-		ImGui::InputText("##saveSceneInputText", sceneName, 256);
-		if (ImGui::Button("Save##saveButton") && sceneName[0] != '\0')
-		{
-			App->GO->SaveScene(sceneName);
-			close = true;
-			if (clearAfterSave)
-			{
-				App->GO->ClearScene();
-			}
-		}
-		ImGui::SameLine();
-		if (close || ImGui::Button("Cancel##cancelSaveScene"))
-		{
-			strcpy(sceneName, "");
-			clearAfterSave = false;
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
-	if (ImGui::BeginPopupModal("Load Scene"))
-	{
-		selectedGameObject = nullptr;
-		ImGui::Text("Scene name:");
-		ImGui::InputText("##saveSceneInputText", sceneName, 256);
-		bool close = false;
-		if (ImGui::Button("Load##loadButton") && sceneName[0] != '\0')
-		{
-			App->GO->LoadScene(sceneName);
-			close = true;
-		}
-		ImGui::SameLine();
-		if ( close || ImGui::Button("Cancel##cancelLoadScene"))
-		{
-			strcpy(sceneName, "");
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::EndPopup();
-	}
-
-	if (wantNew)
-	{
-		ImGui::OpenPopup("New scene");
-		wantNew = false;
-	}
-	if (wantToSave)
-	{
-		ImGui::OpenPopup("Save scene");
-		wantToSave = false;
-	}
-	if (wantToLoad)
-	{
-		ImGui::OpenPopup("Load Scene");
-		wantToLoad = false;
-	}
-
-	return false;
-}
-
-void ModuleEditor::SelectByViewPort()
-{
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
-	{
-		viewPort* port = nullptr;
-		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
-		//Checking the click was made on a port
-		if (port != nullptr)
-		{
-			//Normalizing the mouse position in port to [-1,1]
-			portPos.x = portPos.x / (port->size.x / 2) - 1;
-			portPos.y = portPos.y / (port->size.y / 2) - 1;
-			//Generating the LineSegment we'll check for collisions
-			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
-
-			GameObject* out_go = NULL;
-
-			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal, false))
-			{
-				SelectGameObject(out_go);
-			}
-			else
-			{
-				SelectGameObject(nullptr);
-			}
-
-		}
-	}
 }

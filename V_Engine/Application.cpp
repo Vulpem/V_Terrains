@@ -290,17 +290,6 @@ bool Application::OpenBrowser(const char* link)
 	return true;
 }
 
-void Application::Log(char* str)
-{
-	if (gameRunning == true)
-	{
-		if (Editor != nullptr && Editor->IsEnabled())
-		{
-			Editor->Log(str);
-		}
-	}
-}
-
 const char* Application::GetOrganization()
 {
 	return organisation.data();

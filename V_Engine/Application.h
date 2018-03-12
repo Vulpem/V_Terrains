@@ -77,7 +77,6 @@ public:
 	void Render(const viewPort& port);
 
 	bool OpenBrowser(const char* link);
-	void Log(char* str);
 
 	const char* GetOrganization();
 	const char* GetTitle();
