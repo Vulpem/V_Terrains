@@ -25,9 +25,13 @@ public:
 
     void GenMap();
 	void WantRegen();
+    void ShaderEditor();
 
     //NoiseGeneration
     uint32_t seed;
+
+    bool m_openShaderEditor;
+    std::string m_shaderResult;
 
 	bool m_wantRegen;
 	Timer m_regenTimer;

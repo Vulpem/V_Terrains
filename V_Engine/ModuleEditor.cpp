@@ -18,7 +18,6 @@
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"
 
-#include "../V_Terrain/Code/Include.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -274,7 +273,6 @@ update_status ModuleEditor::MenuBar()
 			{
 				SwitchViewPorts();
 			}
-			ImGui::Checkbox("Edit default shaders", &openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
 			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::EndMenu();
@@ -303,7 +301,6 @@ update_status ModuleEditor::MenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
-	DefaultShadersEditorPopUp();
 	return ret;
 }
 
@@ -634,53 +631,6 @@ bool ModuleEditor::SaveLoadPopups()
 	}
 
 	return false;
-}
-
-void ModuleEditor::DefaultShadersEditorPopUp()
-{
-	if (openShaderEditor)
-	{
-		if (ImGui::Begin("Default Shader Editor", &openShaderEditor))
-		{
-			bool recompile = false;
-            const uint vertexLen = VTerrain::GetVertexShader().length() + 256;
-			char* vertexBuf = new char[vertexLen];
-            const uint fragmentLen = VTerrain::GetFragmentShader().length() + 256;
-            char* fragmentBuf = new char[fragmentLen];
-
-            strcpy(vertexBuf, VTerrain::GetVertexShader().data());
-			if (ImGui::CollapsingHeader("Vertex shader"))
-			{
-				if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 400)))
-				{
-					recompile = true;
-				}
-			}
-
-            strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
-			if (ImGui::CollapsingHeader("Fragment shader"))
-			{
-				if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 400)))
-				{
-					recompile = true;
-				}
-			}
-
-			if (recompile)
-			{
-                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf);
-			}
-
-			if (m_shaderResult.length() > 5)
-			{
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
-				ImGui::TextWrapped(m_shaderResult.data());
-			}
-			RELEASE_ARRAY(vertexBuf);
-            RELEASE_ARRAY(fragmentBuf);
-			ImGui::End();
-		}
-	}
 }
 
 void ModuleEditor::SelectByViewPort()

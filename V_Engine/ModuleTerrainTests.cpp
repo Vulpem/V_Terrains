@@ -28,6 +28,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
     , m_curvePow(2)
     , m_setCurvePow(2)
+    , m_openShaderEditor(false)
 {
 	moduleName = "ModuleTerrainTests";
     VTerrain::SetHeightCurve(
@@ -103,7 +104,7 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Separator();
         ImGui::Text("Render:");
-
+        ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
         int tmpLOD = VTerrain::config.tmp.LOD;
         if (ImGui::SliderInt("LOD", &tmpLOD, 0,VTerrain::config.nLODs - 1))
         {
@@ -265,6 +266,8 @@ update_status ModuleTerrain::Update()
 		ImGui::End();
     }
 
+    ShaderEditor();
+
 	if (m_wantRegen && m_regenTimer.Read() > 2000.0f)
 	{
 		m_regenTimer.Stop();
@@ -309,4 +312,51 @@ void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
 	m_regenTimer.Start();
+}
+
+void ModuleTerrain::ShaderEditor()
+{
+    if (m_openShaderEditor)
+    {
+        if (ImGui::Begin("Default Shader Editor", &m_openShaderEditor))
+        {
+            bool recompile = false;
+            const uint vertexLen = VTerrain::GetVertexShader().length() + 256;
+            char* vertexBuf = new char[vertexLen];
+            const uint fragmentLen = VTerrain::GetFragmentShader().length() + 256;
+            char* fragmentBuf = new char[fragmentLen];
+
+            strcpy(vertexBuf, VTerrain::GetVertexShader().data());
+            if (ImGui::CollapsingHeader("Vertex shader"))
+            {
+                if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 400)))
+                {
+                    recompile = true;
+                }
+            }
+
+            strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
+            if (ImGui::CollapsingHeader("Fragment shader"))
+            {
+                if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 400)))
+                {
+                    recompile = true;
+                }
+            }
+
+            if (recompile)
+            {
+                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf);
+            }
+
+            if (m_shaderResult.length() > 5)
+            {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
+                ImGui::TextWrapped(m_shaderResult.data());
+            }
+            RELEASE_ARRAY(vertexBuf);
+            RELEASE_ARRAY(fragmentBuf);
+            ImGui::End();
+        }
+    }
 }

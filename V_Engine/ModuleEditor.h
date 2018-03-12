@@ -48,7 +48,6 @@ private:
 	void AttributeWindow();
 	void ViewPortUI(const viewPort& port);
 	bool SaveLoadPopups();
-	void DefaultShadersEditorPopUp();
 
 	void SelectByViewPort();
 
