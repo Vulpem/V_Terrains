@@ -329,7 +329,7 @@ void ModuleTerrain::ShaderEditor()
             strcpy(vertexBuf, VTerrain::GetVertexShader().data());
             if (ImGui::CollapsingHeader("Vertex shader"))
             {
-                if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 400)))
+                if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 600)));
                 {
                     recompile = true;
                 }
@@ -338,7 +338,7 @@ void ModuleTerrain::ShaderEditor()
             strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
             if (ImGui::CollapsingHeader("Fragment shader"))
             {
-                if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 400)))
+                if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 600)))
                 {
                     recompile = true;
                 }

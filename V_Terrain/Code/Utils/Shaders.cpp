@@ -154,7 +154,8 @@ namespace VTerrain
             result += infoLog;
             result += '\n';
             result += '\n';
-            return 0;
+            glDeleteShader(ret);
+            ret = 0;
         }
 
         switch (type)
