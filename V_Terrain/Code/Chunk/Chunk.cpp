@@ -30,11 +30,6 @@ namespace VTerrain
 
     void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
     {
-        if (m_mesh.IsGenerated() == false)
-        {
-            m_mesh.Generate();
-        }
-
 		if (m_buf_heightmap != 0)
 		{
 			Free();

@@ -21,7 +21,7 @@ namespace VTerrain
     PerlinNoise::PerlinNoise()
         : m_heightCurve([](float a) { return a; })
     {
-        SetSeed(time(NULL));
+        SetSeed(static_cast<uint>(time(NULL)));
     }
 
     void PerlinNoise::SetSeed(uint seed)
@@ -38,9 +38,9 @@ namespace VTerrain
         const uint startX = -offset.x() * (config.chunkWidth) - 1;
         const uint startY = -offset.y() * (config.chunkHeight) - 1;
 
-        for (int y = 0; y < static_cast<int>(ret.Height()); y++)
+        for (uint y = 0; y < ret.Height(); y++)
         {
-            for (int x = 0; x < static_cast<int>(ret.Width()); x++)
+            for (uint x = 0; x < ret.Width(); x++)
             {
                 ret[x + y * ret.Width()] = GetValue(x + startX, y + startY);
             }
@@ -50,9 +50,9 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)  const
     {
-        const float dx = (config.chunkWidth) / config.noise.frequency;
-        const float dy = (config.chunkHeight) / config.noise.frequency;
-        return m_heightCurve(m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
+        const float dx = x/ (config.chunkWidth / config.noise.frequency);
+        const float dy = y /(config.chunkHeight / config.noise.frequency);
+        return m_heightCurve(m_perlin.octaveNoise0_1(dx, dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
     }
     void PerlinNoise::SetCurve(std::function<float(float)> func)
     {

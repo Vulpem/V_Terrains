@@ -52,6 +52,8 @@ public:
     int m_curvePow = 1;
     int m_setCurvePow = 1;
 
+    float m_quadSize = 6.f;
+
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
 };

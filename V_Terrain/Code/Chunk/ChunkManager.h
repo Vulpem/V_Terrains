@@ -46,5 +46,8 @@ namespace VTerrain
         Vec2<int> m_currentChunk;
 
         ChunkFactory m_factory;
+
+        Vec2<int> m_lastFrameChunkSize;
+        float m_lastFrameQuadSize;
     };
 }

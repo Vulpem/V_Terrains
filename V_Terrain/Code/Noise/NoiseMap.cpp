@@ -29,6 +29,7 @@ namespace VTerrain
 
         NoiseMap::~NoiseMap()
         {
+            m_data.clear();
         }
 
         void NoiseMap::Set(std::vector<float> data, uint width, uint height)

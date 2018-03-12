@@ -24,6 +24,7 @@ namespace VTerrain
 		, m_lastOffPos(0, 0)
         , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
+        , m_lastFrameChunkSize(0, 0)
     {
         m_chunks.resize(config.maxChunks);
     }
@@ -42,6 +43,13 @@ namespace VTerrain
             (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
         );
         
+
+        if (m_lastFrameChunkSize != Vec2<int>(config.chunkWidth, config.chunkHeight) || config.quadSize != m_lastFrameQuadSize)
+        {
+            Chunk::m_mesh.Generate();
+            m_lastFrameChunkSize = Vec2<int>(config.chunkWidth, config.chunkHeight);
+            m_lastFrameQuadSize = config.quadSize;
+        }
 
         while (m_factory.HasGeneratedChunks())
         {

@@ -141,7 +141,9 @@ update_status ModuleTerrain::Update()
         ImGui::Text("Terrain generation:");
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
         ImGui::Separator();
-        if (ImGui::DragFloat2("Chunk Size", &m_size[0], 1.f, 5.f, 1024.f)) { WantRegen(); }
+        if (ImGui::DragFloat2("Chunk Size", &m_size[0], 1.f, 5.f, 1024.f)) { VTerrain::config.chunkWidth = m_size[0]; VTerrain::config.chunkHeight = m_size[1]; }
+        ImGui::DragFloat("Quad Size", &VTerrain::config.quadSize, 1.f, 0.1f, 48.f);
+        
 
         ImGui::Separator();
 
@@ -296,10 +298,6 @@ void ModuleTerrain::Render(const viewPort & port)
 
 void ModuleTerrain::GenMap()
 {
-    VTerrain::config.chunkHeight = m_size.x;
-    VTerrain::config.chunkWidth = m_size.y;
-   
-
     VTerrain::config.noise.frequency = m_frequency;
     VTerrain::config.noise.octaves = m_octaves;
     VTerrain::config.noise.lacunarity = m_lacunarity;
