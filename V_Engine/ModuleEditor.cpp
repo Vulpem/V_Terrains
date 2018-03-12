@@ -266,56 +266,6 @@ update_status ModuleEditor::MenuBar()
 
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("New Scene##NewMenuBar"))
-			{
-				wantNew = true;
-			}
-			if (ImGui::MenuItem("Save Scene##SaveMenuBar"))
-			{
-				wantToSave = true;
-			}
-			if (ImGui::MenuItem("Load Scene##LoadMenuBar"))
-			{
-				wantToLoad = true;
-			}
-			if (ImGui::MenuItem("ClearConsole"))
-			{
-				ClearConsole();
-			}
-			if (ImGui::MenuItem("Quit"))
-			{
-				ret = UPDATE_STOP;
-			}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Import"))
-		{
-			ImGui::Checkbox("Auto Refresh", &App->resources->autoRefresh);
-			if (App->resources->autoRefresh)
-			{
-				ImGui::Text("Auto Refresh delay(seconds):");
-				ImGui::DragInt("##autoRefreshDelay", &App->resources->refreshDelay, 1.0f, 1, 600);
-			}
-			ImGui::Separator();
-			if (ImGui::MenuItem("Refresh Assets"))
-			{
-				App->resources->Refresh();
-			}
-
-			ImGui::NewLine();
-			ImGui::NewLine();
-			ImGui::Separator();
-			if (ImGui::MenuItem("Reimport All Assets"))
-			{
-				App->resources->ReimportAll();
-			}
-			ImGui::Separator();
-			ImGui::Text("It may take some time.\nAlso, it may cause\nsome problems if\nthere are already\nassets loaded.\nRecommended to use refresh\nwhen possible");
-			ImGui::EndMenu();
-		}
-
 		if (ImGui::BeginMenu("View"))
 		{
 			if (ImGui::Checkbox("Multiple Views", &multipleViews))
@@ -325,26 +275,9 @@ update_status ModuleEditor::MenuBar()
 			ImGui::Checkbox("Edit default shaders", &openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
 			ImGui::Checkbox("InGame Plane", &showPlane);
-			ImGui::Checkbox("QuadTree", &App->GO->drawQuadTree);
-			if (ImGui::Checkbox("Render Normals", &renderNormals))
-			{
-				SelectGameObject(selectedGameObject);
-			}
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Create"))
-		{
-			if (ImGui::MenuItem("Empty##CreateEmpty") == true)
-			{
-				App->GO->CreateEmpty();
-			}
-			if (ImGui::MenuItem("Camera##CreateEmptyCam") == true)
-			{
-				App->GO->CreateCamera();
-			}
-			ImGui::EndMenu();
-		}
 		if (ImGui::BeginMenu("Documentation"))
 		{
 			if (ImGui::MenuItem("MathGeoLib"))
@@ -410,8 +343,8 @@ void ModuleEditor::PlayButtons()
 
 void ModuleEditor::Editor()
 {
-		ImGui::SetNextWindowPos(ImVec2(0, (screenH - 20) / 2 + 50));
-		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/2 - 30));
+		ImGui::SetNextWindowPos(ImVec2(0, ((screenH - 20) / 4) * 3));
+		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/4 + 20));
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -431,109 +364,14 @@ void ModuleEditor::Editor()
 			sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
 			ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
 		}
-
-		if (ImGui::CollapsingHeader("Input"))
-		{
-			ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
-			ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
-		}
-
+		
 		if (ImGui::CollapsingHeader("Camera##CameraModule"))
 		{
-			ImGui::Text("Position");
 			ImGui::Text("Camera speed");
 			ImGui::DragFloat("##camSpeed", &App->camera->camSpeed, 0.1f);
 			ImGui::Text("Sprint speed multiplier");
 			ImGui::DragFloat("##camsprint", &App->camera->camSprintMultiplier, 0.1f);
 
-		}
-
-		if (ImGui::CollapsingHeader("Render"))
-		{
-			ImGui::Text("Global light direction");
-			ImGui::DragFloat3("##GlobalLightDirection", App->renderer3D->sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
-
-			ImGui::Text("Ambient light intensity");
-			ImGui::DragFloat("##GlobalLightDirection", &App->renderer3D->ambientLight.x, 0.1f, -1.0f, 1.0f);
-
-			if (ImGui::TreeNode("Lights"))
-			{
-				for (int nLight = 0; nLight < MAX_LIGHTS; nLight++)
-				{
-					char lightName[46];
-					sprintf(lightName, "Light %i", nLight);
-					bool on = App->renderer3D->lights[nLight].on;
-					ImGui::Checkbox(lightName, &on);
-
-					if (on != App->renderer3D->lights[nLight].on)
-					{
-						App->renderer3D->lights[nLight].Active(on);
-					}
-					if (App->renderer3D->lights[nLight].on == true)
-					{
-
-						sprintf(lightName, "Expand##Light_%i", nLight);
-						ImGui::SameLine();
-						if (ImGui::TreeNode(lightName))
-						{
-							char tmp[46];
-							sprintf(tmp, "X##light_%i", nLight);
-							ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.x, 1.0f);
-							sprintf(tmp, "Y##light_%i", nLight);
-							ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.y, 1.0f);
-							sprintf(tmp, "Z##light_%i", nLight);
-							ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.z, 1.0f);
-							ImGui::TreePop();
-						}
-					}
-				}
-				ImGui::TreePop();
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Resource Manager"))
-		{
-			ImGui::Text("Loaded resources:");
-			const std::vector<Resource*> res = App->resources->ReadLoadedResources();
-			if (res.size() > 0)
-			{
-				std::vector<Resource*>::const_iterator it = res.begin();
-				Component::Type lastType = Component::Type::C_None;
-				char name[256];
-				for (; it != res.end(); it++)
-				{
-					if (lastType != (*it)->GetType())
-					{
-						lastType = (*it)->GetType();
-						ImGui::Separator();
-						switch (lastType)
-						{
-						case (Component::C_GO):
-						{
-							ImGui::Text("GameObjects:"); break;
-						}
-						case (Component::C_material):
-						{
-							ImGui::Text("Materials:"); break;
-						}
-						case (Component::C_mesh):
-						{
-							ImGui::Text("Meshes:"); break;
-						}
-						case (Component::C_Texture):
-						{
-							ImGui::Text("Textures:"); break;
-						}
-						}
-					}
-					sprintf(name, "%s", (*it)->name.data());
-					if (ImGui::TreeNode(name))
-					{
-						ImGui::Text("N references: %u", (*it)->nReferences);
-						ImGui::TreePop();
-					}
-				}
-			}
 		}
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
@@ -555,16 +393,6 @@ void ModuleEditor::Editor()
 			else
 			{
 				ImGui::Text("No timers initialized");
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Tests"))
-		{
-			ImGui::InputText("##consoleTest", testConsoleInput, 60);
-			ImGui::SameLine();
-			if (ImGui::Button("TestConsole"))
-			{
-				LOG(testConsoleInput);
 			}
 		}
 		ImGui::End();

@@ -28,6 +28,7 @@ bool ModuleCamera3D::Start()
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
 	defaultCamera->SetFarPlane(30000);
 	defaultCameraGO->HideFromOutliner();
+    defaultCameraGO->GetTransform()->SetGlobalPos(0.f, 600.f, 0.f);
 
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 1000, 0);
@@ -35,6 +36,7 @@ bool ModuleCamera3D::Start()
 	topView->GetTransform()->allowRotation = false;
 	topView->GetComponent<Camera>().front()->SetFarPlane(10000);
 	topView->GetComponent<Camera>().front()->SwitchViewType();
+    topView->GetComponent<Camera>().front()->SetHorizontalFOV(50000);
 	topView->HideFromOutliner();
 
 	return ret;

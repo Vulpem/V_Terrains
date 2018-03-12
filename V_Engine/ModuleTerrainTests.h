@@ -38,7 +38,7 @@ public:
     float m_persistance;
 
     float2 m_size;
-    float2 m_offset;
+    std::string m_currentHeightCurve;
 
     float m_maxHeight;
 	float m_fogDistance;
@@ -46,6 +46,7 @@ public:
     uint m_shaderProgram;
 
     int m_curvePow = 1;
+    int m_setCurvePow = 1;
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;

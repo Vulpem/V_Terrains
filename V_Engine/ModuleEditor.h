@@ -35,6 +35,7 @@ public:
 
 	void ModuleEditor::Log(const char* input);
 	void ClearConsole();
+    void SwitchViewPorts();
 private:
 	void SceneTreeGameObject(GameObject* node);
 	void SelectGameObject(GameObject* node);
@@ -45,7 +46,6 @@ private:
 	void Console();
 	void Outliner();
 	void AttributeWindow();
-	void SwitchViewPorts();
 	void ViewPortUI(const viewPort& port);
 	bool SaveLoadPopups();
 	void DefaultShadersEditorPopUp();
