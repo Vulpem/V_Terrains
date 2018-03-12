@@ -59,6 +59,7 @@ public:
 
 	bool showPlane = true;
 	bool renderNormals = false;
+    std::string m_shaderResult;
 
 	//TMP
 	LineSegment selectRay;

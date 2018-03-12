@@ -26,6 +26,12 @@ namespace VTerrain
     void SetHeightCurve(std::function<float(float)> func);
 	void CleanChunks();
     void SetSeed(unsigned int seed);
+
+
+    //TMP
+    std::string GetVertexShader();
+    std::string GetFragmentShader();
+    std::string CompileShaders(const char* frag, const char* vert);
 }
 
 #endif // !__VTERRAIN_INCLUDE__

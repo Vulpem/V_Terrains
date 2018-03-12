@@ -18,37 +18,37 @@ namespace VTerrain
 {
     struct Shader
     {
-        unsigned int m_program;
+        unsigned int m_program = 0u;
 
-        unsigned int loc_position;
-        unsigned int loc_texCoord;
+        unsigned int loc_position = 0u;
+        unsigned int loc_texCoord = 0u;
 
-        unsigned int loc_view_matrix;
-        unsigned int loc_projection_matrix;
+        unsigned int loc_view_matrix = 0u;
+        unsigned int loc_projection_matrix = 0u;
 
-        unsigned int loc_position_offset;
-        unsigned int loc_max_height;
-        unsigned int loc_fog_distance;
-        unsigned int loc_water_height;
-        unsigned int loc_global_light_direction;
-        unsigned int loc_ambient_color;
-        unsigned int loc_water_color;
-        unsigned int loc_fog_color;
+        unsigned int loc_position_offset = 0u;
+        unsigned int loc_max_height = 0u;
+        unsigned int loc_fog_distance = 0u;
+        unsigned int loc_water_height = 0u;
+        unsigned int loc_global_light_direction = 0u;
+        unsigned int loc_ambient_color = 0u;
+        unsigned int loc_water_color = 0u;
+        unsigned int loc_fog_color = 0u;
 
-        unsigned int loc_render_heightmap;
-        unsigned int loc_render_chunk_borders;
+        unsigned int loc_render_heightmap = 0u;
+        unsigned int loc_render_chunk_borders = 0u;
     };
 
     class Shaders
     {
     public:
-        static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf);
+        static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf, std::string& result);
         static void FreeShader(const Shader& shader);
 
         static std::string m_defaultVertexShader;
         static std::string m_defaultFragmentShader;
     private:
         static std::string OpenFile(const char* fileDir);
-        static unsigned int Compile(std::string code, unsigned int type);
+        static unsigned int Compile(std::string code, unsigned int type, std::string& result);
     };
 }

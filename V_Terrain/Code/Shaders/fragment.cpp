@@ -1,5 +1,5 @@
 #version 330 core
-		
+
 in lowp vec3 pos;
 in lowp float fog;
 in lowp vec2 UV;

@@ -24,15 +24,30 @@ namespace VTerrain
 
 	std::string Shaders::m_defaultFragmentShader = std::string("Here will go the shader TODO");
 
-    Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf)
+    Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, std::string& result)
     {
         GLint success;
         Shader ret;
-        std::string programResult;
 
         //TODO customizable
-        unsigned int vertexShader = Compile(OpenFile("vertex.cpp"), GL_VERTEX_SHADER);
-        unsigned int fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER);
+        unsigned int vertexShader = 0;
+        if (vertexBuf == nullptr)
+        {
+            vertexShader = Compile(OpenFile("vertex.cpp"), GL_VERTEX_SHADER, result);
+        }
+        else
+        {
+            vertexShader = Compile(vertexBuf, GL_VERTEX_SHADER, result);
+        }
+        unsigned int fragmentShader = 0;
+        if (fragmentBuf == nullptr)
+        {
+            fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER, result);
+        }
+        else
+        {
+            fragmentShader = Compile(fragmentBuf, GL_FRAGMENT_SHADER, result);
+        }
 
         if (fragmentShader != 0 && vertexShader != 0)
         {
@@ -48,34 +63,35 @@ namespace VTerrain
             {
                 GLchar infoLog[512];
                 glGetProgramInfoLog(program, 512, NULL, infoLog);
-                programResult += "\n------ Shader Program ------\n";
-                programResult += infoLog;
-                programResult += '\n';
-                assert(false);
+                result += "\n------ Shader Program ------\n";
+                result += infoLog;
+                result += '\n';
             }
+            else
+            {
+                ret.m_program = program;
 
-            ret.m_program = program;
+                ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
+                ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
 
-            ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
-            ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
+                ret.loc_position_offset = glGetUniformLocation(program, "position_offset");
+                ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
+                ret.loc_max_height = glGetUniformLocation(program, "max_height");
+                ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
+                ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
+                ret.loc_water_color = glGetUniformLocation(program, "water_color");
+                ret.loc_water_height = glGetUniformLocation(program, "water_height");
+                ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
 
-            ret.loc_position_offset = glGetUniformLocation(program, "position_offset");
-            ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
-            ret.loc_max_height = glGetUniformLocation(program, "max_height");
-            ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
-            ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
-            ret.loc_water_color = glGetUniformLocation(program, "water_color");
-            ret.loc_water_height = glGetUniformLocation(program, "water_height");
-            ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
+                ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
+                ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
 
-            ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
-            ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
-
-            ret.loc_position = 0;
-            ret.loc_texCoord = 1;
-
+                ret.loc_position = 0;
+                ret.loc_texCoord = 1;
+            }
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);
+
         }
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
@@ -112,10 +128,9 @@ namespace VTerrain
         return ret;
     }
 
-    unsigned int Shaders::Compile(std::string code, unsigned int type)
+    unsigned int Shaders::Compile(std::string code, unsigned int type, std::string& result)
     {
         unsigned int ret;
-        std::string result;
         GLint success;
 
         ret = glCreateShader(type);
@@ -125,11 +140,31 @@ namespace VTerrain
         glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
         if (success == 0)
         {
+            switch (type)
+            {
+            case GL_VERTEX_SHADER:
+                result += "--Vertex Shader--\n";
+                break;
+            case GL_FRAGMENT_SHADER:
+                result += "--Fragment Shader--\n";
+                break;
+            }
             GLchar infoLog[512];
             glGetShaderInfoLog(ret, 512, NULL, infoLog);
             result += infoLog;
             result += '\n';
-            assert(false);
+            result += '\n';
+            return 0;
+        }
+
+        switch (type)
+        {
+        case GL_VERTEX_SHADER:
+            m_defaultVertexShader = code;
+            break;
+        case GL_FRAGMENT_SHADER:
+            m_defaultFragmentShader = code;
+            break;
         }
 
         return ret;

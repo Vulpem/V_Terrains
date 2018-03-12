@@ -18,6 +18,8 @@
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"
 
+#include "../V_Terrain/Code/Include.h"
+
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	moduleName = "ModuleEditor";
@@ -641,41 +643,41 @@ void ModuleEditor::DefaultShadersEditorPopUp()
 		if (ImGui::Begin("Default Shader Editor", &openShaderEditor))
 		{
 			bool recompile = false;
-			uint len = MAX(App->resources->defaultFragmentBuf.length(), App->resources->defaultVertexBuf.length());
-			len += 500;
-			char* buf = new char[len];
+            const uint vertexLen = VTerrain::GetVertexShader().length() + 256;
+			char* vertexBuf = new char[vertexLen];
+            const uint fragmentLen = VTerrain::GetFragmentShader().length() + 256;
+            char* fragmentBuf = new char[fragmentLen];
 
+            strcpy(vertexBuf, VTerrain::GetVertexShader().data());
 			if (ImGui::CollapsingHeader("Vertex shader"))
 			{
-				strcpy(buf, App->resources->defaultVertexBuf.data());
-				if (ImGui::InputTextMultiline("##vertexShaderEditor", buf, len, ImVec2(ImGui::GetWindowWidth(), 400)))
+				if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 400)))
 				{
-					App->resources->defaultVertexBuf = buf;
 					recompile = true;
 				}
 			}
 
+            strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
 			if (ImGui::CollapsingHeader("Fragment shader"))
 			{
-				strcpy(buf, App->resources->defaultFragmentBuf.data());
-				if (ImGui::InputTextMultiline("##fragmentShaderEditor", buf, len, ImVec2(ImGui::GetWindowWidth(), 400)))
+				if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 400)))
 				{
-					App->resources->defaultFragmentBuf = buf;
 					recompile = true;
 				}
 			}
 
 			if (recompile)
 			{
-				App->resources->GenerateDefaultShader();
+                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf);
 			}
 
-			if (App->resources->shadersResult.length() > 1)
+			if (m_shaderResult.length() > 5)
 			{
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
-				ImGui::TextWrapped(App->resources->shadersResult.data());
+				ImGui::TextWrapped(m_shaderResult.data());
 			}
-			RELEASE_ARRAY(buf);
+			RELEASE_ARRAY(vertexBuf);
+            RELEASE_ARRAY(fragmentBuf);
 			ImGui::End();
 		}
 	}

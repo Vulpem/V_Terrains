@@ -22,7 +22,8 @@ namespace VTerrain
 
     void Init()
     {
-        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr);
+        std::string result;
+        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, result);
     }
 
 	void Update(int posX, int posY)
@@ -48,5 +49,29 @@ namespace VTerrain
     void SetSeed(unsigned int seed)
     {
         chunkManager.SetSeed(seed);
+    }
+
+
+
+
+    std::string GetVertexShader()
+    {
+        return Shaders::m_defaultVertexShader;
+    }
+
+    std::string GetFragmentShader()
+    {
+        return  Shaders::m_defaultFragmentShader;
+    }
+
+    std::string CompileShaders(const char * frag, const char * vert)
+    {
+        std::string result;
+        Shader shader = Shaders::CompileShader(vert, frag, result);
+        if (shader.m_program != 0)
+        {
+            Chunk::m_shader = shader;
+        }
+        return result;
     }
 }
