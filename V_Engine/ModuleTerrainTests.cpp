@@ -54,8 +54,7 @@ bool ModuleTerrain::Start()
 	bool ret = true;
     VTerrain::Init();
 
-    std::vector<float> tmp = { 0.f,0.f,0.f };
-   
+    App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
 
 	return ret;
