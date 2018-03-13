@@ -37,6 +37,7 @@ namespace VTerrain
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;
+		unsigned int loc_render_light = 0u;
     };
 
     class Shaders

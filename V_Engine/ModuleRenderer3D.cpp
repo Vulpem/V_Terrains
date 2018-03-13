@@ -437,7 +437,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (useLightLoc != -1) { glUniform1i(useLightLoc, currentViewPort->useLighting); }
 
-	if (meshInfo.textureBuffer > 0 && currentViewPort->useMaterials)
+	if (!meshInfo.textureBuffer > 0 && currentViewPort->renderHeightMap)
 	{
 		if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
@@ -543,7 +543,7 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 	if (port.useLighting) { glEnable(GL_LIGHTING); usingLights = true; }
 	else { glDisable(GL_LIGHTING); usingLights = false;}
 
-	if (port.useMaterials) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
+	if (!port.renderHeightMap) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
 	else { glDisable(GL_TEXTURE_2D); usingTextures = false;}
 }
 

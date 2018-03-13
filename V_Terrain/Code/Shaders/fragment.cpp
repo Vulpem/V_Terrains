@@ -13,6 +13,7 @@ uniform lowp vec3 water_color;
 uniform lowp vec3 fog_color;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
+uniform int render_light;
 
 uniform lowp sampler2D heightmap;
 
@@ -24,7 +25,6 @@ void main()
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
     lowp float height = heightmapVal.w * max_height;
-    lowp float lightIntensity = max(dot(global_light_direction, norm), ambient_min);
 
     lowp vec3 col;
     //Water
@@ -77,7 +77,9 @@ void main()
         col = vec3(1.f, 1.f, 1.f);
     }
 
-
-    col *= lightIntensity;
+	if (render_light != 0)
+	{
+		col *= max(dot(global_light_direction, norm), ambient_min);
+	}
     color = vec4(mix(col, fog_color, fog), 1.f);
 }

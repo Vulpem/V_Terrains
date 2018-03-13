@@ -313,7 +313,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 			viewPort* editPort = App->renderer3D->FindViewPort(port.ID);
 			ImGui::Checkbox("Wired", &editPort->useOnlyWires);
 			ImGui::Checkbox("Lightning", &editPort->useLighting);
-			ImGui::Checkbox("Textured", &editPort->useMaterials);
+			ImGui::Checkbox("Render Heightmap", &editPort->renderHeightMap);
 			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
 			ImGui::EndMenu();
 		}

@@ -69,13 +69,13 @@ namespace VTerrain
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
             //TODO improve set LOD
-			if (config.tmp.LOD == 0)
+			if (config.debug.LOD == 0)
 			{
 				it->Draw(viewMatrix, projectionMatrix, (uint)(m_lastOffPos - it->GetPos()).Length() / 2);
 			}
 			else
 			{
-				it->Draw(viewMatrix, projectionMatrix, config.tmp.LOD);
+				it->Draw(viewMatrix, projectionMatrix, config.debug.LOD);
 			}
         }
     }

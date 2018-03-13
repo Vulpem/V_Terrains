@@ -102,8 +102,9 @@ namespace VTerrain
 
 			glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
-            glUniform1i(m_shader.loc_render_chunk_borders, config.tmp.renderChunkBorders);
-            glUniform1i(m_shader.loc_render_heightmap, config.tmp.renderHeightmap);
+            glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
+            glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
+			glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
 
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
@@ -117,14 +118,22 @@ namespace VTerrain
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
             glEnableVertexAttribArray(1);
 
-			
-			if (config.wiredRender == false)
+			if (config.debug.wiredRender == false)
 			{
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 			else
 			{
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+
+			if (config.singleSidedFaces)
+			{
+				glEnable(GL_CULL_FACE);
+			}
+			else
+			{
+				glDisable(GL_CULL_FACE);
 			}
 
             glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(drawLOD), GL_UNSIGNED_INT, (void*)0);

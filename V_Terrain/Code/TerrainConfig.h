@@ -27,7 +27,8 @@ namespace VTerrain
 		float fogDistance = 5000.f;
 		float waterHeight = 330.f;
         float ambientLight = 0.4f;
-		bool wiredRender = true;
+
+		bool singleSidedFaces = true;
 
 		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
 		float fogColor[3] = { 0.78f, 0.81f, 0.84f };
@@ -40,12 +41,14 @@ namespace VTerrain
 			float persistency = 0.4f;
         } noise;
 
-		struct TMP
+		struct Debug
         {
-            unsigned int LOD = 0;;
+			bool wiredRender = false;
+			bool renderLight = true;
+            unsigned int LOD = 0;
             bool renderHeightmap = false;
             bool renderChunkBorders = false;
-        } tmp;
+        } debug;
    };
 
 	extern Config config;

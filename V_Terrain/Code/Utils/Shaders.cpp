@@ -85,6 +85,7 @@ namespace VTerrain
 
                 ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
+				ret.loc_render_light = glGetUniformLocation(program, "render_light");
 
                 ret.loc_position = 0;
                 ret.loc_texCoord = 1;

@@ -105,10 +105,10 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Text("Render:");
         ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
-        int tmpLOD = VTerrain::config.tmp.LOD;
+        int tmpLOD = VTerrain::config.debug.LOD;
         if (ImGui::SliderInt("LOD", &tmpLOD, 0,VTerrain::config.nLODs - 1))
         {
-            VTerrain::config.tmp.LOD = tmpLOD;
+            VTerrain::config.debug.LOD = tmpLOD;
         }
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip(  "Reduce the amount of triangles by a\n"
@@ -253,8 +253,7 @@ update_status ModuleTerrain::Update()
             float3 pos = App->camera->GetDefaultCam()->GetPosition();
             App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
         }
-        ImGui::Checkbox("Chunk Borders", &VTerrain::config.tmp.renderChunkBorders);
-        ImGui::Checkbox("Render Heightmap", &VTerrain::config.tmp.renderHeightmap);
+        ImGui::Checkbox("Chunk Borders", &VTerrain::config.debug.renderChunkBorders);
 
         if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
         {
@@ -293,7 +292,10 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::Render(const viewPort & port)
 {
-	VTerrain::config.wiredRender = port.useOnlyWires;
+	VTerrain::config.debug.wiredRender = port.useOnlyWires;
+	VTerrain::config.debug.renderLight = port.useLighting;
+	VTerrain::config.singleSidedFaces = port.useSingleSidedFaces;
+	VTerrain::config.debug.renderHeightmap = port.renderHeightMap;
 	VTerrain::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
 }
 
