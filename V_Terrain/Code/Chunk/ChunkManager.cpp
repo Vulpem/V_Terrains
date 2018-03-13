@@ -104,7 +104,14 @@ namespace VTerrain
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
-		const int maxDist = static_cast<int>(log2f(static_cast<float>(config.maxChunks)));
+
+		int maxDist = 0;
+		uint nChunks = 1;
+		while (nChunks < config.maxChunks)
+		{
+			nChunks += ++maxDist * 4;
+		}
+		maxDist --;
 		for (int dist = 0; dist <= maxDist; dist++)
 		{
 			for (int y = -dist; y <= dist; y++)
