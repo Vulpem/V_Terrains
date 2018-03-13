@@ -38,8 +38,8 @@ namespace VTerrain
 		Vec3 operator/ (T a) const { return Vec3(d[0] / a, d[1] / a, d[2] / a); }
         bool operator== (const Vec3& a) const { return (d[0] == a.d[0] && d[1] == a.d[1] && d[2] == a.d[2]); }
         bool operator!= (const Vec3& a) const { return !(*this == a); }
-        float LengthSqr() const { return (d[0] * d[0] + d[1] * d[1] + d[2] * d[2]); }
-		float Length() const { return sqrtf(d[0]*d[0] + d[1]*d[1] + d[2] * d[2]); }
+        float LengthSqr() const { return ((float)d[0] * (float)d[0] + (float)d[1] * (float)d[1] + (float)d[2] * (float)d[2]); }
+		float Length() const { return sqrtf((float)d[0]* (float)d[0] + (float)d[1]* (float)d[1] + (float)d[2] * (float)d[2]); }
 		void Normalize()
 		{
 			const float len = Length();
@@ -90,8 +90,8 @@ namespace VTerrain
         bool operator!= (const Vec2& a) const { return !(*this == a); }
         bool operator< (const Vec2& a) const { return (d[0] < a.d[0] ? true : (d[0] == a.d[0] ? (d[1] < a.d[1]) : false)); }
         bool operator> (const Vec2& a) const { return (d[0] > a.d[0] ? true : (d[0] == a.d[0] ? (d[1] > a.d[1]) : false)); }
-        float LengthSqr() const { return ((d[0] * d[0] + d[1] * d[1])); }
-		float Length() const { return (sqrtf(d[0]*d[0] + d[1]*d[1])); }
+        float LengthSqr() const { return (float)d[0] * (float)d[0] + (float)d[1] * (float)d[1]; }
+		float Length() const { return sqrtf((float)d[0]* (float)d[0] + (float)d[1]* (float)d[1]); }
 		void Normalize()
 		{
 			const float len = Length();
