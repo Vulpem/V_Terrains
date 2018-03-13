@@ -22,13 +22,14 @@ namespace VTerrain
         unsigned int chunkWidth = 64u;
         unsigned int chunkHeight = 64u;
         unsigned int maxChunks = 256u;
-        unsigned int nLODs = 6;
+        unsigned int nLODs = 5;
         float quadSize = 6.f;
-		float fogDistance = 5000.f;
+		float fogDistance = 4000.f;
 		float waterHeight = 330.f;
         float ambientLight = 0.4f;
 
 		bool singleSidedFaces = true;
+		float LODdistance = 1.f;
 
 		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
 		float fogColor[3] = { 0.78f, 0.81f, 0.84f };

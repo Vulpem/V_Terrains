@@ -71,7 +71,7 @@ namespace VTerrain
             //TODO improve set LOD
 			if (config.debug.LOD == 0)
 			{
-				it->Draw(viewMatrix, projectionMatrix, (uint)(m_lastOffPos - it->GetPos()).Length() / 2);
+				it->Draw(viewMatrix, projectionMatrix, (uint)(utils::Max(floorf((m_lastOffPos - it->GetPos()).Length()) - 1, 0.f) / config.LODdistance));
 			}
 			else
 			{

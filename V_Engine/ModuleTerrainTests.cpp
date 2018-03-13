@@ -110,6 +110,7 @@ update_status ModuleTerrain::Update()
         {
             VTerrain::config.debug.LOD = tmpLOD;
         }
+		ImGui::DragFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 0.0f, 100.f);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip(  "Reduce the amount of triangles by a\n"
                                 "power of this value.\n"
