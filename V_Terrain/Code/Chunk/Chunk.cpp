@@ -51,6 +51,8 @@ namespace VTerrain
 
     void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD) const
     {
+		//TODO investigate tesselation
+		//TODO render wired
         if (IsLoaded())
         {
             uint drawLOD = LOD;
@@ -104,7 +106,6 @@ namespace VTerrain
             glUniform1i(m_shader.loc_render_heightmap, config.tmp.renderHeightmap);
 
 
-
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
 
@@ -116,14 +117,23 @@ namespace VTerrain
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
             glEnableVertexAttribArray(1);
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			
+			if (config.wiredRender == false)
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			else
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+
             glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(drawLOD), GL_UNSIGNED_INT, (void*)0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
             glPopMatrix();
-
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glBindTexture(GL_TEXTURE_2D, 0);
             glDisableClientState(GL_VERTEX_ARRAY);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);

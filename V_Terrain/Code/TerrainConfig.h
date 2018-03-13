@@ -27,6 +27,7 @@ namespace VTerrain
 		float fogDistance = 5000.f;
 		float waterHeight = 330.f;
         float ambientLight = 0.4f;
+		bool wiredRender = true;
 
 		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
 		float fogColor[3] = { 0.78f, 0.81f, 0.84f };

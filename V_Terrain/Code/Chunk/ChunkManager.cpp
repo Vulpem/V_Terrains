@@ -104,7 +104,7 @@ namespace VTerrain
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
-
+		//TODO draw a circle instead of a square
 		int maxDist = 0;
 		uint nChunks = 1;
 		while (nChunks < config.maxChunks)

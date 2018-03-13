@@ -293,6 +293,7 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::Render(const viewPort & port)
 {
+	VTerrain::config.wiredRender = port.useOnlyWires;
 	VTerrain::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
 }
 
