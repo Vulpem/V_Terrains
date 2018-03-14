@@ -24,7 +24,10 @@ namespace VTerrain
 
 	std::string Shaders::m_defaultFragmentShader = std::string("Here will go the shader TODO");
 
-    Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, std::string& result)
+    std::string Shaders::m_defaultTCSShader = std::string("TODO");
+    std::string Shaders::m_defaultTESShader = std::string("TODO");
+
+    Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, const char* TCSbuf, const char* TESbuf, std::string& result)
     {
         GLint success;
         Shader ret;
@@ -49,13 +52,35 @@ namespace VTerrain
             fragmentShader = Compile(fragmentBuf, GL_FRAGMENT_SHADER, result);
         }
 
-        if (fragmentShader != 0 && vertexShader != 0)
+        unsigned int TCS = 0;
+        if (TCSbuf == nullptr)
+        {
+            TCS = Compile(OpenFile("TCS.cpp"), GL_TESS_CONTROL_SHADER, result);
+        }
+        else
+        {
+            TCS = Compile(TCSbuf, GL_TESS_CONTROL_SHADER, result);
+        }
+
+        unsigned int TES = 0;
+        if (TCSbuf == nullptr)
+        {
+            TES = Compile(OpenFile("TES.cpp"), GL_TESS_EVALUATION_SHADER, result);
+        }
+        else
+        {
+            TES = Compile(TESbuf, GL_TESS_EVALUATION_SHADER, result);
+        }
+
+        if (fragmentShader != 0 && vertexShader != 0 && TCS != 0 && TES != 0)
         {
             unsigned int program;
             program = glCreateProgram();
 
             glAttachShader(program, vertexShader);
             glAttachShader(program, fragmentShader);
+            glAttachShader(program, TCS);
+            glAttachShader(program, TES);
 
             glLinkProgram(program);
             glGetProgramiv(program, GL_LINK_STATUS, &success);
@@ -166,6 +191,12 @@ namespace VTerrain
             break;
         case GL_FRAGMENT_SHADER:
             m_defaultFragmentShader = code;
+            break;
+        case GL_TESS_CONTROL_SHADER:
+            m_defaultTCSShader = code;
+            break;
+        case GL_TESS_EVALUATION_SHADER:
+            m_defaultTESShader = code;
             break;
         }
 

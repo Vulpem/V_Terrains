@@ -17,6 +17,9 @@
     <Filter Include="Source Files\Chunk">
       <UniqueIdentifier>{7b59f095-b33d-499b-a29e-ba5b62857831}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{c510d548-1cd2-4a57-b0dc-98d64b0c37bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Noise\PerlinNoise.h">

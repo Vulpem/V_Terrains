@@ -23,7 +23,7 @@ namespace VTerrain
     void Init()
     {
         std::string result;
-        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, result);
+        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
     }
 
 	void Update(int posX, int posY)
@@ -64,10 +64,20 @@ namespace VTerrain
         return  Shaders::m_defaultFragmentShader;
     }
 
-    std::string CompileShaders(const char * frag, const char * vert)
+    std::string GetTCS()
+    {
+        return Shaders::m_defaultTCSShader;
+    }
+
+    std::string GetTES()
+    {
+        return Shaders::m_defaultTESShader;
+    }
+
+    std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES)
     {
         std::string result;
-        Shader shader = Shaders::CompileShader(vert, frag, result);
+        Shader shader = Shaders::CompileShader(vert, frag, TCS, TES, result);
         if (shader.m_program != 0)
         {
             Chunk::m_shader = shader;

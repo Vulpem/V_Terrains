@@ -52,10 +52,9 @@ namespace VTerrain
     void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD) const
     {
 		//TODO investigate tesselation
-		//TODO render wired
         if (IsLoaded())
         {
-            uint drawLOD = LOD;
+            uint drawLOD = 0;
             if (IsLODReady(LOD) == false)
             {
                 drawLOD = m_minLOD;
@@ -64,6 +63,13 @@ namespace VTerrain
             {
                 drawLOD = config.nLODs - 1;
             }
+
+            //
+
+            glPatchParameteri(GL_PATCH_VERTICES, (config.chunkWidth + 1) * (config.chunkHeight + 1));
+            glPatchParameteri(GL_PATCH_DEFAULT_OUTER_LEVEL, LOD);
+            glPatchParameteri(GL_PATCH_DEFAULT_INNER_LEVEL, LOD);
+            //
 
             glUseProgram(m_shader.m_program);
 
@@ -136,7 +142,7 @@ namespace VTerrain
 				glDisable(GL_CULL_FACE);
 			}
 
-            glDrawElements(GL_TRIANGLES, m_mesh.GetNumIndices(drawLOD), GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_PATCHES, m_mesh.GetNumIndices(drawLOD), GL_UNSIGNED_INT, (void*)0);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);

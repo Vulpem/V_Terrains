@@ -43,11 +43,13 @@ namespace VTerrain
     class Shaders
     {
     public:
-        static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf, std::string& result);
+        static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf, const char* TCS, const char* TES, std::string& result);
         static void FreeShader(const Shader& shader);
 
         static std::string m_defaultVertexShader;
         static std::string m_defaultFragmentShader;
+        static std::string m_defaultTCSShader;
+        static std::string m_defaultTESShader;
     private:
         static std::string OpenFile(const char* fileDir);
         static unsigned int Compile(std::string code, unsigned int type, std::string& result);

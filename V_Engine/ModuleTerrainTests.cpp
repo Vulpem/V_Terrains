@@ -327,6 +327,10 @@ void ModuleTerrain::ShaderEditor()
             char* vertexBuf = new char[vertexLen];
             const uint fragmentLen = VTerrain::GetFragmentShader().length() + 256;
             char* fragmentBuf = new char[fragmentLen];
+            const uint TESLen = VTerrain::GetTES().length() + 256;
+            char* TESbuf = new char[TESLen];
+            const uint TCSlen = VTerrain::GetTCS().length() + 256;
+            char* TCSbuf = new char[TCSlen];
 
             strcpy(vertexBuf, VTerrain::GetVertexShader().data());
             if (ImGui::CollapsingHeader("Vertex shader"))
@@ -346,9 +350,27 @@ void ModuleTerrain::ShaderEditor()
                 }
             }
 
+            strcpy(TCSbuf, VTerrain::GetTCS().data());
+            if (ImGui::CollapsingHeader("Tesselation Control Shader"))
+            {
+                if (ImGui::InputTextMultiline("##TCSEditor", TCSbuf, TCSlen, ImVec2(ImGui::GetWindowWidth(), 600)))
+                {
+                    recompile = true;
+                }
+            }
+
+            strcpy(TESbuf, VTerrain::GetTES().data());
+            if (ImGui::CollapsingHeader("Tesselation Evaluation Shader"))
+            {
+                if (ImGui::InputTextMultiline("##TESEditor", TESbuf, TESLen, ImVec2(ImGui::GetWindowWidth(), 600)))
+                {
+                    recompile = true;
+                }
+            }
+
             if (recompile)
             {
-                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf);
+                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf, TCSbuf, TESbuf);
             }
 
             if (m_shaderResult.length() > 5)

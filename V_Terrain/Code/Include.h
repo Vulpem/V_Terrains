@@ -31,7 +31,9 @@ namespace VTerrain
     //TMP
     std::string GetVertexShader();
     std::string GetFragmentShader();
-    std::string CompileShaders(const char* frag, const char* vert);
+    std::string GetTCS();
+    std::string GetTES();
+    std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
 }
 
 #endif // !__VTERRAIN_INCLUDE__
