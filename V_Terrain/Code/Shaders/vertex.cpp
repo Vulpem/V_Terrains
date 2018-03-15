@@ -7,7 +7,7 @@ out lowp vec3 pos;
 out lowp float fog;
 out lowp vec2 UV;
 
-out lowp float distSqr;
+out lowp float dist;
 
 uniform lowp mat4 view_matrix;
 uniform lowp mat4 projection_matrix;
@@ -24,12 +24,14 @@ void main()
 {
     lowp mat4 transform = projection_matrix * view_matrix;
     lowp vec4 heightMapVal = texture(heightmap, texCoord);
-    pos = position + position_offset + vec3(0, heightMapVal.w * max_height, 0);
+    pos = position /*+ position_offset + vec3(0, heightMapVal.w * max_height, 0)*/;
     pos.y = max(pos.y, water_height);
-    vec4 outPos = transform * vec4(pos, 1);
-    gl_Position = outPos;
-	distSqr = outPos.x * outPos.x + outPos.y * outPos.y + outPos.z * outPos.z;
-    fog = min( distSqr / (fog_distance * fog_distance), 1);
+
+	gl_Position = vec4(pos, 1); // outPos;
+
+	vec4 outPos = transform * vec4(pos + position_offset, 1);
+	dist = sqrt(outPos.x * outPos.x + outPos.y * outPos.y + outPos.z * outPos.z);
+    //fog = min( distSqr / (fog_distance * fog_distance), 1);
 
     UV = texCoord;
 }

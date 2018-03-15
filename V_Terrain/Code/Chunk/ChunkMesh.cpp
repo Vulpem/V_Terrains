@@ -38,7 +38,7 @@ namespace VTerrain
     void Mesh::GenerateMesh()
     {
         std::vector<float> data;
-        data.resize((config.chunkWidth + 1) * (config.chunkHeight + 1) * 5);
+        data.resize((2) * (2) * 5);
 
         const float topLeftX = (config.chunkWidth * config.quadSize - (config.chunkWidth % 2 != 0)) / -2.f;
         const float topLeftY = (config.chunkHeight * config.quadSize - (config.chunkHeight % 2 != 0)) / -2.f;
@@ -46,16 +46,15 @@ namespace VTerrain
 
         std::vector<Vec2<float>> UVs;
 
-        for (uint y = 0; y < config.chunkHeight + 1; y++)
+        for (uint y = 0; y < 2; y++)
         {
-            for (uint x = 0; x < config.chunkWidth + 1; x++)
+            for (uint x = 0; x < 2; x++)
             {
-                data[n + 0] = topLeftX + x * config.quadSize;
-                data[n + 1] = 0.f;
-                data[n + 2] = topLeftY + y * config.quadSize;
-                data[n + 3] = (float)(x) / (float)(config.chunkWidth);
-                data[n + 4] = (float)(y) / (float)(config.chunkHeight);
-                n += 5;
+                data[n++] = topLeftX + x * config.quadSize * config.chunkWidth;
+                data[n++] = 0.f;
+                data[n++] = topLeftY + y * config.quadSize * config.chunkHeight;
+				data[n++] = (float)(x);// / (float)(1.f);
+				data[n++] = (float)(y);// / (float)(1.f);
             }
         }
 
@@ -71,8 +70,8 @@ namespace VTerrain
 
     void Mesh::GenerateIndices(uint LOD)
     {
-        const uint width = config.chunkWidth + 1;
-        const uint height = config.chunkHeight + 1;
+        const uint width = 2;
+        const uint height = 2;
         std::vector<uint> indices(width*height * 6u);
         uint n = 0;
         uint i = 0;
@@ -96,7 +95,9 @@ namespace VTerrain
             }
         }
 
-        m_nIndices[LOD] = n;
+		indices = { 0, 2, 3, 1 };
+
+        m_nIndices[LOD] = 4;
         if (m_indicesBuff.find(LOD) == m_indicesBuff.end())
         {
             glGenBuffers(1, &m_indicesBuff[LOD]);

@@ -24,6 +24,7 @@ namespace VTerrain
     {
         std::string result;
         Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
+		assert(Chunk::m_shader.m_program != 0);
     }
 
 	void Update(int posX, int posY)

@@ -166,15 +166,6 @@ namespace VTerrain
         glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
         if (success == 0)
         {
-            switch (type)
-            {
-            case GL_VERTEX_SHADER:
-                result += "--Vertex Shader--\n";
-                break;
-            case GL_FRAGMENT_SHADER:
-                result += "--Fragment Shader--\n";
-                break;
-            }
             GLchar infoLog[512];
             glGetShaderInfoLog(ret, 512, NULL, infoLog);
             result += infoLog;
