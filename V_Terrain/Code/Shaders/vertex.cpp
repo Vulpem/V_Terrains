@@ -7,6 +7,8 @@ out lowp vec3 pos;
 out lowp float fog;
 out lowp vec2 UV;
 
+out lowp float distSqr;
+
 uniform lowp mat4 view_matrix;
 uniform lowp mat4 projection_matrix;
 
@@ -26,8 +28,8 @@ void main()
     pos.y = max(pos.y, water_height);
     vec4 outPos = transform * vec4(pos, 1);
     gl_Position = outPos;
-
-    fog = min((outPos.x * outPos.x + outPos.y * outPos.y + outPos.z * outPos.z) / (fog_distance * fog_distance), 1);
+	distSqr = outPos.x * outPos.x + outPos.y * outPos.y + outPos.z * outPos.z;
+    fog = min( distSqr / (fog_distance * fog_distance), 1);
 
     UV = texCoord;
 }
