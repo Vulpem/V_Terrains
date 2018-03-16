@@ -1,8 +1,9 @@
 #version 330 core
 
-in lowp vec3 pos;
 in lowp float fog;
 in lowp vec2 UV;
+in lowp float poliDensity;
+in lowp float poliMaxDensity;
 
 uniform lowp vec3 global_light_direction;
 
@@ -21,7 +22,6 @@ out vec4 color;
 
 void main()
 {
-
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
     lowp float height = heightmapVal.w * max_height;
@@ -81,5 +81,9 @@ void main()
 	{
 		col *= max(dot(global_light_direction, norm), ambient_min);
 	}
+    else
+    {
+        col = vec3(poliDensity / poliMaxDensity, 0.f, 0.f);
+    }
     color = vec4(mix(col, fog_color, fog), 1.f);
 }
