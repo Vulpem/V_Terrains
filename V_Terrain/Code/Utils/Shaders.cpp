@@ -96,6 +96,9 @@ namespace VTerrain
             {
                 ret.m_program = program;
 
+                ret.attrib_vertex = glGetAttribLocation(program, "position");
+                ret.attrib_UV = glGetAttribLocation(program, "texCoord");
+
                 ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
                 ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
 

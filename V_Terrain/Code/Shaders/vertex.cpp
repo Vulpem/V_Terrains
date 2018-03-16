@@ -1,7 +1,7 @@
 #version 330 core
 
-layout (location = 0) in lowp vec3 position;
-layout (location = 1) in lowp vec2 texCoord;
+in lowp vec3 position;
+in lowp vec2 texCoord;
 
 out lowp vec3 pos;
 out lowp float fog;

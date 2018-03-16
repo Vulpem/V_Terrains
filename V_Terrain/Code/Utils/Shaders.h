@@ -20,6 +20,9 @@ namespace VTerrain
     {
         unsigned int m_program = 0u;
 
+        unsigned int attrib_vertex = 0u;
+        unsigned int attrib_UV = 0u;
+
         unsigned int loc_position = 0u;
         unsigned int loc_texCoord = 0u;
 

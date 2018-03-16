@@ -66,7 +66,7 @@ namespace VTerrain
 
             //
 
-            glPatchParameteri(GL_PATCH_VERTICES, (config.chunkWidth + 1) * (config.chunkHeight + 1));
+            glPatchParameteri(GL_PATCH_VERTICES, (2) * (2));
             glPatchParameteri(GL_PATCH_DEFAULT_OUTER_LEVEL, LOD);
             glPatchParameteri(GL_PATCH_DEFAULT_INNER_LEVEL, LOD);
             //
@@ -117,12 +117,12 @@ namespace VTerrain
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf(drawLOD));
 
             //Vertices
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
-            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(m_shader.attrib_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
+            glEnableVertexAttribArray(m_shader.attrib_vertex);
 
             //UVs
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(m_shader.attrib_UV, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(m_shader.attrib_UV);
 
 			if (config.debug.wiredRender == false)
 			{
