@@ -111,12 +111,13 @@ namespace VTerrain
                 ret.loc_water_height = glGetUniformLocation(program, "water_height");
                 ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
 
+                ret.loc_maxLOD = glGetUniformLocation(program, "maxDensity");
+                ret.loc_LODdistance = glGetUniformLocation(program, "LODDistance");
+
                 ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
 				ret.loc_render_light = glGetUniformLocation(program, "render_light");
 
-                ret.loc_position = 0;
-                ret.loc_texCoord = 1;
             }
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);

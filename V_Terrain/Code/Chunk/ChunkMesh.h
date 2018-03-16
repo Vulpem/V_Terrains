@@ -26,20 +26,20 @@ namespace VTerrain
             void Free();
 
             uint GetMeshBuf() const { return m_dataBuff; }
-            uint GetIndicesBuf(uint LOD) const { return m_indicesBuff.at(LOD); }
-            uint GetNumIndices(uint LOD) const { return m_nIndices.at(LOD); }
+            uint GetIndicesBuf() const { return m_indicesBuff; }
+            uint GetNumIndices() const { return m_nIndices; }
             bool IsGenerated() const { return m_generated; }
         private:
 
             void GenerateMesh();
-            void GenerateIndices(uint LOD);
+            void GenerateIndices();
 
             void FreeMesh();
-            void FreeLOD(uint lod);
+            void FreeIndices();
 
             bool m_bufferGenerated = false;
-            std::map<uint, uint> m_indicesBuff;
-            std::map<uint, uint> m_nIndices;
+            uint m_indicesBuff;
+            uint m_nIndices;
             uint m_dataBuff;
             bool m_generated;
         };

@@ -7,14 +7,14 @@ in lowp vec2 UV[];
 
 out lowp vec2 UVs[];
 patch out lowp float density;
-patch out lowp float maxDensity;
+
+uniform unsigned int maxDensity;
+uniform float LODDistance;
 
 void main(void) {
     if (gl_InvocationID == 0)
     {
-        maxDensity = 40;
-
-        const float inner = max(maxDensity - (dist[0] + dist[1] + dist[2] + dist[3])/1000.f, 1.f);
+        const float inner = max(maxDensity - (dist[0] + dist[1] + dist[2] + dist[3])/LODDistance, 1.f);
         const float outter = inner;
         gl_TessLevelInner[0] = inner;
 		gl_TessLevelInner[1] = inner;

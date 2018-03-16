@@ -28,17 +28,14 @@ namespace VTerrain
     void Mesh::Generate()
     {
         GenerateMesh();
-        for (uint lod = 0; lod < config.nLODs; lod++)
-        {
-            GenerateIndices(lod);
-        }
+        GenerateIndices();
         m_generated = true;
     }
 
     void Mesh::GenerateMesh()
     {
         std::vector<float> data;
-        data.resize((2) * (2) * 5);
+        data.resize((config.chunkHeight + 1) * (config.chunkWidth + 1) * 5);
 
         const float topLeftX = (config.chunkWidth * config.quadSize - (config.chunkWidth % 2 != 0)) / -2.f;
         const float topLeftY = (config.chunkHeight * config.quadSize - (config.chunkHeight % 2 != 0)) / -2.f;
@@ -46,15 +43,15 @@ namespace VTerrain
 
         std::vector<Vec2<float>> UVs;
 
-        for (uint y = 0; y < 2; y++)
+        for (uint y = 0; y < config.chunkHeight + 1; y++)
         {
-            for (uint x = 0; x < 2; x++)
+            for (uint x = 0; x < config.chunkWidth + 1; x++)
             {
-                data[n++] = topLeftX + x * config.quadSize * config.chunkWidth;
+                data[n++] = topLeftX + x * config.quadSize;
                 data[n++] = 0.f;
-                data[n++] = topLeftY + y * config.quadSize * config.chunkHeight;
-				data[n++] = (float)(x);// / (float)(1.f);
-				data[n++] = (float)(y);// / (float)(1.f);
+                data[n++] = topLeftY + y * config.quadSize;
+				data[n++] = (float)(x) / (float)(config.chunkWidth);
+				data[n++] = (float)(y) / (float)(config.chunkHeight);
             }
         }
 
@@ -68,14 +65,14 @@ namespace VTerrain
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void Mesh::GenerateIndices(uint LOD)
+    void Mesh::GenerateIndices()
     {
-        const uint width = 2;
-        const uint height = 2;
+        const uint width = config.chunkWidth + 1;
+        const uint height = config.chunkHeight + 1;
         std::vector<uint> indices(width*height * 6u);
         uint n = 0;
         uint i = 0;
-        uint step = static_cast<uint>(powf(2, static_cast<float>(LOD)));
+        const uint step = 1;
         for (uint y = 0; y < height; y += step)
         {
             i = (width)*y;
@@ -86,24 +83,19 @@ namespace VTerrain
                     indices[n++] = i;
                     indices[n++] = i + (width) * utils::Min(step, height - y);
                     indices[n++] = i + (width) * utils::Min(step, height - y) + utils::Min(step, width - x);
-
-                    indices[n++] = i + (width) * utils::Min(step, height - y) + utils::Min(step, width - x);
                     indices[n++] = i + utils::Min(step, width - x);
-                    indices[n++] = i;
                 }
                 i += step;
             }
         }
-
-		indices = { 0, 2, 3, 1 };
-
-        m_nIndices[LOD] = 4;
-        if (m_indicesBuff.find(LOD) == m_indicesBuff.end())
+        
+        m_nIndices = indices.size();
+        if (m_indicesBuff == 0)
         {
-            glGenBuffers(1, &m_indicesBuff[LOD]);
+            glGenBuffers(1, &m_indicesBuff);
         }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff[LOD]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices[LOD], indices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuff);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * m_nIndices, indices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
@@ -116,14 +108,12 @@ namespace VTerrain
         }
     }
 
-    void Mesh::FreeLOD(uint lod)
+    void Mesh::FreeIndices()
     {
-        auto it = m_indicesBuff.find(lod);
-        if ( it != m_indicesBuff.end())
+        if (m_indicesBuff != 0)
         {
-            glDeleteBuffers(1, &it->second);
-            m_nIndices.erase(it->first);
-            m_indicesBuff.erase(it);
+            glDeleteBuffers(1, &m_indicesBuff);
+            m_indicesBuff = 0;
         }
     }
 
@@ -132,10 +122,7 @@ namespace VTerrain
         if (m_generated)
         {
             FreeMesh();
-            while (m_indicesBuff.size() > 0)
-            {
-                FreeLOD(m_nIndices.begin()->first);
-            }
+            FreeIndices();
             m_generated = false;
         }
     }

@@ -18,7 +18,7 @@
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
-    , m_size(128, 128)
+    , m_size(8, 8)
     , m_frequency(0.8f)
     , m_octaves(8)
     , m_lacunarity(2.0f)
@@ -110,7 +110,8 @@ update_status ModuleTerrain::Update()
         {
             VTerrain::config.debug.LOD = tmpLOD;
         }
-		ImGui::DragFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 0.0f, 100.f);
+        ImGui::SliderInt("Amount of LODs", &(int)VTerrain::config.nLODs, 0, 64);
+		ImGui::SliderFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 10000.f, "%.3f", 2.f);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip(  "Reduce the amount of triangles by a\n"
                                 "power of this value.\n"
@@ -143,7 +144,7 @@ update_status ModuleTerrain::Update()
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
         ImGui::Separator();
         if (ImGui::DragFloat2("Chunk Size", &m_size[0], 1.f, 5.f, 1024.f)) { VTerrain::config.chunkWidth = m_size[0]; VTerrain::config.chunkHeight = m_size[1]; }
-        ImGui::DragFloat("Quad Size", &VTerrain::config.quadSize, 1.f, 0.1f, 48.f);
+        if(ImGui::DragFloat("Quad Size", &VTerrain::config.quadSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
         
 
         ImGui::Separator();

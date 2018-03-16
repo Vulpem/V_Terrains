@@ -50,9 +50,9 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)  const
     {
-        const float dx = x/ (config.chunkWidth / config.noise.frequency);
-        const float dy = y /(config.chunkHeight / config.noise.frequency);
-        return m_heightCurve(m_perlin.octaveNoise0_1(dx, dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
+        const float dx = (config.chunkWidth / config.noise.frequency);
+        const float dy = (config.chunkHeight / config.noise.frequency);
+        return m_heightCurve(m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
     }
     void PerlinNoise::SetCurve(std::function<float(float)> func)
     {

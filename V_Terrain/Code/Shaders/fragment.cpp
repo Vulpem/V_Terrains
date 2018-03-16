@@ -3,7 +3,6 @@
 in lowp float fog;
 in lowp vec2 UV;
 in lowp float poliDensity;
-in lowp float poliMaxDensity;
 
 uniform lowp vec3 global_light_direction;
 
@@ -15,10 +14,27 @@ uniform lowp vec3 fog_color;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
 uniform int render_light;
+uniform unsigned int maxDensity;
 
 uniform lowp sampler2D heightmap;
 
 out vec4 color;
+
+float SteppedScalar(float scalar, int nSteps)
+{
+    return (int(scalar * nSteps) % nSteps) / float(nSteps);
+}
+
+vec3 ScalarToColor (float s)
+{
+    float r = (1 - (s * 0.5));
+    r = SteppedScalar(r, 10);
+    float g = (s);
+    g = SteppedScalar(g, 10);
+    float b = 0.f;
+
+    return vec3(r, g, b);
+}
 
 void main()
 {
@@ -83,7 +99,7 @@ void main()
 	}
     else
     {
-        col = vec3(poliDensity / poliMaxDensity, 0.f, 0.f);
+        col = ScalarToColor(poliDensity / maxDensity);
     }
     color = vec4(mix(col, fog_color, fog), 1.f);
 }

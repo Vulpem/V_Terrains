@@ -3,11 +3,9 @@
 layout(quads, ccw) in;
 in lowp vec2 UVs[];
 patch in lowp float density;
-patch in lowp float maxDensity;
 
 out lowp vec2 UV;
 out lowp float poliDensity;
-out lowp float poliMaxDensity;
 
 uniform lowp mat4 view_matrix;
 uniform lowp mat4 projection_matrix;
@@ -23,7 +21,6 @@ uniform lowp sampler2D heightmap;
 void main(void)
 {
     poliDensity = density;
-    poliMaxDensity = maxDensity;
 
 	UV = mix( mix(UVs[0], UVs[1], gl_TessCoord.x), mix(UVs[3], UVs[2], gl_TessCoord.x), gl_TessCoord.y );
     vec3 position = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x), mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x), gl_TessCoord.y).xyz;
@@ -32,6 +29,6 @@ void main(void)
 	lowp vec4 heightMapVal = texture(heightmap, UV);
 
 	vec3 finalPos = position + position_offset + vec3(0, heightMapVal.w * max_height, 0);
-    finalPos.y = max(finalPos.y, water_height);
+	finalPos.y = max(finalPos.y, water_height);
 	gl_Position = transform * vec4(finalPos, 1);
 }

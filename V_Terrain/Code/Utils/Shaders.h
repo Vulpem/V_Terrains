@@ -23,9 +23,6 @@ namespace VTerrain
         unsigned int attrib_vertex = 0u;
         unsigned int attrib_UV = 0u;
 
-        unsigned int loc_position = 0u;
-        unsigned int loc_texCoord = 0u;
-
         unsigned int loc_view_matrix = 0u;
         unsigned int loc_projection_matrix = 0u;
 
@@ -37,6 +34,9 @@ namespace VTerrain
         unsigned int loc_ambient_color = 0u;
         unsigned int loc_water_color = 0u;
         unsigned int loc_fog_color = 0u;
+
+        unsigned int loc_maxLOD = 0u;
+        unsigned int loc_LODdistance = 0u;
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;
