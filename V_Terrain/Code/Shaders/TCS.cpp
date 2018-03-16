@@ -20,9 +20,6 @@ void main(void) {
         gl_TessLevelOuter[2] = outter;
 		gl_TessLevelOuter[3] = outter;
     }
-	UVs[0] = UV[0];
-	UVs[1] = UV[1];
-	UVs[2] = UV[2];
-	UVs[3] = UV[3];
+	UVs[gl_InvocationID] = UV[gl_InvocationID];
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }
