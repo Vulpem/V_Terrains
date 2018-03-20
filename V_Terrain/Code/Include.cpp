@@ -14,6 +14,7 @@
 
 #include "Utils/Shaders.h"
 #include "Chunk/ChunkManager.h"
+#include "Utils/GenImage.h"
 
 namespace VTerrain
 {
@@ -25,6 +26,9 @@ namespace VTerrain
         std::string result;
         Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
 		assert(Chunk::m_shader.m_program != 0);
+
+        const bool error = GenImage::Init();
+        assert(error);
     }
 
 	void Update(int posX, int posY)
