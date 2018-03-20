@@ -35,23 +35,23 @@ namespace VTerrain
     void Mesh::GenerateMesh()
     {
         std::vector<float> data;
-        data.resize((config.chunkHeight + 1) * (config.chunkWidth + 1) * 5);
+        data.resize(2 * 2 * 5);
 
-        const float topLeftX = (config.chunkWidth * config.quadSize - (config.chunkWidth % 2 != 0)) / -2.f;
-        const float topLeftY = (config.chunkHeight * config.quadSize - (config.chunkHeight % 2 != 0)) / -2.f;
+        const float topLeftX = config.quadSize / -2.f;
+        const float topLeftY = config.quadSize / -2.f;
         uint n = 0;
 
         std::vector<Vec2<float>> UVs;
 
-        for (uint y = 0; y < config.chunkHeight + 1; y++)
+        for (uint y = 0; y < 2; y++)
         {
-            for (uint x = 0; x < config.chunkWidth + 1; x++)
+            for (uint x = 0; x < 2; x++)
             {
                 data[n++] = topLeftX + x * config.quadSize;
                 data[n++] = 0.f;
                 data[n++] = topLeftY + y * config.quadSize;
-				data[n++] = (float)(x) / (float)(config.chunkWidth);
-				data[n++] = (float)(y) / (float)(config.chunkHeight);
+				data[n++] = (float)(x);
+				data[n++] = (float)(y);
             }
         }
 
@@ -67,8 +67,8 @@ namespace VTerrain
 
     void Mesh::GenerateIndices()
     {
-        const uint width = config.chunkWidth + 1;
-        const uint height = config.chunkHeight + 1;
+        const uint width = 2;
+        const uint height = 2;
         std::vector<uint> indices(width*height * 6u);
         uint n = 0;
         uint i = 0;

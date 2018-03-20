@@ -36,8 +36,8 @@ namespace VTerrain
 
     void ChunkManager::Update(int posX, int posY)
     {
-        const int W = static_cast<int>(config.chunkWidth * config.quadSize);
-        const int H = static_cast<int>(config.chunkHeight * config.quadSize);
+        const int W = static_cast<int>(config.quadSize);
+        const int H = static_cast<int>(config.quadSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
