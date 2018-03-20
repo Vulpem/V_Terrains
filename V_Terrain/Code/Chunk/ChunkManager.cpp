@@ -24,7 +24,7 @@ namespace VTerrain
 		, m_lastOffPos(0, 0)
         , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
-        , m_lastFrameChunkSize(0, 0)
+        , m_lastFramechunkHeightmapResolution(0u)
     {
         m_chunks.resize(config.maxChunks);
     }
@@ -36,19 +36,18 @@ namespace VTerrain
 
     void ChunkManager::Update(int posX, int posY)
     {
-        const int W = static_cast<int>(config.quadSize);
-        const int H = static_cast<int>(config.quadSize);
+        const int W = static_cast<int>(config.chunkSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
-            (int)floor((posY - floor(H / 2.f) + (H % 2 != 0)) / H) + 1
+            (int)floor((posY - floor(W / 2.f) + (W % 2 != 0)) / W) + 1
         );
         
 
-        if (m_lastFrameChunkSize != Vec2<int>(config.chunkWidth, config.chunkHeight) || config.quadSize != m_lastFrameQuadSize)
+        if (m_lastFramechunkHeightmapResolution != config.chunkHeightmapResolution || config.chunkSize != m_lastFramechunkSize)
         {
             Chunk::m_mesh.Generate();
-            m_lastFrameChunkSize = Vec2<int>(config.chunkWidth, config.chunkHeight);
-            m_lastFrameQuadSize = config.quadSize;
+            m_lastFramechunkHeightmapResolution = config.chunkHeightmapResolution;
+            m_lastFramechunkSize = config.chunkSize;
         }
 
         while (m_factory.HasGeneratedChunks())

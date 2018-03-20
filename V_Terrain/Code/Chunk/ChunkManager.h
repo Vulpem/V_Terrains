@@ -47,7 +47,7 @@ namespace VTerrain
 
         ChunkFactory m_factory;
 
-        Vec2<int> m_lastFrameChunkSize;
-        float m_lastFrameQuadSize;
+        unsigned int m_lastFramechunkHeightmapResolution;
+        float m_lastFramechunkSize;
     };
 }

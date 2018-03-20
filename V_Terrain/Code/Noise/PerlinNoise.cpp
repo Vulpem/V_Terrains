@@ -31,12 +31,12 @@ namespace VTerrain
 
     NoiseMap PerlinNoise::GenNoiseMap(Vec2<int> offset)  const
     {
-        NoiseMap ret(config.chunkWidth + 3, config.chunkHeight + 3);
+        NoiseMap ret(config.chunkHeightmapResolution + 3, config.chunkHeightmapResolution + 3);
         config.noise.frequency = utils::Clamp(config.noise.frequency, 0.1f, 64.0f);
         config.noise.octaves = utils::Clamp(config.noise.octaves, 1u, 16u);
 
-        const uint startX = -offset.x() * config.chunkWidth - 1u;
-        const uint startY = -offset.y() * config.chunkHeight - 1u;
+        const uint startX = -offset.x() * config.chunkHeightmapResolution - 1u;
+        const uint startY = -offset.y() * config.chunkHeightmapResolution - 1u;
 
         for (uint y = 0; y < ret.Height(); y++)
         {
@@ -50,9 +50,8 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)  const
     {
-        const float dx = (config.chunkWidth / config.noise.frequency);
-        const float dy = (config.chunkHeight / config.noise.frequency);
-        return m_heightCurve(m_perlin.octaveNoise0_1(x / dx, y / dy, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
+        const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
+        return m_heightCurve(m_perlin.octaveNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
     }
     void PerlinNoise::SetCurve(std::function<float(float)> func)
     {

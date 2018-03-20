@@ -18,7 +18,7 @@
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
-    , m_size(8, 8)
+    , m_resolution(32)
     , m_frequency(0.8f)
     , m_octaves(8)
     , m_lacunarity(2.0f)
@@ -87,11 +87,10 @@ update_status ModuleTerrain::Update()
             "Hold shift to move faster.\n"
             "Press space for top view.");
         ImGui::Separator();
-        const int W = static_cast<int>(VTerrain::config.chunkWidth);
-        const int H = static_cast<int>(VTerrain::config.chunkHeight);
+        const int HMresolution = static_cast<int>(VTerrain::config.chunkHeightmapResolution);
         int p[2] = {
-            floor((pos.x - floor(W / 2.f) + (W % 2 != 0)) / W + 1),
-            floor((pos.z - floor(H / 2.f) + (H % 2 != 0)) / H + 1)
+            floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
+            floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
         };
         ImGui::Text("Current chunk:\nX: %i,   Z: %i", p[0], p[1]);
         ImGui::NewLine();
@@ -143,8 +142,8 @@ update_status ModuleTerrain::Update()
         ImGui::Text("Terrain generation:");
         if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
         ImGui::Separator();
-        if (ImGui::DragFloat2("Chunk Size", &m_size[0], 1.f, 5.f, 1024.f)) { VTerrain::config.chunkWidth = m_size[0]; VTerrain::config.chunkHeight = m_size[1]; }
-        if(ImGui::DragFloat("Quad Size", &VTerrain::config.quadSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
+        if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 5, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; }
+        if(ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
         
 
         ImGui::Separator();

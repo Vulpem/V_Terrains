@@ -41,7 +41,7 @@ public:
     float m_lacunarity;
     float m_persistance;
 
-    float2 m_size;
+    int m_resolution;
     std::string m_currentHeightCurve;
 
     float m_maxHeight;
@@ -52,7 +52,7 @@ public:
     int m_curvePow = 1;
     int m_setCurvePow = 1;
 
-    float m_quadSize = 6.f;
+    float m_chunkSize = 256.f;
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;

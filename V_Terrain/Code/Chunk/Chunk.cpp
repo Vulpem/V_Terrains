@@ -87,7 +87,7 @@ namespace VTerrain
             //Projection Matrix
             glUniformMatrix4fv(m_shader.loc_projection_matrix, 1, GL_FALSE, projectionMatrix);
 
-            const float tmp[3] = { m_pos.x() * config.quadSize, 0.f, m_pos.y() * config.quadSize };
+            const float tmp[3] = { m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize };
             glUniform3fv(m_shader.loc_position_offset, 1, tmp);
 
             glUniform1f(m_shader.loc_ambient_color, config.ambientLight);
