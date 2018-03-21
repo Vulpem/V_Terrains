@@ -135,6 +135,7 @@
     <ClInclude Include="Code\Chunk\ChunkFactory.h" />
     <ClInclude Include="Code\Chunk\ChunkManager.h" />
     <ClInclude Include="Code\Chunk\ChunkMesh.h" />
+    <ClInclude Include="Code\Chunk\ConditionalTexture.h" />
     <ClInclude Include="Code\Globals.h" />
     <ClInclude Include="Code\Include.h" />
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h" />

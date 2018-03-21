@@ -25,7 +25,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_persistance (0.4f)
     , m_maxHeight(1000.f)
 	, m_fogDistance(5000.f)
-    , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
+    , m_currentHeightCurve("float func(float x)\n{ return x; }")
     , m_curvePow(2)
     , m_setCurvePow(2)
     , m_openShaderEditor(false)
@@ -34,7 +34,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     VTerrain::SetHeightCurve(
         [](float x)
     {
-        return pow(x,2);
+        return x;
     }
     );
 }
@@ -265,6 +265,25 @@ update_status ModuleTerrain::Update()
             ImGui::Spacing();
             ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
         }
+
+
+		if (ImGui::CollapsingHeader("Textures"))
+		{
+			for (int n = 0; n < 10; n++)
+			{
+				ImGui::Text("Texture N %i", n);
+				VTerrain::ConditionalTexture& tex = VTerrain::GetTexture(n);
+				ImGui::SliderFloat3("Color", tex.color.d, 0.0f, 1.0f);
+				ImGui::SliderFloat("MinHeight", &tex.minHeight, 0.f, m_maxHeight);
+				ImGui::SliderFloat("MaxHeight", &tex.maxHeight, 0.f, m_maxHeight);
+				ImGui::SliderFloat("MinSlope", &tex.minSlope, 0.f, 1.f);
+				ImGui::SliderFloat("MaxSlope", &tex.maxSlope, 0.f, 1.f);
+
+				ImGui::Separator();
+			}
+			ImGui::End();
+		}
+
 		ImGui::End();
     }
 

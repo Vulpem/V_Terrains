@@ -17,19 +17,10 @@
 #include "ChunkMesh.h"
 #include "../Utils/Shaders.h"
 
+#include "ConditionalTexture.h"
+
 namespace VTerrain
 {
-	struct ConditionalTexture
-	{
-		unsigned int buf_diffuse;
-		unsigned int buf_heightmap;
-		Vec3<float> color;
-		float minSlope = 0.f;
-		float maxSlope = 1.f;
-		float minHeight = 0.f;
-		float maxHeight = 0.f;
-	};
-
 	class Chunk
 	{
 	public:

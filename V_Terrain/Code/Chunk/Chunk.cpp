@@ -16,7 +16,6 @@
 #include "../Utils/GenImage.h"
 #include "../ExternalLibs/Glew/include/glew.h"
 
-
 namespace VTerrain
 {
     Shader Chunk::m_shader = Shader();

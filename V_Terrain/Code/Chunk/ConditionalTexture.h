@@ -10,34 +10,20 @@
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
-#ifndef __VTERRAIN_INCLUDE__
-#define __VTERRAIN_INCLUDE__
+#pragma once
 
-#include "TerrainConfig.h"
-
-#include <functional>
-
-#include "Chunk/ConditionalTexture.h"
+#include "../Globals.h"
 
 namespace VTerrain
 {
-   //Global Funcs
-    void Init();
-	void Update(int posX, int posY);
-    void Render(const float * viewMatrix, const float * projectionMatrix);
-    void SetHeightCurve(std::function<float(float)> func);
-	void CleanChunks();
-    void SetSeed(unsigned int seed);
-
-
-    //TMP
-    std::string GetVertexShader();
-    std::string GetFragmentShader();
-    std::string GetTCS();
-    std::string GetTES();
-    std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
-
-	ConditionalTexture& GetTexture(int n);
+	struct ConditionalTexture
+	{
+		unsigned int buf_diffuse;
+		unsigned int buf_heightmap;
+		Vec3<float> color;
+		float minSlope = 0.f;
+		float maxSlope = 1.f;
+		float minHeight = 0.f;
+		float maxHeight = 0.f;
+	};
 }
-
-#endif // !__VTERRAIN_INCLUDE__
