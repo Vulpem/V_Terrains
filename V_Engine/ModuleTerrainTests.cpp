@@ -11,6 +11,7 @@
 #include "ModuleInput.h"
 #include "imGUI\imgui.h"
 
+#include "AllResources.h"
 
 #include "OpenGL.h"
 
@@ -58,6 +59,8 @@ bool ModuleTerrain::Start()
     App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
 
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_maxTexturesGL);
+
 	return ret;
 }
 
@@ -86,6 +89,8 @@ update_status ModuleTerrain::Update()
             "Hold right click to pan.\n"
             "Hold shift to move faster.\n"
             "Press space for top view.");
+        ImGui::Separator();
+        ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
         ImGui::Separator();
         const int HMresolution = static_cast<int>(VTerrain::config.chunkHeightmapResolution);
         int p[2] = {
@@ -271,17 +276,40 @@ update_status ModuleTerrain::Update()
 		{
 			for (int n = 0; n < 10; n++)
 			{
+                char tmp[8];
+                sprintf_s(tmp, "##%i", n);
 				ImGui::Text("Texture N %i", n);
 				VTerrain::ConditionalTexture& tex = VTerrain::GetTexture(n);
-				ImGui::SliderFloat3("Color", tex.color.d, 0.0f, 1.0f);
-				ImGui::SliderFloat("MinHeight", &tex.minHeight, 0.f, m_maxHeight);
-				ImGui::SliderFloat("MaxHeight", &tex.maxHeight, 0.f, m_maxHeight);
-				ImGui::SliderFloat("MinSlope", &tex.minSlope, 0.f, 1.f);
-				ImGui::SliderFloat("MaxSlope", &tex.maxSlope, 0.f, 1.f);
+                ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d);
+				ImGui::SliderFloat((std::string("MinHeight") + tmp).data(),&tex.minHeight, 0.f, m_maxHeight);
+				ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight);
+				ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f);
+				ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f);
+                ImGui::NewLine();
 
+#pragma region AddTexturePopup
+                if (ImGui::BeginPopup((std::string("Add New Texture") + tmp).data()))
+                {
+                    std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+                    std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
+                    for (; fileIt != meshRes.end(); fileIt++)
+                    {
+                        if (ImGui::MenuItem(fileIt->first.data()))
+                        {          
+                            uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
+                            tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID;
+                            break;
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+#pragma endregion
+                if (ImGui::Button((std::string("Add New Texture##AddTextureButton") + tmp).data()))
+                {
+                    ImGui::OpenPopup((std::string("Add New Texture") + tmp).data());
+                }
 				ImGui::Separator();
 			}
-			ImGui::End();
 		}
 
 		ImGui::End();

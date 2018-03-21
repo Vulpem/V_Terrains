@@ -18,9 +18,9 @@ namespace VTerrain
 {
 	struct ConditionalTexture
 	{
-		unsigned int buf_diffuse;
-		unsigned int buf_heightmap;
-		Vec3<float> color;
+		unsigned int buf_diffuse = 0u;
+		unsigned int buf_heightmap = 0u;
+		Vec3<float> color = Vec3<float>(1.f,1.f,1.f);
 		float minSlope = 0.f;
 		float maxSlope = 1.f;
 		float minHeight = 0.f;

@@ -33,6 +33,8 @@ public:
     bool m_openShaderEditor;
     std::string m_shaderResult;
 
+    int m_maxTexturesGL;
+
 	bool m_wantRegen;
 	Timer m_regenTimer;
 

@@ -122,7 +122,7 @@ namespace VTerrain
 				{
 					char val[28];
 					sprintf_s(val, 28, "textures[%i].", n);
-					ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "color").data());
+					ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "diffuse").data());
 					ret.textures[n].loc_heightmap = glGetUniformLocation(program, (std::string(val) + "heightmap").data());
 
 					ret.textures[n].loc_color = glGetUniformLocation(program, (std::string(val) + "color").data());

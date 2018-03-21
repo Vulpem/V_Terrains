@@ -67,7 +67,7 @@ void main()
 				&& slope >= textures[n].minSlope
 				&& slope <= textures[n].maxSlope)
 			{
-				col = textures[n].color;
+				col = textures[n].color * texture(textures[n].diffuse, UV).xyz;
 				break;
 			}
 		}
