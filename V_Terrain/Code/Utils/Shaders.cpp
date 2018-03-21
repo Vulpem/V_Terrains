@@ -122,6 +122,9 @@ namespace VTerrain
 				{
 					char val[28];
 					sprintf_s(val, 28, "textures[%i].", n);
+					ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "color").data());
+					ret.textures[n].loc_heightmap = glGetUniformLocation(program, (std::string(val) + "heightmap").data());
+
 					ret.textures[n].loc_color = glGetUniformLocation(program, (std::string(val) + "color").data());
 					ret.textures[n].loc_minSlope = glGetUniformLocation(program, (std::string(val) + "minSlope").data());
 					ret.textures[n].loc_maxSlope = glGetUniformLocation(program, (std::string(val) + "maxSlope").data());
@@ -129,6 +132,9 @@ namespace VTerrain
 					ret.textures[n].loc_maxHeight = glGetUniformLocation(program, (std::string(val) + "maxHeight").data());
 				}
             }
+
+			ret.loc_heightmap = glGetUniformLocation(program, "heightmap");
+
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);
 

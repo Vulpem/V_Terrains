@@ -95,10 +95,7 @@ namespace VTerrain
 
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
             glEnable(GL_TEXTURE_2D);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
             // ------ Setting uniforms -------------------------
 
@@ -135,8 +132,20 @@ namespace VTerrain
             glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
 			glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
+			glUniform1i(m_shader.loc_heightmap, 0);
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
+
 			for (int n = 0; n < 10; n++)
 			{
+				glUniform1i(m_shader.textures[n].loc_diffuse, n * 2 + 1);
+				glActiveTexture(GL_TEXTURE0 + n*2 + 1);
+				glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
+
+				glUniform1i(m_shader.textures[n].loc_heightmap, n * 2 + 2);
+				glActiveTexture(GL_TEXTURE0 + n * 2 + 2);
+				glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
+
 				glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
 				glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
 				glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);

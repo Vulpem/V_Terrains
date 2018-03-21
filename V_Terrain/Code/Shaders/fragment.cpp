@@ -2,6 +2,8 @@
 
 struct ConditionalTexture
 {
+	lowp sampler2D diffuse;
+	lowp sampler2D heightmap;
 	vec3 color;
 	float minSlope;
 	float maxSlope;
