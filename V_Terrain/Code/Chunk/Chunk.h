@@ -19,6 +19,15 @@
 
 namespace VTerrain
 {
+	struct ConditionalTexture
+	{
+		Vec3<float> color;
+		float minSlope = 0.f;
+		float maxSlope = 1.f;
+		float minHeight = 0.f;
+		float maxHeight = 0.f;
+	};
+
 	class Chunk
 	{
 	public:
@@ -33,6 +42,7 @@ namespace VTerrain
 
 		static Shader m_shader;
 		static Mesh m_mesh;
+		static ConditionalTexture m_textures[10];
 	private:
 		Vec2<int> m_pos;
 		uint m_minLOD;

@@ -1,5 +1,14 @@
 #version 330 core
 
+struct ConditionalTexture
+{
+	vec3 color;
+	float minSlope;
+	float maxSlope;
+	float minHeight;
+	float maxHeight;
+};
+
 in lowp float fog;
 in lowp vec2 UV;
 in lowp float poliDensity;
@@ -17,6 +26,8 @@ uniform int render_light;
 uniform unsigned int maxDensity;
 
 uniform lowp sampler2D heightmap;
+
+uniform ConditionalTexture textures[10];
 
 out vec4 color;
 
@@ -41,11 +52,25 @@ void main()
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
     lowp float height = heightmapVal.w * max_height;
+	lowp float slope = 1.f - norm.y;
 
     lowp vec3 col;
-    //Water
+
     if (render_heightmap == 0)
     {
+		for (int n = 0; n < 10; n++)
+		{
+			if (height >= textures[n].minHeight
+				&& height < textures[n].maxHeight
+				&& slope >= textures[n].minSlope
+				&& slope <= textures[n].maxSlope)
+			{
+				col = textures[n].color;
+				break;
+			}
+		}
+		/*
+		//Water
         if (height <= water_height + water_height * 0.0001f)
         {
             col = water_color;
@@ -82,11 +107,12 @@ void main()
         {
             col = vec3(0.478f, 0.8f, 0.561f);
         }
+		*/
     }
-    else
-    {
-        col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
-    }
+	else
+	{
+		col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
+	}
 
     if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
     {
@@ -101,5 +127,6 @@ void main()
     {
         col = ScalarToColor(poliDensity / maxDensity);
     }
+
     color = vec4(mix(col, fog_color, fog), 1.f);
 }

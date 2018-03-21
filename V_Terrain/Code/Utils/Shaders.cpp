@@ -118,6 +118,16 @@ namespace VTerrain
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
 				ret.loc_render_light = glGetUniformLocation(program, "render_light");
 
+				for (int n = 0; n < 10; n++)
+				{
+					char val[28];
+					sprintf_s(val, 28, "textures[%i].", n);
+					ret.textures[n].loc_color = glGetUniformLocation(program, (std::string(val) + "color").data());
+					ret.textures[n].loc_minSlope = glGetUniformLocation(program, (std::string(val) + "minSlope").data());
+					ret.textures[n].loc_maxSlope = glGetUniformLocation(program, (std::string(val) + "maxSlope").data());
+					ret.textures[n].loc_minHeight = glGetUniformLocation(program, (std::string(val) + "minHeight").data());
+					ret.textures[n].loc_maxHeight = glGetUniformLocation(program, (std::string(val) + "maxHeight").data());
+				}
             }
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);

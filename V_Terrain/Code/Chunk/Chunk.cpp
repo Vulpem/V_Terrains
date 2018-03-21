@@ -21,11 +21,31 @@ namespace VTerrain
 {
     Shader Chunk::m_shader = Shader();
 	Mesh Chunk::m_mesh = Mesh();
+	ConditionalTexture Chunk::m_textures[10];
 
      Chunk::Chunk() :
         m_minLOD(UINT_MAX)
         , m_buf_heightmap(0u)
     {
+
+		 m_textures[0].color = { 1.f,0.f,1.f };
+		 m_textures[0].minHeight = 0.f;
+		 m_textures[0].maxHeight = 100.f;
+		 m_textures[0].minSlope = 0.f;
+		 m_textures[0].maxSlope = 1.f;
+
+		 m_textures[1].color = { 0.f,0.f,1.f };
+		 m_textures[1].minHeight = 0.f;
+		 m_textures[1].maxHeight = 10000.f;
+		 m_textures[1].minSlope = 0.f;
+		 m_textures[1].maxSlope = 0.5f;
+
+		 m_textures[2].color = { 0.f,1.f,0.f };
+		 m_textures[2].minHeight = 0.f;
+		 m_textures[2].maxHeight = 10000.f;
+		 m_textures[2].minSlope = 0.f;
+		 m_textures[2].maxSlope = 1.f;
+
     }
 
     void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
@@ -115,6 +135,14 @@ namespace VTerrain
             glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
 			glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
+			for (int n = 0; n < 10; n++)
+			{
+				glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
+				glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
+				glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);
+				glUniform1f(m_shader.textures[n].loc_minHeight, m_textures[n].minHeight);
+				glUniform1f(m_shader.textures[n].loc_maxHeight, m_textures[n].maxHeight);
+			}
 
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf());
