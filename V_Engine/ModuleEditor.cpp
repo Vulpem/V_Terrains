@@ -15,7 +15,8 @@
 #include "AllComponents.h"
 #include "AllResources.h"
 
-#include "Imgui/imgui_impl_sdl_gl3.h"
+#include "imGUI\imgui_impl_sdl_gl3.h"
+
 #include "OpenGL.h"
 
 
@@ -43,7 +44,7 @@ return ret;
 
 bool ModuleEditor::Start()
 {
-	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
+	//ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
 	App->renderer3D->FindViewPort(0)->active = false;
 
@@ -107,7 +108,7 @@ update_status ModuleEditor::PostUpdate()
 
 	if (IsOpenTestWindow)
 	{
-		ImGui::ShowTestWindow(&IsOpenTestWindow);
+		ImGui::ShowTestWindow();
 	}
 
 	ret = MenuBar();
