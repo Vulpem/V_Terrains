@@ -27,24 +27,6 @@ namespace VTerrain
         , m_buf_heightmap(0u)
     {
 
-		 m_textures[0].color = { 1.f,0.f,1.f };
-		 m_textures[0].minHeight = 0.f;
-		 m_textures[0].maxHeight = 100.f;
-		 m_textures[0].minSlope = 0.f;
-		 m_textures[0].maxSlope = 1.f;
-
-		 m_textures[1].color = { 0.f,0.f,1.f };
-		 m_textures[1].minHeight = 0.f;
-		 m_textures[1].maxHeight = 10000.f;
-		 m_textures[1].minSlope = 0.f;
-		 m_textures[1].maxSlope = 0.5f;
-
-		 m_textures[2].color = { 0.f,1.f,0.f };
-		 m_textures[2].minHeight = 0.f;
-		 m_textures[2].maxHeight = 10000.f;
-		 m_textures[2].minSlope = 0.f;
-		 m_textures[2].maxSlope = 1.f;
-
     }
 
     void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
@@ -57,6 +39,9 @@ namespace VTerrain
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
         m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
+
+
+        glUniform1i(m_shader.loc_heightmap, 0);
     }
 
     void  Chunk::Free()
@@ -68,33 +53,14 @@ namespace VTerrain
         m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD) const
+    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix) const
     {
 		//TODO investigate tesselation
         if (IsLoaded())
         {
-            uint drawLOD = 0;
-            if (IsLODReady(LOD) == false)
-            {
-                drawLOD = m_minLOD;
-            }
-            if (drawLOD >= config.nLODs)
-            {
-                drawLOD = config.nLODs - 1;
-            }
-
-            //
-
-            glPatchParameteri(GL_PATCH_VERTICES, (2) * (2));
-            glPatchParameteri(GL_PATCH_DEFAULT_OUTER_LEVEL, LOD);
-            glPatchParameteri(GL_PATCH_DEFAULT_INNER_LEVEL, LOD);
-            //
+            glPatchParameteri(GL_PATCH_VERTICES, 4);
 
             glUseProgram(m_shader.m_program);
-
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glEnable(GL_TEXTURE_2D);
 
             // ------ Setting uniforms -------------------------
 
@@ -131,25 +97,26 @@ namespace VTerrain
             glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
 			glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
-			glUniform1i(m_shader.loc_heightmap, 0);
 			glActiveTexture(GL_TEXTURE0 + 0);
 			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
             for (int n = 0; n < 10; n++)
             {
                 glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
-                glActiveTexture(GL_TEXTURE1 + n * 2);
-                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
 
                 glUniform1i(m_shader.textures[n].loc_heightmap, (n * 2 + 2));
-                glActiveTexture(GL_TEXTURE1 + n * 2 + 1);
-                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
-
                 glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
                 glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
                 glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);
                 glUniform1f(m_shader.textures[n].loc_minHeight, m_textures[n].minHeight);
                 glUniform1f(m_shader.textures[n].loc_maxHeight, m_textures[n].maxHeight);
+
+
+                glActiveTexture(GL_TEXTURE1 + n * 2);
+                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
+
+                glActiveTexture(GL_TEXTURE1 + n * 2 + 1);
+                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
             }
 
             glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
@@ -183,14 +150,7 @@ namespace VTerrain
 
             glDrawElements(GL_PATCHES, m_mesh.GetNumIndices(), GL_UNSIGNED_INT, (void*)0);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            glPopMatrix();
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glBindTexture(GL_TEXTURE_2D, 0);
-            glDisableClientState(GL_VERTEX_ARRAY);
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
             glUseProgram(0);
         }
@@ -210,4 +170,14 @@ namespace VTerrain
 	{
 		return m_pos;
 	}
+    const ConditionalTexture & Chunk::GetTexture(int n)
+    {
+        return m_textures[n];
+    }
+    void Chunk::SetTexture(int n, const ConditionalTexture & tex)
+    {
+        m_textures[n] = tex;
+
+       
+    }
 }

@@ -28,15 +28,19 @@ namespace VTerrain
 
 		void Regenerate(ChunkFactory::GeneratedChunk base);
 		void Free();
-		void Draw(const float* viewMatrix, const float* projectionMatrix, uint LOD = 0) const;
+		void Draw(const float* viewMatrix, const float* projectionMatrix) const;
 		bool IsLODReady(uint LOD)  const;
 		bool IsLoaded()  const;
 		Vec2<int> GetPos() const;
 
+        static const ConditionalTexture& GetTexture(int n);
+        static void SetTexture(int n, const ConditionalTexture& tex);
+
 		static Shader m_shader;
 		static Mesh m_mesh;
-		static ConditionalTexture m_textures[10];
 	private:
+        static ConditionalTexture m_textures[10];
+
 		Vec2<int> m_pos;
 		uint m_minLOD;
 		uint m_buf_heightmap;

@@ -37,7 +37,8 @@ namespace VTerrain
     std::string GetTES();
     std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
 
-	ConditionalTexture& GetTexture(int n);
+	const ConditionalTexture& GetTexture(int n);
+    void SetTexture(int n, const ConditionalTexture& tex);
 }
 
 #endif // !__VTERRAIN_INCLUDE__

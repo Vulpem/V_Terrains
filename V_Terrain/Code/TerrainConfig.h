@@ -45,7 +45,6 @@ namespace VTerrain
         {
 			bool wiredRender = false;
 			bool renderLight = true;
-            unsigned int LOD = 0;
             bool renderHeightmap = false;
             bool renderChunkBorders = false;
         } debug;

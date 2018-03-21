@@ -109,11 +109,7 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Text("Render:");
         ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
-        int tmpLOD = VTerrain::config.debug.LOD;
-        if (ImGui::SliderInt("LOD", &tmpLOD, 0,VTerrain::config.nLODs - 1))
-        {
-            VTerrain::config.debug.LOD = tmpLOD;
-        }
+       
         ImGui::SliderInt("Amount of LODs", &(int)VTerrain::config.nLODs, 0, 64);
 		ImGui::SliderFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 10000.f, "%.3f", 2.f);
         if (ImGui::IsItemHovered())
@@ -276,15 +272,17 @@ update_status ModuleTerrain::Update()
 		{
 			for (int n = 0; n < 10; n++)
 			{
+                bool changed = false;
                 char tmp[8];
                 sprintf_s(tmp, "##%i", n);
 				ImGui::Text("Texture N %i", n);
-				VTerrain::ConditionalTexture& tex = VTerrain::GetTexture(n);
-                ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d);
-				ImGui::SliderFloat((std::string("MinHeight") + tmp).data(),&tex.minHeight, 0.f, m_maxHeight);
-				ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight);
-				ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f);
-				ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f);
+				VTerrain::ConditionalTexture tex = VTerrain::GetTexture(n);
+                if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d)) { changed = true; }
+                if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(),&tex.minHeight, 0.f, m_maxHeight)) { changed = true; }
+                if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight)) { changed = true; }
+                if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
+                if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
+
                 ImGui::NewLine();
 
 #pragma region AddTexturePopup
@@ -298,6 +296,7 @@ update_status ModuleTerrain::Update()
                         {          
                             uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
                             tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID;
+                            changed = true;
                             break;
                         }
                     }
@@ -307,6 +306,11 @@ update_status ModuleTerrain::Update()
                 if (ImGui::Button((std::string("Add New Texture##AddTextureButton") + tmp).data()))
                 {
                     ImGui::OpenPopup((std::string("Add New Texture") + tmp).data());
+                }
+
+                if (changed)
+                {
+                    VTerrain::SetTexture(n, tex);
                 }
 				ImGui::Separator();
 			}

@@ -89,8 +89,14 @@ namespace VTerrain
         }
         return result;
     }
-	ConditionalTexture& GetTexture(int n)
+
+	const ConditionalTexture& GetTexture(int n)
 	{
-		return Chunk::m_textures[n];
+		return Chunk::GetTexture(n);
 	}
+
+    void SetTexture(int n, const ConditionalTexture & tex)
+    {
+        Chunk::SetTexture(n, tex);
+    }
 }
