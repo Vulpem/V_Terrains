@@ -300,7 +300,7 @@ update_status ModuleTerrain::Update()
 #pragma region AddTexturePopup
                     if (ImGui::BeginPopup((std::string("Set Diffuse") + tmp).data()))
                     {
-						if (ImGui::MenuItem("None"))
+						if (ImGui::MenuItem((std::string("None##DIFF") + tmp).data()))
 						{
 							tex.buf_diffuse = 0;
 							changed = true;
@@ -324,9 +324,9 @@ update_status ModuleTerrain::Update()
 #pragma region AddTexturePopup
                     if (ImGui::BeginPopup((std::string("Set Diff Heightmap") + tmp).data()))
                     {
-						if (ImGui::MenuItem("None"))
+						if (ImGui::MenuItem((std::string("None##HM") + tmp).data()))
 						{
-							tex.buf_diffuse = 0;
+							tex.buf_heightmap = 0;
 							changed = true;
 						}
                         std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
