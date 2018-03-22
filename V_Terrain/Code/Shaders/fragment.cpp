@@ -7,13 +7,14 @@
 #define maxSlope 4
 #define minHeight 5
 #define maxHeight 6
-#define hasTexture 7
+#define sizeMultiplier 7
+#define hasTexture 8
 
 struct ConditionalTexture
 {
     lowp sampler2D diffuse;
     lowp sampler2D heightmap;
-	float[8] data;
+	float[9] data;
 };
 
 in lowp float dist;
@@ -73,8 +74,11 @@ void main()
                 && slope >= textures[n].data[minSlope]
                 && slope <= textures[n].data[maxSlope])
             {
-				vec3 color = vec3(textures[n].data[colorR]);
-                col = color * texture(textures[n].diffuse, UV).xyz;
+				col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
+				if (textures[n].data[hasTexture] != 0.f)
+				{
+					col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+				}
                 break;
             }
         }

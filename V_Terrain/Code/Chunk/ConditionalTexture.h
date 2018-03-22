@@ -16,8 +16,9 @@
 
 namespace VTerrain
 {
-	struct ConditionalTexture
+	class ConditionalTexture
 	{
+	public:
 		enum class val
 		{
 			colorR = 0,
@@ -27,18 +28,27 @@ namespace VTerrain
 			maxSlope = 4,
 			minHeight = 5,
 			maxHeight = 6,
-			hasTexture = 7
+			sizeMultiplier = 7,
+			hasTexture = 8
+
 		};
+		const float* Get() const
+		{
+			float* ret = (float*)color.d;
+			ret[(int)val::hasTexture] = (buf_diffuse != 0 ? 10.f : 0.f);
+			return ret;
+		}
+
 		unsigned int buf_diffuse = 0u;
 		unsigned int buf_heightmap = 0u;
+
 		Vec3<float> color = Vec3<float>(1.f,1.f,1.f);
 		float minSlope = 0.f;
 		float maxSlope = 1.f;
 		float minHeight = 0.f;
 		float maxHeight = 0.f;
-		const float* Get() const
-		{
-			return color.Data();
-		}
+		float sizeMultiplier = 4.f;
+	private:
+		float hasTexture = 0.f;
 	};
 }

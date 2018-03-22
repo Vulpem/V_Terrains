@@ -285,6 +285,7 @@ update_status ModuleTerrain::Update()
                     if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("SizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
 
                     ImGui::NewLine();
 

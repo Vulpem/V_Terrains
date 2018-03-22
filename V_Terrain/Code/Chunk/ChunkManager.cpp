@@ -118,7 +118,7 @@ namespace VTerrain
 
             glUniform1i(m_shader.textures[n].loc_heightmap, (n * 2 + 2));
 
-			glUniform1fv(m_shader.textures[n].data, 8, m_textures[n].Get());
+			glUniform1fv(m_shader.textures[n].data, 9, m_textures[n].Get());
 
             glActiveTexture(GL_TEXTURE1 + n * 2);
             glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
