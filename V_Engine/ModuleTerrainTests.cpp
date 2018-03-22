@@ -402,7 +402,7 @@ void ModuleTerrain::ShaderEditor()
 {
     if (m_openShaderEditor)
     {
-        if (ImGui::Begin("Default Shader Editor", &m_openShaderEditor))
+        if (ImGui::Begin("Default Shader Editor", &m_openShaderEditor, ImGuiWindowFlags_NoCollapse))
         {
             bool recompile = false;
             const uint vertexLen = VTerrain::GetVertexShader().length() + 256;
@@ -418,15 +418,6 @@ void ModuleTerrain::ShaderEditor()
             if (ImGui::CollapsingHeader("Vertex shader"))
             {
                 if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 600)));
-                {
-                    recompile = true;
-                }
-            }
-
-            strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
-            if (ImGui::CollapsingHeader("Fragment shader"))
-            {
-                if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 600)))
                 {
                     recompile = true;
                 }
@@ -449,6 +440,15 @@ void ModuleTerrain::ShaderEditor()
                     recompile = true;
                 }
             }
+
+			strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
+			if (ImGui::CollapsingHeader("Fragment shader"))
+			{
+				if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 600)))
+				{
+					recompile = true;
+				}
+			}
 
             if (recompile)
             {
