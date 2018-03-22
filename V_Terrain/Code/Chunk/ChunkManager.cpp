@@ -24,14 +24,22 @@ namespace VTerrain
 		, m_lastOffPos(0, 0)
         , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
-        , m_lastFramechunkHeightmapResolution(0u)
     {
         m_chunks.resize(config.maxChunks);
     }
 
     ChunkManager::~ChunkManager()
     {
-        Chunk::m_mesh.Free();
+        m_mesh.Free();
+    }
+
+    void ChunkManager::Init()
+    {
+        std::string result;
+        m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
+        assert(m_shader.m_program != 0);
+
+        m_mesh.Generate();
     }
 
     void ChunkManager::Update(int posX, int posY)
@@ -41,14 +49,6 @@ namespace VTerrain
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
             (int)floor((posY - floor(W / 2.f) + (W % 2 != 0)) / W) + 1
         );
-        
-
-        if (m_lastFramechunkHeightmapResolution != config.chunkHeightmapResolution || config.chunkSize != m_lastFramechunkSize)
-        {
-            Chunk::m_mesh.Generate();
-            m_lastFramechunkHeightmapResolution = config.chunkHeightmapResolution;
-            m_lastFramechunkSize = config.chunkSize;
-        }
 
         while (m_factory.HasGeneratedChunks())
         {
@@ -65,10 +65,97 @@ namespace VTerrain
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix) const
     {
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+        glUseProgram(m_shader.m_program);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf());
+
+        //Vertices
+        glVertexAttribPointer(m_shader.attrib_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
+        glEnableVertexAttribArray(m_shader.attrib_vertex);
+
+        //UVs
+        glVertexAttribPointer(m_shader.attrib_UV, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(m_shader.attrib_UV);
+
+        // ------ Setting uniforms -------------------------
+        glUniformMatrix4fv(m_shader.loc_view_matrix, 1, GL_FALSE, viewMatrix);
+
+        //Projection Matrix
+        glUniformMatrix4fv(m_shader.loc_projection_matrix, 1, GL_FALSE, projectionMatrix);
+
+        glUniform1f(m_shader.loc_ambient_color, config.ambientLight);
+
+
+        //Global light direction
+        Vec3<float> dir(config.globalLight[0], config.globalLight[1], config.globalLight[2]);
+        dir.Normalize();
+        glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
+
+        glUniform1f(m_shader.loc_max_height, config.maxHeight);
+
+        glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
+
+        glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
+
+        glUniform3fv(m_shader.loc_water_color, 1, config.waterColor);
+
+        glUniform1f(m_shader.loc_water_height, config.waterHeight);
+
+        glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
+        glUniform1f(m_shader.loc_LODdistance, config.LODdistance);
+
+        glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
+        glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
+        glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
+
+        glUniform1i(m_shader.loc_heightmap, 0);
+        for (int n = 0; n < 10; n++)
+        {
+            glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
+
+            glUniform1i(m_shader.textures[n].loc_heightmap, (n * 2 + 2));
+            glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
+            glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
+            glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);
+            glUniform1f(m_shader.textures[n].loc_minHeight, m_textures[n].minHeight);
+            glUniform1f(m_shader.textures[n].loc_maxHeight, m_textures[n].maxHeight);
+
+
+            glActiveTexture(GL_TEXTURE1 + n * 2);
+            glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
+
+            glActiveTexture(GL_TEXTURE1 + n * 2 + 1);
+            glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
+        }
+
+        if (config.debug.wiredRender == false)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
+        if (config.singleSidedFaces)
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
+        }
+
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
-				it->Draw(viewMatrix, projectionMatrix);
+            it->Draw(m_shader);
         }
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glUseProgram(0);
     }
 
     void ChunkManager::CleanChunks()

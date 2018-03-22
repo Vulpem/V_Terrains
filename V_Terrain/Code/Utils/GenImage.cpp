@@ -25,7 +25,7 @@
 
 namespace VTerrain
 {
-    bool GenImage::Init()
+    void GenImage::Init()
     {
         ilInit();
 
@@ -35,11 +35,9 @@ namespace VTerrain
         {
             printf("Devil Error (ilInit: %s\n", iluErrorString(devilError));
             assert(false);
-            return false;
         }
 
         ilutRenderer(ILUT_OPENGL);
-        return true;
     }
     unsigned int GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
     {

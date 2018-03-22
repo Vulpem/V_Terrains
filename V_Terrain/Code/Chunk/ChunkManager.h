@@ -25,12 +25,17 @@ namespace VTerrain
         ChunkManager();
         ~ChunkManager();
 
+        void Init();
+
         void Update(int posX, int posY);
         void Render(const float* viewMatrix, const float* projectionMatrix) const;
         void CleanChunks();
 
         void SetHeightCurve(std::function<float(float)> func);
         void SetSeed(uint seed);
+
+        ConditionalTexture m_textures[10];
+        Shader m_shader;
     private:
         void AddChunksToRegen(Vec2<int> pos);
         bool AddChunkToRegen(Vec2<int> pos);	
@@ -47,7 +52,6 @@ namespace VTerrain
 
         ChunkFactory m_factory;
 
-        unsigned int m_lastFramechunkHeightmapResolution;
-        float m_lastFramechunkSize;
+        Mesh m_mesh;
     };
 }

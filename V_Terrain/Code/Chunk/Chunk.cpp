@@ -18,10 +18,6 @@
 
 namespace VTerrain
 {
-    Shader Chunk::m_shader = Shader();
-	Mesh Chunk::m_mesh = Mesh();
-	ConditionalTexture Chunk::m_textures[10];
-
      Chunk::Chunk() :
         m_minLOD(UINT_MAX)
         , m_buf_heightmap(0u)
@@ -39,9 +35,6 @@ namespace VTerrain
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
         m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
-
-
-        glUniform1i(m_shader.loc_heightmap, 0);
     }
 
     void  Chunk::Free()
@@ -53,106 +46,18 @@ namespace VTerrain
         m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const float* viewMatrix, const float* projectionMatrix) const
+    void  Chunk::Draw(const Shader& shader) const
     {
 		//TODO investigate tesselation
         if (IsLoaded())
         {
-            glPatchParameteri(GL_PATCH_VERTICES, 4);
-
-            glUseProgram(m_shader.m_program);
-
-            // ------ Setting uniforms -------------------------
-
-            glUniformMatrix4fv(m_shader.loc_view_matrix, 1, GL_FALSE, viewMatrix);
-
-            //Projection Matrix
-            glUniformMatrix4fv(m_shader.loc_projection_matrix, 1, GL_FALSE, projectionMatrix);
-
             const float tmp[3] = { m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize };
-            glUniform3fv(m_shader.loc_position_offset, 1, tmp);
+            glUniform3fv(shader.loc_position_offset, 1, tmp);
 
-            glUniform1f(m_shader.loc_ambient_color, config.ambientLight);
-
-
-            //Global light direction
-            Vec3<float> dir(config.globalLight[0], config.globalLight[1], config.globalLight[2]);
-            dir.Normalize();
-            glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
-
-            glUniform1f(m_shader.loc_max_height, config.maxHeight);
-
-		    glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
-
-			glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
-
-			glUniform3fv(m_shader.loc_water_color, 1, config.waterColor);
-
-			glUniform1f(m_shader.loc_water_height, config.waterHeight);
-
-            glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
-            glUniform1f(m_shader.loc_LODdistance, config.LODdistance);
-
-            glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
-            glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
-			glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
-
-			glActiveTexture(GL_TEXTURE0 + 0);
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
-            for (int n = 0; n < 10; n++)
-            {
-                glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
-
-                glUniform1i(m_shader.textures[n].loc_heightmap, (n * 2 + 2));
-                glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
-                glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
-                glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);
-                glUniform1f(m_shader.textures[n].loc_minHeight, m_textures[n].minHeight);
-                glUniform1f(m_shader.textures[n].loc_maxHeight, m_textures[n].maxHeight);
-
-
-                glActiveTexture(GL_TEXTURE1 + n * 2);
-                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
-
-                glActiveTexture(GL_TEXTURE1 + n * 2 + 1);
-                glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
-            }
-
-            glBindBuffer(GL_ARRAY_BUFFER, m_mesh.GetMeshBuf());
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mesh.GetIndicesBuf());
-
-            //Vertices
-            glVertexAttribPointer(m_shader.attrib_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
-            glEnableVertexAttribArray(m_shader.attrib_vertex);
-
-            //UVs
-            glVertexAttribPointer(m_shader.attrib_UV, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(m_shader.attrib_UV);
-
-			if (config.debug.wiredRender == false)
-			{
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			}
-			else
-			{
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			}
-
-			if (config.singleSidedFaces)
-			{
-				glEnable(GL_CULL_FACE);
-			}
-			else
-			{
-				glDisable(GL_CULL_FACE);
-			}
-
-            glDrawElements(GL_PATCHES, m_mesh.GetNumIndices(), GL_UNSIGNED_INT, (void*)0);
-
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-            glUseProgram(0);
+            glDrawElements(GL_PATCHES, 6/*nIndices*/, GL_UNSIGNED_INT, (void*)0);
         }
     }
 
@@ -170,14 +75,4 @@ namespace VTerrain
 	{
 		return m_pos;
 	}
-    const ConditionalTexture & Chunk::GetTexture(int n)
-    {
-        return m_textures[n];
-    }
-    void Chunk::SetTexture(int n, const ConditionalTexture & tex)
-    {
-        m_textures[n] = tex;
-
-       
-    }
 }

@@ -23,12 +23,8 @@ namespace VTerrain
 
     void Init()
     {
-        std::string result;
-        Chunk::m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
-		assert(Chunk::m_shader.m_program != 0);
-
-        const bool error = GenImage::Init();
-        assert(error);
+        chunkManager.Init();
+        GenImage::Init();
     }
 
 	void Update(int posX, int posY)
@@ -85,18 +81,18 @@ namespace VTerrain
         Shader shader = Shaders::CompileShader(vert, frag, TCS, TES, result);
         if (shader.m_program != 0)
         {
-            Chunk::m_shader = shader;
+            chunkManager.m_shader = shader;
         }
         return result;
     }
 
 	const ConditionalTexture& GetTexture(int n)
 	{
-		return Chunk::GetTexture(n);
+		return chunkManager.m_textures[n];
 	}
 
     void SetTexture(int n, const ConditionalTexture & tex)
     {
-        Chunk::SetTexture(n, tex);
+        chunkManager.m_textures[n] = tex;
     }
 }

@@ -19,7 +19,7 @@ namespace VTerrain
     class GenImage
     {
     public:
-        static bool Init();
+        static void Init();
         static unsigned int FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h);
         static unsigned int FromRGBA(const std::vector<float>& color, unsigned int w, unsigned int h);
         static unsigned int FromPath(const std::string& path);

@@ -68,7 +68,7 @@ namespace VTerrain
     {
         const uint width = 2;
         const uint height = 2;
-        std::vector<uint> indices(width*height * 6u);
+        std::vector<uint> indices((width - 1)*(height - 1) * 6u);
         uint n = 0;
         uint i = 0;
         const uint step = 1;
