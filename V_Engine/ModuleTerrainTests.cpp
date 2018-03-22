@@ -107,167 +107,164 @@ update_status ModuleTerrain::Update()
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::Separator();
-        ImGui::Text("Render:");
-        ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
-       
-        ImGui::SliderInt("Amount of LODs", &(int)VTerrain::config.nLODs, 0, 64);
-		ImGui::SliderFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 10000.f, "%.3f", 2.f);
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(  "Reduce the amount of triangles by a\n"
-                                "power of this value.\n"
-                                "If set to 0, they're set automatically\n"
-                                "from distance to camera.");
+		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
+		if (ImGui::CollapsingHeader("Render"))
+		{
+			ImGui::SliderInt("Amount of LODs", &(int)VTerrain::config.nLODs, 0, 64);
+			ImGui::SliderFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 10000.f, "%.3f", 2.f);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Reduce the amount of triangles by a\n"
+					"power of this value.\n"
+					"If set to 0, they're set automatically\n"
+					"from distance to camera.");
 
-		ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
-		ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight);
-        ImGui::NewLine();
-        ImGui::Text("Global light:");
-        bool lightDirChanged = false;
-        if (ImGui::SliderFloat("Direction", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
-        if (ImGui::SliderFloat("Height", &m_globalLightHeight, -90, 90)) { lightDirChanged = true; }
+			ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
+			ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight);
+			ImGui::NewLine();
+			ImGui::Text("Global light:");
+			bool lightDirChanged = false;
+			if (ImGui::SliderFloat("Direction", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
+			if (ImGui::SliderFloat("Height", &m_globalLightHeight, -90, 90)) { lightDirChanged = true; }
 
-        if (lightDirChanged)
-        {
-            float3 tmp(1.f, 0.f, 0.f);
-            Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight * DEGTORAD, 0.f);
-            tmp = rot * tmp;
-            VTerrain::config.globalLight[0] = tmp.x;
-            VTerrain::config.globalLight[1] = tmp.y;
-            VTerrain::config.globalLight[2] = tmp.z;
-        }
+			if (lightDirChanged)
+			{
+				float3 tmp(1.f, 0.f, 0.f);
+				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight * DEGTORAD, 0.f);
+				tmp = rot * tmp;
+				VTerrain::config.globalLight[0] = tmp.x;
+				VTerrain::config.globalLight[1] = tmp.y;
+				VTerrain::config.globalLight[2] = tmp.z;
+			}
 
-        ImGui::DragFloat3("Light vector", VTerrain::config.globalLight);
-        ImGui::NewLine();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Text("Terrain generation:");
-        if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
-        ImGui::Separator();
-        if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 5, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; }
-        if(ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
-        
-
-        ImGui::Separator();
-
-        if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.0001f, 2.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Frequency", &m_frequency, 0.01f, 0.0001f, 2.f)) { WantRegen(); }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(
-                "Wavelength of the noise generation.\n"
-                "Will reset all chunks.");
-        ImGui::Separator();
-
-        if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 15)) { WantRegen(); }
-        if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 15)) { WantRegen(); }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(
-                "Amount of noisemaps generated and\n"
-                "overlapped to generate the final result.\n"
-                "Will reset all chunks.");
-        ImGui::Separator();
-
-        if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.01f, 8.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.01f, 0.01f, 8.f)) { WantRegen(); }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(
-                "Octave frequency multiplier.\n"
-                "Will reset all chunks.");
-        ImGui::Separator();
-
-        if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
-        if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(
-                "Strength multiplier for each octave.\n"
-                "Will reset all chunks.");
-        ImGui::Separator();
-        if (ImGui::BeginMenu("Set Height Curve"))
-        {
-            ImGui::InputInt("P", &m_curvePow);
-            ImGui::Text("Functions:");
-            ImGui::Separator();
-            if (ImGui::MenuItem(
-                "float func (float x)\n"
-                "{ return x; }"
-            ))
-            {
-                m_currentHeightCurve =
-                    "float func (float x)\n"
-                    "{ return x; }";
-                VTerrain::SetHeightCurve([](float x) {return x;});
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem(
-                "float func(float x)\n"
-                "{ return pow(x, P); }"
-            ))
-            {
-                m_setCurvePow = m_curvePow;
-                m_currentHeightCurve =
-                    "float func(float x)\n"
-                    "{ return pow(x, %i); }";
-                int n = m_curvePow;
-                VTerrain::SetHeightCurve([n](float x) {return pow(x, n);});
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem(
-                "float func(float x)\n"
-                "{\n"
-                "   x = x * 2.f - 1.f;\n"
-                "   return (pow(x, P) + 1.f) * 0.5f;\n"
-                "}"
-            ))
-            {
-                m_setCurvePow = m_curvePow;
-                m_currentHeightCurve =
-                    "float func(float x)\n"
-                    "{\n"
-                    "   x = x * 2.f - 1.f;\n"
-                    "   return (pow(x, %i) + 1.f) * 0.5f;\n"
-                    "}";
-                int n = m_curvePow;
-                VTerrain::SetHeightCurve([n](float x)
-                {
-                    x = x * 2.f - 1.f;
-                    return (pow(x, n) + 1.f) * 0.5f;
-                });
-            }
-
-            ImGui::EndMenu();
-        }
-        ImGui::Separator();
-        ImGui::Text(m_currentHeightCurve.data(), m_setCurvePow);
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(
-                "Function that will be applied to.\n"
-                "all heightmap pixels.\n"
-                "Recieves a value from 0 to 1 and\n"
-                "returns another one in the same range.\n"
-                "Will reset all chunks.");
-
-        ImGui::NewLine();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Text("Debug visualization:");
-
-        if (ImGui::Button("Reset Camera Height"))
-        {
-            float3 pos = App->camera->GetDefaultCam()->GetPosition();
-            App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
-        }
-        ImGui::Checkbox("Chunk Borders", &VTerrain::config.debug.renderChunkBorders);
-
-        if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
-        {
-            App->Editor->SwitchViewPorts();
-        }
-        if (App->Editor->multipleViews)
-        {
-            ImGui::Spacing();
-            ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
-        }
+			ImGui::DragFloat3("Light vector", VTerrain::config.globalLight);
+			ImGui::NewLine();
+		}
+		if (ImGui::CollapsingHeader("Terrain generation"))
+		{
+			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
+			ImGui::Separator();
+			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 5, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; }
+			if (ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
 
 
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.0001f, 2.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Frequency", &m_frequency, 0.01f, 0.0001f, 2.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Wavelength of the noise generation.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 15)) { WantRegen(); }
+			if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 15)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Amount of noisemaps generated and\n"
+					"overlapped to generate the final result.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.01f, 8.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.01f, 0.01f, 8.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Octave frequency multiplier.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Strength multiplier for each octave.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+			if (ImGui::BeginMenu("Set Height Curve"))
+			{
+				ImGui::InputInt("P", &m_curvePow);
+				ImGui::Text("Functions:");
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func (float x)\n"
+					"{ return x; }"
+				))
+				{
+					m_currentHeightCurve =
+						"float func (float x)\n"
+						"{ return x; }";
+					VTerrain::SetHeightCurve([](float x) {return x; });
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func(float x)\n"
+					"{ return pow(x, P); }"
+				))
+				{
+					m_setCurvePow = m_curvePow;
+					m_currentHeightCurve =
+						"float func(float x)\n"
+						"{ return pow(x, %i); }";
+					int n = m_curvePow;
+					VTerrain::SetHeightCurve([n](float x) {return pow(x, n); });
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func(float x)\n"
+					"{\n"
+					"   x = x * 2.f - 1.f;\n"
+					"   return (pow(x, P) + 1.f) * 0.5f;\n"
+					"}"
+				))
+				{
+					m_setCurvePow = m_curvePow;
+					m_currentHeightCurve =
+						"float func(float x)\n"
+						"{\n"
+						"   x = x * 2.f - 1.f;\n"
+						"   return (pow(x, %i) + 1.f) * 0.5f;\n"
+						"}";
+					int n = m_curvePow;
+					VTerrain::SetHeightCurve([n](float x)
+					{
+						x = x * 2.f - 1.f;
+						return (pow(x, n) + 1.f) * 0.5f;
+					});
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::Separator();
+			ImGui::Text(m_currentHeightCurve.data(), m_setCurvePow);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Function that will be applied to.\n"
+					"all heightmap pixels.\n"
+					"Recieves a value from 0 to 1 and\n"
+					"returns another one in the same range.\n"
+					"Will reset all chunks.");
+		}
+		if (ImGui::CollapsingHeader("Debug visualization"))
+		{
+			if (ImGui::Button("Reset Camera Height"))
+			{
+				float3 pos = App->camera->GetDefaultCam()->GetPosition();
+				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+			}
+			ImGui::Checkbox("Chunk Borders", &VTerrain::config.debug.renderChunkBorders);
+
+			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
+			{
+				App->Editor->SwitchViewPorts();
+			}
+			if (App->Editor->multipleViews)
+			{
+				ImGui::Spacing();
+				ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
+			}
+
+		}
 		if (ImGui::CollapsingHeader("Textures"))
 		{
 			for (int n = 0; n < 10; n++)
