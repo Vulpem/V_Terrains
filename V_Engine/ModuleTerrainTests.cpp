@@ -269,14 +269,19 @@ update_status ModuleTerrain::Update()
 		{
 			for (int n = 0; n < 10; n++)
 			{
-                
+				VTerrain::ConditionalTexture tex = VTerrain::GetTexture(n);
                 bool changed = false;
                 char tmp[8];
                 sprintf_s(tmp, "##%i", n);
 
+				ImGui::ColorButton(tmp, ImVec4(tex.color.x(), tex.color.y(), tex.color.z(), 1.f));
+				ImGui::SameLine();
+				ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(20, 20));
+				ImGui::SameLine();
+				ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(20, 20));
+				ImGui::SameLine();
                 if (ImGui::BeginMenu((std::string("Texture ") + tmp).data()))
                 {
-                    VTerrain::ConditionalTexture tex = VTerrain::GetTexture(n);
                     if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, m_maxHeight)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight)) { changed = true; }
