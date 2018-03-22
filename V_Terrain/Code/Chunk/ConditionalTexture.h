@@ -22,16 +22,16 @@ namespace VTerrain
 		enum class val
 		{
 			colorR = 0,
-			colorG = 1,
-			colorB = 2,
-			minSlope = 3,
-			maxSlope = 4,
-			minHeight = 5,
-			maxHeight = 6,
-			sizeMultiplier = 7,
-			hasTexture = 8,
-			heightFade = 9,
-			slopeFade = 10
+			colorG,
+			colorB,
+			minSlope,
+			maxSlope,
+			minHeight,
+			maxHeight,
+			sizeMultiplier,
+			heightFade,
+			slopeFade,
+			hasTexture
 		};
 		const float* Get() const
 		{

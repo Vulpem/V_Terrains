@@ -8,9 +8,9 @@
 #define minHeight 5
 #define maxHeight 6
 #define sizeMultiplier 7
-#define hasTexture 8
-#define heightFade 9
-#define slopeFade 10
+#define heightFade 8
+#define slopeFade 9
+#define hasTexture 10
 
 struct ConditionalTexture
 {
