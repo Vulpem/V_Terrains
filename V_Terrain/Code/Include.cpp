@@ -24,7 +24,6 @@ namespace VTerrain
     void Init()
     {
         chunkManager.Init();
-        GenImage::Init();
     }
 
 	void Update(int posX, int posY)

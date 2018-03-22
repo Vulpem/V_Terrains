@@ -15,30 +15,8 @@
 
 #include "../ExternalLibs/Glew/include/glew.h"
 
-#include "../ExternalLibs/Devil/include/il.h"
-#include "../ExternalLibs/Devil/include/ilu.h"
-#include "../ExternalLibs/Devil/include/ilut.h"
-
-#pragma comment(lib, "Devil/libx86/DevIL.lib")
-#pragma comment(lib, "Devil/libx86/ILU.lib")
-#pragma comment(lib, "Devil/libx86/ILUT.lib")
-
 namespace VTerrain
 {
-    void GenImage::Init()
-    {
-        ilInit();
-
-        ILuint devilError = ilGetError();
-
-        if (devilError != IL_NO_ERROR)
-        {
-            printf("Devil Error (ilInit: %s\n", iluErrorString(devilError));
-            assert(false);
-        }
-
-        ilutRenderer(ILUT_OPENGL);
-    }
     unsigned int GenImage::FromRGB(const std::vector<float>& color, unsigned int w, unsigned int h)
     {
         unsigned int ret = 0;
@@ -69,15 +47,6 @@ namespace VTerrain
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_FLOAT, color.data());
 
         return ret;
-    }
-
-    unsigned int GenImage::FromPath(const std::string & path)
-    {
-        char filePath[1024];
-        strcpy_s(filePath, path.size(), path.data());
-        unsigned int ID = ilutGLLoadImage(filePath);
-        assert(ID != 0);
-        return ID;
     }
 
     void GenImage::FreeImage(unsigned int& buffer)
