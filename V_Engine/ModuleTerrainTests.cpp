@@ -286,7 +286,7 @@ update_status ModuleTerrain::Update()
                 ImGui::NewLine();
 
 #pragma region AddTexturePopup
-                if (ImGui::BeginPopup((std::string("Add New Texture") + tmp).data()))
+                if (ImGui::BeginPopup((std::string("Set Diffuse") + tmp).data()))
                 {
                     std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
                     std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
@@ -303,9 +303,32 @@ update_status ModuleTerrain::Update()
                     ImGui::EndPopup();
                 }
 #pragma endregion
-                if (ImGui::Button((std::string("Add New Texture##AddTextureButton") + tmp).data()))
+                if (ImGui::Button((std::string("Set Diffuse##AddTextureButton") + tmp).data()))
                 {
-                    ImGui::OpenPopup((std::string("Add New Texture") + tmp).data());
+                    ImGui::OpenPopup((std::string("Set Diffuse") + tmp).data());
+                }
+
+#pragma region AddTexturePopup
+                if (ImGui::BeginPopup((std::string("Set Diff Heightmap") + tmp).data()))
+                {
+                    std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+                    std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
+                    for (; fileIt != meshRes.end(); fileIt++)
+                    {
+                        if (ImGui::MenuItem(fileIt->first.data()))
+                        {
+                            uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
+                            tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID;
+                            changed = true;
+                            break;
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+#pragma endregion
+                if (ImGui::Button((std::string("Set Diff Heightmap##AddTextureButton") + tmp).data()))
+                {
+                    ImGui::OpenPopup((std::string("Set Diff Heightmap") + tmp).data());
                 }
 
                 if (changed)
