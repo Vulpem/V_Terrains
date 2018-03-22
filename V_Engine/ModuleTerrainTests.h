@@ -23,6 +23,8 @@ public:
 
 	void Render(const viewPort& port) override;
 
+	void SetDefaultTextures();
+
     void GenMap();
 	void WantRegen();
     void ShaderEditor();
