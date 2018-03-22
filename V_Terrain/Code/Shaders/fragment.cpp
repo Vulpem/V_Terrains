@@ -2,16 +2,16 @@
 
 struct ConditionalTexture
 {
-	lowp sampler2D diffuse;
-	lowp sampler2D heightmap;
-	vec3 color;
-	float minSlope;
-	float maxSlope;
-	float minHeight;
-	float maxHeight;
+    lowp sampler2D diffuse;
+    lowp sampler2D heightmap;
+    vec3 color;
+    float minSlope;
+    float maxSlope;
+    float minHeight;
+    float maxHeight;
 };
 
-in lowp float fog;
+in lowp float dist;
 in lowp vec2 UV;
 in lowp float poliDensity;
 
@@ -22,6 +22,7 @@ uniform lowp float max_height;
 uniform lowp float water_height;
 uniform lowp vec3 water_color;
 uniform lowp vec3 fog_color;
+uniform lowp float fog_distance;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
 uniform int render_light;
@@ -38,7 +39,7 @@ float SteppedScalar(float scalar, int nSteps)
     return (int(scalar * nSteps) % nSteps) / float(nSteps);
 }
 
-vec3 ScalarToColor (float s)
+vec3 ScalarToColor(float s)
 {
     float r = (1 - (s * 0.5));
     r = SteppedScalar(r, 10);
@@ -54,23 +55,46 @@ void main()
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
     lowp float height = heightmapVal.w * max_height;
-	lowp float slope = 1.f - norm.y;
+    lowp float slope = 1.f - norm.y;
 
     lowp vec3 col;
 
     if (render_heightmap == 0)
     {
-		for (int n = 0; n < 10; n++)
-		{
-			if (height >= textures[n].minHeight
-				&& height < textures[n].maxHeight
-				&& slope >= textures[n].minSlope
-				&& slope <= textures[n].maxSlope)
-			{
-				col = textures[n].color * texture(textures[n].diffuse, UV).xyz;
-				break;
-			}
-		}
+        for (int n = 0; n < 10; n++)
+        {
+            if (height >= textures[n].minHeight
+                && height < textures[n].maxHeight
+                && slope >= textures[n].minSlope
+                && slope <= textures[n].maxSlope)
+            {
+                col = textures[n].color * texture(textures[n].diffuse, UV).xyz;
+                break;
+            }
+        }
+    }
+    else
+    {
+        col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
+    }
+
+    if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
+    {
+        col = vec3(1.f, 1.f, 1.f);
+    }
+
+    if (render_light != 0)
+    {
+        col *= max(dot(global_light_direction, norm), ambient_min);
+    }
+    else
+    {
+        col = ScalarToColor(poliDensity / maxDensity);
+    }
+
+    color = vec4(mix(col, fog_color, min((dist*dist) / (fog_distance*fog_distance), 1.f)), 1.f);
+}
+
 		/*
 		//Water
         if (height <= water_height + water_height * 0.0001f)
@@ -110,25 +134,3 @@ void main()
             col = vec3(0.478f, 0.8f, 0.561f);
         }
 		*/
-    }
-	else
-	{
-		col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
-	}
-
-    if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
-    {
-        col = vec3(1.f, 1.f, 1.f);
-    }
-
-	if (render_light != 0)
-	{
-		col *= max(dot(global_light_direction, norm), ambient_min);
-	}
-    else
-    {
-        col = ScalarToColor(poliDensity / maxDensity);
-    }
-
-    color = vec4(mix(col, fog_color, fog), 1.f);
-}
