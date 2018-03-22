@@ -283,13 +283,17 @@ update_status ModuleTerrain::Update()
                 if (ImGui::BeginMenu((std::string("Texture ") + tmp).data()))
                 {
                     if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d)) { changed = true; }
+					ImGui::Separator();
                     if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, m_maxHeight)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("HeightFadeDistance") + tmp).data(), &tex.heightFade, 0.f, 200.f)) { changed = true; }
+					ImGui::Separator();
                     if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
-					if (ImGui::SliderFloat((std::string("SizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
-
-                    ImGui::NewLine();
+					if (ImGui::SliderFloat((std::string("SlopeFadeDistance") + tmp).data(), &tex.slopeFade, 0.f, 1.f)) { changed = true; }
+					ImGui::Separator();
+					if (ImGui::SliderFloat((std::string("TextureSizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
+					ImGui::Separator();
 
 #pragma region AddTexturePopup
                     if (ImGui::BeginPopup((std::string("Set Diffuse") + tmp).data()))

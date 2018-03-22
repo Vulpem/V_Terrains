@@ -29,8 +29,9 @@ namespace VTerrain
 			minHeight = 5,
 			maxHeight = 6,
 			sizeMultiplier = 7,
-			hasTexture = 8
-
+			hasTexture = 8,
+			heightFade = 9,
+			slopeFade = 10
 		};
 		const float* Get() const
 		{
@@ -48,6 +49,8 @@ namespace VTerrain
 		float minHeight = 0.f;
 		float maxHeight = 0.f;
 		float sizeMultiplier = 4.f;
+		float heightFade = 10.f;
+		float slopeFade = 0.01f;
 	private:
 		float hasTexture = 0.f;
 	};

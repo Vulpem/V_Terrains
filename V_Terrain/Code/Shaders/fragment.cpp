@@ -9,12 +9,14 @@
 #define maxHeight 6
 #define sizeMultiplier 7
 #define hasTexture 8
+#define heightFade 9
+#define slopeFade 10
 
 struct ConditionalTexture
 {
     lowp sampler2D diffuse;
     lowp sampler2D heightmap;
-	float[9] data;
+	float[11] data;
 };
 
 in lowp float dist;
