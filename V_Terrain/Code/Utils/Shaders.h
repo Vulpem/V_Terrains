@@ -46,11 +46,7 @@ namespace VTerrain
 		{
 			unsigned int loc_diffuse = 0u;
 			unsigned int loc_heightmap = 0u;
-			unsigned int loc_color = 0u;
-			unsigned int loc_minSlope = 0u;
-			unsigned int loc_maxSlope = 0u;
-			unsigned int loc_minHeight = 0u;
-			unsigned int loc_maxHeight = 0u;
+			unsigned int data = 0u;
 		}textures[10];
 
 		unsigned int loc_heightmap = 0u;

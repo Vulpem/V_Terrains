@@ -1,14 +1,19 @@
 #version 330 core
 
+#define colorR 0
+#define colorG 1
+#define colorB 2
+#define minSlope 3
+#define maxSlope 4
+#define minHeight 5
+#define maxHeight 6
+#define hasTexture 7
+
 struct ConditionalTexture
 {
     lowp sampler2D diffuse;
     lowp sampler2D heightmap;
-    vec3 color;
-    float minSlope;
-    float maxSlope;
-    float minHeight;
-    float maxHeight;
+	float[8] data;
 };
 
 in lowp float dist;
@@ -63,12 +68,13 @@ void main()
     {
         for (int n = 0; n < 10; n++)
         {
-            if (height >= textures[n].minHeight
-                && height < textures[n].maxHeight
-                && slope >= textures[n].minSlope
-                && slope <= textures[n].maxSlope)
+            if (height >= textures[n].data[minHeight]
+                && height < textures[n].data[maxHeight]
+                && slope >= textures[n].data[minSlope]
+                && slope <= textures[n].data[maxSlope])
             {
-                col = textures[n].color * texture(textures[n].diffuse, UV).xyz;
+				vec3 color = vec3(textures[n].data[colorR]);
+                col = color * texture(textures[n].diffuse, UV).xyz;
                 break;
             }
         }

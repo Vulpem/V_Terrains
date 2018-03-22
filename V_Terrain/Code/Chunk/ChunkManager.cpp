@@ -117,12 +117,8 @@ namespace VTerrain
             glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
 
             glUniform1i(m_shader.textures[n].loc_heightmap, (n * 2 + 2));
-            glUniform3fv(m_shader.textures[n].loc_color, 1, m_textures[n].color.Data());
-            glUniform1f(m_shader.textures[n].loc_minSlope, m_textures[n].minSlope);
-            glUniform1f(m_shader.textures[n].loc_maxSlope, m_textures[n].maxSlope);
-            glUniform1f(m_shader.textures[n].loc_minHeight, m_textures[n].minHeight);
-            glUniform1f(m_shader.textures[n].loc_maxHeight, m_textures[n].maxHeight);
 
+			glUniform1fv(m_shader.textures[n].data, 8, m_textures[n].Get());
 
             glActiveTexture(GL_TEXTURE1 + n * 2);
             glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
