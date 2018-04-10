@@ -36,7 +36,7 @@ namespace VTerrain
         unsigned int loc_fog_color = 0u;
 
         unsigned int loc_maxLOD = 0u;
-        unsigned int loc_LODdistance = 0u;
+        unsigned int loc_tesselationDensity = 0u;
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;
