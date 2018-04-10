@@ -42,15 +42,6 @@ namespace VTerrain
         {
             vertexShader = Compile(vertexBuf, GL_VERTEX_SHADER, result);
         }
-        unsigned int fragmentShader = 0;
-        if (fragmentBuf == nullptr)
-        {
-            fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER, result);
-        }
-        else
-        {
-            fragmentShader = Compile(fragmentBuf, GL_FRAGMENT_SHADER, result);
-        }
 
         unsigned int TCS = 0;
         if (TCSbuf == nullptr)
@@ -70,6 +61,16 @@ namespace VTerrain
         else
         {
             TES = Compile(TESbuf, GL_TESS_EVALUATION_SHADER, result);
+        }
+
+        unsigned int fragmentShader = 0;
+        if (fragmentBuf == nullptr)
+        {
+            fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER, result);
+        }
+        else
+        {
+            fragmentShader = Compile(fragmentBuf, GL_FRAGMENT_SHADER, result);
         }
 
         if (fragmentShader != 0 && vertexShader != 0 && TCS != 0 && TES != 0)
@@ -182,6 +183,21 @@ namespace VTerrain
         glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
         if (success == 0)
         {
+            switch (type)
+            {
+            case GL_VERTEX_SHADER:
+                result += "-- Vertex Shader -- \n";
+                break;
+            case GL_FRAGMENT_SHADER:
+                result += "-- Fragment Shader -- \n";
+                break;
+            case GL_TESS_CONTROL_SHADER:
+                result += "-- TCS Shader -- \n";
+                break;
+            case GL_TESS_EVALUATION_SHADER:
+                result += "-- TES Shader -- \n";
+                break;
+            }
             GLchar infoLog[512];
             glGetShaderInfoLog(ret, 512, NULL, infoLog);
             result += infoLog;

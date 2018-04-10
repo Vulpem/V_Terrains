@@ -62,7 +62,6 @@ void main()
 {
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
-    lowp float height = heightmapVal.w * max_height;
     lowp float slope = 1.f - norm.y;
 
     lowp vec3 col;
@@ -71,8 +70,8 @@ void main()
     {
         for (int n = 0; n < 10; n++)
         {
-            if (height >= textures[n].data[minHeight]
-                && height < textures[n].data[maxHeight]
+            if (heightmapVal.w >= textures[n].data[minHeight]
+                && heightmapVal.w < textures[n].data[maxHeight]
                 && slope >= textures[n].data[minSlope]
                 && slope <= textures[n].data[maxSlope])
             {

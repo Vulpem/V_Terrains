@@ -48,22 +48,21 @@ namespace VTerrain
 
     void  Chunk::Draw(const Shader& shader, const Vec3<float>& cameraPos) const
     {
-		//TODO investigate tesselation
         if (IsLoaded())
         {
             const float tmp[3] = { m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize };
             glUniform3fv(shader.loc_position_offset, 1, tmp);
 
 
-			//TODO
+			//TODO: improve this nonsense
 			int density[6];
-			density[0] = utils::Max(1u, config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0], tmp[1], tmp[2])).Length() / config.LODdistance));
+			density[0] = utils::Max(1,          (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],                   tmp[1], tmp[2]  )).Length() / config.LODdistance));
 			density[1] = density[0];
 
-			density[2] = utils::Max(1u, config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).Length() / config.LODdistance));
-			density[3] = utils::Max(1u, config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize, tmp[1], tmp[2]						)).Length() / config.LODdistance));
-			density[4] = utils::Max(1u, config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).Length() / config.LODdistance));
-			density[5] = utils::Max(1u, config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize, tmp[1], tmp[2]						)).Length() / config.LODdistance));
+			density[2] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).Length() / config.LODdistance));
+			density[3] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize,tmp[1], tmp[2]						)).Length() / config.LODdistance));
+			density[4] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).Length() / config.LODdistance));
+			density[5] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize,tmp[1], tmp[2]						)).Length() / config.LODdistance));
 
 			glUniform1iv(shader.loc_tesselationDensity, 6, density);
 
