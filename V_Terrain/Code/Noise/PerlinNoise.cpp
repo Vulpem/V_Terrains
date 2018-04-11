@@ -38,11 +38,17 @@ namespace VTerrain
         const uint startX = -offset.x() * config.chunkHeightmapResolution - 1u;
         const uint startY = -offset.y() * config.chunkHeightmapResolution - 1u;
 
+		//TODO remove this test thingies
+		static float min = 1000;
+		static float max = -1000;
         for (uint y = 0; y < ret.Height(); y++)
         {
             for (uint x = 0; x < ret.Width(); x++)
             {
                 ret[x + y * ret.Width()] = GetValue(x + startX, y + startY);
+				if (ret[x + y * ret.Width()] < min) { min = ret[x + y * ret.Width()]; }
+				if (ret[x + y * ret.Width()] > max) { max = ret[x + y * ret.Width()]; }
+
             }
         }
         return ret;
@@ -50,7 +56,7 @@ namespace VTerrain
 
     float PerlinNoise::GetValue(int x, int y)  const
     {
-        const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
+		const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
         return m_heightCurve(m_perlin.octaveNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
     }
     void PerlinNoise::SetCurve(std::function<float(float)> func)

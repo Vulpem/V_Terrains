@@ -187,7 +187,7 @@ namespace siv
 
         float octaveNoise0_1(float x, float y, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
-            return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5f + 0.5f;
+           return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5f + 0.5f;
         }
 
         float octaveNoise0_1(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
@@ -208,22 +208,27 @@ namespace siv
 
 		std::function<double(double, double)> Basis = [=](double x, double y) { return (double)this->noise0_1((float)x, (float)y); };
 
-		double fBm(double x, double y, double H, double lacunarity, int32_t octaves)
+		double fBm(double x, double y, double H, double lacunarity, int32_t octaves) const
 		{
-#define MAX_OCTAVES 64
-			double value, frequency, remainder;
-			int i;
-			bool first = true;
+#define MAX_OCTAVES 17
+			double value;
+			static bool first = true;
+			static double lastH, lastLacunarity;
 			static double exponent_array[MAX_OCTAVES];
+			int i;
+
 			/* precompute and store spectral weights */
-			if (first) {
-				frequency = 1.0;
+			if (first || lastH != H || lastLacunarity != lacunarity)
+			{
+				double frequency = 1.0;
 				for (i = 0; i<MAX_OCTAVES; i++) {
 					/* compute weight for each frequency */
 					exponent_array[i] = pow(frequency, -H);
 					frequency *= lacunarity;
 				}
 				first = false;
+				lastH = H;
+				lastLacunarity = lacunarity;
 			}
 			value = 0.0;
 			/* inner loop of spectral construction */
@@ -232,11 +237,11 @@ namespace siv
 				x *= lacunarity;
 				y *= lacunarity;
 			} /* for */
-			remainder = octaves - (int)octaves;
+			double remainder = octaves - (int)octaves;
 			if (remainder) /* add in "octaves" remainder */
 						   /* "i" and spatial freq. are preset in loop above */
 				value += remainder * Basis(x,y) * exponent_array[i];
-			return(value);
+			return(value / 3.0);
 		} /* fBm() */
 
 
@@ -247,11 +252,10 @@ namespace siv
 		  * H: 0.25
 		  * distortion: 0.3
 		  */
-		double WarpedFBm(double x, double y, double H, double lacunarity, double octaves, double distortion)
+		double WarpedFBm(double x, double y, double H = 0.25, double lacunarity = 2.0, int32_t octaves = 8, double distortion = 0.3) const
 		{
 			double Noise3();
 			double tmpX, tmpY, distortX, distortY;
-			int i;
 			/* compute distortion vector */
 			tmpX = x;
 			tmpY = y;
