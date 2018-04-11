@@ -94,7 +94,7 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
         ImGui::Separator();
-        const int HMresolution = static_cast<int>(VTerrain::config.chunkHeightmapResolution);
+        const int HMresolution = static_cast<int>(VTerrain::config.chunkSize);
         int p[2] = {
             floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
             floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
