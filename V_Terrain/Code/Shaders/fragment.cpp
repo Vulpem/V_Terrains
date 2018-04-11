@@ -21,7 +21,6 @@ struct ConditionalTexture
 
 in lowp float dist;
 in lowp vec2 UV;
-in lowp float poliDensity;
 
 uniform lowp vec3 global_light_direction;
 

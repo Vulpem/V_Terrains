@@ -176,6 +176,20 @@ namespace VTerrain
         GLint success;
 
         ret = glCreateShader(type);
+
+		if (ret == 0)
+		{
+			GLenum err = glGetError();
+			while (err != 0)
+			{
+				const GLubyte* errorString = glewGetErrorString(err);
+				result += "\n";
+				result += (char*)errorString;
+				err = glGetError();
+			}
+			assert(ret != 0);
+		}
+
         const char* tmp = code.c_str();
         glShaderSource(ret, 1, &tmp, NULL);
         glCompileShader(ret);
