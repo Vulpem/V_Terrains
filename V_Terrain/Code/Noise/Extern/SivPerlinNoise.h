@@ -30,6 +30,7 @@
 # include <numeric>
 # include <algorithm>
 # include <random>
+#include <functional>
 
 namespace siv
 {
@@ -193,5 +194,76 @@ namespace siv
         {
             return octaveNoise(x, y, z, octaves, lacunarity, persistance) * 0.5f + 0.5f;
         }
+
+		//https://www.classes.cs.uchicago.edu/archive/2015/fall/23700-1/final-project/MusgraveTerrain00.pdf
+
+		   /* Procedural fBm evaluated at "point"; returns value stored in "value".
+			*
+			* Parameters:
+		    *"H" is the fractal increment
+			* "lacunarity" is the gap between successive frequencies
+			* "octaves" is the number of frequencies in the fBm
+			* "Basis()" is usually Perlin noise
+			*/
+
+		std::function<double(double, double)> Basis = [=](double x, double y) { return (double)this->noise0_1((float)x, (float)y); };
+
+		double fBm(double x, double y, double H, double lacunarity, int32_t octaves)
+		{
+#define MAX_OCTAVES 64
+			double value, frequency, remainder;
+			int i;
+			bool first = true;
+			static double exponent_array[MAX_OCTAVES];
+			/* precompute and store spectral weights */
+			if (first) {
+				frequency = 1.0;
+				for (i = 0; i<MAX_OCTAVES; i++) {
+					/* compute weight for each frequency */
+					exponent_array[i] = pow(frequency, -H);
+					frequency *= lacunarity;
+				}
+				first = false;
+			}
+			value = 0.0;
+			/* inner loop of spectral construction */
+			for (i = 0; i<octaves; i++) {
+				value += Basis(x,y) * exponent_array[i];
+				x *= lacunarity;
+				y *= lacunarity;
+			} /* for */
+			remainder = octaves - (int)octaves;
+			if (remainder) /* add in "octaves" remainder */
+						   /* "i" and spatial freq. are preset in loop above */
+				value += remainder * Basis(x,y) * exponent_array[i];
+			return(value);
+		} /* fBm() */
+
+
+		  /* Domain-distorted fBm.
+		  *
+		  * Some good parameter values to start with:
+		  *
+		  * H: 0.25
+		  * distortion: 0.3
+		  */
+		double WarpedFBm(double x, double y, double H, double lacunarity, double octaves, double distortion)
+		{
+			double Noise3();
+			double tmpX, tmpY, distortX, distortY;
+			int i;
+			/* compute distortion vector */
+			tmpX = x;
+			tmpY = y;
+			distortX = fBm(tmpX, tmpY, H, lacunarity, octaves);
+			tmpX += 10.5;
+			tmpY += 10.5;
+			distortY = fBm(tmpX, tmpY, H, lacunarity, octaves);
+
+			/* add distortion to sample point */
+			x += distortion * distortX;
+			y += distortion * distortY;
+			return(fBm(x, y, H, lacunarity, octaves));
+		} /* WarpedFBm() */
     };
 }
