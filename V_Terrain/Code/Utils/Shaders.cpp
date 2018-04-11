@@ -32,7 +32,6 @@ namespace VTerrain
         GLint success;
         Shader ret;
 
-        //TODO customizable
         unsigned int vertexShader = 0;
         if (vertexBuf == nullptr)
         {

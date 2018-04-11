@@ -55,14 +55,15 @@ namespace VTerrain
 
 
 			//TODO: improve this nonsense
+			const float distSqr = config.LODdistance * config.LODdistance;
 			int density[6];
-			density[0] = utils::Max(1,          (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],                   tmp[1], tmp[2]  )).Length() / config.LODdistance));
+			density[0] = utils::Max(1,          (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],                   tmp[1], tmp[2]  )).LengthSqr() / distSqr));
 			density[1] = density[0];
 
-			density[2] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).Length() / config.LODdistance));
-			density[3] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize,tmp[1], tmp[2]						)).Length() / config.LODdistance));
-			density[4] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).Length() / config.LODdistance));
-			density[5] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize,tmp[1], tmp[2]						)).Length() / config.LODdistance));
+			density[2] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).LengthSqr() / distSqr));
+			density[3] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
+			density[4] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).LengthSqr() / distSqr));
+			density[5] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
 
 			glUniform1iv(shader.loc_tesselationDensity, 6, density);
 
