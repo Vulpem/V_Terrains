@@ -2,11 +2,9 @@
 
 layout(quads, ccw) in;
 in lowp vec2 UVs[];
-patch in lowp float density;
 in lowp float distance[];
 
 out lowp vec2 UV;
-out lowp float poliDensity;
 out lowp float dist;
 
 uniform lowp mat4 view_matrix;
@@ -22,8 +20,6 @@ uniform lowp sampler2D heightmap;
 
 void main(void)
 {
-    poliDensity = density;
-
     dist = mix(mix(distance[0], distance[1], gl_TessCoord.x), mix(distance[3], distance[2], gl_TessCoord.x), gl_TessCoord.y);
     UV = mix(mix(UVs[0], UVs[1], gl_TessCoord.x), mix(UVs[3], UVs[2], gl_TessCoord.x), gl_TessCoord.y);
     vec3 position = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x), mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x), gl_TessCoord.y).xyz;

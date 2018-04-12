@@ -46,13 +46,27 @@ namespace VTerrain
         m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const Shader& shader) const
+    void  Chunk::Draw(const Shader& shader, const Vec3<float>& cameraPos) const
     {
-		//TODO investigate tesselation
         if (IsLoaded())
         {
             const float tmp[3] = { m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize };
             glUniform3fv(shader.loc_position_offset, 1, tmp);
+
+
+			//TODO: improve this nonsense
+			const float distSqr = config.LODdistance * config.LODdistance;
+			int density[6];
+			density[0] = utils::Max(1,          (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],                   tmp[1], tmp[2]  )).LengthSqr() / distSqr));
+			density[1] = density[0];
+
+			density[2] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).LengthSqr() / distSqr));
+			density[3] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
+			density[4] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).LengthSqr() / distSqr));
+			density[5] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
+
+			glUniform1iv(shader.loc_tesselationDensity, 6, density);
+
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);

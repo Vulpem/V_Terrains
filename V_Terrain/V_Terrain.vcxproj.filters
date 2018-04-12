@@ -96,5 +96,17 @@
     <ClCompile Include="Code\Chunk\ChunkManager.cpp">
       <Filter>Source Files\Chunk</Filter>
     </ClCompile>
+    <ClCompile Include="Code\Shaders\TCS.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Shaders\TES.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Shaders\vertex.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Shaders\fragment.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -30,6 +30,7 @@
 # include <numeric>
 # include <algorithm>
 # include <random>
+#include <functional>
 
 namespace siv
 {
@@ -186,12 +187,87 @@ namespace siv
 
         float octaveNoise0_1(float x, float y, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
-            return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5f + 0.5f;
+           return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5f + 0.5f;
         }
 
         float octaveNoise0_1(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
             return octaveNoise(x, y, z, octaves, lacunarity, persistance) * 0.5f + 0.5f;
         }
+
+		//https://www.classes.cs.uchicago.edu/archive/2015/fall/23700-1/final-project/MusgraveTerrain00.pdf
+
+		   /* Procedural fBm evaluated at "point"; returns value stored in "value".
+			*
+			* Parameters:
+		    *"H" is the fractal increment
+			* "lacunarity" is the gap between successive frequencies
+			* "octaves" is the number of frequencies in the fBm
+			* "Basis()" is usually Perlin noise
+			*/
+
+		std::function<double(double, double)> Basis = [=](double x, double y) { return (double)this->noise0_1((float)x, (float)y); };
+
+		double fBm(double x, double y, double H, double lacunarity, int32_t octaves) const
+		{
+#define MAX_OCTAVES 17
+			double value;
+			static bool first = true;
+			static double lastH, lastLacunarity;
+			static double exponent_array[MAX_OCTAVES];
+			int i;
+
+			/* precompute and store spectral weights */
+			if (first || lastH != H || lastLacunarity != lacunarity)
+			{
+				double frequency = 1.0;
+				for (i = 0; i<MAX_OCTAVES; i++) {
+					/* compute weight for each frequency */
+					exponent_array[i] = pow(frequency, -H);
+					frequency *= lacunarity;
+				}
+				first = false;
+				lastH = H;
+				lastLacunarity = lacunarity;
+			}
+			value = 0.0;
+			/* inner loop of spectral construction */
+			for (i = 0; i<octaves; i++) {
+				value += Basis(x,y) * exponent_array[i];
+				x *= lacunarity;
+				y *= lacunarity;
+			} /* for */
+			double remainder = octaves - (int)octaves;
+			if (remainder) /* add in "octaves" remainder */
+						   /* "i" and spatial freq. are preset in loop above */
+				value += remainder * Basis(x,y) * exponent_array[i];
+			return(value / 3.0);
+		} /* fBm() */
+
+
+		  /* Domain-distorted fBm.
+		  *
+		  * Some good parameter values to start with:
+		  *
+		  * H: 0.25
+		  * distortion: 0.3
+		  */
+		double WarpedFBm(double x, double y, double H = 0.25, double lacunarity = 2.0, int32_t octaves = 8, double distortion = 0.3) const
+		{
+			double Noise3();
+			double tmpX, tmpY, distortX, distortY;
+			/* compute distortion vector */
+			tmpX = x;
+			tmpY = y;
+			distortX = fBm(tmpX, tmpY, H, lacunarity, octaves);
+			tmpX += 10.5;
+			tmpY += 10.5;
+			distortY = fBm(tmpX, tmpY, H, lacunarity, octaves);
+
+			/* add distortion to sample point */
+			x += distortion * distortX;
+			y += distortion * distortY;
+			return(fBm(x, y, H, lacunarity, octaves));
+		} /* WarpedFBm() */
     };
 }

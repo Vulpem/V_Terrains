@@ -105,7 +105,6 @@ namespace VTerrain
         glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
         glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
-        glUniform1f(m_shader.loc_LODdistance, config.LODdistance);
 
         glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
         glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
@@ -145,9 +144,21 @@ namespace VTerrain
             glDisable(GL_CULL_FACE);
         }
 
+        const float r[9] = {    viewMatrix[0], viewMatrix[1], viewMatrix[2],
+                                viewMatrix[4], viewMatrix[5], viewMatrix[6],
+                                viewMatrix[8], viewMatrix[9], viewMatrix[10]};
+        const float p[3] = {    viewMatrix[12], viewMatrix[13], viewMatrix[14] };
+
+
+        Vec3<float> cameraPos = Vec3<float>(
+            p[0] * r[0] + p[1] * r[1] + p[2] * r[2],
+            p[0] * r[3] + p[1] * r[4] + p[2] * r[5],
+            p[0] * r[6] + p[1] * r[7] + p[2] * r[8]
+            );
+
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
-            it->Draw(m_shader);
+            it->Draw(m_shader, cameraPos * -1);
         }
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

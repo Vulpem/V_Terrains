@@ -94,7 +94,7 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
         ImGui::Separator();
-        const int HMresolution = static_cast<int>(VTerrain::config.chunkHeightmapResolution);
+        const int HMresolution = static_cast<int>(VTerrain::config.chunkSize);
         int p[2] = {
             floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
             floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
@@ -286,9 +286,9 @@ update_status ModuleTerrain::Update()
                 {
                     if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d)) { changed = true; }
 					ImGui::Separator();
-                    if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, m_maxHeight)) { changed = true; }
-                    if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, m_maxHeight)) { changed = true; }
-					if (ImGui::SliderFloat((std::string("HeightFadeDistance") + tmp).data(), &tex.heightFade, 0.f, 200.f)) { changed = true; }
+                    if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, 1.0f)) { changed = true; }
+                    if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, 1.0f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("HeightFadeDistance") + tmp).data(), &tex.heightFade, 0.f, 1.0f)) { changed = true; }
 					ImGui::Separator();
                     if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
@@ -405,123 +405,123 @@ void ModuleTerrain::Render(const viewPort & port)
 
 void ModuleTerrain::SetDefaultTextures()
 {
-	VTerrain::ConditionalTexture tex;
-	uint64_t UID;
-	//Water
-	tex.minHeight = 0.f;
-	tex.maxHeight = 285.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.f;
-	tex.maxSlope = 1.f;
-	tex.slopeFade = 0.f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_water", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_water_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(0, tex);
+    VTerrain::ConditionalTexture tex;
+    uint64_t UID;
+    //Water
+    tex.minHeight = 0.f;
+    tex.maxHeight = 0.285f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.f;
+    tex.maxSlope = 1.f;
+    tex.slopeFade = 0.f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_water", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_water_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(0, tex);
 
-	//Sand
-	tex.minHeight = 0.f;
-	tex.maxHeight = 319.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.f;
-	tex.maxSlope = 1.f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_sand", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_sand_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(1, tex);
+    //Sand
+    tex.minHeight = 0.f;
+    tex.maxHeight = 0.319f;
+    tex.heightFade = 0.01f;
+    tex.minSlope = 0.f;
+    tex.maxSlope = 1.f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_sand", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_sand_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(1, tex);
 
-	//Grass
-	tex.color = VTerrain::Vec3<float>(108.f / 255.f, 136.f / 255.f, 177.f / 255.f);
-	tex.minHeight = 45.f;
-	tex.maxHeight = 550.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.28f;
-	tex.maxSlope = 0.82f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(4, tex);
+    //Grass
+    tex.color = VTerrain::Vec3<float>(108.f / 255.f, 136.f / 255.f, 177.f / 255.f);
+    tex.minHeight = 0.045f;
+    tex.maxHeight = 0.550f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.28f;
+    tex.maxSlope = 0.82f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(4, tex);
 
-	//Gravel
-	tex.color = VTerrain::Vec3<float>(158.f / 255.f, 255.f / 255.f, 0.f / 255.f);
-	tex.minHeight = 0.f;
-	tex.maxHeight = 520.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.28f;
-	tex.maxSlope = 0.882f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_gravel", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_gravel_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(5, tex);
+    //Gravel
+    tex.color = VTerrain::Vec3<float>(158.f / 255.f, 255.f / 255.f, 0.f / 255.f);
+    tex.minHeight = 0.f;
+    tex.maxHeight = 0.520f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.28f;
+    tex.maxSlope = 0.882f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_gravel", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_gravel_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(5, tex);
 
-	//GreyRock
-	tex.color = VTerrain::Vec3<float>(122.f / 255.f, 122.f / 255.f, 122.f / 255.f);
-	tex.minHeight = 742.f;
-	tex.maxHeight = 1000.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.87f;
-	tex.maxSlope = 0.95f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(6, tex);
+    //GreyRock
+    tex.color = VTerrain::Vec3<float>(122.f / 255.f, 122.f / 255.f, 122.f / 255.f);
+    tex.minHeight = 0.742f;
+    tex.maxHeight = 1.f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.87f;
+    tex.maxSlope = 0.95f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(6, tex);
 
-	//Snow
-	tex.color = VTerrain::Vec3<float>(1.f,1.f,1.f);
-	tex.minHeight = 618.f;
-	tex.maxHeight = 1000.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.f;
-	tex.maxSlope = 0.88f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_snow", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_snow_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(7, tex);
+    //Snow
+    tex.color = VTerrain::Vec3<float>(1.f, 1.f, 1.f);
+    tex.minHeight = 0.618f;
+    tex.maxHeight = 1.f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.f;
+    tex.maxSlope = 0.88f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_snow", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_snow_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(7, tex);
 
-	//Grey rock
-	tex.minHeight = 0.f;
-	tex.maxHeight = 1000.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.954f;
-	tex.maxSlope = 1.f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(8, tex);
+    //Grey rock
+    tex.minHeight = 0.f;
+    tex.maxHeight = 1.f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.954f;
+    tex.maxSlope = 1.f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(8, tex);
 
-	//Grass
-	tex.minHeight = 0.f;
-	tex.maxHeight = 1000.f;
-	tex.heightFade = 10.f;
-	tex.minSlope = 0.0f;
-	tex.maxSlope = 1.f;
-	tex.slopeFade = 0.05f;
-	tex.sizeMultiplier = 4.f;
-	UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
-	if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-	VTerrain::SetTexture(9, tex);
+    //Grass
+    tex.minHeight = 0.f;
+    tex.maxHeight = 1.f;
+    tex.heightFade = 0.010f;
+    tex.minSlope = 0.0f;
+    tex.maxSlope = 1.f;
+    tex.slopeFade = 0.05f;
+    tex.sizeMultiplier = 4.f;
+    UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
+    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
+    VTerrain::SetTexture(9, tex);
 }
 
 void ModuleTerrain::GenMap()
