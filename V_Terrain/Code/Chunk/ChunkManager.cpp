@@ -94,8 +94,6 @@ namespace VTerrain
         dir.Normalize();
         glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
 
-        glUniform1f(m_shader.loc_max_height, config.maxHeight);
-
         glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
 
         glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);

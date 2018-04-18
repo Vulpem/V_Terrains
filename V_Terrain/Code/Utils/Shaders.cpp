@@ -101,10 +101,9 @@ namespace VTerrain
 
                 ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
                 ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
-
-                ret.loc_position_offset = glGetUniformLocation(program, "position_offset");
+				ret.loc_model_matrix = glGetUniformLocation(program, "model_matrix");
+;
                 ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
-                ret.loc_max_height = glGetUniformLocation(program, "max_height");
                 ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
                 ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
                 ret.loc_water_color = glGetUniformLocation(program, "water_color");
