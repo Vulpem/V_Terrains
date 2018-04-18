@@ -50,28 +50,34 @@ namespace VTerrain
     {
         if (IsLoaded())
         {
-            const float tmp[3] = { m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize };
-            glUniform3fv(shader.loc_position_offset, 1, tmp);
+            const Vec3<float> chunkPos( m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize );
 
+			const float modelMatrix[] =
+			{
+				config.chunkSize,	0,					0,					0,
+				0,					config.maxHeight,	0,					0,
+				0,					0,					config.chunkSize,	0,
+				chunkPos.x(),		chunkPos.y(),		chunkPos.z(),		1
+			};
+
+			glUniformMatrix4fv(shader.loc_model_matrix, 1, GL_FALSE, modelMatrix);
 
 			//TODO: improve this nonsense
-			const float distSqr = config.LODdistance * config.LODdistance;
 			int density[6];
-			density[0] = utils::Max(1,          (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],                   tmp[1], tmp[2]  )).LengthSqr() / distSqr));
+			density[0] = GetDensity(cameraPos, chunkPos.x(), chunkPos.z());
 			density[1] = density[0];
 
-			density[2] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] - config.chunkSize	)).LengthSqr() / distSqr));
-			density[3] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] - config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
-			density[4] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0],					tmp[1], tmp[2] + config.chunkSize	)).LengthSqr() / distSqr));
-			density[5] = utils::Max(density[0], (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(tmp[0] + config.chunkSize,tmp[1], tmp[2]						)).LengthSqr() / distSqr));
+			density[2] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x(),						chunkPos.z() - config.chunkSize	));
+			density[3] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x() - config.chunkSize,	chunkPos.z()					));
+			density[4] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x(),						chunkPos.z() + config.chunkSize	));
+			density[5] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x() + config.chunkSize,	chunkPos.z()					));
 
 			glUniform1iv(shader.loc_tesselationDensity, 6, density);
-
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
-            glDrawElements(GL_PATCHES, 6/*nIndices*/, GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_PATCHES, 4/*nIndices*/, GL_UNSIGNED_INT, (void*)0);
         }
     }
 
@@ -88,5 +94,10 @@ namespace VTerrain
 	Vec2<int> Chunk::GetPos() const
 	{
 		return m_pos;
+	}
+
+	int Chunk::GetDensity(const Vec3<float>& cameraPos, float chunkX, float chunkZ)
+	{
+		return utils::Max(1, (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(chunkX, 0.f, chunkZ)).Length() / config.LODdistance));
 	}
 }

@@ -8,8 +8,6 @@ in lowp vec2 UV[];
 out lowp vec2 UVs[];
 out lowp float distance[];
 
-uniform lowp vec3 position_offset;
-
 uniform int tesselationDensity[];
 
 void main(void) {

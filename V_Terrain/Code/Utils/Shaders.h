@@ -25,9 +25,8 @@ namespace VTerrain
 
         unsigned int loc_view_matrix = 0u;
         unsigned int loc_projection_matrix = 0u;
+		unsigned int loc_model_matrix = 0u;
 
-        unsigned int loc_position_offset = 0u;
-        unsigned int loc_max_height = 0u;
         unsigned int loc_fog_distance = 0u;
         unsigned int loc_water_height = 0u;
         unsigned int loc_global_light_direction = 0u;

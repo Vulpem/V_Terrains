@@ -23,9 +23,9 @@ in lowp float dist;
 in lowp vec2 UV;
 
 uniform lowp vec3 global_light_direction;
+uniform lowp mat4 model_matrix;
 
 uniform lowp float ambient_min;
-uniform lowp float max_height;
 uniform lowp float water_height;
 uniform lowp vec3 water_color;
 uniform lowp vec3 fog_color;
@@ -61,6 +61,8 @@ void main()
 {
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
+	norm = normalize(norm * mat3(model_matrix));
+
     lowp float slope = 1.f - norm.y;
 
     lowp vec3 col;

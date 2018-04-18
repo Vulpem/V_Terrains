@@ -32,6 +32,7 @@ namespace VTerrain
 		bool IsLODReady(uint LOD)  const;
 		bool IsLoaded()  const;
 		Vec2<int> GetPos() const;
+		static int GetDensity(const Vec3<float>& cameraPos, float chunkX, float chunkZ);
 
     private:
 		Vec2<int> m_pos;
