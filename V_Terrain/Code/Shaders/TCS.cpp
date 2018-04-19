@@ -10,6 +10,8 @@ out lowp float distance[];
 
 uniform int tesselationDensity[];
 
+//https://developer.nvidia.com/gameworks-vulkan-and-opengl-samples
+
 void main(void) {
 	if (gl_InvocationID == 0)
 	{
