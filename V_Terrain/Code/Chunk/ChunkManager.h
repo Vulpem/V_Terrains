@@ -53,5 +53,6 @@ namespace VTerrain
         ChunkFactory m_factory;
 
         Mesh m_mesh;
+        bool m_isInit;
     };
 }

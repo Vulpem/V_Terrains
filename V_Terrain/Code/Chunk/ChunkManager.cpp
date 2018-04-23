@@ -24,6 +24,7 @@ namespace VTerrain
 		, m_lastOffPos(0, 0)
         , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
+        , m_isInit(false)
     {
         m_chunks.resize(config.maxChunks);
     }
@@ -40,10 +41,13 @@ namespace VTerrain
         assert(m_shader.m_program != 0);
 
         m_mesh.Generate();
+        m_isInit = true;
     }
 
     void ChunkManager::Update(int posX, int posY)
     {
+        assert(m_isInit);
+
         const int W = static_cast<int>(config.chunkSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
@@ -65,6 +69,8 @@ namespace VTerrain
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix) const
     {
+        assert(m_isInit);
+
         glPatchParameteri(GL_PATCH_VERTICES, 4);
 
         glUseProgram(m_shader.m_program);
