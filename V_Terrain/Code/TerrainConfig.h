@@ -19,13 +19,13 @@ namespace VTerrain
     {
 	public:
         float maxHeight = 1000.f;
-        unsigned int chunkHeightmapResolution = 32u;
+        unsigned int chunkHeightmapResolution = 64u;
         unsigned int maxChunks = 256u;
-        unsigned int nLODs = 18;
-        float LODdistance = 1000.f;
+        unsigned int nLODs = 32;
+        float LODdistance = 256.f;
         float chunkSize = 256.f;
-		float fogDistance = 4000.f;
-		float waterHeight = 330.f;
+		float fogDistance = 3000.f;
+		float waterHeight = 0.f;
         float ambientLight = 0.4f;
 
 		bool singleSidedFaces = true;
@@ -35,10 +35,10 @@ namespace VTerrain
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
 		struct Noise
         {
-			float frequency = 0.8f;
-			unsigned int octaves = 8u;
-			float lacunarity = 2.f;
-			float persistency = 0.4f;
+			float frequency = 0.15f;
+			unsigned int octaves = 10u;
+			float lacunarity = 2.15f;
+			float persistency = 0.48f;
         } noise;
 
 		struct Debug

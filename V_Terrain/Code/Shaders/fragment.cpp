@@ -61,7 +61,8 @@ void main()
 {
     lowp vec4 heightmapVal = texture(heightmap, UV);
     lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
-	norm = normalize(norm * mat3(model_matrix));
+    norm.y /= model_matrix[1][1];
+	norm = normalize(norm);
 
     lowp float slope = 1.f - norm.y;
 

@@ -19,13 +19,13 @@
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
-    , m_resolution(32)
-    , m_frequency(0.8f)
-    , m_octaves(8)
-    , m_lacunarity(2.0f)
-    , m_persistance (0.4f)
+    , m_resolution(64)
+    , m_frequency(0.15f)
+    , m_octaves(10)
+    , m_lacunarity(2.15f)
+    , m_persistance (0.48f)
     , m_maxHeight(1000.f)
-	, m_fogDistance(5000.f)
+	, m_fogDistance(4000.f)
     , m_currentHeightCurve("float func(float x)\n{ return x; }")
     , m_curvePow(2)
     , m_setCurvePow(2)
@@ -38,6 +38,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
         return x;
     }
     );
+    VTerrain::config.waterHeight = 0.33f;
 }
 
 // Destructor
@@ -121,7 +122,7 @@ update_status ModuleTerrain::Update()
 					"from distance to camera.");
 
 			ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
-			ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, m_maxHeight);
+			ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, 1.f);
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;

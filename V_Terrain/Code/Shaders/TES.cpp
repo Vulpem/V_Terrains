@@ -26,6 +26,6 @@ void main(void)
     lowp vec4 heightMapVal = texture(heightmap, UV);
 
     vec3 finalPos = position + vec3(0, heightMapVal.w, 0);
-    //finalPos.y = max(finalPos.y, water_height);
+    finalPos.y = max(finalPos.y, water_height);
     gl_Position = transform * vec4(finalPos, 1);
 }
