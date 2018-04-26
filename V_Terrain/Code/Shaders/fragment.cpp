@@ -42,6 +42,11 @@ uniform ConditionalTexture textures[10];
 
 out vec4 color;
 
+//https://freepbr.com/
+//https://www.textures.com/download/substance0121/131965
+//https://www.textures.com/browse/substance/114546
+//https://www.textures.com/download/substance0058/128242
+
 float SteppedScalar(float scalar, int nSteps)
 {
     return (int(scalar * nSteps) % nSteps) / float(nSteps);
