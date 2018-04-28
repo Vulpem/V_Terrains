@@ -41,6 +41,11 @@ uniform ConditionalTexture textures[10];
 
 out vec4 color;
 
+//https://freepbr.com/
+//https://www.textures.com/download/substance0121/131965
+//https://www.textures.com/browse/substance/114546
+//https://www.textures.com/download/substance0058/128242
+
 float SteppedScalar(float scalar, int nSteps)
 {
     return (int(scalar * nSteps) % nSteps) / float(nSteps);
@@ -65,24 +70,57 @@ void main()
 	norm = normalize(norm);
 
     lowp float slope = 1.f - norm.y;
+	lowp float height = heightmapVal.w;
 
     lowp vec3 col;
 
     if (render_heightmap == 0)
     {
-        for (int n = 0; n < 10; n++)
+		float currentH = 0;
+        for (int n = 9; n >= 0; n--)
         {
-            if (heightmapVal.w >= textures[n].data[minHeight]
-                && heightmapVal.w < textures[n].data[maxHeight]
-                && slope >= textures[n].data[minSlope]
-                && slope <= textures[n].data[maxSlope])
+            if (height >= textures[n].data[minHeight] - textures[n].data[heightFade]
+                && height < textures[n].data[maxHeight] + textures[n].data[heightFade]
+                && slope >= textures[n].data[minSlope] - textures[n].data[slopeFade]
+                && slope <= textures[n].data[maxSlope] + textures[n].data[slopeFade])
             {
-				col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
-				if (textures[n].data[hasTexture] != 0.f)
+				float h = texture(textures[n].heightmap, UV * int(textures[n].data[sizeMultiplier])).x;
+				//texture is in it's range
+				if (height >= textures[n].data[minHeight]
+					&& height < textures[n].data[maxHeight]
+					&& slope >= textures[n].data[minSlope]
+					&& slope <= textures[n].data[maxSlope])
 				{
-					col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+					currentH = h;
+					col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
+					if (textures[n].data[hasTexture] != 0.f)
+					{
+						col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+					}
 				}
-                break;
+				//Texture is in fade range
+				else
+				{
+					if (height > textures[n].data[maxHeight])
+					{
+						float dif = 1- (height - textures[n].data[maxHeight]) / textures[n].data[heightFade];
+						h *= dif;
+					}
+					else if (height < textures[n].data[minHeight])
+					{
+						float dif = 1- (textures[n].data[minHeight] * height) / textures[n].data[heightFade];
+						h *= dif;
+					}
+					if (h > currentH)
+					{
+						currentH = h;
+						col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
+						if (textures[n].data[hasTexture] != 0.f)
+						{
+							col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+						}
+					}
+				}
             }
         }
     }
