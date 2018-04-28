@@ -14,28 +14,28 @@
 
 struct ConditionalTexture
 {
-    lowp sampler2D diffuse;
-    lowp sampler2D heightmap;
+     sampler2D diffuse;
+     sampler2D heightmap;
 	float[11] data;
 };
 
-in lowp float dist;
-in lowp vec2 UV;
+in  float dist;
+in  vec2 UV;
 
-uniform lowp vec3 global_light_direction;
-uniform lowp mat4 model_matrix;
+uniform  vec3 global_light_direction;
+uniform  mat4 model_matrix;
 
-uniform lowp float ambient_min;
-uniform lowp float water_height;
-uniform lowp vec3 water_color;
-uniform lowp vec3 fog_color;
-uniform lowp float fog_distance;
+uniform  float ambient_min;
+uniform  float water_height;
+uniform  vec3 water_color;
+uniform  vec3 fog_color;
+uniform  float fog_distance;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
 uniform int render_light;
 uniform unsigned int maxDensity;
 
-uniform lowp sampler2D heightmap;
+uniform  sampler2D heightmap;
 
 uniform ConditionalTexture textures[10];
 
@@ -64,15 +64,15 @@ vec3 ScalarToColor(float s)
 
 void main()
 {
-    lowp vec4 heightmapVal = texture(heightmap, UV);
-    lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
+     vec4 heightmapVal = texture(heightmap, UV);
+     vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
     norm.y /= model_matrix[1][1];
 	norm = normalize(norm);
 
-    lowp float slope = 1.f - norm.y;
-	lowp float height = heightmapVal.w;
+     float slope = 1.f - norm.y;
+	 float height = heightmapVal.w;
 
-    lowp vec3 col;
+     vec3 col;
 
     if (render_heightmap == 0)
     {

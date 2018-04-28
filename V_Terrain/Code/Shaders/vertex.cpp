@@ -1,17 +1,17 @@
 #version 330 core
 
-in lowp vec3 position;
-in lowp vec2 texCoord;
+in  vec3 position;
+in  vec2 texCoord;
 
-out lowp vec2 UV;
-out lowp float dist;
+out  vec2 UV;
+out  float dist;
 
-uniform lowp mat4 view_matrix;
-uniform lowp mat4 model_matrix;
+uniform  mat4 view_matrix;
+uniform  mat4 model_matrix;
 
-uniform lowp vec3 observerPos;
+uniform  vec3 observerPos;
 
-uniform lowp sampler2D heightmap;
+uniform  sampler2D heightmap;
 
 void main()
 {

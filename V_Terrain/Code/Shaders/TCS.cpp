@@ -2,11 +2,11 @@
 
 layout(vertices = 4) out;
 
-in lowp float dist[];
-in lowp vec2 UV[];
+in  float dist[];
+in  vec2 UV[];
 
-out lowp vec2 UVs[];
-out lowp float distance[];
+out  vec2 UVs[];
+out  float distance[];
 
 uniform int tesselationDensity[];
 
