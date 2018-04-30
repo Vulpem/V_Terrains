@@ -27,6 +27,7 @@ namespace VTerrain
 
             uint GetMeshBuf() const { return m_dataBuff; }
             uint GetIndicesBuf() const { return m_indicesBuff; }
+            uint GetNIndices()const { return m_nIndices; }
             uint GetNumIndices() const { return 6; }
             bool IsGenerated() const { return m_generated; }
         private:
@@ -37,8 +38,9 @@ namespace VTerrain
             void FreeMesh();
             void FreeIndices();
 
-            bool m_bufferGenerated = false;
+            bool m_bufferGenerated;
             uint m_indicesBuff;
+            uint m_nIndices;
             uint m_dataBuff;
             bool m_generated;
         };

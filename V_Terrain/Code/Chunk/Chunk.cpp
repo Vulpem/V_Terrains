@@ -46,7 +46,7 @@ namespace VTerrain
         m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const Shader& shader, const Vec3<float>& cameraPos) const
+    void  Chunk::Draw(const Shader& shader, const Vec3<float>& cameraPos, uint nIndices) const
     {
         if (IsLoaded())
         {
@@ -77,7 +77,7 @@ namespace VTerrain
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
 
-            glDrawElements(GL_PATCHES, 4/*nIndices*/, GL_UNSIGNED_INT, (void*)0);
+            glDrawElements(GL_PATCHES, nIndices, GL_UNSIGNED_INT, (void*)0);
         }
     }
 

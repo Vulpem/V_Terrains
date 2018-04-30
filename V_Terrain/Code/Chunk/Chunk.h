@@ -28,7 +28,7 @@ namespace VTerrain
 
 		void Regenerate(ChunkFactory::GeneratedChunk base);
 		void Free();
-		void Draw(const Shader& shader, const Vec3<float>& cameraPos) const;
+		void Draw(const Shader& shader, const Vec3<float>& cameraPos, uint nIndices) const;
 		bool IsLODReady(uint LOD)  const;
 		bool IsLoaded()  const;
 		Vec2<int> GetPos() const;

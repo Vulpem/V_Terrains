@@ -24,6 +24,7 @@ namespace VTerrain
         unsigned int nLODs = 32;
         float LODdistance = 256.f;
         float chunkSize = 256.f;
+        unsigned int chunkMinDensity = 10;
 		float fogDistance = 3000.f;
 		float waterHeight = 0.f;
         float ambientLight = 0.4f;

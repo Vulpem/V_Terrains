@@ -160,9 +160,10 @@ namespace VTerrain
             p[0] * r[6] + p[1] * r[7] + p[2] * r[8]
             );
 
+        const uint nIndices = m_mesh.GetNIndices();
         for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
         {
-            it->Draw(m_shader, cameraPos * -1);
+            it->Draw(m_shader, cameraPos * -1, nIndices);
         }
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
