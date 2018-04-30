@@ -19,7 +19,6 @@ struct ConditionalTexture
 	float[11] data;
 };
 
-in  float dist;
 in  vec2 UV;
 
 uniform  vec3 global_light_direction;
@@ -144,5 +143,8 @@ void main()
         col = ScalarToColor(poliDensity / maxDensity);
     }*/
 
-    color = vec4(mix(col, fog_color, min((dist*dist) / (fog_distance*fog_distance), 1.f)), 1.f);
+    float fogStrength = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
+    fogStrength = min(fogStrength, 1);
+
+    color = vec4(mix(col, fog_color, fogStrength), 1.f);
 }

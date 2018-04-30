@@ -2,11 +2,9 @@
 
 layout(vertices = 4) out;
 
-in  float dist[];
 in  vec2 UV[];
 
 out  vec2 UVs[];
-out  float distance[];
 
 uniform int tesselationDensity[];
 
@@ -23,7 +21,6 @@ void main(void) {
 		gl_TessLevelOuter[2] = tesselationDensity[4];
 		gl_TessLevelOuter[3] = tesselationDensity[5];
 	}
-	distance[gl_InvocationID] = dist[gl_InvocationID];
 	UVs[gl_InvocationID] = UV[gl_InvocationID];
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }

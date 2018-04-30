@@ -2,10 +2,8 @@
 
 layout(quads, ccw) in;
 in  vec2 UVs[];
-in  float distance[];
 
 out  vec2 UV;
-out  float dist;
 
 uniform  mat4 view_matrix;
 uniform  mat4 projection_matrix;
@@ -18,7 +16,6 @@ uniform  sampler2D heightmap;
 
 void main(void)
 {
-    dist = mix(mix(distance[0], distance[1], gl_TessCoord.x), mix(distance[3], distance[2], gl_TessCoord.x), gl_TessCoord.y);
     UV = mix(mix(UVs[0], UVs[1], gl_TessCoord.x), mix(UVs[3], UVs[2], gl_TessCoord.x), gl_TessCoord.y);
     vec3 position = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x), mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x), gl_TessCoord.y).xyz;
 
