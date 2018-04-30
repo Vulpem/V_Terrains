@@ -161,10 +161,7 @@ namespace VTerrain
             );
 
         const uint nIndices = m_mesh.GetNIndices();
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            it->Draw(m_shader, cameraPos * -1, nIndices);
-        }
+        std::for_each(m_chunks.begin(), m_chunks.end(), [=](const Chunk& chunk) {chunk.Draw(m_shader, cameraPos * -1, nIndices); });
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glUseProgram(0);
@@ -172,10 +169,7 @@ namespace VTerrain
 
     void ChunkManager::CleanChunks()
     {
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            it->Free();
-        }
+        std::for_each(m_chunks.begin(), m_chunks.end(), [](Chunk& chunk) { chunk.Free(); });
         m_factory.ClearRequests();
         AddChunksToRegen(m_lastOffPos);
     }
@@ -214,16 +208,11 @@ namespace VTerrain
 				{
 					if (abs(x) + abs(y) == dist)
 					{
-                        toAdd.push_back(Vec2<int>(pos.x() + x, pos.y() + y));
+                        AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
 					}
 				}
 			}
 		}
-
-        for (auto p : toAdd)
-        {
-            AddChunkToRegen(p);
-        }
     }
 
 	bool ChunkManager::AddChunkToRegen(Vec2<int> pos)
@@ -239,12 +228,10 @@ namespace VTerrain
 
     Chunk & ChunkManager::GetChunk(Vec2<int> pos)
     {
-        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end())
         {
-            if (it->GetPos() == pos)
-            {
                 return *it;
-            }
         }
         assert(false);
         return *m_chunks.begin();
@@ -252,13 +239,11 @@ namespace VTerrain
 
 	const Chunk & ChunkManager::GetChunk(Vec2<int> pos) const
 	{
-		for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
-		{
-			if (it->GetPos() == pos)
-			{
-				return *it;
-			}
-		}
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end())
+        {
+            return *it;
+        }
 		assert(false);
 		return *m_chunks.cbegin();
 	}

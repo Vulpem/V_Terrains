@@ -59,12 +59,10 @@ namespace VTerrain
 
     bool ChunkFactory::IsRequested(Vec2<int> p)
     {
-        for (auto it : m_requests)
+        auto it = std::find(m_requests.begin(), m_requests.end(), p);
+        if (it != m_requests.end())
         {
-            if ((it) == p)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
