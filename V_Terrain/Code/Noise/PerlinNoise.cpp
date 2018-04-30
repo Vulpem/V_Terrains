@@ -38,17 +38,11 @@ namespace VTerrain
         const uint startX = -offset.x() * config.chunkHeightmapResolution - 1u;
         const uint startY = -offset.y() * config.chunkHeightmapResolution - 1u;
 
-		//TODO remove this test thingies
-		static float min = 1000;
-		static float max = -1000;
         for (uint y = 0; y < ret.Height(); y++)
         {
             for (uint x = 0; x < ret.Width(); x++)
             {
                 ret[x + y * ret.Width()] = GetValue(x + startX, y + startY);
-				if (ret[x + y * ret.Width()] < min) { min = ret[x + y * ret.Width()]; }
-				if (ret[x + y * ret.Width()] > max) { max = ret[x + y * ret.Width()]; }
-
             }
         }
         return ret;
