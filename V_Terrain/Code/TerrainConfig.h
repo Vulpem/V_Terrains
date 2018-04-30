@@ -20,10 +20,10 @@ namespace VTerrain
 	public:
         float maxHeight = 1000.f;
         unsigned int chunkHeightmapResolution = 64u;
-        unsigned int maxChunks = 256u;
+        unsigned int maxChunks = 512u;
         unsigned int nLODs = 32;
         float LODdistance = 256.f;
-        float chunkSize = 256.f;
+        float chunkSize = 512.f;
         unsigned int chunkMinDensity = 10;
 		float fogDistance = 3000.f;
 		float waterHeight = 0.f;
