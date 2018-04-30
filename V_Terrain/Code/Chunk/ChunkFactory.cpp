@@ -11,6 +11,8 @@
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChunkFactory.h"
+#include <thread>
+#include <chrono>
 
 #include "../Noise/PerlinNoise.h"
 
@@ -57,7 +59,6 @@ namespace VTerrain
 
     bool ChunkFactory::IsRequested(Vec2<int> p)
     {
-		std::unique_lock<std::mutex> lock(m_mut_requests);
         for (auto it : m_requests)
         {
             if ((it) == p)
@@ -83,7 +84,10 @@ namespace VTerrain
     void ChunkFactory::PushChunkRequest(RequestedChunk request)
     {
 		std::unique_lock<std::mutex> lock(m_mut_requests);
-        m_requests.push_back(request);
+        if (IsRequested(request.pos) == false)
+        {
+            m_requests.push_back(request);
+        }
     }
 
     ChunkFactory::GeneratedChunk ChunkFactory::PopGeneratedChunk()
@@ -170,6 +174,10 @@ namespace VTerrain
             }
 
             m_results.push(result);
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
 

@@ -202,7 +202,11 @@ namespace VTerrain
 			nChunks += ++maxDist * 4;
 		}
 		maxDist --;
-		for (int dist = 0; dist <= maxDist; dist++)
+
+        std::vector<Vec2<int>> toAdd;
+        toAdd.reserve(config.maxChunks);
+
+		for (int dist = 0; dist < maxDist; dist++)
 		{
 			for (int y = -dist; y <= dist; y++)
 			{
@@ -210,16 +214,21 @@ namespace VTerrain
 				{
 					if (abs(x) + abs(y) == dist)
 					{
-						AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
+                        toAdd.push_back(Vec2<int>(pos.x() + x, pos.y() + y));
 					}
 				}
 			}
 		}
+
+        for (auto p : toAdd)
+        {
+            AddChunkToRegen(p);
+        }
     }
 
 	bool ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
-        if (IsLoaded(pos) == false && m_factory.IsRequested(pos) == false)
+        if (IsLoaded(pos) == false)
         {
             m_factory.PushChunkRequest(pos);
 			return true;
@@ -256,12 +265,10 @@ namespace VTerrain
 
     bool ChunkManager::IsLoaded(Vec2<int> pos) const
 	{
-        for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end() && it->IsLoaded())
         {
-            if (it->IsLoaded() && it->GetPos() == pos)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
 	}

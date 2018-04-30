@@ -54,7 +54,6 @@ namespace VTerrain
 		void StopThread();
 
         void ClearRequests();
-        bool IsRequested(Vec2<int> p);
         void SetHeightCurve(std::function<float(float)> func);
         void SetSeed(uint seed);
 
@@ -63,6 +62,8 @@ namespace VTerrain
         bool HasGeneratedChunks();
 
     private:
+        bool IsRequested(Vec2<int> p);
+
         RequestedChunk PopChunkRequest();
         void PushGeneratedChunk(const GeneratedChunk& generated);
 		bool HasRequestedChunks();
