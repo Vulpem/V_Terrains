@@ -193,6 +193,7 @@ namespace VTerrain
 		case GL_TESS_EVALUATION_SHADER:
 			return "TES Shader";
 		}
+        return "Unspecified";
 	}
 
     unsigned int Shaders::Compile(std::string code, unsigned int type, std::string& result)
