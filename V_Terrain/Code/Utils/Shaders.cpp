@@ -29,6 +29,13 @@ namespace VTerrain
 
     Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, const char* TCSbuf, const char* TESbuf, std::string& result)
     {
+		//Checking OpenGL version
+		std::string str = (char*)glGetString(GL_VERSION);
+		str = str.substr(0,str.find_first_of("."));
+		const int version = std::stoi(str);
+		//It must be 4.x or higher in order to support tesselation
+		assert(version >= 4);
+
         GLint success;
         Shader ret;
 
@@ -132,10 +139,14 @@ namespace VTerrain
 
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);
+			glDetachShader(program, TCS);
+			glDetachShader(program, TES);
 
         }
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+		glDeleteShader(TCS);
+		glDeleteShader(TES);
 
         return ret;
     }
@@ -144,6 +155,7 @@ namespace VTerrain
     {
         glDeleteProgram(shader.m_program);
     }
+
     std::string Shaders::OpenFile(const char * fileDir)
     {
         TCHAR pwd[MAX_PATH];
