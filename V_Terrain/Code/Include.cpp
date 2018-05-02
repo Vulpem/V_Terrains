@@ -80,6 +80,10 @@ namespace VTerrain
         Shader shader = Shaders::CompileShader(vert, frag, TCS, TES, result);
         if (shader.m_program != 0)
         {
+            if (chunkManager.m_shader.m_program != 0)
+            {
+                Shaders::FreeShader(chunkManager.m_shader);
+            }
             chunkManager.m_shader = shader;
         }
         return result;
