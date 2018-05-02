@@ -30,10 +30,11 @@ namespace VTerrain
     Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, const char* TCSbuf, const char* TESbuf, std::string& result)
     {
 		//Checking OpenGL version
-		std::string str = (char*)glGetString(GL_VERSION);
-		str = str.substr(0,str.find_first_of("."));
-		const int version = std::stoi(str);
+		std::string fullVersion = (char*)glGetString(GL_VERSION);
+		std::string simpleVersion = fullVersion.substr(0, fullVersion.find_first_of("."));
+		const int version = std::stoi(simpleVersion);
 		//It must be 4.x or higher in order to support tesselation
+		SHOW_ERROR("OpenGL version is not compatible. \nCurrent version is %s.\nMinimum version required is 4.0.0", fullVersion.data());
 		assert(version >= 4);
 
         GLint success;

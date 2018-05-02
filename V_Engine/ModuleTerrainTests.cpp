@@ -17,6 +17,11 @@
 
 #include <time.h>
 
+void ShowError(const char * message)
+{
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, nullptr);
+}
+
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
     , m_resolution(64)
@@ -32,6 +37,9 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_openShaderEditor(false)
 {
 	moduleName = "ModuleTerrainTests";
+
+	VTerrain::config.throwErrorFunc = ShowError;
+
     VTerrain::SetHeightCurve(
         [](float x)
     {

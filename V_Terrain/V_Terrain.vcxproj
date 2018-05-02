@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{02111310-9CFD-4744-8412-D466E6F60BD1}</ProjectGuid>
     <RootNamespace>VTerrain</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)\Code\ExternalLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -161,6 +161,7 @@
     <ClCompile Include="Code\Chunk\ChunkFactory.cpp" />
     <ClCompile Include="Code\Chunk\ChunkManager.cpp" />
     <ClCompile Include="Code\Chunk\ChunkMesh.cpp" />
+    <ClCompile Include="Code\Globals.cpp" />
     <ClCompile Include="Code\Include.cpp" />
     <ClCompile Include="Code\Noise\NoiseMap.cpp" />
     <ClCompile Include="Code\Noise\PerlinNoise.cpp" />

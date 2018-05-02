@@ -13,6 +13,8 @@
 #ifndef __V__TERRAIN__CONFIG__
 #define __V__TERRAIN__CONFIG__
 
+#include <functional>
+
 namespace VTerrain
 {
     struct Config
@@ -49,6 +51,8 @@ namespace VTerrain
             bool renderHeightmap = false;
             bool renderChunkBorders = false;
         } debug;
+
+		std::function<void(const char*)> throwErrorFunc;
    };
 
 	extern Config config;

@@ -8,6 +8,8 @@
 
 #include "Math.h"
 
+void ShowError(const char* message);
+
 class ModuleTerrain : public Module
 {
 public:
