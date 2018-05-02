@@ -11,7 +11,6 @@
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "GenImage.h"
-#include <assert.h>
 
 #include "../ExternalLibs/Glew/include/glew.h"
 

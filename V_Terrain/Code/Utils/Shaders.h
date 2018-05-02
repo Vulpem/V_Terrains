@@ -63,6 +63,7 @@ namespace VTerrain
         static std::string m_defaultTESShader;
     private:
         static std::string OpenFile(const char* fileDir);
+		static const char* GetShaderType(unsigned int type);
         static unsigned int Compile(std::string code, unsigned int type, std::string& result);
     };
 }

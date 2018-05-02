@@ -38,7 +38,7 @@ namespace VTerrain
     {
         std::string result;
         m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
-        assert(m_shader.m_program != 0);
+		ASSERT(m_shader.m_program != 0, "Error compiling shaders:\n%s", result.data());
 
         m_mesh.Generate();
         m_isInit = true;
@@ -46,7 +46,7 @@ namespace VTerrain
 
     void ChunkManager::Update(int posX, int posY)
     {
-        assert(m_isInit);
+        ASSERT(m_isInit, "Called Update before Init");
 
         const int W = static_cast<int>(config.chunkSize);
         Vec2<int> off(
@@ -69,7 +69,7 @@ namespace VTerrain
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix) const
     {
-        assert(m_isInit);
+		ASSERT(m_isInit, "Called Render before Init");
 
         glPatchParameteri(GL_PATCH_VERTICES, 4);
 
@@ -233,7 +233,7 @@ namespace VTerrain
         {
                 return *it;
         }
-        assert(false);
+        ASSERT(false, "Tried to access a non-existing chunk at pos %i, %i", pos.x(), pos.y());
         return *m_chunks.begin();
     }
 
@@ -244,7 +244,7 @@ namespace VTerrain
         {
             return *it;
         }
-		assert(false);
+		ASSERT(false, "Tried to access a non-existing chunk at pos %i, %i", pos.x(), pos.y());
 		return *m_chunks.cbegin();
 	}
 
@@ -277,7 +277,7 @@ namespace VTerrain
                 ret = &(*it);
             }
         }
-        assert(ret != nullptr);
+        ASSERT(ret != nullptr, "This function just straight up broke.");
         return *ret;
     }
 }

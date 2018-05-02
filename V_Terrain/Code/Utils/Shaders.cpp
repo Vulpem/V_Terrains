@@ -16,7 +16,6 @@
 #include "../ExternalLibs/Glew/include/glew.h"
 
 #include <fstream>
-#include <windows.h> 
 
 namespace VTerrain
 {
@@ -34,9 +33,8 @@ namespace VTerrain
 		std::string simpleVersion = fullVersion.substr(0, fullVersion.find_first_of("."));
 		const int version = std::stoi(simpleVersion);
 		//It must be 4.x or higher in order to support tesselation
-		SHOW_ERROR("OpenGL version is not compatible. \nCurrent version is %s.\nMinimum version required is 4.0.0", fullVersion.data());
-		assert(version >= 4);
-
+		ASSERT(version >= 4, "OpenGL version is not compatible. \nCurrent version is %s.\nMinimum version required is 4.0.0", fullVersion.data());
+		
         GLint success;
         Shader ret;
 
@@ -182,6 +180,21 @@ namespace VTerrain
         return ret;
     }
 
+	const char* Shaders::GetShaderType(unsigned int type)
+	{
+		switch (type)
+		{
+		case GL_VERTEX_SHADER:
+			return "Vertex Shader";
+		case GL_FRAGMENT_SHADER:
+			return "Fragment Shader";
+		case GL_TESS_CONTROL_SHADER:
+			return "TCS Shader";
+		case GL_TESS_EVALUATION_SHADER:
+			return "TES Shader";
+		}
+	}
+
     unsigned int Shaders::Compile(std::string code, unsigned int type, std::string& result)
     {
         unsigned int ret;
@@ -199,7 +212,7 @@ namespace VTerrain
 				result += (char*)errorString;
 				err = glGetError();
 			}
-			assert(ret != 0);
+			ASSERT(ret != 0, "Error while compiling %s:\n%s", GetShaderType(type), result.data());
 		}
 
         const char* tmp = code.c_str();
@@ -208,21 +221,9 @@ namespace VTerrain
         glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
         if (success == 0)
         {
-            switch (type)
-            {
-            case GL_VERTEX_SHADER:
-                result += "-- Vertex Shader -- \n";
-                break;
-            case GL_FRAGMENT_SHADER:
-                result += "-- Fragment Shader -- \n";
-                break;
-            case GL_TESS_CONTROL_SHADER:
-                result += "-- TCS Shader -- \n";
-                break;
-            case GL_TESS_EVALUATION_SHADER:
-                result += "-- TES Shader -- \n";
-                break;
-            }
+			result += "-- ";
+			result += GetShaderType(type);
+			result += " -- \n";
             GLchar infoLog[512];
             glGetShaderInfoLog(ret, 512, NULL, infoLog);
             result += infoLog;

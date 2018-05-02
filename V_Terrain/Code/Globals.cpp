@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include <cstdarg>
 #include "TerrainConfig.h"
+#include <assert.h>
 
 namespace VTerrain
 {
@@ -8,7 +9,7 @@ namespace VTerrain
 	{
 		int FormatCString(char *outBuffer, int outBufferSize, const char* format, va_list args)
 		{
-			assert(outBuffer != nullptr && format != nullptr);
+			if (!(outBuffer != nullptr && format != nullptr)) { DebugBreak(); }
 
 			static constexpr char endOfLineChars[]{ '\r', '\n', '\0' };
 
