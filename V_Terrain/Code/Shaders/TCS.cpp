@@ -20,18 +20,6 @@ out  vec2 UVs[];
 
 //https://developer.nvidia.com/gameworks-vulkan-and-opengl-samples
 
-// test if sphere is entirely contained within frustum planes
-/*bool sphereInFrustum(vec3 pos, float r, vec4 plane[6])
-{
-for (int i = 0; i<6; i++) {
-if (dot(vec4(pos, 1.0), plane[i]) + r < 0.0) {
-// sphere outside plane
-return false;
-}
-}
-return true;
-}*/
-
 // transform from world to screen coordinates
 vec2 worldToScreen(vec3 p)
 {
@@ -40,6 +28,15 @@ vec2 worldToScreen(vec3 p)
 	r.xy = r.xy*0.5 + 0.5;  // to NDC
 	r.xy *= viewport.xy;    // to pixels
 	return r.xy;
+}
+
+// test if sphere is entirely contained within frustum planes
+bool sphereInScreen(vec3 pos)
+{
+	vec2 p = worldToScreen(pos);
+	p = p / viewport.xy;
+
+	return (p.x > 0.2f && p.x < 0.8f && p.y > -0.7f && p.y < 0.0f);
 }
 
 // calculate edge tessellation level from two edge vertices in screen space
@@ -86,12 +83,7 @@ void main() {
 	vec3 spherePos = vec3(minX + maxX, minY + maxY, minZ + maxZ) *0.5f;
 
 	// test if patch is visible
-	vec2 p = worldToScreen(spherePos);
-	p = p / viewport.xy;
-
-	bool visible = (p.x > 0.2f && p.x < 0.8f && p.y > -0.7f && p.y < 0.0f); //sphereInFrustum(spherePos, tileBoundingSphereR, frustumPlanes);
-
-	if (!visible) {
+	if (!sphereInScreen(spherePos)) {
 		// cull patch
 		gl_TessLevelOuter[0] = -1;
 		gl_TessLevelOuter[1] = -1;
