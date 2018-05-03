@@ -34,9 +34,9 @@ vec2 worldToScreen(vec3 p)
 bool sphereInScreen(vec3 pos)
 {
 	vec2 p = worldToScreen(pos);
-	p = p / viewport.xy;
+	p /= viewport.xy;
 
-	return (p.x > 0.2f && p.x < 0.8f && p.y > -0.7f && p.y < 0.0f);
+	return (p.x > 0.0f && p.x < 1.f && p.y > 0.0f && p.y < 1.f);
 }
 
 // calculate edge tessellation level from two edge vertices in screen space
@@ -81,6 +81,7 @@ void main() {
 
 	// bounding sphere for patch
 	vec3 spherePos = vec3(minX + maxX, minY + maxY, minZ + maxZ) *0.5f;
+	float sphereR = max(max(maxX - minX, maxY - minY), maxZ - minZ);
 
 	// test if patch is visible
 	if (!sphereInScreen(spherePos)) {
@@ -100,11 +101,11 @@ void main() {
 		// see tessellation diagram in OpenGL 4 specification for vertex order details
 
 		// use screen space size of sphere fit to each edge
-		float sphereD = max(maxX - minX, maxY - minY);// *2.0f;
-		gl_TessLevelOuter[0] = calcEdgeTessellationSphere(pos[3], pos[0], sphereD);
-		gl_TessLevelOuter[1] = calcEdgeTessellationSphere(pos[0], pos[1], sphereD);
-		gl_TessLevelOuter[2] = calcEdgeTessellationSphere(pos[1], pos[2], sphereD);
-		gl_TessLevelOuter[3] = calcEdgeTessellationSphere(pos[2], pos[3], sphereD);
+
+		gl_TessLevelOuter[0] = calcEdgeTessellationSphere(pos[3], pos[0], sphereR * 2);
+		gl_TessLevelOuter[1] = calcEdgeTessellationSphere(pos[0], pos[1], sphereR * 2);
+		gl_TessLevelOuter[2] = calcEdgeTessellationSphere(pos[1], pos[2], sphereR * 2);
+		gl_TessLevelOuter[3] = calcEdgeTessellationSphere(pos[2], pos[3], sphereR * 2);
 
 		// calc interior tessellation level - use average of outer levels
 		gl_TessLevelInner[0] = 0.5 * (gl_TessLevelOuter[1] + gl_TessLevelOuter[3]);
