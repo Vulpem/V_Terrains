@@ -1,6 +1,6 @@
 #version 430 core
 
-layout(quads, ccw, fractional_odd_spacing) in;
+layout(quads, ccw, fractional_even_spacing) in;
 in  vec2 UVs[];
 
 out  vec2 UV;
