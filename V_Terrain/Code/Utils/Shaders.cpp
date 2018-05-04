@@ -21,20 +21,20 @@ namespace VTerrain
 {
     std::string Shaders::m_defaultVertexShader = std::string("Here will go the shader TODO");
 
-	std::string Shaders::m_defaultFragmentShader = std::string("Here will go the shader TODO");
+    std::string Shaders::m_defaultFragmentShader = std::string("Here will go the shader TODO");
 
     std::string Shaders::m_defaultTCSShader = std::string("TODO");
     std::string Shaders::m_defaultTESShader = std::string("TODO");
 
     Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, const char* TCSbuf, const char* TESbuf, std::string& result)
     {
-		//Checking OpenGL version
-		std::string fullVersion = (char*)glGetString(GL_VERSION);
-		std::string simpleVersion = fullVersion.substr(0, fullVersion.find_first_of("."));
-		const int version = std::stoi(simpleVersion);
-		//It must be 4.x or higher in order to support tesselation
-		ASSERT(version >= 4, "OpenGL version is not compatible. \nCurrent version is %s.\nMinimum version required is 4.0.0", fullVersion.data());
-		
+        //Checking OpenGL version
+        std::string fullVersion = (char*)glGetString(GL_VERSION);
+        std::string simpleVersion = fullVersion.substr(0, fullVersion.find_first_of("."));
+        const int version = std::stoi(simpleVersion);
+        //It must be 4.x or higher in order to support tesselation
+        ASSERT(version >= 4, "OpenGL version is not compatible. \nCurrent version is %s.\nMinimum version required is 4.0.0", fullVersion.data());
+
         GLint success;
         Shader ret;
 
@@ -107,8 +107,8 @@ namespace VTerrain
 
                 ret.loc_view_matrix = glGetUniformLocation(program, "view_matrix");
                 ret.loc_projection_matrix = glGetUniformLocation(program, "projection_matrix");
-				ret.loc_model_matrix = glGetUniformLocation(program, "model_matrix");
-;
+                ret.loc_model_matrix = glGetUniformLocation(program, "model_matrix");
+                ;
                 ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
                 ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
                 ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
@@ -121,31 +121,31 @@ namespace VTerrain
 
                 ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
-				ret.loc_render_light = glGetUniformLocation(program, "render_light");
+                ret.loc_render_light = glGetUniformLocation(program, "render_light");
 
-				for (int n = 0; n < 10; n++)
-				{
-					char val[28];
-					sprintf_s(val, 28, "textures[%i].", n);
-					ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "diffuse").data());
-					ret.textures[n].loc_heightmap = glGetUniformLocation(program, (std::string(val) + "heightmap").data());
+                for (int n = 0; n < 10; n++)
+                {
+                    char val[28];
+                    sprintf_s(val, 28, "textures[%i].", n);
+                    ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "diffuse").data());
+                    ret.textures[n].loc_heightmap = glGetUniformLocation(program, (std::string(val) + "heightmap").data());
 
-					ret.textures[n].data = glGetUniformLocation(program, (std::string(val) + "data").data());
-				}
+                    ret.textures[n].data = glGetUniformLocation(program, (std::string(val) + "data").data());
+                }
             }
 
-			ret.loc_heightmap = glGetUniformLocation(program, "heightmap");
+            ret.loc_heightmap = glGetUniformLocation(program, "heightmap");
 
             glDetachShader(program, vertexShader);
             glDetachShader(program, fragmentShader);
-			glDetachShader(program, TCS);
-			glDetachShader(program, TES);
+            glDetachShader(program, TCS);
+            glDetachShader(program, TES);
 
         }
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
-		glDeleteShader(TCS);
-		glDeleteShader(TES);
+        glDeleteShader(TCS);
+        glDeleteShader(TES);
 
         return ret;
     }
@@ -180,41 +180,41 @@ namespace VTerrain
         return ret;
     }
 
-	const char* Shaders::GetShaderType(unsigned int type)
-	{
-		switch (type)
-		{
-		case GL_VERTEX_SHADER:
-			return "Vertex Shader";
-		case GL_FRAGMENT_SHADER:
-			return "Fragment Shader";
-		case GL_TESS_CONTROL_SHADER:
-			return "TCS Shader";
-		case GL_TESS_EVALUATION_SHADER:
-			return "TES Shader";
-		}
+    const char* Shaders::GetShaderType(unsigned int type)
+    {
+        switch (type)
+        {
+        case GL_VERTEX_SHADER:
+            return "Vertex Shader";
+        case GL_FRAGMENT_SHADER:
+            return "Fragment Shader";
+        case GL_TESS_CONTROL_SHADER:
+            return "TCS Shader";
+        case GL_TESS_EVALUATION_SHADER:
+            return "TES Shader";
+        }
         return "Unspecified";
-	}
+    }
 
     unsigned int Shaders::Compile(std::string code, unsigned int type, std::string& result)
     {
         unsigned int ret;
-        GLint success;
+        GLint success = 0;
 
         ret = glCreateShader(type);
 
-		if (ret == 0)
-		{
-			GLenum err = glGetError();
-			while (err != 0)
-			{
-				const GLubyte* errorString = glewGetErrorString(err);
-				result += "\n";
-				result += (char*)errorString;
-				err = glGetError();
-			}
-			ASSERT(ret != 0, "Error while compiling %s:\n%s", GetShaderType(type), result.data());
-		}
+        if (ret == 0)
+        {
+            GLenum err = glGetError();
+            while (err != 0)
+            {
+                const GLubyte* errorString = glewGetErrorString(err);
+                result += "\n";
+                result += (char*)errorString;
+                err = glGetError();
+            }
+            ASSERT(ret != 0, "Error while compiling %s:\n%s", GetShaderType(type), result.data());
+        }
 
         const char* tmp = code.c_str();
         glShaderSource(ret, 1, &tmp, NULL);
@@ -222,9 +222,9 @@ namespace VTerrain
         glGetShaderiv(ret, GL_COMPILE_STATUS, &success);
         if (success == 0)
         {
-			result += "-- ";
-			result += GetShaderType(type);
-			result += " -- \n";
+            result += "-- ";
+            result += GetShaderType(type);
+            result += " -- \n";
             GLchar infoLog[512];
             glGetShaderInfoLog(ret, 512, NULL, infoLog);
             result += infoLog;
