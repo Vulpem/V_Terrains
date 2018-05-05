@@ -76,7 +76,7 @@ namespace VTerrain
         const uint height = config.chunkMinDensity + 1;
 
         std::vector<uint> indices;
-        indices.resize((width - 1)*(height - 1) * 6u);
+        indices.reserve((width - 1)*(height - 1) * 4u);
 
         uint n = 0;
         uint i = 0;
@@ -88,10 +88,10 @@ namespace VTerrain
             {
                 if (x < width - 1 && y < height - 1)
                 {
-                    indices[n++] = i;
-                    indices[n++] = i + (width)* utils::Min(step, height - y);
-                    indices[n++] = i + (width)* utils::Min(step, height - y) + utils::Min(step, width - x);
-                    indices[n++] = i + utils::Min(step, width - x);
+                    indices.push_back(i);
+                    indices.push_back(i + (width)* utils::Min(step, height - y));
+                    indices.push_back(i + (width)* utils::Min(step, height - y) + utils::Min(step, width - x));
+                    indices.push_back(i + utils::Min(step, width - x));
                 }
                 i += step;
             }
