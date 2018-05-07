@@ -170,12 +170,11 @@ namespace VTerrain
                     result[current++] = noiseMap[x + y * noiseMap.Width()];
                 }
             }
-
-            m_results.push(result);
+            PushGeneratedChunk(result);
         }
         else
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
         }
     }
 
