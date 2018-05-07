@@ -25,12 +25,12 @@ void ShowError(const char * message)
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
     , m_resolution(VTerrain::config.chunkHeightmapResolution)
-    , m_frequency(0.15f)
-    , m_octaves(10)
-    , m_lacunarity(2.15f)
-    , m_persistance (0.48f)
-    , m_maxHeight(1000.f)
-	, m_fogDistance(4000.f)
+    , m_frequency(VTerrain::config.noise.frequency)
+    , m_octaves(VTerrain::config.noise.octaves)
+    , m_lacunarity(VTerrain::config.noise.lacunarity)
+    , m_persistance (VTerrain::config.noise.persistency)
+    , m_maxHeight(VTerrain::config.maxHeight)
+	, m_fogDistance(VTerrain::config.fogDistance)
     , m_currentHeightCurve("float func(float x)\n{ return x; }")
     , m_curvePow(2)
     , m_setCurvePow(2)
@@ -155,7 +155,7 @@ update_status ModuleTerrain::Update()
 			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
 			ImGui::Separator();
 			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
-			if (ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 0.1f, 256.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
 
 
 			ImGui::Separator();

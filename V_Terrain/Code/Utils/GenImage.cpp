@@ -55,6 +55,7 @@ namespace VTerrain
         glDeleteTextures(1, &buffer);
         buffer = 0;
     }
+
     void GenImage::SetParams()
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

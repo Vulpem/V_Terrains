@@ -39,7 +39,7 @@ namespace VTerrain
 		struct Noise
         {
 			float frequency = 0.15f;
-			unsigned int octaves = 10u;
+			unsigned int octaves = 8u;
 			float lacunarity = 2.15f;
 			float persistency = 0.48f;
         } noise;
