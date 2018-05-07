@@ -19,7 +19,9 @@ struct ConditionalTexture
 	float[11] data;
 };
 
-in  vec2 UV;
+in vec3 pos;
+in vec3 norm;
+in vec2 UV;
 
 uniform  vec3 global_light_direction;
 uniform  mat4 model_matrix;
@@ -63,13 +65,12 @@ vec3 ScalarToColor(float s)
 
 void main()
 {
-     vec4 heightmapVal = texture(heightmap, UV);
-     vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
-    norm.y /= model_matrix[1][1];
-	norm = normalize(norm);
+     vec3 n = norm;
+     n.y /= model_matrix[1][1];
+	 n = normalize(n);
 
-     float slope = 1.f - norm.y;
-	 float height = heightmapVal.w;
+     float slope = 1.f - n.y;
+	 float height = pos.y / model_matrix[1][1];
 
      vec3 col;
 
@@ -125,7 +126,8 @@ void main()
     }
     else
     {
-        col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
+        float val = texture(heightmap, UV).w;
+        col = vec3(val, val, val);
     }
 
     if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
@@ -135,7 +137,7 @@ void main()
 
     if (render_light != 0)
     {
-        col *= max(dot(global_light_direction, norm), ambient_min);
+        col *= max(dot(global_light_direction, n), ambient_min);
     }
     
 	/*if(renderDensity)

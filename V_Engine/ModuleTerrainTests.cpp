@@ -46,7 +46,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
         return x;
     }
     );
-    VTerrain::config.waterHeight = 0.33f;
+    VTerrain::config.waterHeight = 0.28f;
 }
 
 // Destructor
@@ -418,7 +418,7 @@ void ModuleTerrain::SetDefaultTextures()
     uint64_t UID;
     //Water
     tex.minHeight = 0.f;
-    tex.maxHeight = 0.285f;
+    tex.maxHeight = 0.2801f;
     tex.heightFade = 0.010f;
     tex.minSlope = 0.f;
     tex.maxSlope = 1.f;
@@ -432,7 +432,7 @@ void ModuleTerrain::SetDefaultTextures()
 
     //Sand
     tex.minHeight = 0.f;
-    tex.maxHeight = 0.319f;
+    tex.maxHeight = 0.295f;
     tex.heightFade = 0.01f;
     tex.minSlope = 0.f;
     tex.maxSlope = 1.f;

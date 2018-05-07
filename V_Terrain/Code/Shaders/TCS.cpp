@@ -1,10 +1,7 @@
 #version 430 core
 
-float heightScale = 1.f;
-float triSize = 30.f;
-//vec4 frustumPlanes[6];
-vec3 tileSize = vec3(1.f, 1.f, 1.f);
-//float tileBoundingSphereR = length(tileSize/2.f);
+//TODO send as uniforms
+float triSize = 20.f;
 vec2 viewport = vec2(1920, 1080);
 
 
@@ -13,10 +10,13 @@ layout(vertices = 4) out;
 uniform  mat4 view_matrix;
 uniform  mat4 projection_matrix;
 
-in  vec2 UV[];
 in vec3 pos[];
+in vec3 norm[];
+in vec2 UV[];
 
-out  vec2 UVs[];
+out vec3 position[];
+out vec3 normal[];
+out vec2 UVs[];
 
 //https://developer.nvidia.com/gameworks-vulkan-and-opengl-samples
 
@@ -63,14 +63,15 @@ float calcEdgeTessellationSphere(vec3 w0, vec3 w1, float diameter)
 
 void main()
 {
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    position[gl_InvocationID] = pos[gl_InvocationID];
+    normal[gl_InvocationID] = norm[gl_InvocationID];
     UVs[gl_InvocationID] = UV[gl_InvocationID];
 
     vec3 spherePos = (pos[0] + pos[1] + pos[2] + pos[3]) *0.25f;
     float sphereDiam = distance(spherePos, pos[0]) * 1.1f;
     vec2 diamOnScreen = eyeToScreen(vec4(sphereDiam, 0.f, 0.f, 1.f)).xy;
 
-    if (!sphereInScreen(spherePos, -0.1))//length(diamOnScreen) / 2.f))
+    if (!sphereInScreen(spherePos, -0.05))//length(diamOnScreen) / 2.f))
     {
         gl_TessLevelOuter[0] = -1;
         gl_TessLevelOuter[1] = -1;
