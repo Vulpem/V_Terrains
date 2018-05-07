@@ -21,7 +21,7 @@ namespace VTerrain
     {
 	public:
         float maxHeight = 1000.f;
-        unsigned int chunkHeightmapResolution = 64u;
+        unsigned int chunkHeightmapResolution = 16u;
         unsigned int maxChunks = 512u;
         unsigned int nLODs = 32;
         float LODdistance = 65.f;
