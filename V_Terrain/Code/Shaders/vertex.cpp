@@ -11,7 +11,7 @@ out vec3 pos;
 
 void main()
 {
-	pos = (model_matrix * vec4((position), 1.f)).xyz;
-	gl_Position = vec4(position, 1);
+    pos = (model_matrix * vec4(position + vec3(0, texture2D(heightmap, texCoord).w, 0), 1.f)).xyz;
+    gl_Position = vec4(position, 1);
 	UV = texCoord;
 }
