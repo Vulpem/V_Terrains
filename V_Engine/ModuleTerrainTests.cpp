@@ -47,6 +47,15 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     }
     );
     VTerrain::config.waterHeight = 0.28f;
+
+    m_vertex = VTerrain::GetDefaultVertexShader();
+    m_vertex.reserve(m_vertex.capacity() + 1024);
+    m_TCS = VTerrain::GetDefaultTCS();
+    m_TCS.reserve(m_TCS.capacity() + 1024);
+    m_TES = VTerrain::GetDefaultTES();
+    m_TES.reserve(m_TES.capacity() + 1024);
+    m_fragment = VTerrain::GetDefaultFragmentShader();
+    m_fragment.reserve(m_fragment.capacity() + 1024);
 }
 
 // Destructor
@@ -285,7 +294,7 @@ update_status ModuleTerrain::Update()
                 char tmp[8];
                 sprintf_s(tmp, "##%i", n);
 
-				ImGui::ColorButton(tmp, ImVec4(tex.color.x(), tex.color.y(), tex.color.z(), 1.f));
+				ImGui::ColorButton(tmp, ImVec4(tex.color[0], tex.color[1], tex.color[2], 1.f));
 				ImGui::SameLine();
 				ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(20, 20));
 				ImGui::SameLine();
@@ -293,7 +302,7 @@ update_status ModuleTerrain::Update()
 				ImGui::SameLine();
                 if (ImGui::BeginMenu((std::string("Texture ") + tmp).data()))
                 {
-                    if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color.d)) { changed = true; }
+                    if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color)) { changed = true; }
 					ImGui::Separator();
                     if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, 1.0f)) { changed = true; }
                     if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, 1.0f)) { changed = true; }
@@ -445,7 +454,9 @@ void ModuleTerrain::SetDefaultTextures()
     VTerrain::SetTexture(1, tex);
 
     //Grass
-    tex.color = VTerrain::Vec3<float>(108.f / 255.f, 136.f / 255.f, 177.f / 255.f);
+    tex.color[0] = 108.f / 255.f;
+    tex.color[1] = 136.f / 255.f;
+    tex.color[2] = 177.f / 255.f;
     tex.minHeight = 0.045f;
     tex.maxHeight = 0.550f;
     tex.heightFade = 0.010f;
@@ -460,7 +471,9 @@ void ModuleTerrain::SetDefaultTextures()
     VTerrain::SetTexture(4, tex);
 
     //Gravel
-    tex.color = VTerrain::Vec3<float>(158.f / 255.f, 255.f / 255.f, 0.f / 255.f);
+    tex.color[0] = 158.f / 255.f;
+    tex.color[1] = 255.f / 255.f;
+    tex.color[2] = 0.f / 255.f;
     tex.minHeight = 0.f;
     tex.maxHeight = 0.520f;
     tex.heightFade = 0.010f;
@@ -475,7 +488,9 @@ void ModuleTerrain::SetDefaultTextures()
     VTerrain::SetTexture(5, tex);
 
     //GreyRock
-    tex.color = VTerrain::Vec3<float>(122.f / 255.f, 122.f / 255.f, 122.f / 255.f);
+    tex.color[0] = 122.f / 255.f;
+    tex.color[1] = 122.f / 255.f;
+    tex.color[2] = 122.f / 255.f;
     tex.minHeight = 0.742f;
     tex.maxHeight = 1.f;
     tex.heightFade = 0.010f;
@@ -490,7 +505,9 @@ void ModuleTerrain::SetDefaultTextures()
     VTerrain::SetTexture(6, tex);
 
     //Snow
-    tex.color = VTerrain::Vec3<float>(1.f, 1.f, 1.f);
+    tex.color[0] = 1.f;
+    tex.color[1] = 1.f;
+    tex.color[2] = 1.f;
     tex.minHeight = 0.618f;
     tex.maxHeight = 1.f;
     tex.heightFade = 0.010f;
@@ -556,54 +573,65 @@ void ModuleTerrain::ShaderEditor()
         if (ImGui::Begin("Default Shader Editor", &m_openShaderEditor, ImGuiWindowFlags_NoCollapse))
         {
             bool recompile = false;
-            const uint vertexLen = VTerrain::GetVertexShader().length() + 256;
-            char* vertexBuf = new char[vertexLen];
-            const uint fragmentLen = VTerrain::GetFragmentShader().length() + 256;
-            char* fragmentBuf = new char[fragmentLen];
-            const uint TESLen = VTerrain::GetTES().length() + 256;
-            char* TESbuf = new char[TESLen];
-            const uint TCSlen = VTerrain::GetTCS().length() + 256;
-            char* TCSbuf = new char[TCSlen];
+            if (ImGui::Button("Save shaders"))
+            {
+                VTerrain::SaveShader(m_vertex, "vertex.cpp");
+                VTerrain::SaveShader(m_TCS, "TCS.cpp");
+                VTerrain::SaveShader(m_TES, "TES.cpp");
+                VTerrain::SaveShader(m_fragment, "fragment.cpp");
+            }
 
-            strcpy(vertexBuf, VTerrain::GetVertexShader().data());
             if (ImGui::CollapsingHeader("Vertex shader"))
             {
-                if (ImGui::InputTextMultiline("##vertexShaderEditor", vertexBuf, vertexLen, ImVec2(ImGui::GetWindowWidth(), 600)));
+                bool refresh = false;
+                if (m_vertex.length() + 512 >= m_vertex.capacity()) { m_vertex.reserve(m_vertex.capacity() + 512); refresh = true; }
+                if (ImGui::InputTextMultiline((refresh ? "##vertexShaderEditorRefreshing" : "##vertexShaderEditor"), (char*)m_vertex.data(), m_vertex.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
                 {
+                    //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
+                    m_vertex = m_vertex.data();
                     recompile = true;
                 }
             }
 
-            strcpy(TCSbuf, VTerrain::GetTCS().data());
-            if (ImGui::CollapsingHeader("Tesselation Control Shader"))
+            if (ImGui::CollapsingHeader("TCS shader"))
             {
-                if (ImGui::InputTextMultiline("##TCSEditor", TCSbuf, TCSlen, ImVec2(ImGui::GetWindowWidth(), 600)))
+                bool refresh = false;
+                if (m_TCS.length() + 512 >= m_TCS.capacity()) { m_TCS.reserve(m_TCS.capacity() + 512); refresh = true; }
+                if (ImGui::InputTextMultiline((refresh ? "##TCSShaderEditorRefreshing" : "##TCSShaderEditor"), (char*)m_TCS.data(), m_TCS.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
                 {
+                    //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
+                    m_TCS = m_TCS.data();
                     recompile = true;
                 }
             }
 
-            strcpy(TESbuf, VTerrain::GetTES().data());
-            if (ImGui::CollapsingHeader("Tesselation Evaluation Shader"))
+            if (ImGui::CollapsingHeader("TES shader"))
             {
-                if (ImGui::InputTextMultiline("##TESEditor", TESbuf, TESLen, ImVec2(ImGui::GetWindowWidth(), 600)))
+                bool refresh = false;
+                if (m_TES.length() + 512 >= m_TES.capacity()) { m_TES.reserve(m_TES.capacity() + 512); refresh = true; }
+                if (ImGui::InputTextMultiline((refresh ? "##vertexShaderEditorRefreshing" : "##vertexShaderEditor"), (char*)m_TES.data(), m_TES.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
                 {
+                    //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
+                    m_TES = m_TES.data();
                     recompile = true;
                 }
             }
 
-			strcpy(fragmentBuf, VTerrain::GetFragmentShader().data());
-			if (ImGui::CollapsingHeader("Fragment shader"))
-			{
-				if (ImGui::InputTextMultiline("##fragmentShaderEditor", fragmentBuf, fragmentLen, ImVec2(ImGui::GetWindowWidth(), 600)))
-				{
-					recompile = true;
-				}
-			}
+            if (ImGui::CollapsingHeader("Fragment shader"))
+            {
+                bool refresh = false;
+                if (m_fragment.length() + 512 >= m_fragment.capacity()) { m_fragment.reserve(m_fragment.capacity() + 512); refresh = true; }
+                if (ImGui::InputTextMultiline((refresh ? "##vertexShaderEditorRefreshing" : "##vertexShaderEditor"), (char*)m_fragment.data(), m_fragment.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
+                {
+                    //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
+                    m_fragment = m_fragment.data();
+                    recompile = true;
+                }
+            }
 
             if (recompile)
             {
-                m_shaderResult = VTerrain::CompileShaders(fragmentBuf, vertexBuf, TCSbuf, TESbuf);
+                m_shaderResult = VTerrain::CompileShaders(m_fragment.data(), m_vertex.data(), m_TCS.data(), m_TES.data());
             }
 
             if (m_shaderResult.length() > 5)
@@ -611,8 +639,7 @@ void ModuleTerrain::ShaderEditor()
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
                 ImGui::TextWrapped(m_shaderResult.data());
             }
-            RELEASE_ARRAY(vertexBuf);
-            RELEASE_ARRAY(fragmentBuf);
+
             ImGui::End();
         }
     }

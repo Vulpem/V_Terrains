@@ -12,8 +12,6 @@
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
-#include "../Globals.h"
-
 #include "Chunk.h"
 #include "ChunkFactory.h"
 
@@ -44,6 +42,7 @@ namespace VTerrain
 		const Chunk& GetChunk(Vec2<int> pos) const;
 		bool IsLoaded(Vec2<int> pos) const;
         Chunk& GetFurthestChunk();
+
 
         std::vector<Chunk> m_chunks;
 

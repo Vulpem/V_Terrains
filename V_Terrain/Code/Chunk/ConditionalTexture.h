@@ -12,38 +12,22 @@
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
-#include "../Globals.h"
-
 namespace VTerrain
 {
 	class ConditionalTexture
 	{
 	public:
-		enum class val
-		{
-			colorR = 0,
-			colorG,
-			colorB,
-			minSlope,
-			maxSlope,
-			minHeight,
-			maxHeight,
-			sizeMultiplier,
-			heightFade,
-			slopeFade,
-			hasTexture
-		};
 		const float* Get() const
 		{
-			float* ret = (float*)color.d;
-			ret[(int)val::hasTexture] = (buf_diffuse != 0 ? 10.f : 0.f);
-			return ret;
+            //Please ignore this ugly cheat
+            *(float*)&hasTexture = (buf_diffuse != 0 ? 10.f : 0.f);
+			return color;
 		}
 
 		unsigned int buf_diffuse = 0u;
 		unsigned int buf_heightmap = 0u;
 
-		Vec3<float> color = Vec3<float>(1.f,1.f,1.f);
+        float color[3] = { 1.f,1.f,1.f };
 		float minSlope = 0.f;
 		float maxSlope = 1.f;
 		float minHeight = 0.f;

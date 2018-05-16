@@ -13,7 +13,7 @@
 #pragma once
 
 #include "../Globals.h"
-#include "ChunkFactory.h"
+#include "ChunkRequests.h"
 #include "ChunkMesh.h"
 #include "../Utils/Shaders.h"
 
@@ -26,17 +26,15 @@ namespace VTerrain
 	public:
 		Chunk();
 
-		void Regenerate(ChunkFactory::GeneratedChunk base);
+		void Regenerate(GeneratedChunk base);
 		void Free();
-		void Draw(const Shader& shader, const Vec3<float>& cameraPos, uint nIndices) const;
-		bool IsLODReady(uint LOD)  const;
+		void BindHeightmap(int textureN) const;
+        void BindModelMatrix(uint uniformLocation) const;
 		bool IsLoaded()  const;
 		Vec2<int> GetPos() const;
-		static int GetDensity(const Vec3<float>& cameraPos, float chunkX, float chunkZ);
 
     private:
 		Vec2<int> m_pos;
-		uint m_minLOD;
 		uint m_buf_heightmap;
 	};
 }

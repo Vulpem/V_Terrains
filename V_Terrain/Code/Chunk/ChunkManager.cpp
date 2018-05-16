@@ -104,8 +104,6 @@ namespace VTerrain
 
         glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
 
-        glUniform3fv(m_shader.loc_water_color, 1, config.waterColor);
-
         glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
         glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
@@ -114,7 +112,6 @@ namespace VTerrain
         glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
         glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
-        glUniform1i(m_shader.loc_heightmap, 0);
         for (int n = 0; n < 10; n++)
         {
             glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
@@ -160,8 +157,18 @@ namespace VTerrain
             p[0] * r[6] + p[1] * r[7] + p[2] * r[8]
             );
 
+        glUniform1i(m_shader.loc_heightmap, 0);
         const uint nIndices = m_mesh.GetNIndices();
-        std::for_each(m_chunks.begin(), m_chunks.end(), [=](const Chunk& chunk) {chunk.Draw(m_shader, cameraPos * -1, nIndices); });
+        std::for_each(m_chunks.begin(), m_chunks.end(),
+            [=](const Chunk& chunk)
+        {
+            if (chunk.IsLoaded())
+            {
+                chunk.BindHeightmap(0);
+                chunk.BindModelMatrix(m_shader.loc_model_matrix);
+                glDrawElements(GL_PATCHES, nIndices, GL_UNSIGNED_INT, (void*)0);
+            }
+        });
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glUseProgram(0);

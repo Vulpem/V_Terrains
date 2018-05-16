@@ -48,13 +48,14 @@ namespace VTerrain
         return ret;
     }
 
-    float PerlinNoise::GetValue(int x, int y)  const
-    {
-		const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
-        return m_heightCurve(m_perlin.octaveNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
-    }
     void PerlinNoise::SetCurve(std::function<float(float)> func)
     {
         m_heightCurve = func;
+    }
+
+    float PerlinNoise::GetValue(int x, int y)  const
+    {
+        const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
+        return m_heightCurve(m_perlin.octaveNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
     }
 }

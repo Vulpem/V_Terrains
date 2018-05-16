@@ -28,7 +28,6 @@ namespace VTerrain
             uint GetMeshBuf() const { return m_dataBuff; }
             uint GetIndicesBuf() const { return m_indicesBuff; }
             uint GetNIndices()const { return m_nIndices; }
-            uint GetNumIndices() const { return 6; }
             bool IsGenerated() const { return m_generated; }
         private:
 

@@ -13,10 +13,7 @@
 #ifndef __VTERRAIN_INCLUDE__
 #define __VTERRAIN_INCLUDE__
 
-#include "TerrainConfig.h"
-
-#include <functional>
-
+#include "Terrainconfig.h"
 #include "Chunk/ConditionalTexture.h"
 
 namespace VTerrain
@@ -29,13 +26,15 @@ namespace VTerrain
 	void CleanChunks();
     void SetSeed(unsigned int seed);
 
+    std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
 
     //TMP
-    std::string GetVertexShader();
-    std::string GetFragmentShader();
-    std::string GetTCS();
-    std::string GetTES();
-    std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
+    std::string GetDefaultVertexShader();
+    std::string GetDefaultFragmentShader();
+    std::string GetDefaultTCS();
+    std::string GetDefaultTES();
+    
+    void SaveShader(const std::string& data, const char* fileName);
 
 	const ConditionalTexture& GetTexture(int n);
     void SetTexture(int n, const ConditionalTexture& tex);

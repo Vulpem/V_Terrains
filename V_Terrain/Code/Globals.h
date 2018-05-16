@@ -16,7 +16,7 @@
 typedef unsigned int uint;
 
 #include "utils/IncludeSTD.h"
-#include "TerrainConfig.h"
+#include "Terrainconfig.h"
 #include "utils/Vec3.h"
 #include <windows.h> 
 

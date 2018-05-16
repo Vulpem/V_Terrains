@@ -88,7 +88,7 @@ namespace VTerrain
         }
     }
 
-    ChunkFactory::GeneratedChunk ChunkFactory::PopGeneratedChunk()
+    GeneratedChunk ChunkFactory::PopGeneratedChunk()
     {
 		std::unique_lock<std::mutex> lock(m_mut_results);
         const GeneratedChunk ret = m_results.front();
@@ -102,7 +102,7 @@ namespace VTerrain
         return (!m_results.empty());
     }
 
-    ChunkFactory::RequestedChunk ChunkFactory::PopChunkRequest()
+    RequestedChunk ChunkFactory::PopChunkRequest()
     {
 		std::unique_lock<std::mutex> lock(m_mut_requests);
         const RequestedChunk ret = *m_requests.begin();
@@ -136,7 +136,6 @@ namespace VTerrain
 
             result.m_pos = request.pos;
             result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };
-            result.m_LOD = 0;
             result.m_data.resize(result.m_size.x() * result.m_size.y() * 4);
 
             const float topLeftX = (noiseMap.Width() - (noiseMap.Width() % 2 != 0)) / 2.f;

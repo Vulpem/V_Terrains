@@ -37,6 +37,11 @@ public:
     bool m_openShaderEditor;
     std::string m_shaderResult;
 
+    std::string m_vertex;
+    std::string m_TCS;
+    std::string m_TES;
+    std::string m_fragment;
+
     int m_maxTexturesGL;
 
 	bool m_wantRegen;

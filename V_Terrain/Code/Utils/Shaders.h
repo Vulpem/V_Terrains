@@ -31,11 +31,9 @@ namespace VTerrain
         unsigned int loc_water_height = 0u;
         unsigned int loc_global_light_direction = 0u;
         unsigned int loc_ambient_color = 0u;
-        unsigned int loc_water_color = 0u;
         unsigned int loc_fog_color = 0u;
 
         unsigned int loc_maxLOD = 0u;
-        unsigned int loc_tesselationDensity = 0u;
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;
@@ -57,13 +55,17 @@ namespace VTerrain
         static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf, const char* TCS, const char* TES, std::string& result);
         static void FreeShader(const Shader& shader);
 
-        static std::string m_defaultVertexShader;
-        static std::string m_defaultFragmentShader;
-        static std::string m_defaultTCSShader;
-        static std::string m_defaultTESShader;
+
+        static std::string GetDefaultVertexShader();
+        static std::string GetDefaultFragmentShader();
+        static std::string GetDefaultTCSShader();
+        static std::string GetDefaultTESShader();
+
+        //TODO to remove
+        static void SaveFile(const std::string& file, const char* fileDir);
     private:
         static std::string OpenFile(const char* fileDir);
 		static const char* GetShaderType(unsigned int type);
-        static unsigned int Compile(std::string code, unsigned int type, std::string& result);
+        static unsigned int Compile(const std::string& code, unsigned int type, std::string& result);
     };
 }

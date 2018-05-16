@@ -15,6 +15,7 @@
 #include "../Globals.h"
 
 #include "../Noise/PerlinNoise.h"
+#include "ChunkRequests.h"
 
 #include <mutex>
 #include <thread>
@@ -24,30 +25,11 @@ namespace VTerrain
     class ChunkFactory
     {
     public:
-        struct RequestedChunk
-        {
-            RequestedChunk(int x = 0, int y = 0) : pos(x, y) {}
-            RequestedChunk(Vec2<int> p) : pos(p) {}
-            Vec2<int> pos;
-            bool operator== (const RequestedChunk& p) { return pos == p.pos; }
-            bool operator== (const Vec2<int>& p) { return pos == p; }
-        };
-
-        struct GeneratedChunk
-        {
-			GeneratedChunk() = default;
-            Vec2<int> m_pos;
-            Vec2<uint> m_size;
-            uint m_LOD;
-            std::vector<float> m_data;
-            float& operator[] (int n) { return m_data[n]; }
-        };
-
 		ChunkFactory();
 		~ChunkFactory();
 
-		ChunkFactory(const ChunkFactory&) {};
-        ChunkFactory& operator=(const ChunkFactory&) {};
+        ChunkFactory(const ChunkFactory&) = delete;
+        ChunkFactory& operator=(const ChunkFactory&) = delete;
 
 		void LaunchThread();
 		bool IsThreadRunning() const { return m_runningThread; }
@@ -79,9 +61,10 @@ namespace VTerrain
         std::queue<GeneratedChunk> m_results;
 		std::mutex m_mut_results;
 
-		std::thread m_thread;
 		bool m_runningThread;
 		bool m_wantToStopThread;
 		std::mutex m_mut_wantToStopThread;
+
+        std::thread m_thread;
     };
 }

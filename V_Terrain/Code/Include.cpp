@@ -18,8 +18,8 @@
 
 namespace VTerrain
 {
-	Config VTerrain::config = Config();
-	ChunkManager chunkManager = ChunkManager();
+	Config VTerrain::config;
+	ChunkManager chunkManager;
 
     void Init()
     {
@@ -51,28 +51,36 @@ namespace VTerrain
         chunkManager.SetSeed(seed);
     }
 
-
-
-
-    std::string GetVertexShader()
+    std::string GetDefaultVertexShader()
     {
-        return Shaders::m_defaultVertexShader;
+        return Shaders::GetDefaultVertexShader();
     }
 
-    std::string GetFragmentShader()
+    std::string GetDefaultFragmentShader()
     {
-        return  Shaders::m_defaultFragmentShader;
+        return Shaders::GetDefaultFragmentShader();
     }
 
-    std::string GetTCS()
+    std::string GetDefaultTCS()
     {
-        return Shaders::m_defaultTCSShader;
+        return Shaders::GetDefaultTCSShader();
     }
 
-    std::string GetTES()
+    std::string GetDefaultTES()
     {
-        return Shaders::m_defaultTESShader;
+        return Shaders::GetDefaultTESShader();
     }
+
+#if _DEBUG
+    void SaveShader(const std::string & data, const char * fileName)
+    {
+        Shaders::SaveFile(data, fileName);
+    }
+#else
+    void SaveShader(const std::string & data, const char * fileName)
+    {
+    }
+#endif
 
     std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES)
     {

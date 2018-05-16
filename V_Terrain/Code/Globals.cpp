@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include <cstdarg>
-#include "TerrainConfig.h"
+#include "Terrainconfig.h"
 #include <assert.h>
 
 namespace VTerrain

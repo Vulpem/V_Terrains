@@ -32,17 +32,11 @@ namespace VTerrain
             m_data.clear();
         }
 
-        void NoiseMap::Set(std::vector<float> data, uint width, uint height)
+        void NoiseMap::Set(const std::vector<float>& data, uint width, uint height)
         {
             m_width = width;
             m_height = height;
             m_data = data;
-        }
-
-        void NoiseMap::Init(uint width, uint height)
-        {
-            m_width = width;
-            m_height = height;
         }
 
         uint NoiseMap::Width() const

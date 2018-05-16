@@ -19,7 +19,6 @@ namespace VTerrain
 {
     struct Config
     {
-	public:
         float maxHeight = 1000.f;
         unsigned int chunkHeightmapResolution = 16u;
         unsigned int maxChunks = 512u;
@@ -51,10 +50,8 @@ namespace VTerrain
             bool renderHeightmap = false;
             bool renderChunkBorders = false;
         } debug;
-
 		std::function<void(const char*)> throwErrorFunc;
-   };
-
-	extern Config config;
+    };
+    extern Config config;
 }
 #endif

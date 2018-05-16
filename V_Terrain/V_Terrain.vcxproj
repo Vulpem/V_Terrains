@@ -144,6 +144,7 @@
     <ClInclude Include="Code\Chunk\ChunkFactory.h" />
     <ClInclude Include="Code\Chunk\ChunkManager.h" />
     <ClInclude Include="Code\Chunk\ChunkMesh.h" />
+    <ClInclude Include="Code\Chunk\ChunkRequests.h" />
     <ClInclude Include="Code\Chunk\ConditionalTexture.h" />
     <ClInclude Include="Code\Globals.h" />
     <ClInclude Include="Code\Include.h" />
@@ -211,6 +212,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="Code\Utils\DefaultShaders.cpp" />
     <ClCompile Include="Code\Utils\GenImage.cpp" />
     <ClCompile Include="Code\Utils\Shaders.cpp" />
   </ItemGroup>

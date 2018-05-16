@@ -19,13 +19,6 @@
 
 namespace VTerrain
 {
-    std::string Shaders::m_defaultVertexShader = std::string("Here will go the shader TODO");
-
-    std::string Shaders::m_defaultFragmentShader = std::string("Here will go the shader TODO");
-
-    std::string Shaders::m_defaultTCSShader = std::string("TODO");
-    std::string Shaders::m_defaultTESShader = std::string("TODO");
-
     Shader Shaders::CompileShader(const char * vertexBuf, const char * fragmentBuf, const char* TCSbuf, const char* TESbuf, std::string& result)
     {
         //Checking OpenGL version
@@ -37,11 +30,17 @@ namespace VTerrain
 
         GLint success;
         Shader ret;
+        std::string code;
 
         unsigned int vertexShader = 0;
         if (vertexBuf == nullptr)
         {
-            vertexShader = Compile(OpenFile("vertex.cpp"), GL_VERTEX_SHADER, result);
+            code = OpenFile("vertex.cpp");
+            if(code.length() <= 1)
+            {
+                code = GetDefaultVertexShader();
+            }
+            vertexShader = Compile(code, GL_VERTEX_SHADER, result);
         }
         else
         {
@@ -51,7 +50,12 @@ namespace VTerrain
         unsigned int TCS = 0;
         if (TCSbuf == nullptr)
         {
-            TCS = Compile(OpenFile("TCS.cpp"), GL_TESS_CONTROL_SHADER, result);
+            code = OpenFile("TCS.cpp");
+            if (code.length() <= 1)
+            {
+                code = GetDefaultTCSShader();
+            }
+            TCS = Compile(code, GL_TESS_CONTROL_SHADER, result);
         }
         else
         {
@@ -61,7 +65,12 @@ namespace VTerrain
         unsigned int TES = 0;
         if (TCSbuf == nullptr)
         {
-            TES = Compile(OpenFile("TES.cpp"), GL_TESS_EVALUATION_SHADER, result);
+            code = OpenFile("TES.cpp");
+            if (code.length() <= 1)
+            {
+                code = GetDefaultTESShader();
+            }
+            TES = Compile(code, GL_TESS_EVALUATION_SHADER, result);
         }
         else
         {
@@ -71,7 +80,12 @@ namespace VTerrain
         unsigned int fragmentShader = 0;
         if (fragmentBuf == nullptr)
         {
-            fragmentShader = Compile(OpenFile("fragment.cpp"), GL_FRAGMENT_SHADER, result);
+            code = OpenFile("fragment.cpp");
+            if (code.length() <= 1)
+            {
+                code = GetDefaultFragmentShader();
+            }
+            fragmentShader = Compile(code, GL_FRAGMENT_SHADER, result);
         }
         else
         {
@@ -112,12 +126,10 @@ namespace VTerrain
                 ret.loc_global_light_direction = glGetUniformLocation(program, "global_light_direction");
                 ret.loc_fog_distance = glGetUniformLocation(program, "fog_distance");
                 ret.loc_fog_color = glGetUniformLocation(program, "fog_color");
-                ret.loc_water_color = glGetUniformLocation(program, "water_color");
                 ret.loc_water_height = glGetUniformLocation(program, "water_height");
                 ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
 
                 ret.loc_maxLOD = glGetUniformLocation(program, "maxDensity");
-                ret.loc_tesselationDensity = glGetUniformLocation(program, "tesselationDensity");
 
                 ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
@@ -180,6 +192,25 @@ namespace VTerrain
         return ret;
     }
 
+    void Shaders::SaveFile(const std::string& file, const char * fileDir)
+    {
+        TCHAR pwd[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, pwd);
+
+        std::string dir(pwd);
+        dir += "/../V_Terrain/Code/Shaders/";
+        dir += fileDir;
+        std::string ret;
+        std::ofstream outStream;
+        outStream.open(dir.data());
+       
+        if (outStream.is_open())
+        {
+            outStream.write(file.data(), file.size());
+            outStream.close();
+        }
+    }
+
     const char* Shaders::GetShaderType(unsigned int type)
     {
         switch (type)
@@ -196,7 +227,7 @@ namespace VTerrain
         return "Unspecified";
     }
 
-    unsigned int Shaders::Compile(std::string code, unsigned int type, std::string& result)
+    unsigned int Shaders::Compile(const std::string& code, unsigned int type, std::string& result)
     {
         unsigned int ret;
         GLint success = 0;
@@ -232,22 +263,6 @@ namespace VTerrain
             result += '\n';
             glDeleteShader(ret);
             ret = 0;
-        }
-
-        switch (type)
-        {
-        case GL_VERTEX_SHADER:
-            m_defaultVertexShader = code;
-            break;
-        case GL_FRAGMENT_SHADER:
-            m_defaultFragmentShader = code;
-            break;
-        case GL_TESS_CONTROL_SHADER:
-            m_defaultTCSShader = code;
-            break;
-        case GL_TESS_EVALUATION_SHADER:
-            m_defaultTESShader = code;
-            break;
         }
 
         return ret;

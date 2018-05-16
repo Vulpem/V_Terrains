@@ -12,10 +12,7 @@
 //  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
-#include "../Globals.h"
-
 #include "NoiseMap.h"
-#include "Extern/SivPerlinNoise.h"
 
 namespace VTerrain
 {
@@ -26,10 +23,11 @@ namespace VTerrain
 
         void SetSeed(uint seed);
         NoiseMap GenNoiseMap(Vec2<int> offset) const;
-        float GetValue(int x, int y)  const;
         void SetCurve(std::function<float(float)> func);
 
 	private:
+        float GetValue(int x, int y)  const;
+
         siv::SivPerlinNoise m_perlin;
         std::function<float(float)> m_heightCurve;
     };

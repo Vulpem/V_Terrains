@@ -19,13 +19,13 @@
 namespace VTerrain
 {
      Chunk::Chunk() :
-        m_minLOD(UINT_MAX)
-        , m_buf_heightmap(0u)
+        m_buf_heightmap(0u)
+         , m_pos(0,0)
     {
 
     }
 
-    void  Chunk::Regenerate(ChunkFactory::GeneratedChunk base)
+    void  Chunk::Regenerate(GeneratedChunk base)
     {
 		if (m_buf_heightmap != 0)
 		{
@@ -33,7 +33,6 @@ namespace VTerrain
 		}
 
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
-        m_minLOD = base.m_LOD;
         m_pos = base.m_pos;
     }
 
@@ -43,61 +42,35 @@ namespace VTerrain
 		{
 			GenImage::FreeImage(m_buf_heightmap);
 		}
-        m_minLOD = UINT_MAX;
     }
 
-    void  Chunk::Draw(const Shader& shader, const Vec3<float>& cameraPos, uint nIndices) const
+    void Chunk::BindHeightmap(int textureN) const
     {
-        if (IsLoaded())
+        glActiveTexture(GL_TEXTURE0 + textureN);
+        glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
+    }
+
+    void Chunk::BindModelMatrix(uint uniformLocation) const
+    {
+        const Vec3<float> chunkPos(m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize);
+        const float modelMatrix[] =
         {
-            const Vec3<float> chunkPos( m_pos.x() * config.chunkSize, 0.f, m_pos.y() * config.chunkSize );
+            config.chunkSize,	0,					0,					0,
+            0,					config.maxHeight,	0,					0,
+            0,					0,					config.chunkSize,	0,
+            chunkPos.x(),		chunkPos.y(),		chunkPos.z(),		1
+        };
 
-			const float modelMatrix[] =
-			{
-				config.chunkSize,	0,					0,					0,
-				0,					config.maxHeight,	0,					0,
-				0,					0,					config.chunkSize,	0,
-				chunkPos.x(),		chunkPos.y(),		chunkPos.z(),		1
-			};
-
-			glUniformMatrix4fv(shader.loc_model_matrix, 1, GL_FALSE, modelMatrix);
-
-			//TODO: improve this nonsense
-			int density[6];
-			density[0] = GetDensity(cameraPos, chunkPos.x(), chunkPos.z());
-			density[1] = density[0];
-
-			density[2] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x(),						chunkPos.z() - config.chunkSize	));
-			density[3] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x() - config.chunkSize,	chunkPos.z()					));
-			density[4] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x(),						chunkPos.z() + config.chunkSize	));
-			density[5] = utils::Max(density[0], GetDensity(cameraPos, chunkPos.x() + config.chunkSize,	chunkPos.z()					));
-
-			glUniform1iv(shader.loc_tesselationDensity, 6, density);
-
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_buf_heightmap);
-
-            glDrawElements(GL_PATCHES, nIndices, GL_UNSIGNED_INT, (void*)0);
-        }
-    }
-
-    bool  Chunk::IsLODReady(uint LOD)  const
-    {
-        return (LOD >= m_minLOD);
+        glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, modelMatrix);
     }
 
     bool  Chunk::IsLoaded() const
     {
-        return (m_minLOD != UINT_MAX);
+        return (m_buf_heightmap != 0);
     }
 
 	Vec2<int> Chunk::GetPos() const
 	{
 		return m_pos;
-	}
-
-	int Chunk::GetDensity(const Vec3<float>& cameraPos, float chunkX, float chunkZ)
-	{
-		return utils::Max(1, (int)config.nLODs - static_cast<int>((cameraPos - Vec3<float>(chunkX, 0.f, chunkZ)).Length() / config.LODdistance));
 	}
 }
