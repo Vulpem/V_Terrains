@@ -609,7 +609,7 @@ void ModuleTerrain::ShaderEditor()
             {
                 bool refresh = false;
                 if (m_TES.length() + 512 >= m_TES.capacity()) { m_TES.reserve(m_TES.capacity() + 512); refresh = true; }
-                if (ImGui::InputTextMultiline((refresh ? "##vertexShaderEditorRefreshing" : "##vertexShaderEditor"), (char*)m_TES.data(), m_TES.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
+                if (ImGui::InputTextMultiline((refresh ? "##TESShaderEditorRefreshing" : "##TESShaderEditor"), (char*)m_TES.data(), m_TES.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
                 {
                     //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
                     m_TES = m_TES.data();
@@ -621,7 +621,7 @@ void ModuleTerrain::ShaderEditor()
             {
                 bool refresh = false;
                 if (m_fragment.length() + 512 >= m_fragment.capacity()) { m_fragment.reserve(m_fragment.capacity() + 512); refresh = true; }
-                if (ImGui::InputTextMultiline((refresh ? "##vertexShaderEditorRefreshing" : "##vertexShaderEditor"), (char*)m_fragment.data(), m_fragment.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
+                if (ImGui::InputTextMultiline((refresh ? "##FragmentShaderEditorRefreshing" : "##FragmentShaderEditor"), (char*)m_fragment.data(), m_fragment.capacity(), ImVec2(ImGui::GetWindowWidth() - 50, 600), ImGuiInputTextFlags_::ImGuiInputTextFlags_AllowTabInput));
                 {
                     //Since we're brute-forcing the characters into the string, this will update it's variables (like "length") to the real size. This a debug-only feature
                     m_fragment = m_fragment.data();
