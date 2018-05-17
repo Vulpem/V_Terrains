@@ -145,8 +145,16 @@ void main()
         col = ScalarToColor(poliDensity / maxDensity);
     }*/
 
-    float fogStrength = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
-    fogStrength = min(fogStrength, 1);
+    float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
+	distanceFog = min(distanceFog, 1);
 
-    color = vec4(mix(col, fog_color, fogStrength), 1.f);
+    float heightFog = (1 + water_height - height);
+    heightFog = pow(heightFog, 3);
+
+    float fog = distanceFog + (heightFog * 0.5f) * pow(distanceFog, 0.25f);
+	fog = min(fog,1);
+
+    color = vec4(mix(col, fog_color, fog), 1.f);
 }
+
+

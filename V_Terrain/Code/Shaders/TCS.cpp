@@ -71,7 +71,7 @@ void main()
     float sphereDiam = distance(spherePos, pos[0]) * 1.1f;
     vec2 diamOnScreen = eyeToScreen(vec4(sphereDiam, 0.f, 0.f, 1.f)).xy;
 
-    if (!sphereInScreen(spherePos, -0.05))//length(diamOnScreen) / 2.f))
+    if (!sphereInScreen(spherePos, 0.15))//length(diamOnScreen) / 2.f))
     {
         gl_TessLevelOuter[0] = -1;
         gl_TessLevelOuter[1] = -1;
@@ -92,3 +92,4 @@ void main()
         gl_TessLevelInner[1] = 0.5 * (gl_TessLevelOuter[0] + gl_TessLevelOuter[2]);
     }
 }
+
