@@ -20,13 +20,11 @@ namespace VTerrain
     struct Config
     {
         float maxHeight = 1000.f;
-        unsigned int chunkHeightmapResolution = 16u;
+        unsigned int chunkHeightmapResolution = 32u;
         unsigned int maxChunks = 512u;
-        unsigned int nLODs = 32;
-        float LODdistance = 65.f;
-        float chunkSize = 512.f;
+        float chunkSize = 1024.f;
         unsigned int chunkMinDensity = 10;
-		float fogDistance = 4000.f;
+		float fogDistance = 10000.f;
 		float waterHeight = 0.f;
         float ambientLight = 0.4f;
 
@@ -37,10 +35,11 @@ namespace VTerrain
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
 		struct Noise
         {
-			float frequency = 0.15f;
-			unsigned int octaves = 8u;
-			float lacunarity = 2.15f;
-			float persistency = 0.48f;
+			unsigned int ridgedDepth = 1;
+			float frequency = 0.404f;
+			unsigned int octaves = 5u;
+			float lacunarity = 2.82f;
+			float persistency = 0.428f;
         } noise;
 
 		struct Debug

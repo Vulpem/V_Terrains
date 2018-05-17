@@ -130,7 +130,7 @@ void main()
         col = vec3(val, val, val);
     }
 
-    if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
+    if (render_chunk_borders != 0 && (UV.x <= 0.03f || UV.y <= 0.03f || UV.x >= 0.97 || UV.y >= 0.97))
     {
         col = vec3(1.f, 1.f, 1.f);
     }
@@ -156,5 +156,6 @@ void main()
 
     color = vec4(mix(col, fog_color, fog), 1.f);
 }
+
 
 

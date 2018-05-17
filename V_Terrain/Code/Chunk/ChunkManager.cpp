@@ -106,8 +106,6 @@ namespace VTerrain
 
         glUniform1f(m_shader.loc_water_height, config.waterHeight);
 
-        glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
-
         glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
         glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
         glUniform1i(m_shader.loc_render_light, config.debug.renderLight);

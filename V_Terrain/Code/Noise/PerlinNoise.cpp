@@ -56,6 +56,6 @@ namespace VTerrain
     float PerlinNoise::GetValue(int x, int y)  const
     {
         const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
-        return m_heightCurve(m_perlin.octaveNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.lacunarity, config.noise.persistency));
+        return m_heightCurve(m_perlin.ridgedNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.ridgedDepth, config.noise.lacunarity, config.noise.persistency));
     }
 }

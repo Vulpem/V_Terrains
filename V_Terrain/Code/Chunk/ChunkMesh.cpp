@@ -78,7 +78,6 @@ namespace VTerrain
         std::vector<uint> indices;
         indices.reserve((width - 1)*(height - 1) * 4u);
 
-        uint n = 0;
         uint i = 0;
         const uint step = 1;
         for (uint y = 0; y < height; y += step)

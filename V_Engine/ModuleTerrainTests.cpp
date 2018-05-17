@@ -31,7 +31,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_persistance (VTerrain::config.noise.persistency)
     , m_maxHeight(VTerrain::config.maxHeight)
 	, m_fogDistance(VTerrain::config.fogDistance)
-    , m_currentHeightCurve("float func(float x)\n{ return x; }")
+    , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
     , m_curvePow(2)
     , m_setCurvePow(2)
     , m_openShaderEditor(false)
@@ -41,11 +41,9 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	VTerrain::config.throwErrorFunc = ShowError;
 
     VTerrain::SetHeightCurve(
-        [](float x)
-    {
-        return x;
-    }
-    );
+    [](float x) {
+		return pow(x, 2);
+    });
     VTerrain::config.waterHeight = 0.28f;
 
     m_vertex = VTerrain::GetDefaultVertexShader();
@@ -130,14 +128,6 @@ update_status ModuleTerrain::Update()
 		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
 		if (ImGui::CollapsingHeader("Render"))
 		{
-			ImGui::SliderInt("Amount of LODs", &(int)VTerrain::config.nLODs, 0, 64);
-			ImGui::SliderFloat("LOD distance", &VTerrain::config.LODdistance, 0.1f, 10000.f, "%.3f", 2.f);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Reduce the amount of triangles by a\n"
-					"power of this value.\n"
-					"If set to 0, they're set automatically\n"
-					"from distance to camera.");
-
 			ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, 1.f);
 			ImGui::NewLine();
@@ -200,6 +190,8 @@ update_status ModuleTerrain::Update()
 				ImGui::SetTooltip(
 					"Strength multiplier for each octave.\n"
 					"Will reset all chunks.");
+			ImGui::Separator();
+			if (ImGui::SliderInt("Ridged depth", &(int)VTerrain::config.noise.ridgedDepth, 0, VTerrain::config.noise.octaves)) { WantRegen(); }
 			ImGui::Separator();
 			if (ImGui::BeginMenu("Set Height Curve"))
 			{
