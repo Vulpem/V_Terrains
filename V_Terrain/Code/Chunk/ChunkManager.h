@@ -31,6 +31,7 @@ namespace VTerrain
 
         void SetHeightCurve(std::function<float(float)> func);
         void SetSeed(uint seed);
+        void GenerateMesh();
 
         ConditionalTexture m_textures[10];
         Shader m_shader;

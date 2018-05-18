@@ -46,6 +46,11 @@ namespace VTerrain
 		chunkManager.CleanChunks();
 	}
 
+    void RegenerateMesh()
+    {
+        chunkManager.GenerateMesh();
+    }
+
     void SetSeed(unsigned int seed)
     {
         chunkManager.SetSeed(seed);

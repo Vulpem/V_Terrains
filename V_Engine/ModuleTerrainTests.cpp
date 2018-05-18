@@ -44,7 +44,6 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     [](float x) {
 		return pow(x, 2);
     });
-    VTerrain::config.waterHeight = 0.28f;
 
     m_vertex = VTerrain::GetDefaultVertexShader();
     m_vertex.reserve(m_vertex.capacity() + 1024);
@@ -155,7 +154,7 @@ update_status ModuleTerrain::Update()
 			ImGui::Separator();
 			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
 			if (ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
-
+            if (ImGui::DragInt("Min chunk polys", &(int)VTerrain::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
 
 			ImGui::Separator();
 
@@ -419,8 +418,8 @@ void ModuleTerrain::SetDefaultTextures()
     uint64_t UID;
     //Water
     tex.minHeight = 0.f;
-    tex.maxHeight = 0.2801f;
-    tex.heightFade = 0.010f;
+    tex.maxHeight = 0.005f;
+    tex.heightFade = 0.f;
     tex.minSlope = 0.f;
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.f;
@@ -433,8 +432,8 @@ void ModuleTerrain::SetDefaultTextures()
 
     //Sand
     tex.minHeight = 0.f;
-    tex.maxHeight = 0.295f;
-    tex.heightFade = 0.01f;
+    tex.maxHeight = 0.01f;
+    tex.heightFade = 0.001f;
     tex.minSlope = 0.f;
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.05f;
@@ -549,6 +548,7 @@ void ModuleTerrain::GenMap()
     VTerrain::config.noise.lacunarity = m_lacunarity;
     VTerrain::config.noise.persistency = m_persistance;
 
+    VTerrain::RegenerateMesh();
     VTerrain::CleanChunks();
 }
 

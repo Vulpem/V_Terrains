@@ -40,7 +40,7 @@ namespace VTerrain
         m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
 		ASSERT(m_shader.m_program != 0, "Error compiling shaders:\n%s", result.data());
 
-        m_mesh.Generate();
+        GenerateMesh();
         m_isInit = true;
     }
 
@@ -189,6 +189,12 @@ namespace VTerrain
     {
         m_factory.SetSeed(seed);
         CleanChunks();
+    }
+
+    void ChunkManager::GenerateMesh()
+    {
+        m_mesh.Free();
+        m_mesh.Generate();
     }
 
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)

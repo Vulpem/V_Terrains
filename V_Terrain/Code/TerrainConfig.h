@@ -25,7 +25,7 @@ namespace VTerrain
         float chunkSize = 1024.f;
         unsigned int chunkMinDensity = 10;
 		float fogDistance = 10000.f;
-		float waterHeight = 0.f;
+		float waterHeight = 0.004f;
         float ambientLight = 0.4f;
 
 		bool singleSidedFaces = true;
