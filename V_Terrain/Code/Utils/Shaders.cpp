@@ -111,6 +111,7 @@ namespace VTerrain
                 result += "\n------ Shader Program ------\n";
                 result += infoLog;
                 result += '\n';
+                glDeleteProgram(program);
             }
             else
             {

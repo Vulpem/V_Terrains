@@ -42,7 +42,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 
     VTerrain::SetHeightCurve(
     [](float x) {
-		return pow(x, 2);
+        return pow(x, 2.f);
     });
 
     m_vertex = VTerrain::GetDefaultVertexShader();
@@ -243,6 +243,26 @@ update_status ModuleTerrain::Update()
 						return (pow(x, n) + 1.f) * 0.5f;
 					});
 				}
+                ImGui::Separator();
+                if (ImGui::MenuItem(
+                    "float func(float x)\n"
+                    "{\n"
+                    "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
+                    "}"
+                ))
+                {
+                    m_setCurvePow = m_curvePow;
+                    m_currentHeightCurve =
+                        "float func(float x)\n"
+                        "{\n"
+                        "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
+                        "}";
+                    int n = m_curvePow;
+                    VTerrain::SetHeightCurve([n](float x)
+                    {
+                        return 1.f / (1.f + exp((float)(-n)*(x * 2.f - 1.f)));
+                    });
+                }
 
 				ImGui::EndMenu();
 			}

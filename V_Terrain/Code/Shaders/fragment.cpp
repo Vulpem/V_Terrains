@@ -20,7 +20,6 @@ struct ConditionalTexture
 };
 
 in vec3 pos;
-in vec3 norm;
 in vec2 UV;
 
 uniform  vec3 global_light_direction;
@@ -65,11 +64,13 @@ vec3 ScalarToColor(float s)
 
 void main()
 {
-     vec3 n = norm;
-     n.y /= model_matrix[1][1];
-	 n = normalize(n);
+     vec4 hmVal = texture2D(heightmap, UV);
+     vec3 norm = hmVal.xyz * 2.f - 1.f;
 
-     float slope = 1.f - n.y;
+     norm.y /= model_matrix[1][1];
+	 norm = normalize(norm);
+
+     float slope = 1.f - norm.y;
 	 float height = pos.y / model_matrix[1][1];
 
      vec3 col;
@@ -79,16 +80,16 @@ void main()
 		float currentH = 0;
         for (int n = 9; n >= 0; n--)
         {
-            if (height >= textures[n].data[minHeight] - textures[n].data[heightFade]
-                && height < textures[n].data[maxHeight] + textures[n].data[heightFade]
-                && slope >= textures[n].data[minSlope] - textures[n].data[slopeFade]
+            if (height > textures[n].data[minHeight] - textures[n].data[heightFade]
+                && height <= textures[n].data[maxHeight] + textures[n].data[heightFade]
+                && slope > textures[n].data[minSlope] - textures[n].data[slopeFade]
                 && slope <= textures[n].data[maxSlope] + textures[n].data[slopeFade])
             {
 				float h = texture(textures[n].heightmap, UV * int(textures[n].data[sizeMultiplier])).x;
 				//texture is in it's range
-				if (height >= textures[n].data[minHeight]
-					&& height < textures[n].data[maxHeight]
-					&& slope >= textures[n].data[minSlope]
+				if (height > textures[n].data[minHeight]
+					&& height <= textures[n].data[maxHeight]
+					&& slope > textures[n].data[minSlope]
 					&& slope <= textures[n].data[maxSlope])
 				{
 					currentH = h;
@@ -137,7 +138,7 @@ void main()
 
     if (render_light != 0)
     {
-        col *= max(dot(global_light_direction, n), ambient_min);
+        col *= max(dot(global_light_direction, norm), ambient_min);
     }
     
 	/*if(renderDensity)
@@ -156,6 +157,10 @@ void main()
 
     color = vec4(mix(col, fog_color, fog), 1.f);
 }
+
+
+
+
 
 
 

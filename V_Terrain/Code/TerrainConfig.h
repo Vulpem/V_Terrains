@@ -35,10 +35,10 @@ namespace VTerrain
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
 		struct Noise
         {
-			unsigned int ridgedDepth = 1;
+			unsigned int ridgedDepth = 2;
 			float frequency = 0.404f;
 			unsigned int octaves = 5u;
-			float lacunarity = 2.82f;
+			float lacunarity = 2.0f;
 			float persistency = 0.428f;
         } noise;
 

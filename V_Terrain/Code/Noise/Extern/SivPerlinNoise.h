@@ -150,26 +150,32 @@ namespace siv
 
 		float ridgeOctaveNoise(float x, float y, std::int32_t octaves, int ridgeStartingOctave, float lacunarity = 2.f, float persistance = 0.25f) const
 		{
-			float result = 0.0f;
+			float result1 = 0.0f;
+            float result2 = 0.f;
 			float amp = 1.0f;
 			std::int32_t i = 0;
-			for (; i < ridgeStartingOctave; ++i)
-			{
-				result += (noise(x, y)* 0.5f + 0.5f) * amp;
-				x *= lacunarity;
-				y *= lacunarity;
-				amp *= persistance;
-			}
-			//result = result * 0.5f + 0.5f;
-
+            if (ridgeStartingOctave > 0)
+            {
+                for (; i < ridgeStartingOctave; ++i)
+                {
+                    result1 += noise(x, y) * amp;
+                    x *= lacunarity;
+                    y *= lacunarity;
+                    amp *= persistance;
+                }
+                result1 = (result1 * 0.5f + 0.5f);
+            }
+            float maxVal = 0.f;
 			for (; i < octaves; ++i)
 			{
-				result += std::abs(noise(x, y)) * amp;
+                float val = 
+				result2 += noise(x, y) * amp;
 				x *= lacunarity;
 				y *= lacunarity;
 				amp *= persistance;
 			}
-			return std::abs(1 - result);
+            result2 = std::abs(result2);
+			return min((result1 + result2), 0.999999f);
 		}
 
         float octaveNoise(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
