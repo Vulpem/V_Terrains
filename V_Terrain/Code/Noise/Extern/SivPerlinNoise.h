@@ -165,10 +165,9 @@ namespace siv
                 }
                 result1 = (result1 * 0.5f + 0.5f);
             }
-            float maxVal = 0.f;
-			for (; i < octaves; ++i)
+
+            for (; i < octaves; ++i)
 			{
-                float val = 
 				result2 += noise(x, y) * amp;
 				x *= lacunarity;
 				y *= lacunarity;
