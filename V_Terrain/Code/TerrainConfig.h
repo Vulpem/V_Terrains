@@ -19,20 +19,21 @@ namespace VTerrain
 {
     struct Config
     {
-        float maxHeight = 1000.f;
-        unsigned int chunkHeightmapResolution = 32u;
         unsigned int maxChunks = 512u;
         float chunkSize = 1024.f;
+        unsigned int chunkHeightmapResolution = 32u;
         unsigned int chunkMinDensity = 10;
-		float fogDistance = 10000.f;
+
+        float maxHeight = 1000.f;
 		float waterHeight = 0.004f;
-        float ambientLight = 0.4f;
 
-		bool singleSidedFaces = true;
-
-		float waterColor[3] = { 0.137f, 0.537f, 0.855f };
+        float fogDistance = 10000.f;
 		float fogColor[3] = { 0.78f, 0.81f, 0.84f };
+
+        float ambientLight = 0.4f;
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
+        bool singleSidedFaces = true;
+
 		struct Noise
         {
 			unsigned int ridgedDepth = 2;
@@ -49,6 +50,7 @@ namespace VTerrain
             bool renderHeightmap = false;
             bool renderChunkBorders = false;
         } debug;
+
 		std::function<void(const char*)> throwErrorFunc;
     };
     extern Config config;

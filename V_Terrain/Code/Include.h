@@ -19,6 +19,7 @@
 namespace VTerrain
 {
    //Global Funcs
+
     void Init();
 	void Update(int posX, int posY);
     void Render(const float * viewMatrix, const float * projectionMatrix);
@@ -29,16 +30,17 @@ namespace VTerrain
 
     std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
 
+    float GetHeightAt(float x, float y);
+
+	const ConditionalTexture& GetTexture(int n);
+    void SetTexture(int n, const ConditionalTexture& tex);
+
     //TMP
     std::string GetDefaultVertexShader();
     std::string GetDefaultFragmentShader();
     std::string GetDefaultTCS();
     std::string GetDefaultTES();
-    
     void SaveShader(const std::string& data, const char* fileName);
-
-	const ConditionalTexture& GetTexture(int n);
-    void SetTexture(int n, const ConditionalTexture& tex);
 }
 
 #endif // !__VTERRAIN_INCLUDE__

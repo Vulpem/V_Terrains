@@ -102,6 +102,21 @@ namespace VTerrain
         return result;
     }
 
+    float GetHeightAt(float x, float y)
+    {
+        int x1 = (int)floor(abs(x)) % 10;
+        int y1 = (int)floor(abs(y)) % 10;
+        float val[10][10];
+        for (int a = 0; a < 10; a++)
+        {
+            for (int b = 0; b < 10; b++)
+            {
+                val[a][b] = 0.f;
+            }
+        }
+        return val[x1][y1];
+    }
+
 	const ConditionalTexture& GetTexture(int n)
 	{
 		return chunkManager.m_textures[n];
