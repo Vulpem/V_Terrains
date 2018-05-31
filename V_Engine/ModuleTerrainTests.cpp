@@ -24,13 +24,13 @@ void ShowError(const char * message)
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     Module(app, start_enabled)
-    , m_resolution(VTerrain::config.chunkHeightmapResolution)
-    , m_frequency(VTerrain::config.noise.frequency)
-    , m_octaves(VTerrain::config.noise.octaves)
-    , m_lacunarity(VTerrain::config.noise.lacunarity)
-    , m_persistance (VTerrain::config.noise.persistency)
-    , m_maxHeight(VTerrain::config.maxHeight)
-	, m_fogDistance(VTerrain::config.fogDistance)
+    , m_resolution(RPGT::config.chunkHeightmapResolution)
+    , m_frequency(RPGT::config.noise.frequency)
+    , m_octaves(RPGT::config.noise.octaves)
+    , m_lacunarity(RPGT::config.noise.lacunarity)
+    , m_persistance (RPGT::config.noise.persistency)
+    , m_maxHeight(RPGT::config.maxHeight)
+	, m_fogDistance(RPGT::config.fogDistance)
     , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
     , m_curvePow(2)
     , m_setCurvePow(2)
@@ -38,20 +38,20 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 {
 	moduleName = "ModuleTerrainTests";
 
-	VTerrain::config.throwErrorFunc = ShowError;
+	RPGT::config.throwErrorFunc = ShowError;
 
-    VTerrain::SetHeightCurve(
+    RPGT::SetHeightCurve(
     [](float x) {
         return pow(x, 2.f);
     });
 
-    m_vertex = VTerrain::GetDefaultVertexShader();
+    m_vertex = RPGT::GetDefaultVertexShader();
     m_vertex.reserve(m_vertex.capacity() + 1024);
-    m_TCS = VTerrain::GetDefaultTCS();
+    m_TCS = RPGT::GetDefaultTCS();
     m_TCS.reserve(m_TCS.capacity() + 1024);
-    m_TES = VTerrain::GetDefaultTES();
+    m_TES = RPGT::GetDefaultTES();
     m_TES.reserve(m_TES.capacity() + 1024);
-    m_fragment = VTerrain::GetDefaultFragmentShader();
+    m_fragment = RPGT::GetDefaultFragmentShader();
     m_fragment.reserve(m_fragment.capacity() + 1024);
 }
 
@@ -69,7 +69,7 @@ bool ModuleTerrain::Init()
 bool ModuleTerrain::Start()
 {
 	bool ret = true;
-    VTerrain::Init();
+    RPGT::Init();
 
     App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
@@ -90,7 +90,7 @@ update_status ModuleTerrain::PreUpdate()
 update_status ModuleTerrain::Update()
 {
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
-	VTerrain::Update(pos.x, pos.z);
+	RPGT::Update(pos.x, pos.z);
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
@@ -109,7 +109,7 @@ update_status ModuleTerrain::Update()
         ImGui::Separator();
         ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
         ImGui::Separator();
-        const int HMresolution = static_cast<int>(VTerrain::config.chunkSize);
+        const int HMresolution = static_cast<int>(RPGT::config.chunkSize);
         int p[2] = {
             floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
             floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
@@ -118,7 +118,7 @@ update_status ModuleTerrain::Update()
         ImGui::NewLine();
         if (ImGui::Button("Generate new random seed"))
         {
-            VTerrain::SetSeed(time(NULL));
+            RPGT::SetSeed(time(NULL));
         }
 
         ImGui::NewLine();
@@ -127,8 +127,8 @@ update_status ModuleTerrain::Update()
 		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
 		if (ImGui::CollapsingHeader("Render"))
 		{
-			ImGui::SliderFloat("FogDistance", &VTerrain::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
-			ImGui::SliderFloat("WaterHeight", &VTerrain::config.waterHeight, 0.0f, 1.f);
+			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
+			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;
@@ -140,21 +140,21 @@ update_status ModuleTerrain::Update()
 				float3 tmp(1.f, 0.f, 0.f);
 				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight * DEGTORAD, 0.f);
 				tmp = rot * tmp;
-				VTerrain::config.globalLight[0] = tmp.x;
-				VTerrain::config.globalLight[1] = tmp.y;
-				VTerrain::config.globalLight[2] = tmp.z;
+				RPGT::config.globalLight[0] = tmp.x;
+				RPGT::config.globalLight[1] = tmp.y;
+				RPGT::config.globalLight[2] = tmp.z;
 			}
 
-			ImGui::DragFloat3("Light vector", VTerrain::config.globalLight);
+			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
 			ImGui::NewLine();
 		}
 		if (ImGui::CollapsingHeader("Terrain generation"))
 		{
-			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { VTerrain::config.maxHeight = m_maxHeight; }
+			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { RPGT::config.maxHeight = m_maxHeight; }
 			ImGui::Separator();
-			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { VTerrain::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
-			if (ImGui::DragFloat("Chunk Size", &VTerrain::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
-            if (ImGui::DragInt("Min chunk polys", &(int)VTerrain::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
+			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { RPGT::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
+			if (ImGui::DragFloat("Chunk Size", &RPGT::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
+            if (ImGui::DragInt("Min chunk polys", &(int)RPGT::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
 
 			ImGui::Separator();
 
@@ -190,7 +190,7 @@ update_status ModuleTerrain::Update()
 					"Strength multiplier for each octave.\n"
 					"Will reset all chunks.");
 			ImGui::Separator();
-			if (ImGui::SliderInt("Ridged depth", &(int)VTerrain::config.noise.ridgedDepth, 0, VTerrain::config.noise.octaves)) { WantRegen(); }
+			if (ImGui::SliderInt("Ridged depth", &(int)RPGT::config.noise.ridgedDepth, 0, RPGT::config.noise.octaves)) { WantRegen(); }
 			ImGui::Separator();
 			if (ImGui::BeginMenu("Set Height Curve"))
 			{
@@ -205,7 +205,7 @@ update_status ModuleTerrain::Update()
 					m_currentHeightCurve =
 						"float func (float x)\n"
 						"{ return x; }";
-					VTerrain::SetHeightCurve([](float x) {return x; });
+					RPGT::SetHeightCurve([](float x) {return x; });
 				}
 				ImGui::Separator();
 				if (ImGui::MenuItem(
@@ -218,7 +218,7 @@ update_status ModuleTerrain::Update()
 						"float func(float x)\n"
 						"{ return pow(x, %i); }";
 					int n = m_curvePow;
-					VTerrain::SetHeightCurve([n](float x) {return pow(x, n); });
+					RPGT::SetHeightCurve([n](float x) {return pow(x, n); });
 				}
 				ImGui::Separator();
 				if (ImGui::MenuItem(
@@ -237,7 +237,7 @@ update_status ModuleTerrain::Update()
 						"   return (pow(x, %i) + 1.f) * 0.5f;\n"
 						"}";
 					int n = m_curvePow;
-					VTerrain::SetHeightCurve([n](float x)
+					RPGT::SetHeightCurve([n](float x)
 					{
 						x = x * 2.f - 1.f;
 						return (pow(x, n) + 1.f) * 0.5f;
@@ -258,7 +258,7 @@ update_status ModuleTerrain::Update()
                         "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
                         "}";
                     int n = m_curvePow;
-                    VTerrain::SetHeightCurve([n](float x)
+                    RPGT::SetHeightCurve([n](float x)
                     {
                         return 1.f / (1.f + exp((float)(-n)*(x * 2.f - 1.f)));
                     });
@@ -283,7 +283,7 @@ update_status ModuleTerrain::Update()
 				float3 pos = App->camera->GetDefaultCam()->GetPosition();
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
-			ImGui::Checkbox("Chunk Borders", &VTerrain::config.debug.renderChunkBorders);
+			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
 
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
@@ -300,7 +300,7 @@ update_status ModuleTerrain::Update()
 		{
 			for (int n = 0; n < 10; n++)
 			{
-				VTerrain::ConditionalTexture tex = VTerrain::GetTexture(n);
+				RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
                 bool changed = false;
                 char tmp[8];
                 sprintf_s(tmp, "##%i", n);
@@ -390,7 +390,7 @@ update_status ModuleTerrain::Update()
 
                     if (changed)
                     {
-                        VTerrain::SetTexture(n, tex);
+                        RPGT::SetTexture(n, tex);
                     }
                     ImGui::EndMenu();
                 }
@@ -425,16 +425,16 @@ bool ModuleTerrain::CleanUp()
 
 void ModuleTerrain::Render(const viewPort & port)
 {
-	VTerrain::config.debug.wiredRender = port.useOnlyWires;
-	VTerrain::config.debug.renderLight = port.useLighting;
-	VTerrain::config.singleSidedFaces = port.useSingleSidedFaces;
-	VTerrain::config.debug.renderHeightmap = port.renderHeightMap;
-	VTerrain::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+	RPGT::config.debug.wiredRender = port.useOnlyWires;
+	RPGT::config.debug.renderLight = port.useLighting;
+	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
+	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
+	RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
 }
 
 void ModuleTerrain::SetDefaultTextures()
 {
-    VTerrain::ConditionalTexture tex;
+    RPGT::ConditionalTexture tex;
     uint64_t UID;
     //Water
     tex.minHeight = 0.f;
@@ -448,7 +448,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_water_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(0, tex);
+    RPGT::SetTexture(0, tex);
 
     //Sand
     tex.minHeight = 0.f;
@@ -462,7 +462,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_sand_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(1, tex);
+    RPGT::SetTexture(1, tex);
 
     //Grass
     tex.color[0] = 108.f / 255.f;
@@ -479,7 +479,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(4, tex);
+    RPGT::SetTexture(4, tex);
 
     //Gravel
     tex.color[0] = 158.f / 255.f;
@@ -496,7 +496,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_gravel_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(5, tex);
+    RPGT::SetTexture(5, tex);
 
     //GreyRock
     tex.color[0] = 122.f / 255.f;
@@ -513,7 +513,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(6, tex);
+    RPGT::SetTexture(6, tex);
 
     //Snow
     tex.color[0] = 1.f;
@@ -530,7 +530,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_snow_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(7, tex);
+    RPGT::SetTexture(7, tex);
 
     //Grey rock
     tex.minHeight = 0.f;
@@ -544,7 +544,7 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(8, tex);
+    RPGT::SetTexture(8, tex);
 
     //Grass
     tex.minHeight = 0.f;
@@ -558,18 +558,18 @@ void ModuleTerrain::SetDefaultTextures()
     if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
     if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    VTerrain::SetTexture(9, tex);
+    RPGT::SetTexture(9, tex);
 }
 
 void ModuleTerrain::GenMap()
 {
-    VTerrain::config.noise.frequency = m_frequency;
-    VTerrain::config.noise.octaves = m_octaves;
-    VTerrain::config.noise.lacunarity = m_lacunarity;
-    VTerrain::config.noise.persistency = m_persistance;
+    RPGT::config.noise.frequency = m_frequency;
+    RPGT::config.noise.octaves = m_octaves;
+    RPGT::config.noise.lacunarity = m_lacunarity;
+    RPGT::config.noise.persistency = m_persistance;
 
-    VTerrain::RegenerateMesh();
-    VTerrain::CleanChunks();
+    RPGT::RegenerateMesh();
+    RPGT::CleanChunks();
 }
 
 void ModuleTerrain::WantRegen()
@@ -587,10 +587,10 @@ void ModuleTerrain::ShaderEditor()
             bool recompile = false;
             if (ImGui::Button("Save shaders"))
             {
-                VTerrain::SaveShader(m_vertex, "vertex.cpp");
-                VTerrain::SaveShader(m_TCS, "TCS.cpp");
-                VTerrain::SaveShader(m_TES, "TES.cpp");
-                VTerrain::SaveShader(m_fragment, "fragment.cpp");
+                RPGT::SaveShader(m_vertex, "vertex.cpp");
+                RPGT::SaveShader(m_TCS, "TCS.cpp");
+                RPGT::SaveShader(m_TES, "TES.cpp");
+                RPGT::SaveShader(m_fragment, "fragment.cpp");
             }
 
             if (ImGui::CollapsingHeader("Vertex shader"))
@@ -643,7 +643,7 @@ void ModuleTerrain::ShaderEditor()
 
             if (recompile)
             {
-                m_shaderResult = VTerrain::CompileShaders(m_fragment.data(), m_vertex.data(), m_TCS.data(), m_TES.data());
+                m_shaderResult = RPGT::CompileShaders(m_fragment.data(), m_vertex.data(), m_TCS.data(), m_TES.data());
             }
 
             if (m_shaderResult.length() > 5)

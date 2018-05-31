@@ -3,7 +3,7 @@
 #include "Terrainconfig.h"
 #include <assert.h>
 
-namespace VTerrain
+namespace RPGT
 {
 	namespace utils
 	{
