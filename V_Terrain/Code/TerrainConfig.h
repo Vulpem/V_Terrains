@@ -51,6 +51,7 @@ namespace RPGT
             bool renderChunkBorders = false;
         } debug;
 
+        std::function<float(float)> m_heightCurve;
 		std::function<void(const char*)> throwErrorFunc;
     };
     extern Config config;

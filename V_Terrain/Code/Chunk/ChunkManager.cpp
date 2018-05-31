@@ -179,12 +179,6 @@ namespace RPGT
         AddChunksToRegen(m_lastOffPos);
     }
 
-    void ChunkManager::SetHeightCurve(std::function<float(float)> func)
-    {
-        m_factory.SetHeightCurve(func);
-        CleanChunks();
-    }
-
     void ChunkManager::SetSeed(uint seed)
     {
         m_factory.SetSeed(seed);

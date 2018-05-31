@@ -67,12 +67,6 @@ namespace RPGT
         return false;
     }
 
-    void ChunkFactory::SetHeightCurve(std::function<float(float)> func)
-    {
-        std::unique_lock<std::mutex> curveLock(m_mut_noiseGenerator);
-        m_noiseGenerator.SetCurve(func);
-    }
-
     void ChunkFactory::SetSeed(uint seed)
     {
         std::unique_lock<std::mutex> curveLock(m_mut_noiseGenerator);

@@ -23,12 +23,9 @@ namespace RPGT
 
         void SetSeed(uint seed);
         NoiseMap GenNoiseMap(Vec2<int> offset) const;
-        void SetCurve(std::function<float(float)> func);
 
 	private:
         float GetValue(int x, int y)  const;
-
         siv::SivPerlinNoise m_perlin;
-        std::function<float(float)> m_heightCurve;
     };
 }

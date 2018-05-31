@@ -28,19 +28,20 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     , m_frequency(RPGT::config.noise.frequency)
     , m_octaves(RPGT::config.noise.octaves)
     , m_lacunarity(RPGT::config.noise.lacunarity)
-    , m_persistance (RPGT::config.noise.persistency)
+    , m_persistance(RPGT::config.noise.persistency)
     , m_maxHeight(RPGT::config.maxHeight)
-	, m_fogDistance(RPGT::config.fogDistance)
+    , m_fogDistance(RPGT::config.fogDistance)
     , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
     , m_curvePow(2)
     , m_setCurvePow(2)
     , m_openShaderEditor(false)
+    , m_wantRegen(false)
 {
 	moduleName = "ModuleTerrainTests";
 
 	RPGT::config.throwErrorFunc = ShowError;
 
-    RPGT::SetHeightCurve(
+    RPGT::config.m_heightCurve =(
     [](float x) {
         return pow(x, 2.f);
     });
@@ -205,7 +206,8 @@ update_status ModuleTerrain::Update()
 					m_currentHeightCurve =
 						"float func (float x)\n"
 						"{ return x; }";
-					RPGT::SetHeightCurve([](float x) {return x; });
+                    RPGT::config.m_heightCurve = ([](float x) {return x; });
+                    WantRegen();
 				}
 				ImGui::Separator();
 				if (ImGui::MenuItem(
@@ -218,7 +220,8 @@ update_status ModuleTerrain::Update()
 						"float func(float x)\n"
 						"{ return pow(x, %i); }";
 					int n = m_curvePow;
-					RPGT::SetHeightCurve([n](float x) {return pow(x, n); });
+                    RPGT::config.m_heightCurve = ([n](float x) {return pow(x, n); });
+                    WantRegen();
 				}
 				ImGui::Separator();
 				if (ImGui::MenuItem(
@@ -237,11 +240,12 @@ update_status ModuleTerrain::Update()
 						"   return (pow(x, %i) + 1.f) * 0.5f;\n"
 						"}";
 					int n = m_curvePow;
-					RPGT::SetHeightCurve([n](float x)
+                    RPGT::config.m_heightCurve = ([n](float x)
 					{
 						x = x * 2.f - 1.f;
 						return (pow(x, n) + 1.f) * 0.5f;
 					});
+                    WantRegen();
 				}
                 ImGui::Separator();
                 if (ImGui::MenuItem(
@@ -258,10 +262,11 @@ update_status ModuleTerrain::Update()
                         "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
                         "}";
                     int n = m_curvePow;
-                    RPGT::SetHeightCurve([n](float x)
+                    RPGT::config.m_heightCurve = ([n](float x)
                     {
                         return 1.f / (1.f + exp((float)(-n)*(x * 2.f - 1.f)));
                     });
+                    WantRegen();
                 }
 
 				ImGui::EndMenu();

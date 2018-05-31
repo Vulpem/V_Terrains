@@ -36,7 +36,6 @@ namespace RPGT
 		void StopThread();
 
         void ClearRequests();
-        void SetHeightCurve(std::function<float(float)> func);
         void SetSeed(uint seed);
 
         void PushChunkRequest(RequestedChunk request);

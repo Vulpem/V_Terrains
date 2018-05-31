@@ -23,7 +23,6 @@ namespace RPGT
     void Init();
 	void Update(int posX, int posY);
     void Render(const float * viewMatrix, const float * projectionMatrix);
-    void SetHeightCurve(std::function<float(float)> func);
 	void CleanChunks();
     void RegenerateMesh();
     void SetSeed(unsigned int seed);

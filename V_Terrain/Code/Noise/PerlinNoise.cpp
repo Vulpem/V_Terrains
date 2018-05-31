@@ -19,7 +19,6 @@ namespace RPGT
 {
 
     PerlinNoise::PerlinNoise()
-        : m_heightCurve([](float a) { return a; })
     {
         SetSeed(static_cast<uint>(time(NULL)));
     }
@@ -48,14 +47,9 @@ namespace RPGT
         return ret;
     }
 
-    void PerlinNoise::SetCurve(std::function<float(float)> func)
-    {
-        m_heightCurve = func;
-    }
-
     float PerlinNoise::GetValue(int x, int y)  const
     {
         const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
-        return m_heightCurve(m_perlin.ridgedNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.ridgedDepth, config.noise.lacunarity, config.noise.persistency));
+        return config.m_heightCurve(m_perlin.ridgedNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.ridgedDepth, config.noise.lacunarity, config.noise.persistency));
     }
 }

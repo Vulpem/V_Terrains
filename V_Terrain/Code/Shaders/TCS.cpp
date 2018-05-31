@@ -1,7 +1,7 @@
 #version 430 core
 
 //TODO send as uniforms
-float triSize = 10.f;
+float triSize = 6.5f;
 vec2 viewport = vec2(1920, 1080);
 
 
@@ -108,6 +108,7 @@ void main()
         gl_TessLevelInner[1] = gl_TessLevelInner[0] = gl_TessLevelOuter[0];
     }
 }
+
 
 
 
