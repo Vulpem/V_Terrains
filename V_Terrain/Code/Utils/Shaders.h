@@ -1,20 +1,20 @@
-//  V Terrains
+//  RPG Terrains
 //  Procedural terrain generation for modern C++
 //  Copyright (C) 2018 David Hernàndez Làzaro
 //  
-//  "V Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+//  "RPG Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or any later version.
 //  
-//  "V Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  "RPG Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with RPG Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
 
-namespace VTerrain
+namespace RPGT
 {
     struct Shader
     {
@@ -25,18 +25,15 @@ namespace VTerrain
 
         unsigned int loc_view_matrix = 0u;
         unsigned int loc_projection_matrix = 0u;
+		unsigned int loc_model_matrix = 0u;
 
-        unsigned int loc_position_offset = 0u;
-        unsigned int loc_max_height = 0u;
         unsigned int loc_fog_distance = 0u;
         unsigned int loc_water_height = 0u;
         unsigned int loc_global_light_direction = 0u;
         unsigned int loc_ambient_color = 0u;
-        unsigned int loc_water_color = 0u;
         unsigned int loc_fog_color = 0u;
 
         unsigned int loc_maxLOD = 0u;
-        unsigned int loc_tesselationDensity = 0u;
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;
@@ -58,12 +55,17 @@ namespace VTerrain
         static Shader CompileShader(const char* vertexBuf, const char* fragmentBuf, const char* TCS, const char* TES, std::string& result);
         static void FreeShader(const Shader& shader);
 
-        static std::string m_defaultVertexShader;
-        static std::string m_defaultFragmentShader;
-        static std::string m_defaultTCSShader;
-        static std::string m_defaultTESShader;
+
+        static std::string GetDefaultVertexShader();
+        static std::string GetDefaultFragmentShader();
+        static std::string GetDefaultTCSShader();
+        static std::string GetDefaultTESShader();
+
+        //TODO to remove
+        static void SaveFile(const std::string& file, const char* fileDir);
     private:
         static std::string OpenFile(const char* fileDir);
-        static unsigned int Compile(std::string code, unsigned int type, std::string& result);
+		static const char* GetShaderType(unsigned int type);
+        static unsigned int Compile(const std::string& code, unsigned int type, std::string& result);
     };
 }

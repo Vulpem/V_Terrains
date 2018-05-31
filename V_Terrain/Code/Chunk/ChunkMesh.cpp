@@ -1,23 +1,27 @@
-//  V Terrains
+//  RPG Terrains
 //  Procedural terrain generation for modern C++
 //  Copyright (C) 2018 David Hernàndez Làzaro
 //  
-//  "V Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+//  "RPG Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or any later version.
 //  
-//  "V Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  "RPG Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with RPG Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChunkMesh.h"
 
 #include "../ExternalLibs/Glew/include/glew.h"
 
-namespace VTerrain
+namespace RPGT
 {
     Mesh::Mesh()
-        : m_generated(false)
+        : m_bufferGenerated(false)
+        , m_generated(false)
+        , m_indicesBuff(0)
+        , m_nIndices(0)
+        , m_dataBuff(0)
     {
     }
     Mesh::~Mesh()
@@ -34,25 +38,27 @@ namespace VTerrain
 
     void Mesh::GenerateMesh()
     {
-        std::vector<float> data;
-        data.resize(2 * 2 * 5);
+        const unsigned int width = config.chunkMinDensity + 1;
+        const unsigned int height = config.chunkMinDensity + 1;
 
-        const float topLeft = config.chunkSize / -2.f;
+        std::vector<float> data;
+        data.resize(width * height * 5);
+
+        const float topLeft = -0.5f;
         uint n = 0;
 
-        std::vector<Vec2<float>> UVs;
-
-        for (uint y = 0; y < 2; y++)
+        for (uint y = 0; y < height; y++)
         {
-            for (uint x = 0; x < 2; x++)
+            for (uint x = 0; x < width; x++)
             {
-                data[n++] = topLeft + x * config.chunkSize;
+                data[n++] = (float)x / (float)config.chunkMinDensity - 0.5f;
                 data[n++] = 0.f;
-                data[n++] = topLeft + y * config.chunkSize;
-				data[n++] = (float)(x);
-				data[n++] = (float)(y);
+                data[n++] = (float)y / (float)config.chunkMinDensity - 0.5f;
+                data[n++] = (float)x / (float)config.chunkMinDensity;
+                data[n++] = (float)y / (float)config.chunkMinDensity;
             }
         }
+
 
         if (m_dataBuff == 0)
         {
@@ -66,10 +72,12 @@ namespace VTerrain
 
     void Mesh::GenerateIndices()
     {
-        const uint width = 2;
-        const uint height = 2;
-        std::vector<uint> indices((width - 1)*(height - 1) * 6u);
-        uint n = 0;
+        const uint width = config.chunkMinDensity + 1;
+        const uint height = config.chunkMinDensity + 1;
+
+        std::vector<uint> indices;
+        indices.reserve((width - 1)*(height - 1) * 4u);
+
         uint i = 0;
         const uint step = 1;
         for (uint y = 0; y < height; y += step)
@@ -79,16 +87,16 @@ namespace VTerrain
             {
                 if (x < width - 1 && y < height - 1)
                 {
-                    indices[n++] = i;
-                    indices[n++] = i + (width) * utils::Min(step, height - y);
-                    indices[n++] = i + (width) * utils::Min(step, height - y) + utils::Min(step, width - x);
-                    indices[n++] = i + utils::Min(step, width - x);
+                    indices.push_back(i);
+                    indices.push_back(i + (width)* utils::Min(step, height - y));
+                    indices.push_back(i + (width)* utils::Min(step, height - y) + utils::Min(step, width - x));
+                    indices.push_back(i + utils::Min(step, width - x));
                 }
                 i += step;
             }
         }
-        
         m_nIndices = indices.size();
+
         if (m_indicesBuff == 0)
         {
             glGenBuffers(1, &m_indicesBuff);

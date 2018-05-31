@@ -1,20 +1,22 @@
-//  V Terrains
+//  RPG Terrains
 //  Procedural terrain generation for modern C++
 //  Copyright (C) 2018 David Hernàndez Làzaro
 //  
-//  "V Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+//  "RPG Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or any later version.
 //  
-//  "V Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  "RPG Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with RPG Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChunkFactory.h"
+#include <thread>
+#include <chrono>
 
 #include "../Noise/PerlinNoise.h"
 
-namespace VTerrain
+namespace RPGT
 {
     ChunkFactory::ChunkFactory()
 		: m_runningThread(false)
@@ -57,13 +59,10 @@ namespace VTerrain
 
     bool ChunkFactory::IsRequested(Vec2<int> p)
     {
-		std::unique_lock<std::mutex> lock(m_mut_requests);
-        for (auto it : m_requests)
+        auto it = std::find(m_requests.begin(), m_requests.end(), p);
+        if (it != m_requests.end())
         {
-            if ((it) == p)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -83,10 +82,13 @@ namespace VTerrain
     void ChunkFactory::PushChunkRequest(RequestedChunk request)
     {
 		std::unique_lock<std::mutex> lock(m_mut_requests);
-        m_requests.push_back(request);
+        if (IsRequested(request.pos) == false)
+        {
+            m_requests.push_back(request);
+        }
     }
 
-    ChunkFactory::GeneratedChunk ChunkFactory::PopGeneratedChunk()
+    GeneratedChunk ChunkFactory::PopGeneratedChunk()
     {
 		std::unique_lock<std::mutex> lock(m_mut_results);
         const GeneratedChunk ret = m_results.front();
@@ -100,7 +102,7 @@ namespace VTerrain
         return (!m_results.empty());
     }
 
-    ChunkFactory::RequestedChunk ChunkFactory::PopChunkRequest()
+    RequestedChunk ChunkFactory::PopChunkRequest()
     {
 		std::unique_lock<std::mutex> lock(m_mut_requests);
         const RequestedChunk ret = *m_requests.begin();
@@ -126,7 +128,7 @@ namespace VTerrain
         {
             RequestedChunk request = PopChunkRequest();
             GeneratedChunk result;
-            VTerrain::NoiseMap noiseMap;
+            RPGT::NoiseMap noiseMap;
             {
                 std::unique_lock<std::mutex> curveLock(m_mut_noiseGenerator);
                 noiseMap = m_noiseGenerator.GenNoiseMap(request.pos);
@@ -134,7 +136,6 @@ namespace VTerrain
 
             result.m_pos = request.pos;
             result.m_size = { noiseMap.Width() - 2, noiseMap.Height() - 2 };
-            result.m_LOD = 0;
             result.m_data.resize(result.m_size.x() * result.m_size.y() * 4);
 
             const float topLeftX = (noiseMap.Width() - (noiseMap.Width() % 2 != 0)) / 2.f;
@@ -146,12 +147,12 @@ namespace VTerrain
             {
                 for (uint x = noiseMap.Width() - 2; x >= 1 ; x--)
                 {
-                    const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
+                    const Vec3<float> central(topLeftX - x, noiseMap[x + y * noiseMap.Width()], topLeftY - y);
 
-                    const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()] * config.maxHeight, topLeftY - (y + 1));
-                    const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()] * config.maxHeight, topLeftY - (y - 1));
-                    const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
-                    const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()] * config.maxHeight, topLeftY - y);
+                    const Vec3<float> top = central - Vec3<float>(topLeftX - x, noiseMap[x + (y + 1) * noiseMap.Width()], topLeftY - (y + 1));
+                    const Vec3<float> bottom = central - Vec3<float>(topLeftX - x, noiseMap[x + (y - 1) * noiseMap.Width()], topLeftY - (y - 1));
+                    const Vec3<float> right = central - Vec3<float>(topLeftX - x + 1, noiseMap[x + 1 + y * noiseMap.Width()], topLeftY - y);
+                    const Vec3<float> left = central - Vec3<float>(topLeftX - x - 1, noiseMap[x - 1 + y * noiseMap.Width()], topLeftY - y);
 
 					Vec3<float> norm =
 						top.Cross(left)
@@ -168,8 +169,11 @@ namespace VTerrain
                     result[current++] = noiseMap[x + y * noiseMap.Width()];
                 }
             }
-
-            m_results.push(result);
+            PushGeneratedChunk(result);
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
     }
 

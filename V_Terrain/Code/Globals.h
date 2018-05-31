@@ -1,25 +1,29 @@
-//  V Terrains
+//  RPG Terrains
 //  Procedural terrain generation for modern C++
 //  Copyright (C) 2018 David Hernàndez Làzaro
 //  
-//  "V Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+//  "RPG Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or any later version.
 //  
-//  "V Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  "RPG Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with RPG Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __GLOBALS_V_
 #define __GLOBALS_V_
 
 typedef unsigned int uint;
 
 #include "utils/IncludeSTD.h"
-#include "TerrainConfig.h"
+#include "Terrainconfig.h"
 #include "utils/Vec3.h"
+#include <windows.h> 
 
-namespace VTerrain
+#define SHOW_ERROR(...) RPGT::utils::ShowAlertPopup(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ASSERT(expression, ...) if(!(expression)) { SHOW_ERROR(__VA_ARGS__); DebugBreak();}
+
+namespace RPGT
 {
     namespace utils
     {
@@ -47,6 +51,17 @@ namespace VTerrain
         template <typename T,
             class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
             bool IsAlmost(T a, T b, T range) { return (abs(a - b) < range); }
+
+		int FormatCString(char *outBuffer, int outBufferSize, const char* format, va_list args);
+
+		template<size_t BufferSize>
+		int FormatCString(char(&outBuffer)[BufferSize], const char* format, va_list args)
+		{
+			static_assert(BufferSize > 0, "Output buffer size has to be greater than 0");
+			return FormatCString(outBuffer, BufferSize, format, args);
+		}
+
+		void ShowAlertPopup(const char* file, const char* function, const int line, const char* format, ...);
     }
 }
 #endif // !__GLOBALS__

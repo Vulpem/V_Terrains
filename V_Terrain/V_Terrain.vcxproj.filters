@@ -37,9 +37,6 @@
     <ClInclude Include="Code\Noise\Extern\SivPerlinNoise.h">
       <Filter>Source Files\Noise\Extern</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Utils\Shaders.h">
-      <Filter>Source Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Code\TerrainConfig.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -67,6 +64,12 @@
     <ClInclude Include="Code\Chunk\ConditionalTexture.h">
       <Filter>Source Files\Chunk</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Chunk\ChunkRequests.h">
+      <Filter>Source Files\Chunk</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Utils\Shaders.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Noise\PerlinNoise.cpp">
@@ -79,9 +82,6 @@
       <Filter>Source Files\Noise</Filter>
     </ClCompile>
     <ClCompile Include="Code\Utils\GenImage.cpp">
-      <Filter>Source Files\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Utils\Shaders.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
     <ClCompile Include="Code\Chunk\Chunk.cpp">
@@ -107,6 +107,15 @@
     </ClCompile>
     <ClCompile Include="Code\Shaders\fragment.cpp">
       <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Utils\Shaders.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Utils\DefaultShaders.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,6 +8,8 @@
 
 #include "Math.h"
 
+void ShowError(const char* message);
+
 class ModuleTerrain : public Module
 {
 public:
@@ -34,6 +36,11 @@ public:
 
     bool m_openShaderEditor;
     std::string m_shaderResult;
+
+    std::string m_vertex;
+    std::string m_TCS;
+    std::string m_TES;
+    std::string m_fragment;
 
     int m_maxTexturesGL;
 

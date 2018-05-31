@@ -14,29 +14,28 @@
 
 struct ConditionalTexture
 {
-    lowp sampler2D diffuse;
-    lowp sampler2D heightmap;
+     sampler2D diffuse;
+     sampler2D heightmap;
 	float[11] data;
 };
 
-in lowp float dist;
-in lowp vec2 UV;
-in lowp float poliDensity;
+in vec3 pos;
+in vec2 UV;
 
-uniform lowp vec3 global_light_direction;
+uniform  vec3 global_light_direction;
+uniform  mat4 model_matrix;
 
-uniform lowp float ambient_min;
-uniform lowp float max_height;
-uniform lowp float water_height;
-uniform lowp vec3 water_color;
-uniform lowp vec3 fog_color;
-uniform lowp float fog_distance;
+uniform  float ambient_min;
+uniform  float water_height;
+uniform  vec3 water_color;
+uniform  vec3 fog_color;
+uniform  float fog_distance;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
 uniform int render_light;
 uniform unsigned int maxDensity;
 
-uniform lowp sampler2D heightmap;
+uniform  sampler2D heightmap;
 
 uniform ConditionalTexture textures[10];
 
@@ -65,28 +64,32 @@ vec3 ScalarToColor(float s)
 
 void main()
 {
-    lowp vec4 heightmapVal = texture(heightmap, UV);
-    lowp vec3 norm = vec3(heightmapVal.x * 2.f - 1.f, heightmapVal.y * 2.f - 1.f, heightmapVal.z * 2.f - 1.f);
-    lowp float slope = 1.f - norm.y;
-	lowp float height = heightmapVal.w;
+     vec4 hmVal = texture2D(heightmap, UV);
+     vec3 norm = hmVal.xyz * 2.f - 1.f;
 
-    lowp vec3 col;
+     norm.y /= model_matrix[1][1];
+	 norm = normalize(norm);
+
+     float slope = 1.f - norm.y;
+	 float height = pos.y / model_matrix[1][1];
+
+     vec3 col;
 
     if (render_heightmap == 0)
     {
 		float currentH = 0;
         for (int n = 9; n >= 0; n--)
         {
-            if (height >= textures[n].data[minHeight] - textures[n].data[heightFade]
-                && height < textures[n].data[maxHeight] + textures[n].data[heightFade]
-                && slope >= textures[n].data[minSlope] - textures[n].data[slopeFade]
+            if (height > textures[n].data[minHeight] - textures[n].data[heightFade]
+                && height <= textures[n].data[maxHeight] + textures[n].data[heightFade]
+                && slope > textures[n].data[minSlope] - textures[n].data[slopeFade]
                 && slope <= textures[n].data[maxSlope] + textures[n].data[slopeFade])
             {
 				float h = texture(textures[n].heightmap, UV * int(textures[n].data[sizeMultiplier])).x;
 				//texture is in it's range
-				if (height >= textures[n].data[minHeight]
-					&& height < textures[n].data[maxHeight]
-					&& slope >= textures[n].data[minSlope]
+				if (height > textures[n].data[minHeight]
+					&& height <= textures[n].data[maxHeight]
+					&& slope > textures[n].data[minSlope]
 					&& slope <= textures[n].data[maxSlope])
 				{
 					currentH = h;
@@ -124,10 +127,11 @@ void main()
     }
     else
     {
-        col = vec3(heightmapVal.w, heightmapVal.w, heightmapVal.w);
+        float val = texture(heightmap, UV).w;
+        col = vec3(val, val, val);
     }
 
-    if (render_chunk_borders != 0 && (UV.x <= 0.01f || UV.y <= 0.01f || UV.x >= 0.99 || UV.y >= 0.99))
+    if (render_chunk_borders != 0 && (UV.x <= 0.03f || UV.y <= 0.03f || UV.x >= 0.97 || UV.y >= 0.97))
     {
         col = vec3(1.f, 1.f, 1.f);
     }
@@ -142,5 +146,21 @@ void main()
         col = ScalarToColor(poliDensity / maxDensity);
     }*/
 
-    color = vec4(mix(col, fog_color, min((dist*dist) / (fog_distance*fog_distance), 1.f)), 1.f);
+    float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
+	distanceFog = min(distanceFog, 1);
+
+    float heightFog = (1 + water_height - height);
+    heightFog = pow(heightFog, 3);
+
+    float fog = distanceFog + (heightFog * 0.5f) * pow(distanceFog, 0.25f);
+	fog = min(fog,1);
+
+    color = vec4(mix(col, fog_color, fog), 1.f);
 }
+
+
+
+
+
+
+

@@ -148,6 +148,35 @@ namespace siv
             return result;
         }
 
+		float ridgeOctaveNoise(float x, float y, std::int32_t octaves, int ridgeStartingOctave, float lacunarity = 2.f, float persistance = 0.25f) const
+		{
+			float result1 = 0.0f;
+            float result2 = 0.f;
+			float amp = 1.0f;
+			std::int32_t i = 0;
+            if (ridgeStartingOctave > 0)
+            {
+                for (; i < ridgeStartingOctave; ++i)
+                {
+                    result1 += noise(x, y) * amp;
+                    x *= lacunarity;
+                    y *= lacunarity;
+                    amp *= persistance;
+                }
+                result1 = (result1 * 0.5f + 0.5f);
+            }
+
+            for (; i < octaves; ++i)
+			{
+				result2 += noise(x, y) * amp;
+				x *= lacunarity;
+				y *= lacunarity;
+				amp *= persistance;
+			}
+            result2 = std::abs(result2);
+			return min((result1 + result2), 0.999999f);
+		}
+
         float octaveNoise(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {
             float result = 0.0f;
@@ -189,6 +218,11 @@ namespace siv
         {
            return octaveNoise(x, y, octaves, lacunarity, persistance) * 0.5f + 0.5f;
         }
+
+		float ridgedNoise0_1(float x, float y, std::int32_t octaves, int ridgeStartingOctave = 1, float lacunarity = 2.f, float persistance = 0.25f) const
+		{
+			return ridgeOctaveNoise(x, y, octaves, ridgeStartingOctave, lacunarity, persistance);
+		}
 
         float octaveNoise0_1(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const
         {

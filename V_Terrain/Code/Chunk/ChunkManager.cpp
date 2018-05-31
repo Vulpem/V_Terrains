@@ -1,15 +1,15 @@
-//  V Terrains
+//  RPG Terrains
 //  Procedural terrain generation for modern C++
 //  Copyright (C) 2018 David Hernàndez Làzaro
 //  
-//  "V Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+//  "RPG Terrains" is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or any later version.
 //  
-//  "V Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  "RPG Terrains" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 //  
 //  For more details, read "COPYING.txt" and "COPYING.LESSER.txt" included in this project.
-//  You should have received a copy of the GNU General Public License along with V Terrains.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along with RPG Terrains.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChunkManager.h"
 
 #include "ChunkMesh.h"
@@ -17,13 +17,14 @@
 #include "../ExternalLibs/Glew/include/glew.h"
 
 
-namespace VTerrain
+namespace RPGT
 {
     ChunkManager::ChunkManager()
 		: m_chunks()
 		, m_lastOffPos(0, 0)
         , m_currentChunk(INT_MAX, INT_MIN)
 		, m_factory()
+        , m_isInit(false)
     {
         m_chunks.resize(config.maxChunks);
     }
@@ -36,14 +37,17 @@ namespace VTerrain
     void ChunkManager::Init()
     {
         std::string result;
-        m_shader = VTerrain::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
-        assert(m_shader.m_program != 0);
+        m_shader = RPGT::Shaders::CompileShader(nullptr, nullptr, nullptr, nullptr, result);
+		ASSERT(m_shader.m_program != 0, "Error compiling shaders:\n%s", result.data());
 
-        m_mesh.Generate();
+        GenerateMesh();
+        m_isInit = true;
     }
 
     void ChunkManager::Update(int posX, int posY)
     {
+        ASSERT(m_isInit, "Called Update before Init");
+
         const int W = static_cast<int>(config.chunkSize);
         Vec2<int> off(
 			(int)floor((posX - floor(W / 2.f) + (W % 2 != 0)) / W) + 1,
@@ -65,6 +69,8 @@ namespace VTerrain
 
     void ChunkManager::Render(const float * viewMatrix, const float * projectionMatrix) const
     {
+		ASSERT(m_isInit, "Called Render before Init");
+
         glPatchParameteri(GL_PATCH_VERTICES, 4);
 
         glUseProgram(m_shader.m_program);
@@ -94,23 +100,16 @@ namespace VTerrain
         dir.Normalize();
         glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
 
-        glUniform1f(m_shader.loc_max_height, config.maxHeight);
-
         glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
 
         glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
 
-        glUniform3fv(m_shader.loc_water_color, 1, config.waterColor);
-
         glUniform1f(m_shader.loc_water_height, config.waterHeight);
-
-        glUniform1ui(m_shader.loc_maxLOD, config.nLODs);
 
         glUniform1i(m_shader.loc_render_chunk_borders, config.debug.renderChunkBorders);
         glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
         glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
-        glUniform1i(m_shader.loc_heightmap, 0);
         for (int n = 0; n < 10; n++)
         {
             glUniform1i(m_shader.textures[n].loc_diffuse, (n * 2 + 1));
@@ -156,10 +155,18 @@ namespace VTerrain
             p[0] * r[6] + p[1] * r[7] + p[2] * r[8]
             );
 
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
+        glUniform1i(m_shader.loc_heightmap, 0);
+        const uint nIndices = m_mesh.GetNIndices();
+        std::for_each(m_chunks.begin(), m_chunks.end(),
+            [=](const Chunk& chunk)
         {
-            it->Draw(m_shader, cameraPos * -1);
-        }
+            if (chunk.IsLoaded())
+            {
+                chunk.BindHeightmap(0);
+                chunk.BindModelMatrix(m_shader.loc_model_matrix);
+                glDrawElements(GL_PATCHES, nIndices, GL_UNSIGNED_INT, (void*)0);
+            }
+        });
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glUseProgram(0);
@@ -167,10 +174,7 @@ namespace VTerrain
 
     void ChunkManager::CleanChunks()
     {
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); it++)
-        {
-            it->Free();
-        }
+        std::for_each(m_chunks.begin(), m_chunks.end(), [](Chunk& chunk) { chunk.Free(); });
         m_factory.ClearRequests();
         AddChunksToRegen(m_lastOffPos);
     }
@@ -187,6 +191,12 @@ namespace VTerrain
         CleanChunks();
     }
 
+    void ChunkManager::GenerateMesh()
+    {
+        m_mesh.Free();
+        m_mesh.Generate();
+    }
+
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
 		//TODO draw a circle instead of a square
@@ -197,7 +207,11 @@ namespace VTerrain
 			nChunks += ++maxDist * 4;
 		}
 		maxDist --;
-		for (int dist = 0; dist <= maxDist; dist++)
+
+        std::vector<Vec2<int>> toAdd;
+        toAdd.reserve(config.maxChunks);
+
+		for (int dist = 0; dist < maxDist; dist++)
 		{
 			for (int y = -dist; y <= dist; y++)
 			{
@@ -205,7 +219,7 @@ namespace VTerrain
 				{
 					if (abs(x) + abs(y) == dist)
 					{
-						AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
+                        AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
 					}
 				}
 			}
@@ -214,7 +228,7 @@ namespace VTerrain
 
 	bool ChunkManager::AddChunkToRegen(Vec2<int> pos)
     {
-        if (IsLoaded(pos) == false && m_factory.IsRequested(pos) == false)
+        if (IsLoaded(pos) == false)
         {
             m_factory.PushChunkRequest(pos);
 			return true;
@@ -225,38 +239,32 @@ namespace VTerrain
 
     Chunk & ChunkManager::GetChunk(Vec2<int> pos)
     {
-        for (std::vector<Chunk>::iterator it = m_chunks.begin(); it != m_chunks.end(); it++)
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end())
         {
-            if (it->GetPos() == pos)
-            {
                 return *it;
-            }
         }
-        assert(false);
+        ASSERT(false, "Tried to access a non-existing chunk at pos %i, %i", pos.x(), pos.y());
         return *m_chunks.begin();
     }
 
 	const Chunk & ChunkManager::GetChunk(Vec2<int> pos) const
 	{
-		for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
-		{
-			if (it->GetPos() == pos)
-			{
-				return *it;
-			}
-		}
-		assert(false);
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end())
+        {
+            return *it;
+        }
+		ASSERT(false, "Tried to access a non-existing chunk at pos %i, %i", pos.x(), pos.y());
 		return *m_chunks.cbegin();
 	}
 
     bool ChunkManager::IsLoaded(Vec2<int> pos) const
 	{
-        for (std::vector<Chunk>::const_iterator it = m_chunks.cbegin(); it != m_chunks.cend(); it++)
+        auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
+        if (it != m_chunks.end() && it->IsLoaded())
         {
-            if (it->IsLoaded() && it->GetPos() == pos)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
 	}
@@ -280,7 +288,7 @@ namespace VTerrain
                 ret = &(*it);
             }
         }
-        assert(ret != nullptr);
+        ASSERT(ret != nullptr, "This function just straight up broke.");
         return *ret;
     }
 }
