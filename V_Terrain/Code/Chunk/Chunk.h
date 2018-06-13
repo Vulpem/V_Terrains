@@ -32,6 +32,7 @@ namespace RPGT
         void BindModelMatrix(uint uniformLocation) const;
 		bool IsLoaded()  const;
 		Vec2<int> GetPos() const;
+        void GetPoint(float x, float y, float & height, float * normal) const;
 
     private:
 		Vec2<int> m_pos;

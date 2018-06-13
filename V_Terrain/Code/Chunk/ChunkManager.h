@@ -32,6 +32,8 @@ namespace RPGT
         void SetSeed(uint seed);
         void GenerateMesh();
 
+        void GetPoint(float x, float y, float& height, float* normal) const;
+
         ConditionalTexture m_textures[10];
         Shader m_shader;
     private:

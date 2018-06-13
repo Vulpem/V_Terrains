@@ -73,4 +73,12 @@ namespace RPGT
 	{
 		return m_pos;
 	}
+
+    void Chunk::GetPoint(float x, float y, float & height, float * normal) const
+    {
+        height = 0;
+        normal[0] = 1;
+        normal[1] = 1;
+        normal[2] = 1;
+    }
 }

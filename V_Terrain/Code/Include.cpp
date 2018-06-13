@@ -71,16 +71,12 @@ namespace RPGT
         return Shaders::GetDefaultTESShader();
     }
 
+    void SaveShader(const std::string & data, const char * fileName)
+    {
 #if _DEBUG
-    void SaveShader(const std::string & data, const char * fileName)
-    {
         Shaders::SaveFile(data, fileName);
-    }
-#else
-    void SaveShader(const std::string & data, const char * fileName)
-    {
-    }
 #endif
+    }
 
     std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES)
     {
@@ -97,19 +93,9 @@ namespace RPGT
         return result;
     }
 
-    float GetHeightAt(float x, float y)
+    void GetPoint(float x, float y, float& height, float* normal)
     {
-        int x1 = (int)floor(abs(x)) % 10;
-        int y1 = (int)floor(abs(y)) % 10;
-        float val[10][10];
-        for (int a = 0; a < 10; a++)
-        {
-            for (int b = 0; b < 10; b++)
-            {
-                val[a][b] = 0.f;
-            }
-        }
-        return val[x1][y1];
+        chunkManager.GetPoint(x, y, height, normal);
     }
 
 	const ConditionalTexture& GetTexture(int n)
