@@ -170,13 +170,14 @@ namespace RPGT
 
     std::string Shaders::OpenFile(const char * fileDir)
     {
+        std::string ret;
+#if _DEBUG 
         TCHAR pwd[MAX_PATH];
         GetCurrentDirectory(MAX_PATH, pwd);
 
         std::string dir(pwd);
-        dir += "/../V_Terrain/Code/Shaders/";
+        dir += "/../../V_Terrain/Code/Shaders/";
         dir += fileDir;
-        std::string ret;
         std::ifstream inStream;
         inStream.open(dir.data());
         if (inStream.is_open())
@@ -190,16 +191,18 @@ namespace RPGT
             }
             inStream.close();
         }
+#endif
         return ret;
     }
 
     void Shaders::SaveFile(const std::string& file, const char * fileDir)
     {
+#if _DEBUG 
         TCHAR pwd[MAX_PATH];
         GetCurrentDirectory(MAX_PATH, pwd);
 
         std::string dir(pwd);
-        dir += "/../V_Terrain/Code/Shaders/";
+        dir += "/../../V_Terrain/Code/Shaders/";
         dir += fileDir;
         std::string ret;
         std::ofstream outStream;
@@ -210,6 +213,7 @@ namespace RPGT
             outStream.write(file.data(), file.size());
             outStream.close();
         }
+#endif
     }
 
     const char* Shaders::GetShaderType(unsigned int type)
