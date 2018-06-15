@@ -1,4 +1,4 @@
-#version 430 core
+#version 410 core
 
 //TODO send as uniforms
 float triSize = 6.5f;
@@ -78,12 +78,12 @@ void main()
     position[gl_InvocationID] = pos[gl_InvocationID];
     UVs[gl_InvocationID] = UV[gl_InvocationID];
 
-	vec3 p[4] = {
-(model_matrix * vec4(pos[0], 1.f)).xyz,
-(model_matrix * vec4(pos[1], 1.f)).xyz,
-(model_matrix * vec4(pos[2], 1.f)).xyz,
-(model_matrix * vec4(pos[3], 1.f)).xyz
-};
+	vec3 p[4];
+	p[0] = (model_matrix * vec4(pos[0], 1.f)).xyz;
+	p[1] = (model_matrix * vec4(pos[1], 1.f)).xyz;
+	p[2] = (model_matrix * vec4(pos[2], 1.f)).xyz;
+	p[3] = (model_matrix * vec4(pos[3], 1.f)).xyz;
+
     vec3 spherePos = (p[0] + p[1] + p[2] + p[3]) *0.25f;
     float sphereDiam = distance(spherePos, p[0]) * 1.1f;
     vec2 diamOnScreen = eyeToScreen(vec4(sphereDiam, 0.f, 0.f, 1.f)).xy;

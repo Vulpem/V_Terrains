@@ -139,12 +139,30 @@ namespace RPGT
                 for (int n = 0; n < 10; n++)
                 {
                     char val[28];
-                    sprintf_s(val, 28, "textures[%i].", n);
-                    ret.textures[n].loc_diffuse = glGetUniformLocation(program, (std::string(val) + "diffuse").data());
-                    ret.textures[n].loc_heightmap = glGetUniformLocation(program, (std::string(val) + "heightmap").data());
-
-                    ret.textures[n].data = glGetUniformLocation(program, (std::string(val) + "data").data());
+					const int nTexValues = 11;
+                    sprintf_s(val, 28, "textures[%i]", n * nTexValues);
+                    ret.textures[n].data = glGetUniformLocation(program, val);
                 }
+				ret.textures[0].loc_diffuse = glGetUniformLocation(program, "diff_0");
+				ret.textures[0].loc_heightmap = glGetUniformLocation(program, "hm_0");
+				ret.textures[1].loc_diffuse = glGetUniformLocation(program, "diff_1");
+				ret.textures[1].loc_heightmap = glGetUniformLocation(program, "hm_1");
+				ret.textures[2].loc_diffuse = glGetUniformLocation(program, "diff_2");
+				ret.textures[2].loc_heightmap = glGetUniformLocation(program, "hm_2");
+				ret.textures[3].loc_diffuse = glGetUniformLocation(program, "diff_3");
+				ret.textures[3].loc_heightmap = glGetUniformLocation(program, "hm_3");
+				ret.textures[4].loc_diffuse = glGetUniformLocation(program, "diff_4");
+				ret.textures[4].loc_heightmap = glGetUniformLocation(program, "hm_4");
+				ret.textures[5].loc_diffuse = glGetUniformLocation(program, "diff_5");
+				ret.textures[5].loc_heightmap = glGetUniformLocation(program, "hm_5");
+				ret.textures[6].loc_diffuse = glGetUniformLocation(program, "diff_6");
+				ret.textures[6].loc_heightmap = glGetUniformLocation(program, "hm_6");
+				ret.textures[7].loc_diffuse = glGetUniformLocation(program, "diff_7");
+				ret.textures[7].loc_heightmap = glGetUniformLocation(program, "hm_7");
+				ret.textures[8].loc_diffuse = glGetUniformLocation(program, "diff_8");
+				ret.textures[8].loc_heightmap = glGetUniformLocation(program, "hm_8");
+				ret.textures[9].loc_diffuse = glGetUniformLocation(program, "diff_9");
+				ret.textures[9].loc_heightmap = glGetUniformLocation(program, "hm_9");
             }
 
             ret.loc_heightmap = glGetUniformLocation(program, "heightmap");

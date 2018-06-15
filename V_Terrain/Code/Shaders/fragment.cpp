@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 #define colorR 0
 #define colorG 1
@@ -12,12 +12,40 @@
 #define slopeFade 9
 #define hasTexture 10
 
-struct ConditionalTexture
-{
-     sampler2D diffuse;
-     sampler2D heightmap;
-	float[11] data;
-};
+#define TexNVariables 11
+#define nTextures 10
+
+uniform float[nTextures *TexNVariables] textures;
+
+uniform sampler2D diff_0;
+uniform sampler2D hm_0;
+
+uniform sampler2D diff_1;
+uniform sampler2D hm_1;
+
+uniform sampler2D diff_2;
+uniform sampler2D hm_2;
+
+uniform sampler2D diff_3;
+uniform sampler2D hm_3;
+
+uniform sampler2D diff_4;
+uniform sampler2D hm_4;
+
+uniform sampler2D diff_5;
+uniform sampler2D hm_5;
+
+uniform sampler2D diff_6;
+uniform sampler2D hm_6;
+
+uniform sampler2D diff_7;
+uniform sampler2D hm_7;
+
+uniform sampler2D diff_8;
+uniform sampler2D hm_8;
+
+uniform sampler2D diff_9;
+uniform sampler2D hm_9;
 
 in vec3 pos;
 in vec2 UV;
@@ -37,14 +65,70 @@ uniform unsigned int maxDensity;
 
 uniform  sampler2D heightmap;
 
-uniform ConditionalTexture textures[10];
-
 out vec4 color;
 
-//https://freepbr.com/
-//https://www.textures.com/download/substance0121/131965
-//https://www.textures.com/browse/substance/114546
-//https://www.textures.com/download/substance0058/128242
+vec4 SampleDiff(int texN, vec2 UV)
+{
+	switch (texN)
+	{
+	case 0:
+		return texture2D(diff_0, UV);
+	case 1:
+		return texture2D(diff_1, UV);
+	case 2:
+		return texture2D(diff_2, UV);
+	case 3:
+		return texture2D(diff_3, UV);
+	case 4:
+		return texture2D(diff_4, UV);
+	case 5:
+		return texture2D(diff_5, UV);
+	case 6:
+		return texture2D(diff_6, UV);
+	case 7:
+		return texture2D(diff_7, UV);
+	case 8:
+		return texture2D(diff_8, UV);
+	case 9:
+		return texture2D(diff_9, UV);
+	default:
+		return vec4(0.f, 0.f, 0.f, 0.f);
+	}
+}
+
+vec4 SampleHM(int texN, vec2 UV)
+{
+	switch (texN)
+	{
+	case 0:
+		return texture2D(hm_0, UV);
+	case 1:
+		return texture2D(hm_1, UV);
+	case 2:
+		return texture2D(hm_2, UV);
+	case 3:
+		return texture2D(hm_3, UV);
+	case 4:
+		return texture2D(hm_4, UV);
+	case 5:
+		return texture2D(hm_5, UV);
+	case 6:
+		return texture2D(hm_6, UV);
+	case 7:
+		return texture2D(hm_7, UV);
+	case 8:
+		return texture2D(hm_8, UV);
+	case 9:
+		return texture2D(hm_9, UV);
+	default:
+		return vec4(0.f, 0.f, 0.f, 0.f);
+	}
+}
+
+float GetVal(int texN, int val)
+{
+	return textures[texN * TexNVariables + val];
+}
 
 float SteppedScalar(float scalar, int nSteps)
 {
@@ -62,106 +146,102 @@ vec3 ScalarToColor(float s)
     return vec3(r, g, b);
 }
 
-void main()
+vec4 GetTerrainColor()
 {
-     vec4 hmVal = texture2D(heightmap, UV);
-     vec3 norm = hmVal.xyz * 2.f - 1.f;
+	vec4 hmVal = texture2D(heightmap, UV);
+	vec3 norm = hmVal.xyz * 2.f - 1.f;
 
-     norm.y /= model_matrix[1][1];
-	 norm = normalize(norm);
+	norm.y /= model_matrix[1][1];
+	norm = normalize(norm);
 
-     float slope = 1.f - norm.y;
-	 float height = pos.y / model_matrix[1][1];
+	float slope = 1.f - norm.y;
+	float height = pos.y / model_matrix[1][1];
 
-     vec3 col;
+	vec3 col = vec3(0.f, 0.f, 0.f);
 
-    if (render_heightmap == 0)
-    {
+	if (render_heightmap == 0)
+	{
 		float currentH = 0;
-        for (int n = 9; n >= 0; n--)
-        {
-            if (height > textures[n].data[minHeight] - textures[n].data[heightFade]
-                && height <= textures[n].data[maxHeight] + textures[n].data[heightFade]
-                && slope > textures[n].data[minSlope] - textures[n].data[slopeFade]
-                && slope <= textures[n].data[maxSlope] + textures[n].data[slopeFade])
-            {
-				float h = texture(textures[n].heightmap, UV * int(textures[n].data[sizeMultiplier])).x;
+		for (int n = 9; n >= 0; n--)
+		{
+			if (height > GetVal(n, minHeight) - GetVal(n, heightFade)
+				&& height <= GetVal(n, maxHeight) + GetVal(n, heightFade)
+				&& slope > GetVal(n, minSlope) - GetVal(n, slopeFade)
+				&& slope <= GetVal(n, maxSlope) + GetVal(n, slopeFade))
+			{
+				float h = SampleDiff(n, UV * int(GetVal(n, sizeMultiplier))).x;
 				//texture is in it's range
-				if (height > textures[n].data[minHeight]
-					&& height <= textures[n].data[maxHeight]
-					&& slope > textures[n].data[minSlope]
-					&& slope <= textures[n].data[maxSlope])
+				if (height > GetVal(n, minHeight)
+					&& height <= GetVal(n, maxHeight)
+					&& slope > GetVal(n, minSlope)
+					&& slope <= GetVal(n, maxSlope))
 				{
 					currentH = h;
-					col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
-					if (textures[n].data[hasTexture] != 0.f)
+					col = vec3(GetVal(n, colorR), GetVal(n, colorG), GetVal(n, colorB));
+					if (GetVal(n, hasTexture) != 0.f)
 					{
-						col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+						col *= SampleDiff(n, UV * int(GetVal(n, sizeMultiplier))).xyz;
 					}
 				}
 				//Texture is in fade range
 				else
 				{
-					if (height > textures[n].data[maxHeight])
+					if (height > GetVal(n, maxHeight))
 					{
-						float dif = 1- (height - textures[n].data[maxHeight]) / textures[n].data[heightFade];
+						float dif = 1 - (height - GetVal(n, maxHeight)) / GetVal(n, heightFade);
 						h *= dif;
 					}
-					else if (height < textures[n].data[minHeight])
+					else if (height < GetVal(n, minHeight))
 					{
-						float dif = 1- (textures[n].data[minHeight] * height) / textures[n].data[heightFade];
+						float dif = 1 - (GetVal(n, minHeight) * height) / GetVal(n, heightFade);
 						h *= dif;
 					}
 					if (h > currentH)
 					{
 						currentH = h;
-						col = vec3(textures[n].data[colorR], textures[n].data[colorG], textures[n].data[colorB]);
-						if (textures[n].data[hasTexture] != 0.f)
+						col = vec3(GetVal(n, colorR), GetVal(n, colorG), GetVal(n, colorB));
+						if (GetVal(n, hasTexture) != 0.f)
 						{
-							col *= texture(textures[n].diffuse, UV * int(textures[n].data[sizeMultiplier])).xyz;
+							col *= SampleDiff(n, UV * int(GetVal(n, sizeMultiplier))).xyz;
 						}
 					}
 				}
-            }
-        }
-    }
-    else
-    {
-        float val = texture(heightmap, UV).w;
-        col = vec3(val, val, val);
-    }
+			}
+		}
+	}
+	else
+	{
+		col = vec3(hmVal.w, hmVal.w, hmVal.w);
+	}
 
-    if (render_chunk_borders != 0 && (UV.x <= 0.03f || UV.y <= 0.03f || UV.x >= 0.97 || UV.y >= 0.97))
-    {
-        col = vec3(1.f, 1.f, 1.f);
-    }
+	if (render_chunk_borders != 0 && (UV.x <= 0.03f || UV.y <= 0.03f || UV.x >= 0.97 || UV.y >= 0.97))
+	{
+		col = vec3(1.f, 1.f, 1.f);
+	}
 
-    if (render_light != 0)
-    {
-        col *= max(dot(global_light_direction, norm), ambient_min);
-    }
-    
+	if (render_light != 0)
+	{
+		col *= max(dot(global_light_direction, norm), ambient_min);
+	}
+
 	/*if(renderDensity)
-    {
-        col = ScalarToColor(poliDensity / maxDensity);
-    }*/
+	{
+		col = ScalarToColor(poliDensity / maxDensity);
+	}*/
 
-    float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
+	float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
 	distanceFog = min(distanceFog, 1);
 
-    float heightFog = (1 + water_height - height);
-    heightFog = pow(heightFog, 3);
+	float heightFog = (1 + water_height - height);
+	heightFog = pow(heightFog, 3);
 
-    float fog = distanceFog + (heightFog * 0.5f) * pow(distanceFog, 0.25f);
-	fog = min(fog,1);
+	float fog = distanceFog + (heightFog * 0.5f) * pow(distanceFog, 0.25f);
+	fog = min(fog, 1);
 
-    color = vec4(mix(col, fog_color, fog), 1.f);
+	return vec4(mix(col, fog_color, fog), 1.f);
 }
 
-
-
-
-
-
-
-
+void main()
+{
+	color = GetTerrainColor();
+}
