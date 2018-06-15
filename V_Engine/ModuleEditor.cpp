@@ -230,12 +230,13 @@ update_status ModuleEditor::MenuBar()
 
 void ModuleEditor::Editor()
 {
+
 		ImGui::SetNextWindowPos(ImVec2(0, ((screenH - 20) / 4) * 3));
 		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/4 + 20));
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
-		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f, flags);
+		ImGui::Begin("Editor", 0, flags);
 
 		if (ImGui::CollapsingHeader("Application"))
 		{
