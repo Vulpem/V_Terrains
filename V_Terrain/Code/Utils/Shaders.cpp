@@ -35,11 +35,7 @@ namespace RPGT
         unsigned int vertexShader = 0;
         if (vertexBuf == nullptr)
         {
-            code = OpenFile("vertex.cpp");
-            if(code.length() <= 1)
-            {
-                code = GetDefaultVertexShader();
-            }
+            code = GetDefaultVertexShader();
             vertexShader = Compile(code, GL_VERTEX_SHADER, result);
         }
         else
@@ -50,11 +46,7 @@ namespace RPGT
         unsigned int TCS = 0;
         if (TCSbuf == nullptr)
         {
-            code = OpenFile("TCS.cpp");
-            if (code.length() <= 1)
-            {
-                code = GetDefaultTCSShader();
-            }
+            code = GetDefaultTCSShader();
             TCS = Compile(code, GL_TESS_CONTROL_SHADER, result);
         }
         else
@@ -65,11 +57,7 @@ namespace RPGT
         unsigned int TES = 0;
         if (TCSbuf == nullptr)
         {
-            code = OpenFile("TES.cpp");
-            if (code.length() <= 1)
-            {
-                code = GetDefaultTESShader();
-            }
+            code = GetDefaultTESShader();
             TES = Compile(code, GL_TESS_EVALUATION_SHADER, result);
         }
         else
@@ -80,11 +68,7 @@ namespace RPGT
         unsigned int fragmentShader = 0;
         if (fragmentBuf == nullptr)
         {
-            code = OpenFile("fragment.cpp");
-            if (code.length() <= 1)
-            {
-                code = GetDefaultFragmentShader();
-            }
+            code = GetDefaultFragmentShader();
             fragmentShader = Compile(code, GL_FRAGMENT_SHADER, result);
         }
         else
