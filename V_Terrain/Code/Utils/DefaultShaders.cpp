@@ -127,28 +127,17 @@ uniform float[nTextures *TexNVariables] textures;\n\
 		{\n\
 			switch (texN)\n\
 			{\n\
-			case 0:\n\
-				return texture2D(diff_0, UV);\n\
-			case 1:\n\
-				return texture2D(diff_1, UV);\n\
-			case 2:\n\
-				return texture2D(diff_2, UV);\n\
-			case 3:\n\
-				return texture2D(diff_3, UV);\n\
-			case 4:\n\
-				return texture2D(diff_4, UV);\n\
-			case 5:\n\
-				return texture2D(diff_5, UV);\n\
-			case 6:\n\
-				return texture2D(diff_6, UV);\n\
-			case 7:\n\
-				return texture2D(diff_7, UV);\n\
-			case 8:\n\
-				return texture2D(diff_8, UV);\n\
-			case 9:\n\
-				return texture2D(diff_9, UV);\n\
-			default:\n\
-				return vec4(0.f, 0.f, 0.f, 0.f);\n\
+			case 0: return texture2D(diff_0, UV);\n\
+			case 1: return texture2D(diff_1, UV);\n\
+			case 2: return texture2D(diff_2, UV);\n\
+			case 3: return texture2D(diff_3, UV);\n\
+			case 4: return texture2D(diff_4, UV);\n\
+			case 5: return texture2D(diff_5, UV);\n\
+			case 6: return texture2D(diff_6, UV);\n\
+			case 7: return texture2D(diff_7, UV);\n\
+			case 8: return texture2D(diff_8, UV);\n\
+			case 9: return texture2D(diff_9, UV);\n\
+			default: return vec4(0.f, 0.f, 0.f, 0.f);\n\
 			}\n\
 		}\n\
 \n\
@@ -156,28 +145,17 @@ uniform float[nTextures *TexNVariables] textures;\n\
 		{\n\
 			switch (texN)\n\
 			{\n\
-			case 0:\n\
-				return texture2D(hm_0, UV);\n\
-			case 1:\n\
-				return texture2D(hm_1, UV);\n\
-			case 2:\n\
-				return texture2D(hm_2, UV);\n\
-			case 3:\n\
-				return texture2D(hm_3, UV);\n\
-			case 4:\n\
-				return texture2D(hm_4, UV);\n\
-			case 5:\n\
-				return texture2D(hm_5, UV);\n\
-			case 6:\n\
-				return texture2D(hm_6, UV);\n\
-			case 7:\n\
-				return texture2D(hm_7, UV);\n\
-			case 8:\n\
-				return texture2D(hm_8, UV);\n\
-			case 9:\n\
-				return texture2D(hm_9, UV);\n\
-			default:\n\
-				return vec4(0.f, 0.f, 0.f, 0.f);\n\
+			case 0: return texture2D(hm_0, UV);\n\
+			case 1: return texture2D(hm_1, UV);\n\
+			case 2: return texture2D(hm_2, UV);\n\
+			case 3: return texture2D(hm_3, UV);\n\
+			case 4: return texture2D(hm_4, UV);\n\
+			case 5: return texture2D(hm_5, UV);\n\
+			case 6: return texture2D(hm_6, UV);\n\
+			case 7: return texture2D(hm_7, UV);\n\
+			case 8: return texture2D(hm_8, UV);\n\
+			case 9: return texture2D(hm_9, UV);\n\
+			default: return vec4(0.f, 0.f, 0.f, 0.f);\n\
 			}\n\
 		}\n\
 \n\

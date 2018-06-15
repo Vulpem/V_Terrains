@@ -71,28 +71,17 @@ vec4 SampleDiff(int texN, vec2 UV)
 {
 	switch (texN)
 	{
-	case 0:
-		return texture2D(diff_0, UV);
-	case 1:
-		return texture2D(diff_1, UV);
-	case 2:
-		return texture2D(diff_2, UV);
-	case 3:
-		return texture2D(diff_3, UV);
-	case 4:
-		return texture2D(diff_4, UV);
-	case 5:
-		return texture2D(diff_5, UV);
-	case 6:
-		return texture2D(diff_6, UV);
-	case 7:
-		return texture2D(diff_7, UV);
-	case 8:
-		return texture2D(diff_8, UV);
-	case 9:
-		return texture2D(diff_9, UV);
-	default:
-		return vec4(0.f, 0.f, 0.f, 0.f);
+	case 0: return texture2D(diff_0, UV);
+	case 1: return texture2D(diff_1, UV);
+	case 2: return texture2D(diff_2, UV);
+	case 3: return texture2D(diff_3, UV);
+	case 4: return texture2D(diff_4, UV);
+	case 5: return texture2D(diff_5, UV);
+	case 6: return texture2D(diff_6, UV);
+	case 7: return texture2D(diff_7, UV);
+	case 8: return texture2D(diff_8, UV);
+	case 9: return texture2D(diff_9, UV);
+	default: return vec4(0.f, 0.f, 0.f, 0.f);
 	}
 }
 
@@ -100,28 +89,17 @@ vec4 SampleHM(int texN, vec2 UV)
 {
 	switch (texN)
 	{
-	case 0:
-		return texture2D(hm_0, UV);
-	case 1:
-		return texture2D(hm_1, UV);
-	case 2:
-		return texture2D(hm_2, UV);
-	case 3:
-		return texture2D(hm_3, UV);
-	case 4:
-		return texture2D(hm_4, UV);
-	case 5:
-		return texture2D(hm_5, UV);
-	case 6:
-		return texture2D(hm_6, UV);
-	case 7:
-		return texture2D(hm_7, UV);
-	case 8:
-		return texture2D(hm_8, UV);
-	case 9:
-		return texture2D(hm_9, UV);
-	default:
-		return vec4(0.f, 0.f, 0.f, 0.f);
+	case 0: return texture2D(hm_0, UV);
+	case 1: return texture2D(hm_1, UV);
+	case 2: return texture2D(hm_2, UV);
+	case 3: return texture2D(hm_3, UV);
+	case 4: return texture2D(hm_4, UV);
+	case 5: return texture2D(hm_5, UV);
+	case 6: return texture2D(hm_6, UV);
+	case 7: return texture2D(hm_7, UV);
+	case 8: return texture2D(hm_8, UV);
+	case 9: return texture2D(hm_9, UV);
+	default: return vec4(0.f, 0.f, 0.f, 0.f);
 	}
 }
 
