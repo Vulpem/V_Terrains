@@ -230,15 +230,13 @@ namespace RPGT
 
 		for (int dist = 0; dist < maxDist; dist++)
 		{
-			for (int y = -dist; y <= dist; y++)
+			for (int x = 0; x < dist; x++)
 			{
-				for (int x = -dist; x <= dist; x++)
-				{
-					if (abs(x) + abs(y) == dist)
-					{
-                        AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
-					}
-				}
+				const int y = dist - x;
+				AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
+				AddChunkToRegen(Vec2<int>(pos.x() - x, pos.y() + y));
+				AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() - y));
+				AddChunkToRegen(Vec2<int>(pos.x() - x, pos.y() - y));
 			}
 		}
     }
@@ -279,11 +277,7 @@ namespace RPGT
     bool ChunkManager::IsLoaded(Vec2<int> pos) const
 	{
         auto it = std::find_if(m_chunks.begin(), m_chunks.end(), [pos](const Chunk& chunk) { return chunk.GetPos() == pos; });
-        if (it != m_chunks.end() && it->IsLoaded())
-        {
-            return true;
-        }
-        return false;
+		return (it != m_chunks.end() && it->IsLoaded());
 	}
 
     Chunk& ChunkManager::GetFurthestChunk()
