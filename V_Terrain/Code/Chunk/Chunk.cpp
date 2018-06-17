@@ -31,8 +31,8 @@ namespace RPGT
 		{
 			Free();
 		}
-
         m_buf_heightmap = GenImage::FromRGBA(base.m_data, base.m_size.x(), base.m_size.y());
+		m_data = base.m_data;
         m_pos = base.m_pos;
     }
 
@@ -74,11 +74,43 @@ namespace RPGT
 		return m_pos;
 	}
 
-    void Chunk::GetPoint(float x, float y, float & height, float * normal) const
+    void Chunk::GetPoint(float _x, float _y, float & height, float * normal) const
     {
-        height = 0;
-        normal[0] = 1;
-        normal[1] = 1;
-        normal[2] = 1;
+		if (IsLoaded())
+		{
+			const float x = (_x + config.chunkSize / 2.f) / config.chunkSize * (config.chunkMinDensity + 1);
+			const float y = (_y + config.chunkSize / 2.f) / config.chunkSize * (config.chunkMinDensity + 1);
+
+			const int lx = static_cast<int>(floor(x));
+			int mx = static_cast<int>(ceil(x));
+			if (mx == lx) { mx++; }
+			const int ly = static_cast<int>(floor(y));
+			int my = static_cast<int>(ceil(y));
+			if (my == ly) { my++; }
+
+			const int row = config.chunkMinDensity + 1;
+			const int val = (ly * row + lx);
+
+			normal[0] = utils::Mix(
+				utils::Mix(m_data[(val) * 4 + 0], m_data[(val + row) * 4 + 0], my - y),
+				utils::Mix(m_data[(val + 1) * 4 + 0], m_data[(val + row + 1) * 4 + 0], my - y),
+				mx - x
+			) * 2.f - 1.f;
+			normal[1] = utils::Mix(
+				utils::Mix(m_data[(val) * 4 + 1], m_data[(val + row) * 4 + 1], my - y),
+				utils::Mix(m_data[(val + 1) * 4 + 1], m_data[(val + row + 1) * 4 + 1], my - y),
+				mx - x
+			) * 2.f - 1.f;
+			normal[2] = utils::Mix(
+				utils::Mix(m_data[(val) * 4 + 2], m_data[(val + row) * 4 + 2], my - y),
+				utils::Mix(m_data[(val + 1) * 4 + 2], m_data[(val + row + 1) * 4 + 2], my - y),
+				mx - x
+			) * 2.f - 1.f;
+			height = utils::Mix(
+				utils::Mix(m_data[(val) * 4 + 3], m_data[(val + row) * 4 + 3], my - y),
+				utils::Mix(m_data[(val + 1) * 4 + 3], m_data[(val + row + 1) * 4 + 3], my - y),
+				mx - x
+			) * config.maxHeight;
+		}
     }
 }

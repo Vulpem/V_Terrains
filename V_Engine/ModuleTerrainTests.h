@@ -67,6 +67,9 @@ public:
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
+
+	float3 m_terrainPos[33][33];
+	float3 m_terrainNormal[33][33];
 };
 
 #endif

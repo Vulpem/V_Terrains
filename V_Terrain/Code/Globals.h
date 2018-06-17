@@ -52,6 +52,25 @@ namespace RPGT
             class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
             bool IsAlmost(T a, T b, T range) { return (abs(a - b) < range); }
 
+		template <typename T,
+			class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+			T Round(T a, int nDecimals = 0)
+		{
+			const int m = pow(10, nDecimals);
+			a *= m;
+			const float f = floor(a);
+			const float f2 = floor(a + 0.5f);
+			if (utils::IsAlmost(f, f2, 0.001f))
+			{
+				return f / m;
+			}
+			return ceil(f) / m;
+		}
+
+		template <typename T,
+			class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+			T Mix(T a, T b, float n) { return (a * n) + (b * (1.f - n)); }
+
 		int FormatCString(char *outBuffer, int outBufferSize, const char* format, va_list args);
 
 		template<size_t BufferSize>

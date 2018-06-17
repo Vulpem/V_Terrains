@@ -93,6 +93,20 @@ update_status ModuleTerrain::Update()
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
 
+	float height;
+	float normal[3];
+	const float dist = 50;
+
+	for (int y = -16; y <= 16; y++)
+	{
+		for (int x = -16; x <= 16; x++)
+		{
+			RPGT::GetPoint(pos.x + x * dist, pos.z + y * dist, height, normal);
+			m_terrainPos[y+16][x + 16] = float3(pos.x + x * dist, height, pos.z + y * dist);
+			m_terrainNormal[y + 16][x + 16] = float3(normal[0], normal[1], normal[2]);
+		}
+	}
+
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
     ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20) / 4 * 3 - 20));
@@ -435,6 +449,18 @@ void ModuleTerrain::Render(const viewPort & port)
 	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
 	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
 	RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+	for (int y = 0; y < 33 - 1; y++)
+	{
+		for (int x = 0; x < 33 - 1; x++)
+		{
+			//App->renderer3D->DrawLine(m_terrainPos[n], m_terrainPos[n] + m_terrainNormal[n] * 100, float4(0, 1, 1, 1));
+			App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x+1], float4(0, 1, 1, 1));
+			App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y+1][x], float4(0, 1, 1, 1));
+
+
+			App->renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
+		}
+	}
 }
 
 void ModuleTerrain::SetDefaultTextures()

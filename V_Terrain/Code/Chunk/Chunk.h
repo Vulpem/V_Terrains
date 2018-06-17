@@ -37,5 +37,6 @@ namespace RPGT
     private:
 		Vec2<int> m_pos;
 		uint m_buf_heightmap;
+		std::vector<float> m_data;
 	};
 }

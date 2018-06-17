@@ -194,16 +194,17 @@ namespace RPGT
     void ChunkManager::GetPoint(float x, float y, float & height, float * normal) const
     {
         const int HMresolution = static_cast<int>(RPGT::config.chunkSize);
-        int currentChunk[2] = {
+        Vec2<int> currentChunk(
             floor((x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
             floor((y - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
-        };
+        );
         auto chunk = std::find_if(m_chunks.begin(), m_chunks.end(),
             [currentChunk](const Chunk& c)
-        { return (c.GetPos().x() == currentChunk[0] && c.GetPos().y() == currentChunk[1]); });
+		{ const Vec2<int> p = c.GetPos(); return (p.x() == currentChunk.x() && p.y() == currentChunk.y()); });
+
         if (chunk != m_chunks.end())
         {
-            chunk->GetPoint(x - currentChunk[0] * config.chunkSize, y - currentChunk[1] * config.chunkSize, height, normal);
+            chunk->GetPoint(x - currentChunk.x() * config.chunkSize, y - currentChunk.y() * config.chunkSize, height, normal);
         }
         else
         {
