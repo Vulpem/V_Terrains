@@ -228,14 +228,15 @@ namespace RPGT
         std::vector<Vec2<int>> toAdd;
         toAdd.reserve(config.maxChunks);
 
-		for (int dist = 0; dist < maxDist; dist++)
+		AddChunkToRegen(Vec2<int>(pos.x(), pos.y()));
+		for (int dist = 1; dist < maxDist; dist++)
 		{
 			for (int x = 0; x < dist; x++)
 			{
 				const int y = dist - x;
 				AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() + y));
-				AddChunkToRegen(Vec2<int>(pos.x() - x, pos.y() + y));
-				AddChunkToRegen(Vec2<int>(pos.x() + x, pos.y() - y));
+				AddChunkToRegen(Vec2<int>(pos.x() - x - 1, pos.y() + y - 1));
+				AddChunkToRegen(Vec2<int>(pos.x() + x + 1, pos.y() - y + 1));
 				AddChunkToRegen(Vec2<int>(pos.x() - x, pos.y() - y));
 			}
 		}
