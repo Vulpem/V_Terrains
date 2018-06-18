@@ -8,6 +8,9 @@
 
 #include "Math.h"
 
+#define COL_N 61
+#define COL_D 25
+
 void ShowError(const char* message);
 
 class ModuleTerrain : public Module
@@ -68,8 +71,9 @@ public:
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
 
-	float3 m_terrainPos[33][33];
-	float3 m_terrainNormal[33][33];
+	bool m_displayCollision = true;
+	float3 m_terrainPos[COL_N][COL_N];
+	float3 m_terrainNormal[COL_N][COL_N];
 };
 
 #endif

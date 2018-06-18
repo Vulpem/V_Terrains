@@ -93,20 +93,22 @@ update_status ModuleTerrain::Update()
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
 
-	float height;
-	float normal[3];
-	const float dist = 50;
-
-	for (int y = -16; y <= 16; y++)
+	if (m_displayCollision)
 	{
-		for (int x = -16; x <= 16; x++)
+		float height;
+		float normal[3];
+		const int d = COL_N / 2;
+
+		for (int y = -d; y <= d; y++)
 		{
-			RPGT::GetPoint(pos.x + x * dist, pos.z + y * dist, height, normal);
-			m_terrainPos[y+16][x + 16] = float3(pos.x + x * dist, height, pos.z + y * dist);
-			m_terrainNormal[y + 16][x + 16] = float3(normal[0], normal[1], normal[2]);
+			for (int x = -d; x <= d; x++)
+			{
+				RPGT::GetPoint(pos.x + x * COL_D, pos.z + y * COL_D, height, normal);
+				m_terrainPos[y + d][x + d] = float3(pos.x + x * COL_D, height, pos.z + y * COL_D);
+				m_terrainNormal[y + d][x + d] = float3(normal[0], normal[1], normal[2]);
+			}
 		}
 	}
-
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
     ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20) / 4 * 3 - 20));
@@ -303,6 +305,7 @@ update_status ModuleTerrain::Update()
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
+			ImGui::Checkbox("Display Collisions", &m_displayCollision);
 
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
@@ -449,16 +452,19 @@ void ModuleTerrain::Render(const viewPort & port)
 	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
 	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
 	RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
-	for (int y = 0; y < 33 - 1; y++)
+	if (m_displayCollision)
 	{
-		for (int x = 0; x < 33 - 1; x++)
+		for (int y = 0; y < COL_N - 1; y++)
 		{
-			//App->renderer3D->DrawLine(m_terrainPos[n], m_terrainPos[n] + m_terrainNormal[n] * 100, float4(0, 1, 1, 1));
-			App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x+1], float4(0, 1, 1, 1));
-			App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y+1][x], float4(0, 1, 1, 1));
+			for (int x = 0; x < COL_N - 1; x++)
+			{
+				//App->renderer3D->DrawLine(m_terrainPos[n], m_terrainPos[n] + m_terrainNormal[n] * 100, float4(0, 1, 1, 1));
+				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x + 1], float4(0, 1, 1, 1));
+				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y + 1][x], float4(0, 1, 1, 1));
 
 
-			App->renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
+				App->renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
+			}
 		}
 	}
 }
