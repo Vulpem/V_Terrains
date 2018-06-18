@@ -54,6 +54,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     m_TES.reserve(m_TES.capacity() + 1024);
     m_fragment = RPGT::GetDefaultFragmentShader();
     m_fragment.reserve(m_fragment.capacity() + 1024);
+	RPGT::config.debug.renderChunkBorders = true;
 }
 
 // Destructor
@@ -458,10 +459,10 @@ void ModuleTerrain::Render(const viewPort & port)
 		{
 			for (int x = 0; x < COL_N - 1; x++)
 			{
-				//App->renderer3D->DrawLine(m_terrainPos[n], m_terrainPos[n] + m_terrainNormal[n] * 100, float4(0, 1, 1, 1));
+				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x] + m_terrainNormal[y][x] * 10, float4(1, 0, 1, 1));
+
 				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x + 1], float4(0, 1, 1, 1));
 				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y + 1][x], float4(0, 1, 1, 1));
-
 
 				App->renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
 			}

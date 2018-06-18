@@ -204,7 +204,19 @@ namespace RPGT
 
         if (chunk != m_chunks.end())
         {
-            chunk->GetPoint(x - currentChunk.x() * config.chunkSize, y - currentChunk.y() * config.chunkSize, height, normal);
+            chunk->GetPoint(
+				x - currentChunk.x() * config.chunkSize + floor(HMresolution / 2.f) + (HMresolution % 2 != 0),
+				y - currentChunk.y() * config.chunkSize + floor(HMresolution / 2.f) + (HMresolution % 2 != 0),
+				height, normal);
+			//normal[0] /= (config.chunkSize / config.maxHeight);
+			normal[1] /= config.maxHeight;
+			//normal[2] /= (config.chunkSize / config.maxHeight);
+			Vec3<float> n(normal[0], normal[1], normal[2]);
+			n.Normalize();
+			normal[0] = -n.x();
+			normal[1] = n.y();
+			normal[2] = n.z();
+			height *= config.maxHeight;
         }
         else
         {

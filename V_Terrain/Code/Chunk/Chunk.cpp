@@ -78,8 +78,8 @@ namespace RPGT
     {
 		if (IsLoaded())
 		{
-			const float x = (_x + config.chunkSize / 2.f) / config.chunkSize * (config.chunkMinDensity + 1);
-			const float y = (_y + config.chunkSize / 2.f) / config.chunkSize * (config.chunkMinDensity + 1);
+			const float x = _x / (config.chunkSize / (config.chunkHeightmapResolution));
+			const float y = _y / (config.chunkSize / (config.chunkHeightmapResolution));
 
 			const int lx = static_cast<int>(floor(x));
 			int mx = static_cast<int>(ceil(x));
@@ -88,7 +88,7 @@ namespace RPGT
 			int my = static_cast<int>(ceil(y));
 			if (my == ly) { my++; }
 
-			const int row = config.chunkMinDensity + 1;
+			const int row = config.chunkHeightmapResolution + 1;
 			const int val = (ly * row + lx);
 
 			normal[0] = utils::Mix(
@@ -110,7 +110,9 @@ namespace RPGT
 				utils::Mix(m_data[(val) * 4 + 3], m_data[(val + row) * 4 + 3], my - y),
 				utils::Mix(m_data[(val + 1) * 4 + 3], m_data[(val + row + 1) * 4 + 3], my - y),
 				mx - x
-			) * config.maxHeight;
+			);
+
+			//height = m_data[val * 4 + 3];
 		}
     }
 }
