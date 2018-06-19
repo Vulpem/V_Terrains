@@ -91,6 +91,10 @@ update_status ModuleTerrain::PreUpdate()
 
 update_status ModuleTerrain::Update()
 {
+	RPGT::config.fogColor[0] = App->renderer3D->clearColor.x;
+	RPGT::config.fogColor[1] = App->renderer3D->clearColor.y;
+	RPGT::config.fogColor[2] = App->renderer3D->clearColor.z;
+
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
 
@@ -147,6 +151,7 @@ update_status ModuleTerrain::Update()
 		{
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
+			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;

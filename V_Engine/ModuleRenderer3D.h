@@ -54,6 +54,7 @@ public:
 
 	float4 ambientLight = float4(0.3f, 0.3f, 0.3f, 1.0f);
 	float3 sunDirection = float3(1.0f, 1.0f, 1.0f);
+	float3 clearColor = float3(0.78f, 0.81f, 0.84f);
 
 private:
 	std::multimap<float, Mesh_RenderInfo> alphaObjects;

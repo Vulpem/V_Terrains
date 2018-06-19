@@ -94,7 +94,7 @@ bool ModuleRenderer3D::Init()
 		glClearDepth(10.0f);
 
 		//Initialize clear color
-		glClearColor(0.78f, 0.81f, 0.84f, 1.f);
+		glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.f);
 
 		//Check for error
 		error = glGetError();
