@@ -91,21 +91,24 @@ namespace RPGT
 			const int row = config.chunkHeightmapResolution + 1;
 			const int val = (ly * row + lx);
 
-			normal[0] = utils::Mix(
-				utils::Mix(m_data[(val) * 4 + 0], m_data[(val + row) * 4 + 0], my - y),
-				utils::Mix(m_data[(val + 1) * 4 + 0], m_data[(val + row + 1) * 4 + 0], my - y),
-				mx - x
-			) * 2.f - 1.f;
-			normal[1] = utils::Mix(
-				utils::Mix(m_data[(val) * 4 + 1], m_data[(val + row) * 4 + 1], my - y),
-				utils::Mix(m_data[(val + 1) * 4 + 1], m_data[(val + row + 1) * 4 + 1], my - y),
-				mx - x
-			) * 2.f - 1.f;
-			normal[2] = utils::Mix(
-				utils::Mix(m_data[(val) * 4 + 2], m_data[(val + row) * 4 + 2], my - y),
-				utils::Mix(m_data[(val + 1) * 4 + 2], m_data[(val + row + 1) * 4 + 2], my - y),
-				mx - x
-			) * 2.f - 1.f;
+			if (normal != nullptr)
+			{
+				normal[0] = utils::Mix(
+					utils::Mix(m_data[(val) * 4 + 0], m_data[(val + row) * 4 + 0], my - y),
+					utils::Mix(m_data[(val + 1) * 4 + 0], m_data[(val + row + 1) * 4 + 0], my - y),
+					mx - x
+				) * 2.f - 1.f;
+				normal[1] = utils::Mix(
+					utils::Mix(m_data[(val) * 4 + 1], m_data[(val + row) * 4 + 1], my - y),
+					utils::Mix(m_data[(val + 1) * 4 + 1], m_data[(val + row + 1) * 4 + 1], my - y),
+					mx - x
+				) * 2.f - 1.f;
+				normal[2] = utils::Mix(
+					utils::Mix(m_data[(val) * 4 + 2], m_data[(val + row) * 4 + 2], my - y),
+					utils::Mix(m_data[(val + 1) * 4 + 2], m_data[(val + row + 1) * 4 + 2], my - y),
+					mx - x
+				) * 2.f - 1.f;
+			}
 			height = utils::Mix(
 				utils::Mix(m_data[(val) * 4 + 3], m_data[(val + row) * 4 + 3], my - y),
 				utils::Mix(m_data[(val + 1) * 4 + 3], m_data[(val + row + 1) * 4 + 3], my - y),

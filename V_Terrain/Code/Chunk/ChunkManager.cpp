@@ -214,22 +214,28 @@ namespace RPGT
 				x - currentChunk.x() * config.chunkSize + floor(HMresolution / 2.f) + (HMresolution % 2 != 0),
 				y - currentChunk.y() * config.chunkSize + floor(HMresolution / 2.f) + (HMresolution % 2 != 0),
 				height, normal);
-			//normal[0] /= (config.chunkSize / config.maxHeight);
-			normal[1] /= config.maxHeight;
-			//normal[2] /= (config.chunkSize / config.maxHeight);
-			Vec3<float> n(normal[0], normal[1], normal[2]);
-			n.Normalize();
-			normal[0] = -n.x();
-			normal[1] = n.y();
-			normal[2] = n.z();
+			if (normal != nullptr)
+			{
+				//normal[0] /= (config.chunkSize / config.maxHeight);
+				normal[1] /= config.maxHeight;
+				//normal[2] /= (config.chunkSize / config.maxHeight);
+				Vec3<float> n(normal[0], normal[1], normal[2]);
+				n.Normalize();
+				normal[0] = -n.x();
+				normal[1] = n.y();
+				normal[2] = n.z();
+			}
 			height *= config.maxHeight;
         }
         else
         {
             height = -1.f;
-            normal[0] = 0.f;
-            normal[1] = 0.f;
-            normal[2] = 0.f;
+			if (normal != nullptr)
+			{
+				normal[0] = 0.f;
+				normal[1] = 0.f;
+				normal[2] = 0.f;
+			}
         }
     }
 

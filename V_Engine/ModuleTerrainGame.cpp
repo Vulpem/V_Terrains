@@ -84,11 +84,20 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 	{
 		Turret turret;
 		turret.base = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
-		float height;
-		float normal[3];
-		float3 pos = float3(x * RPGT::config.chunkSize, RPGT::config.maxHeight, y * RPGT::config.chunkSize);
-		RPGT::GetPoint(pos.x, pos.z, pos.y, normal);
-		turret.base->GetTransform()->SetGlobalPos(pos);
+
+		Transform* trans = turret.base->GetTransform();
+
+		float3 pos = float3(
+			x * RPGT::config.chunkSize + (std::rand()%(int)RPGT::config.chunkSize)- RPGT::config.chunkSize/2.f,
+			RPGT::config.maxHeight,
+			y * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f
+		);
+
+		RPGT::GetPoint(pos.x, pos.z, pos.y);
+		trans->SetGlobalPos(pos);
+		trans->SetLocalScale(0.1f, 0.1f, 1.f);
+		trans->SetGlobalRot(90, 0, 0);
+
 		turrets[std::make_pair(x, y)] = turret;
 	}
 }
