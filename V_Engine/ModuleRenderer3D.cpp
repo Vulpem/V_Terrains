@@ -17,6 +17,7 @@
 #include "ViewPort.h"
 
 #include "R_mesh.h"
+#include "Include.h"
 
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
@@ -412,6 +413,12 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	//Global light direction
 	GLint globalLightDirLoc = glGetUniformLocation(meshInfo.shader, "global_light_direction");
 	if (globalLightDirLoc != -1) { glUniform3fv(globalLightDirLoc, 1, sunDirection.ptr()); }
+
+	GLint fogDistance = glGetUniformLocation(meshInfo.shader, "fog_distance");
+	if (fogDistance != -1) { glUniform1i(fogDistance, RPGT::config.fogDistance); }
+
+	GLint fogColor = glGetUniformLocation(meshInfo.shader, "fog_color");
+	if (fogColor != -1) { glUniform3fv(fogColor, 1, RPGT::config.fogColor); }
 	
 	// ------ Setting data format -------------------------
 
