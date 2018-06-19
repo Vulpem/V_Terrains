@@ -85,6 +85,7 @@
     <ClInclude Include="AllResources.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Billboard.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
@@ -199,9 +200,11 @@
     <ClInclude Include="R_Resource.h" />
     <ClInclude Include="R_Shader.h" />
     <ClInclude Include="R_Texture.h" />
+    <ClInclude Include="Ship.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Timers.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Turret.h" />
     <ClInclude Include="ViewPort.h" />
   </ItemGroup>
   <ItemGroup>
@@ -276,6 +279,7 @@
     <ClCompile Include="timerFunctions.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Geometry\KDTree.inl" />

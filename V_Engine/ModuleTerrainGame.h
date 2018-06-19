@@ -3,6 +3,7 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include "Turret.h"
 
 #include "../V_Terrain/Code/Include.h"
 
@@ -26,6 +27,7 @@ public:
 	void Render(const viewPort& port) override;
 
 	GameObject* player;
+	std::list<Turret> turrets;
 };
 
 #endif

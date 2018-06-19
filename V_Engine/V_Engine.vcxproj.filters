@@ -435,6 +435,15 @@
     <ClInclude Include="ModuleTerrainGame.h">
       <Filter>Terrains\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="Turret.h">
+      <Filter>Terrains\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>Terrains\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Terrains\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -648,6 +657,9 @@
       <Filter>Terrains\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="ModuleTerrainGame.cpp">
+      <Filter>Terrains\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Turret.cpp">
       <Filter>Terrains\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
