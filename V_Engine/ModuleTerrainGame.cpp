@@ -80,12 +80,13 @@ void ModuleTerrainGame::Render(const viewPort & port)
 
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
-	if (std::rand() % 100 < 15)
+	if (std::rand() % 100 < 20)
 	{
 		Turret turret;
 		turret.base = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
 
 		Transform* trans = turret.base->GetTransform();
+		float sizeDif = 0.5 + (float)(std::rand() % 100) / 100.f;
 
 		float3 pos = float3(
 			x * RPGT::config.chunkSize + (std::rand()%(int)RPGT::config.chunkSize)- RPGT::config.chunkSize/2.f,
@@ -95,7 +96,7 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 
 		RPGT::GetPoint(pos.x, pos.z, pos.y);
 		trans->SetGlobalPos(pos);
-		trans->SetLocalScale(0.1f, 0.1f, 1.f);
+		trans->SetLocalScale(0.1f * sizeDif, 0.1f * sizeDif, 1.f * sizeDif);
 		trans->SetGlobalRot(90, 0, 0);
 
 		turrets[std::make_pair(x, y)] = turret;
