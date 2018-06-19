@@ -94,7 +94,7 @@ update_status ModuleTerrain::Update()
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
 
-	if (m_displayCollision)
+	if (m_calcCollisions)
 	{
 		float height;
 		float normal[3];
@@ -306,7 +306,6 @@ update_status ModuleTerrain::Update()
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
-			ImGui::Checkbox("Display Collisions", &m_displayCollision);
 
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
@@ -431,6 +430,7 @@ update_status ModuleTerrain::Update()
 		m_wantRegen = false;
 		GenMap();
 	}
+	m_calcCollisions = false;
     return UPDATE_CONTINUE;
 }
 
@@ -452,9 +452,13 @@ void ModuleTerrain::Render(const viewPort & port)
 	RPGT::config.debug.renderLight = port.useLighting;
 	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
 	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
-	RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
-	if (m_displayCollision)
+	if (port.renderTerrain)
 	{
+		RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+	}
+	if (port.renderTerrainCollisions)
+	{
+		m_calcCollisions = true;
 		for (int y = 0; y < COL_N - 1; y++)
 		{
 			for (int x = 0; x < COL_N - 1; x++)

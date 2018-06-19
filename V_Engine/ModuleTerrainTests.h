@@ -71,7 +71,7 @@ public:
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
 
-	bool m_displayCollision = true;
+	bool m_calcCollisions = false;
 	float3 m_terrainPos[COL_N][COL_N];
 	float3 m_terrainNormal[COL_N][COL_N];
 };

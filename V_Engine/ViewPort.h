@@ -17,6 +17,8 @@ struct viewPort
 	bool useSingleSidedFaces = true;
 	bool useOnlyWires = false;
 	bool renderHeightMap = false;
+	bool renderTerrain = true;
+	bool renderTerrainCollisions = false;
 
 	Camera* camera = nullptr;
 	float2 pos = float2::zero;

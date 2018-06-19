@@ -317,6 +317,9 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 			ImGui::Checkbox("Lightning", &editPort->useLighting);
 			ImGui::Checkbox("Render Heightmap", &editPort->renderHeightMap);
 			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
+			ImGui::Checkbox("Render Terrain", &editPort->renderTerrain);
+			ImGui::Checkbox("Render Terrain collision", &editPort->renderTerrainCollisions);
+
 			ImGui::EndMenu();
 		}
 		sprintf(tmp, "Camera##ViewPort%i", port.ID);
