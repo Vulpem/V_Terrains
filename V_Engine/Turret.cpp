@@ -3,7 +3,10 @@
 #include "GameObject.h"
 #include "AllComponents.h"
 
-void Turret::Update(GameObject * player)
+void Turret::Update(float dt)
 {
-	
+	if (barrel != nullptr)
+	{
+		barrel->GetTransform()->LookAt(target);
+	}
 }

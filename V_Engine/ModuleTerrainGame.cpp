@@ -13,7 +13,10 @@
 
 #include "AllResources.h"
 
+#include "GlobalFunctions.h"
+
 #include <time.h>
+#include <algorithm>
 
 ModuleTerrainGame::ModuleTerrainGame(Application* app, bool start_enabled) :
     Module(app, start_enabled)
@@ -46,7 +49,7 @@ bool ModuleTerrainGame::Start()
 	player->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
 	player->GetTransform()->SetGlobalPos(float3(40, 0, 0));
 
-	GameObject* turret = App->GO->LoadGO("Assets/Turrets/Turret01/Turret.fbx").front();
+	//GameObject* turret = App->GO->LoadGO("Assets/Turrets/Turret01/Turret.fbx").front();
 	return ret;
 }
 
@@ -58,6 +61,15 @@ update_status ModuleTerrainGame::PreUpdate()
 
 update_status ModuleTerrainGame::Update()
 {
+	float3 target = App->camera->GetMovingCamera()->GetPosition();
+	float dt = Time.dt;
+	std::for_each(turrets.begin(), turrets.end(),
+		[dt, target](auto& turret)
+	{ 
+		turret.second.target = target;
+		turret.second.Update(dt);
+	}
+	);
     return UPDATE_CONTINUE;
 }
 
@@ -80,10 +92,10 @@ void ModuleTerrainGame::Render(const viewPort & port)
 
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
-	if (std::rand() % 100 < 20)
+	if (std::rand() % 1000 < 5)
 	{
 		Turret turret;
-		turret.base = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
+		turret.base = App->GO->LoadGO("Assets/Tower/Tower1.fbx").front();
 
 		Transform* trans = turret.base->GetTransform();
 		float sizeDif = 0.5 + (float)(std::rand() % 100) / 100.f;
@@ -96,11 +108,30 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 
 		RPGT::GetPoint(pos.x, pos.z, pos.y);
 		trans->SetGlobalPos(pos);
-		trans->SetLocalScale(0.1f * sizeDif, 0.1f * sizeDif, 1.f * sizeDif);
-		trans->SetGlobalRot(90, 0, 0);
+		trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
 
 		turrets[std::make_pair(x, y)] = turret;
 	}
+	else if (std::rand() % 100 < 20)
+		{
+			Turret turret;
+			turret.base = App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front();
+			turret.barrel = turret.base->childs.front();
+
+			Transform* trans = turret.base->GetTransform();
+
+			float3 pos = float3(
+				x * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f,
+				RPGT::config.maxHeight,
+				y * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f
+			);
+
+			RPGT::GetPoint(pos.x, pos.z, pos.y);
+			trans->SetGlobalPos(pos);
+			trans->SetLocalScale(2.f, 2.f, 2.f);
+
+			turrets[std::make_pair(x, y)] = turret;
+		}
 }
 
 void ModuleTerrainGame::OnChunkUnload(int x, int y)
