@@ -53,6 +53,15 @@ namespace RPGT
 
         std::function<float(float)> m_heightCurve;
 		std::function<void(const char*)> throwErrorFunc;
+		std::function<void(int x, int y)> chunkLoaded;
+		std::function<void(int x, int y)> chunkUnloaded;
+
+		Config()
+			: m_heightCurve([](float a) {return a; })
+			, throwErrorFunc([](const char* c) {})
+			, chunkLoaded([](int x, int y) {})
+			, chunkUnloaded([](int x, int y) {})
+		{}
     };
     extern Config config;
 }

@@ -82,6 +82,8 @@ public:
 	uint AmountOfComponent(Component::Type type);
 	Transform* GetTransform();
 
+	void Delete();
+
 	void Save(pugi::xml_node& node);
 
 	//For system use, do not call please

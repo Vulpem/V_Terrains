@@ -54,7 +54,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
     m_TES.reserve(m_TES.capacity() + 1024);
     m_fragment = RPGT::GetDefaultFragmentShader();
     m_fragment.reserve(m_fragment.capacity() + 1024);
-	RPGT::config.debug.renderChunkBorders = true;
+	RPGT::config.debug.renderChunkBorders = false;
 }
 
 // Destructor

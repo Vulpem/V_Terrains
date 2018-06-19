@@ -36,6 +36,10 @@ bool ModuleTerrainGame::Init()
 bool ModuleTerrainGame::Start()
 {
 	bool ret = true;
+
+	RPGT::config.chunkLoaded = [this](int x, int y) { this->OnChunkLoad(x, y); };
+	RPGT::config.chunkUnloaded = [this](int x, int y) { this->OnChunkUnload(x, y); };
+
 	//App->GO->LoadGO("Assets/Spaceships/MechaT.fbx");
 
 	player = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
@@ -72,4 +76,29 @@ bool ModuleTerrainGame::CleanUp()
 void ModuleTerrainGame::Render(const viewPort & port)
 {
 	
+}
+
+void ModuleTerrainGame::OnChunkLoad(int x, int y)
+{
+	if (std::rand() % 100 < 15)
+	{
+		Turret turret;
+		turret.base = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
+		float height;
+		float normal[3];
+		float3 pos = float3(x * RPGT::config.chunkSize, RPGT::config.maxHeight, y * RPGT::config.chunkSize);
+		RPGT::GetPoint(pos.x, pos.z, pos.y, normal);
+		turret.base->GetTransform()->SetGlobalPos(pos);
+		turrets[std::make_pair(x, y)] = turret;
+	}
+}
+
+void ModuleTerrainGame::OnChunkUnload(int x, int y)
+{
+	auto turret = turrets.find(std::make_pair(x, y));
+	if (turret != turrets.end())
+	{
+		turret->second.base->Delete();
+		turrets.erase(turret);
+	}
 }

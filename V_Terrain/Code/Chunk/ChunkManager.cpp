@@ -56,7 +56,13 @@ namespace RPGT
 
         while (m_factory.HasGeneratedChunks())
         {
-            GetFurthestChunk().Regenerate(m_factory.PopGeneratedChunk());
+			Chunk& toOverwrite = GetFurthestChunk();
+			if (toOverwrite.IsLoaded())
+			{
+				config.chunkUnloaded(toOverwrite.GetPos().x(), toOverwrite.GetPos().y());
+			}
+			toOverwrite.Regenerate(m_factory.PopGeneratedChunk());
+			config.chunkLoaded(toOverwrite.GetPos().x(), toOverwrite.GetPos().y());
         }
 
         if (off != m_lastOffPos)

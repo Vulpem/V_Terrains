@@ -8,6 +8,7 @@
 #include "../V_Terrain/Code/Include.h"
 
 #include "Math.h"
+#include <map>
 
 class GameObject;
 
@@ -26,8 +27,11 @@ public:
 
 	void Render(const viewPort& port) override;
 
+	void OnChunkLoad(int x, int y);
+	void OnChunkUnload(int x, int y);
+
 	GameObject* player;
-	std::list<Turret> turrets;
+    std::map<std::pair<int, int>, Turret> turrets;
 };
 
 #endif

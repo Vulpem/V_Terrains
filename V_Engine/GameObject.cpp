@@ -280,11 +280,14 @@ void GameObject::Unselect()
 {
 	selected = false;
 	renderNormals = false;
-	std::vector<GameObject*>::iterator childIt = childs.begin();
-	while (childIt != childs.end())
+	if (childs.empty() == false)
 	{
-		(*childIt)->Unselect();
-		childIt++;
+		std::vector<GameObject*>::iterator childIt = childs.begin();
+		while (childIt != childs.end())
+		{
+			(*childIt)->Unselect();
+			childIt++;
+		}
 	}
 }
 
@@ -482,6 +485,12 @@ uint GameObject::AmountOfComponent(Component::Type type)
 Transform * GameObject::GetTransform()
 {
 	return transform;
+}
+
+void GameObject::Delete()
+{
+	Unselect();
+	App->GO->DeleteGameObject(this);
 }
 
 void GameObject::Save(pugi::xml_node& node)

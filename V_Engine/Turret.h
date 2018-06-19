@@ -6,10 +6,10 @@ class GameObject;
 
 class Turret
 {
-
+public:
 	void Update(GameObject* player);
 
-private:
+
 	float3 originalRotation;
 	float3 rotation;
 
