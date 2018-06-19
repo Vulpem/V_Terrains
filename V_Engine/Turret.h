@@ -7,15 +7,15 @@ class GameObject;
 class Turret
 {
 public:
-	void Update(GameObject* player);
+	void Update(float dt);
 
+	float3 target;
+
+	float speed = 90.f;
 
 	float3 originalRotation;
 	float3 rotation;
 
 	GameObject* base = nullptr;
-	GameObject* rotator_Y = nullptr;
-	GameObject* rotator_X = nullptr;
 	GameObject* barrel = nullptr;
-	GameObject* metal = nullptr;
 };
