@@ -117,7 +117,7 @@ update_status ModuleEditor::PostUpdate()
 	Editor();
 	//Console();
 	//PlayButtons();
-	//Outliner();
+	Outliner();
 	AttributeWindow();
 	//SaveLoadPopups();
 	
@@ -156,7 +156,7 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 {
 	screenW = width;
 	screenH = heigth;
-	viewPortMax.x = screenW;
+	viewPortMax.x = screenW-330;
 	viewPortMax.y = screenH;
 	viewPortMin.x = 350;
 	viewPortMin.y = 20;
@@ -233,8 +233,8 @@ update_status ModuleEditor::MenuBar()
 void ModuleEditor::Editor()
 {
 
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, ((screenH - 20) / 3) * 2));
-		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20)/3 + 20));
+		ImGui::SetNextWindowPos(ImVec2(0, ((screenH - 20) / 4) * 3));
+		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/4 + 20));
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -362,7 +362,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 void ModuleEditor::AttributeWindow()
 {
 	ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 3 * 2 - 20));
+	ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 3 * 2));
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -431,4 +431,57 @@ void ModuleEditor::SelectGameObject(GameObject* node)
 		node->Select(renderNormals);
 	}
 	selectedGameObject = node;
+}
+
+void ModuleEditor::Outliner()
+{
+	ImGui::SetNextWindowPos(ImVec2(screenW - 330.f, (screenH - 20)/3.f*2+20));
+	ImGui::SetNextWindowSize(ImVec2(330.f, (screenH - 20) / 3.f));
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+	ImGui::Begin("Outliner", 0, flags);
+
+	std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
+	while (node != App->GO->GetRoot()->childs.end())
+	{
+		SceneTreeGameObject((*node));
+		node++;
+	}
+
+	ImGui::End();
+}
+
+void ModuleEditor::SceneTreeGameObject(GameObject* node)
+{
+	if (node->HiddenFromOutliner() == false)
+	{
+		ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		if (selectedGameObject == node)
+		{
+			node_flags += ImGuiTreeNodeFlags_Selected;
+		}
+		if (node->childs.empty())
+		{
+			node_flags += ImGuiTreeNodeFlags_Leaf;
+		}
+		char name[256];
+		sprintf(name, "%s##%llu", node->GetName(), node->GetUID());
+
+		if (ImGui::TreeNodeEx(name, node_flags))
+		{
+			if (ImGui::IsItemClicked())
+			{
+				SelectGameObject(node);
+			}
+
+			std::vector<GameObject*>::iterator it = node->childs.begin();
+			while (it != node->childs.end())
+			{
+				SceneTreeGameObject((*it));
+				it++;
+			}
+			ImGui::TreePop();
+		}
+	}
 }

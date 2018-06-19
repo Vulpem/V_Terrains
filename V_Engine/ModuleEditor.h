@@ -40,6 +40,9 @@ private:
 	void Editor();
     void ViewPortUI(const viewPort & port);
 	void AttributeWindow();
+	void Outliner();
+
+	void SceneTreeGameObject(GameObject* node);
 
 	void SelectByViewPort();
 	void SelectGameObject(GameObject* node);
