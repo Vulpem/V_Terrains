@@ -368,8 +368,12 @@ update_status ModuleTerrain::Update()
                             if (ImGui::MenuItem(fileIt->first.data()))
                             {
                                 uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
-                                tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID;
-                                changed = true;
+								Resource* res = App->resources->Peek(UID);
+								if (res)
+								{
+									tex.buf_heightmap = res->Read<R_Texture>()->bufferID;
+									changed = true;
+								}
                                 break;
                             }
                         }
@@ -392,8 +396,12 @@ update_status ModuleTerrain::Update()
                             if (ImGui::MenuItem(fileIt->first.data()))
                             {
                                 uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
-                                tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID;
-                                changed = true;
+								Resource* res = App->resources->Peek(UID);
+								if (res)
+								{
+									tex.buf_heightmap = res->Read<R_Texture>()->bufferID;
+									changed = true;
+								}
                                 break;
                             }
                         }
