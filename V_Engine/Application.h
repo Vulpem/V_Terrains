@@ -22,6 +22,7 @@ class ModuleImporter;
 class ModuleResourceManager;
 class TimerManager;
 class ModuleTerrain;
+class ModuleTerrainGame;
 
 struct viewPort;
 
@@ -44,6 +45,7 @@ public:
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
     ModuleTerrain* terrain;
+	ModuleTerrainGame* game;
 
 	float ms_frame[EDITOR_FRAME_SAMPLES];
 	float framerate[EDITOR_FRAME_SAMPLES];

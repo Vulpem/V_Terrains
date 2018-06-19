@@ -18,6 +18,7 @@ public:
 
 	uint NofTextures();
 	int GetTexture(uint n);
+	bool AddTexture(std::string fileName);
 
 	void SetColor(float r, float g, float b, float a = 1.0f);
 	math::float4 GetColor();

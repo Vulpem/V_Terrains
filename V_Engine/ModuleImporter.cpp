@@ -1147,6 +1147,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 	const MetaInf* inf = App->resources->GetMetaData(Component::C_Texture, resName);
 	if (inf != nullptr)
 	{
+		glActiveTexture(0);
 		char fullPath[526];
 		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->fs->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
 

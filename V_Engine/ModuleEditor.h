@@ -39,7 +39,10 @@ private:
 	update_status MenuBar();
 	void Editor();
     void ViewPortUI(const viewPort & port);
+	void AttributeWindow();
 
+	void SelectByViewPort();
+	void SelectGameObject(GameObject* node);
 public:
 	bool multipleViews = false;
 
@@ -57,6 +60,15 @@ private:
 	float2 viewPortMax;
 	uint singleViewPort = 0;
 	uint multipleViewPorts[2] = { 0,0 };
+
+	GameObject* selectedGameObject = nullptr;
+	float selectedPos[3] = { 0,0,0 };
+	float selectedScale[3] = { 1,1,1 };
+	float selectedEuler[3] = { 0,0,0 };
+
+	LineSegment selectRay;
+	float3 out_normal;
+	float3 out_pos;
 public:
 };
 

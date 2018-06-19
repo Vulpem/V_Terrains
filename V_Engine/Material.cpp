@@ -212,6 +212,13 @@ int Material::GetTexture(uint n)
 	return 0;
 }
 
+bool Material::AddTexture(std::string fileName)
+{
+	R_Material* res = ReadRes<R_Material>();
+	res->textures.push_back(App->resources->LinkResource(fileName, Component::Type::C_Texture));
+	return true;
+}
+
 void Material::SetColor(float r, float g, float b, float a)
 {
 	ReadRes<R_Material>()->color[0] = r;

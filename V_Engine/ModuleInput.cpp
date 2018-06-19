@@ -8,13 +8,13 @@
 #include "imGUI/imgui.h"
 #include "Imgui/imgui_impl_sdl_gl3.h"
 
-#define MAX_KEYS 300
+#define MAX_KEYS SDL_NUM_SCANCODES
 
 ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	moduleName = "ModuleInput";
 
-	keyboard = new KEY_STATE[MAX_KEYS];
+	keyboard = new KEY_STATE[MAX_KEYS + 1];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
 	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
 }
@@ -52,7 +52,7 @@ update_status ModuleInput::PreUpdate()
 	SDL_PumpEvents();
 
 	file_was_dropped = false;
-
+	
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	
 	for(int i = 0; i < MAX_KEYS; ++i)

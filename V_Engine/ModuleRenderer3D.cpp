@@ -344,6 +344,7 @@ void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 {
+	glActiveTexture(0);
 	if (meshInfo.alphaType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
 	{
 		//TMP / TODO
@@ -435,9 +436,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		RenderMeshWired(meshInfo);
 	}
 
-	if (useLightLoc != -1) { glUniform1i(useLightLoc, currentViewPort->useLighting); }
+	if (useLightLoc != -1) { glUniform1i(useLightLoc, 0/*currentViewPort->useLighting*/); }
 
-	if (!meshInfo.textureBuffer > 0 && currentViewPort->renderHeightMap)
+	if (meshInfo.textureBuffer > 0)
 	{
 		if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);

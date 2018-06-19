@@ -112,7 +112,7 @@ update_status ModuleTerrain::Update()
 	}
     ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
-    ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20) / 4 * 3 - 20));
+    ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20)));
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
 

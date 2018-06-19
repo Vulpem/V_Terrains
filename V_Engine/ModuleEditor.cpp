@@ -93,6 +93,8 @@ update_status ModuleEditor::Update()
 		}
 	}
 
+	SelectByViewPort();
+
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
 		multipleViews = !multipleViews;
@@ -116,7 +118,7 @@ update_status ModuleEditor::PostUpdate()
 	//Console();
 	//PlayButtons();
 	//Outliner();
-	//AttributeWindow();
+	AttributeWindow();
 	//SaveLoadPopups();
 	
 	return ret;
@@ -231,8 +233,8 @@ update_status ModuleEditor::MenuBar()
 void ModuleEditor::Editor()
 {
 
-		ImGui::SetNextWindowPos(ImVec2(0, ((screenH - 20) / 4) * 3));
-		ImGui::SetNextWindowSize(ImVec2(350, (screenH - 20)/4 + 20));
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, ((screenH - 20) / 3) * 2));
+		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20)/3 + 20));
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -355,4 +357,78 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 		ImGui::EndMenuBar();
 	}
 	ImGui::End();
+}
+
+void ModuleEditor::AttributeWindow()
+{
+	ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
+	ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 3 * 2 - 20));
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+	ImGui::Begin("Attribute Editor", 0, flags);
+	if (selectedGameObject)
+	{
+		selectedGameObject->DrawOnEditor();
+		ImGui::Separator();
+		if (selectedGameObject->HasComponent(Component::Type::C_transform))
+		{
+			if (ImGui::Button("Look at"))
+			{
+				float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
+				App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
+			}
+			ImGui::NewLine();
+			ImGui::Text("Danger Zone:");
+			if (ImGui::Button("Delete##DeleteGO"))
+			{
+				App->GO->DeleteGameObject(selectedGameObject);
+				selectedGameObject = nullptr;
+			}
+		}
+	}
+	ImGui::End();
+}
+
+void ModuleEditor::SelectByViewPort()
+{
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+		viewPort* port = nullptr;
+		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
+		//Checking the click was made on a port
+		if (port != nullptr)
+		{
+			//Normalizing the mouse position in port to [-1,1]
+			portPos.x = portPos.x / (port->size.x / 2) - 1;
+			portPos.y = portPos.y / (port->size.y / 2) - 1;
+			//Generating the LineSegment we'll check for collisions
+			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+
+			GameObject* out_go = NULL;
+
+			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal, false))
+			{
+				SelectGameObject(out_go);
+			}
+			else
+			{
+				SelectGameObject(nullptr);
+			}
+
+		}
+	}
+}
+
+void ModuleEditor::SelectGameObject(GameObject* node)
+{
+	if (selectedGameObject)
+	{
+		selectedGameObject->Unselect();
+	}
+	if (node)
+	{
+		node->Select(renderNormals);
+	}
+	selectedGameObject = node;
 }
