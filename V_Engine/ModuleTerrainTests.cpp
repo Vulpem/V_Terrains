@@ -23,38 +23,48 @@ void ShowError(const char * message)
 }
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
-    Module(app, start_enabled)
-    , m_resolution(RPGT::config.chunkHeightmapResolution)
-    , m_frequency(RPGT::config.noise.frequency)
-    , m_octaves(RPGT::config.noise.octaves)
-    , m_lacunarity(RPGT::config.noise.lacunarity)
-    , m_persistance(RPGT::config.noise.persistency)
-    , m_maxHeight(RPGT::config.maxHeight)
-    , m_fogDistance(RPGT::config.fogDistance)
-    , m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
-    , m_curvePow(2)
-    , m_setCurvePow(2)
-    , m_openShaderEditor(false)
-    , m_wantRegen(false)
+	Module(app, start_enabled)
+	, m_resolution(RPGT::config.chunkHeightmapResolution)
+	, m_frequency(RPGT::config.noise.frequency)
+	, m_octaves(RPGT::config.noise.octaves)
+	, m_lacunarity(RPGT::config.noise.lacunarity)
+	, m_persistance(RPGT::config.noise.persistency)
+	, m_maxHeight(RPGT::config.maxHeight)
+	, m_fogDistance(RPGT::config.fogDistance)
+	, m_currentHeightCurve("float func(float x)\n{ return pow(x, %i); }")
+	, m_curvePow(2)
+	, m_setCurvePow(2)
+	, m_openShaderEditor(false)
+	, m_wantRegen(false)
+	, m_globalLightHeight(25)
+	, m_globalLightDir(-40)
 {
 	moduleName = "ModuleTerrainTests";
 
 	RPGT::config.throwErrorFunc = ShowError;
 
-    RPGT::config.m_heightCurve =(
-    [](float x) {
-        return pow(x, 2.f);
-    });
+	RPGT::config.m_heightCurve = (
+		[](float x) {
+		return pow(x, 2.f);
+	});
 
-    m_vertex = RPGT::GetDefaultVertexShader();
-    m_vertex.reserve(m_vertex.capacity() + 1024);
-    m_TCS = RPGT::GetDefaultTCS();
-    m_TCS.reserve(m_TCS.capacity() + 1024);
-    m_TES = RPGT::GetDefaultTES();
-    m_TES.reserve(m_TES.capacity() + 1024);
-    m_fragment = RPGT::GetDefaultFragmentShader();
-    m_fragment.reserve(m_fragment.capacity() + 1024);
+	m_vertex = RPGT::GetDefaultVertexShader();
+	m_vertex.reserve(m_vertex.capacity() + 1024);
+	m_TCS = RPGT::GetDefaultTCS();
+	m_TCS.reserve(m_TCS.capacity() + 1024);
+	m_TES = RPGT::GetDefaultTES();
+	m_TES.reserve(m_TES.capacity() + 1024);
+	m_fragment = RPGT::GetDefaultFragmentShader();
+	m_fragment.reserve(m_fragment.capacity() + 1024);
 	RPGT::config.debug.renderChunkBorders = false;
+
+	float3 tmp(1.f, 0.f, 0.f);
+	Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight * DEGTORAD, 0.f);
+	tmp = rot * tmp;
+	RPGT::config.globalLight[0] = tmp.x;
+	RPGT::config.globalLight[1] = tmp.y;
+	RPGT::config.globalLight[2] = tmp.z;
+	App->renderer3D->sunDirection = tmp;
 }
 
 // Destructor
@@ -156,16 +166,17 @@ update_status ModuleTerrain::Update()
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;
 			if (ImGui::SliderFloat("Direction", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
-			if (ImGui::SliderFloat("Height", &m_globalLightHeight, -90, 90)) { lightDirChanged = true; }
+			if (ImGui::SliderFloat("Height", &m_globalLightHeight, 0, 90)) { lightDirChanged = true; }
 
 			if (lightDirChanged)
 			{
 				float3 tmp(1.f, 0.f, 0.f);
-				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, -m_globalLightHeight * DEGTORAD, 0.f);
+				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight * DEGTORAD, 0.f);
 				tmp = rot * tmp;
 				RPGT::config.globalLight[0] = tmp.x;
 				RPGT::config.globalLight[1] = tmp.y;
 				RPGT::config.globalLight[2] = tmp.z;
+				App->renderer3D->sunDirection = tmp;
 			}
 
 			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
