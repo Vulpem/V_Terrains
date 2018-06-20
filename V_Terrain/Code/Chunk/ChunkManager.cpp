@@ -183,7 +183,7 @@ namespace RPGT
         std::for_each(m_chunks.begin(), m_chunks.end(),
 			[](Chunk& chunk)
 		{
-			config.chunkLoaded(chunk.GetPos().x(), chunk.GetPos().y());
+			config.chunkUnloaded(chunk.GetPos().x(), chunk.GetPos().y());
 			chunk.Free();
 		});
         m_factory.ClearRequests();

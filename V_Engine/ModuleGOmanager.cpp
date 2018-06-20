@@ -17,6 +17,7 @@
 #include "AllComponents.h"
 
 #include <unordered_set>
+#include <algorithm>
 
 
 //------------------------- MODULE --------------------------------------------------------------------------------
@@ -631,10 +632,8 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 				{
 					GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
 				}
-				for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
-				{
-					toRender.insert(*toInsert);
-				}
+				toRender.reserve(GOs.size());
+				std::for_each(GOs.begin(), GOs.end(), [&toRender](GameObject* g) {toRender.insert(g); });
 			}
 		}
 
@@ -653,6 +652,10 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
 			{
 				toRender.insert(*toInsert);
+				if ((*toInsert)->selected > 1)
+				{
+					int a = 0;
+				}
 			}
 		}
 		TIMER_READ_MS_MAX("Cam culling longest");
