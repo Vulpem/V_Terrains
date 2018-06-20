@@ -96,6 +96,7 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 	{
 		Turret turret;
 		turret.base = App->GO->LoadGO("Assets/Tower/Tower1.fbx").front();
+		turret.base->SetStatic(true);
 
 		Transform* trans = turret.base->GetTransform();
 		float sizeDif = 0.5 + (float)(std::rand() % 100) / 100.f;
@@ -118,6 +119,7 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 			Turret turret;
 			turret.base = App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front();
 			turret.barrel = turret.base->childs.front();
+			turret.base->SetStatic(true);
 
 			Transform* trans = turret.base->GetTransform();
 

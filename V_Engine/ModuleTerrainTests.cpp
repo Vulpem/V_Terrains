@@ -371,7 +371,7 @@ update_status ModuleTerrain::Update()
 								Resource* res = App->resources->Peek(UID);
 								if (res)
 								{
-									tex.buf_heightmap = res->Read<R_Texture>()->bufferID;
+									tex.buf_diffuse = res->Read<R_Texture>()->bufferID;
 									changed = true;
 								}
                                 break;

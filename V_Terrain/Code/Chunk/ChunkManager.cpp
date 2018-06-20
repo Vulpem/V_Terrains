@@ -180,7 +180,12 @@ namespace RPGT
 
     void ChunkManager::CleanChunks()
     {
-        std::for_each(m_chunks.begin(), m_chunks.end(), [](Chunk& chunk) { chunk.Free(); });
+        std::for_each(m_chunks.begin(), m_chunks.end(),
+			[](Chunk& chunk)
+		{
+			config.chunkLoaded(chunk.GetPos().x(), chunk.GetPos().y());
+			chunk.Free();
+		});
         m_factory.ClearRequests();
         AddChunksToRegen(m_lastOffPos);
     }
