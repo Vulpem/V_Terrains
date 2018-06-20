@@ -306,21 +306,13 @@ void Transform::SetGlobalRot(float x, float y, float z)
 	{
 		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 		{
-			//TODO
-			//Needs cleaning
 			x *= DEGTORAD;
 			y *= DEGTORAD;
 			z *= DEGTORAD;
 
 			Transform* parentTrans = object->parent->GetTransform();
-
-			float4x4 localMat = (float4x4::FromTRS(GetGlobalPos(), float3x3::FromEulerXYZ(x, y, z), GetGlobalScale())).Transposed() * parentTrans->GetGlobalTransform().Inverted();
-			localMat.Transposed();
-
-			float3 localEuler = localMat.ToEulerXYZ();
-			localEuler *= RADTODEG;
-
-			SetLocalRot(localEuler.x, localEuler.y, localEuler.z);
+			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans->GetGlobalRotQuat().Conjugated();
+			SetLocalRot(local.x, local.y, local.z, local.w);
 		}
 		else
 		{
