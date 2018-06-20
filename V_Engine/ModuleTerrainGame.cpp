@@ -111,7 +111,6 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 		trans->SetGlobalPos(pos);
 		trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
 
-		//turret.base->SetStatic(true);
 		turrets[std::make_pair(x, y)] = turret;
 	}
 	else if (std::rand() % 100 < 20)
@@ -127,12 +126,12 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 				RPGT::config.maxHeight,
 				y * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f
 			);
-
-			RPGT::GetPoint(pos.x, pos.z, pos.y);
+			float3 normal;
+			RPGT::GetPoint(pos.x, pos.z, pos.y, normal.ptr());
 			trans->SetGlobalPos(pos);
 			trans->SetLocalScale(2.f, 2.f, 2.f);
+			trans->SetGlobalRot(Quat::RotateFromTo(float3(0, 1, 0), normal).ToEulerXYZ()*RADTODEG);
 
-			//turret.base->SetStatic(true);
 			turrets[std::make_pair(x, y)] = turret;
 		}
 }

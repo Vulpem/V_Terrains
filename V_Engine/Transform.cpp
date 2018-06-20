@@ -310,6 +310,8 @@ void Transform::SetGlobalRot(float x, float y, float z)
 			y *= DEGTORAD;
 			z *= DEGTORAD;
 
+			Quat::from
+
 			Transform* parentTrans = object->parent->GetTransform();
 			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans->GetGlobalRotQuat().Conjugated();
 			SetLocalRot(local.x, local.y, local.z, local.w);
