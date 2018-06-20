@@ -397,11 +397,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	//Has texture bool
 	GLint hasTextLoc = glGetUniformLocation(meshInfo.shader, "has_texture");
-	if (hasTextLoc != -1) { glUniform1i(hasTextLoc, 0); }
 
 	//UseLight
 	GLint useLightLoc = glGetUniformLocation(meshInfo.shader, "use_light");
-	if (useLightLoc != -1) { glUniform1i(useLightLoc, 0); }
 
 	//Time
 	GLint timeLoc = glGetUniformLocation(meshInfo.shader, "time");
@@ -420,6 +418,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	GLint fogColor = glGetUniformLocation(meshInfo.shader, "fog_color");
 	if (fogColor != -1) { glUniform3fv(fogColor, 1, RPGT::config.fogColor); }
+
+	GLint maxHeight = glGetUniformLocation(meshInfo.shader, "max_height");
+	if (maxHeight != -1) { glUniform1f(maxHeight, RPGT::config.maxHeight); }
 	
 	// ------ Setting data format -------------------------
 
@@ -444,11 +445,11 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		RenderMeshWired(meshInfo);
 	}
 
-	if (useLightLoc != -1) { glUniform1i(useLightLoc, 0/*currentViewPort->useLighting*/); }
+	if (useLightLoc != -1) { glUniform1i(useLightLoc, currentViewPort->useLighting); }
 
+	if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
 	if (meshInfo.textureBuffer > 0)
 	{
-		if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
 	}
 

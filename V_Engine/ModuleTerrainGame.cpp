@@ -107,6 +107,7 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 		);
 
 		RPGT::GetPoint(pos.x, pos.z, pos.y);
+		pos.y -= 60.f;
 		trans->SetGlobalPos(pos);
 		trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
 

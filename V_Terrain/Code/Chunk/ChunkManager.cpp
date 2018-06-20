@@ -102,7 +102,7 @@ namespace RPGT
 
 
         //Global light direction
-        Vec3<float> dir(config.globalLight[0], config.globalLight[1], config.globalLight[2]);
+        Vec3<float> dir(-config.globalLight[0], config.globalLight[1], config.globalLight[2]);
         dir.Normalize();
         glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
 
