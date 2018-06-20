@@ -100,6 +100,7 @@ namespace RPGT
 
         glUniform1f(m_shader.loc_ambient_color, config.ambientLight);
 
+		glUniform1i(m_shader.loc_hmRes, config.chunkHeightmapResolution);
 
         //Global light direction
         Vec3<float> dir(-config.globalLight[0], config.globalLight[1], config.globalLight[2]);
@@ -107,7 +108,6 @@ namespace RPGT
         glUniform3fv(m_shader.loc_global_light_direction, 1, dir.Data());
 
         glUniform1f(m_shader.loc_fog_distance, config.fogDistance);
-
         glUniform3fv(m_shader.loc_fog_color, 1, config.fogColor);
 
         glUniform1f(m_shader.loc_water_height, config.waterHeight);
@@ -221,9 +221,7 @@ namespace RPGT
 				height, normal);
 			if (normal != nullptr)
 			{
-				//normal[0] /= (config.chunkSize / config.maxHeight);
-				normal[1] /= config.maxHeight;
-				//normal[2] /= (config.chunkSize / config.maxHeight);
+				normal[1] /= ((config.maxHeight * config.chunkHeightmapResolution) / (config.chunkSize));
 				Vec3<float> n(normal[0], normal[1], normal[2]);
 				n.Normalize();
 				normal[0] = -n.x();

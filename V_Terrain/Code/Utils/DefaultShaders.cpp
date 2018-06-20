@@ -117,7 +117,7 @@ uniform float[nTextures *TexNVariables] textures;\n\
 		uniform int render_chunk_borders;\n\
 		uniform int render_heightmap;\n\
 		uniform int render_light;\n\
-		uniform unsigned int maxDensity;\n\
+		uniform int heightmapResolution;\n\
 \n\
 		uniform  sampler2D heightmap;\n\
 \n\
@@ -185,7 +185,7 @@ uniform float[nTextures *TexNVariables] textures;\n\
 			vec4 hmVal = texture2D(heightmap, UV);\n\
 			vec3 norm = hmVal.xyz * 2.f - 1.f;\n\
 \n\
-			norm.y /= model_matrix[1][1];\n\
+			norm.y /= (model_matrix[1][1] * heightmapResolution)/(model_matrix[0][0]);\n\
 			norm = normalize(norm);\n\
 \n\
 			float slope = 1.f - norm.y;\n\
@@ -257,11 +257,6 @@ uniform float[nTextures *TexNVariables] textures;\n\
 			{\n\
 				col *= max(dot(global_light_direction, norm), ambient_min);\n\
 			}\n\
-\n\
-			/*if(renderDensity)\n\
-			{\n\
-			col = ScalarToColor(poliDensity / maxDensity);\n\
-			}*/\n\
 \n\
 			float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;\n\
 			distanceFog = min(distanceFog, 1);\n\

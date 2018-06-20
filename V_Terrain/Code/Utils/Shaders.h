@@ -33,7 +33,7 @@ namespace RPGT
         unsigned int loc_ambient_color = 0u;
         unsigned int loc_fog_color = 0u;
 
-        unsigned int loc_maxLOD = 0u;
+        unsigned int loc_hmRes = 0u;
 
         unsigned int loc_render_heightmap = 0u;
         unsigned int loc_render_chunk_borders = 0u;

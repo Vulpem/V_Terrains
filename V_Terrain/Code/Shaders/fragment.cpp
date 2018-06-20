@@ -61,7 +61,7 @@ uniform  float fog_distance;
 uniform int render_chunk_borders;
 uniform int render_heightmap;
 uniform int render_light;
-uniform unsigned int maxDensity;
+uniform int heightmapResolution;
 
 uniform  sampler2D heightmap;
 
@@ -129,7 +129,7 @@ vec4 GetTerrainColor()
 	vec4 hmVal = texture2D(heightmap, UV);
 	vec3 norm = hmVal.xyz * 2.f - 1.f;
 
-	norm.y /= model_matrix[1][1];
+	norm.y /= (model_matrix[1][1] * heightmapResolution)/(model_matrix[0][0]);
 	norm = normalize(norm);
 
 	float slope = 1.f - norm.y;
@@ -201,11 +201,6 @@ vec4 GetTerrainColor()
 	{
 		col *= max(dot(global_light_direction, norm), ambient_min);
 	}
-
-	/*if(renderDensity)
-	{
-		col = ScalarToColor(poliDensity / maxDensity);
-	}*/
 
 	float distanceFog = (gl_FragCoord.z / gl_FragCoord.w) / fog_distance;
 	distanceFog = min(distanceFog, 1);

@@ -114,7 +114,7 @@ namespace RPGT
                 ret.loc_water_height = glGetUniformLocation(program, "water_height");
                 ret.loc_ambient_color = glGetUniformLocation(program, "ambient_min");
 
-                ret.loc_maxLOD = glGetUniformLocation(program, "maxDensity");
+                ret.loc_hmRes = glGetUniformLocation(program, "heightmapResolution");
 
                 ret.loc_render_chunk_borders = glGetUniformLocation(program, "render_chunk_borders");
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
