@@ -33,6 +33,7 @@ namespace RPGT
         void GenerateMesh();
 
         void GetPoint(float x, float y, float& height, float* normal) const;
+		bool RayCast(float * origin, float * direction, float * hitPoint, float * hitNormal);
 
         ConditionalTexture m_textures[10];
         Shader m_shader;

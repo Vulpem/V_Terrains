@@ -244,6 +244,12 @@ namespace RPGT
         }
     }
 
+	bool ChunkManager::RayCast(float * origin, float * direction, float * hitPoint, float * hitNormal)
+	{
+		//TODO
+		return false;
+	}
+
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
 		//TODO draw a circle instead of a square

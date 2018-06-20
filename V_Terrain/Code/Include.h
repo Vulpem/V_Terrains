@@ -29,7 +29,8 @@ namespace RPGT
 
     std::string CompileShaders(const char * frag, const char * vert, const char* TCS, const char* TES);
 
-    void GetPoint(float x, float y, float& height, float* normal = nullptr);
+    void GetPoint(float x, float z, float& height, float* normal = nullptr);
+	bool RayCast(float* origin, float* direction, float* hitPoint = nullptr, float* hitNormal = nullptr);
 
 	const ConditionalTexture& GetTexture(int n);
     void SetTexture(int n, const ConditionalTexture& tex);

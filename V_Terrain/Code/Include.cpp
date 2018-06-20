@@ -98,6 +98,11 @@ namespace RPGT
         chunkManager.GetPoint(x, y, height, normal);
     }
 
+	bool RayCast(float * origin, float * direction, float * hitPoint, float * hitNormal)
+	{
+		return chunkManager.RayCast(origin, direction, hitPoint, hitNormal);
+	}
+
 	const ConditionalTexture& GetTexture(int n)
 	{
 		return chunkManager.m_textures[n];
