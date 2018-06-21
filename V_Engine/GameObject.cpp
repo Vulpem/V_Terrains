@@ -11,6 +11,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleGOmanager.h"
+#include "ModuleEditor.h"
 
 
 GameObject::GameObject()
@@ -489,7 +490,7 @@ Transform * GameObject::GetTransform()
 
 void GameObject::Delete()
 {
-	Unselect();
+	App->Editor->UnselectGameObject(this);
 	App->GO->DeleteGameObject(this);
 }
 

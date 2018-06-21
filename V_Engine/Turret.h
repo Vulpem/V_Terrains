@@ -8,7 +8,7 @@ class Building
 {
 public:
 	Building(GameObject* go, int x, int y);
-	~Building();
+	virtual ~Building();
 
 	void Update(float dt);
 	void Destroy();

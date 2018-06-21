@@ -6,6 +6,7 @@
 #include "Globals.h"
 
 #include "ModuleCamera3D.h"
+#include "ModuleEditor.h"
 
 #include "../V_Terrain/Code/Include.h"
 
@@ -28,6 +29,7 @@ Building::Building(GameObject * go, int x, int y) :
 Building::~Building()
 {
 	base->Delete();
+	base = nullptr;
 }
 
 void Building::Update(float dt)
@@ -60,6 +62,7 @@ Turret::Turret(GameObject * go, int x, int y)
 	float3 barrelPos = barrel->GetTransform()->GetGlobalPos();
 	float3 barrelScale = barrel->GetTransform()->GetGlobalScale();
 	barrel->parent = base->parent;
+	barrel->parent->childs.push_back(barrel);
 	base->childs.clear();
 
 	barrel->GetTransform()->SetGlobalPos(barrelPos);
@@ -69,7 +72,7 @@ Turret::Turret(GameObject * go, int x, int y)
 Turret::~Turret()
 {
 	barrel->Delete();
-	base->Delete();
+	barrel = nullptr;
 }
 
 void Turret::VirtualUpdate(float dt)

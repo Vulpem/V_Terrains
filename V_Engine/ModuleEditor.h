@@ -34,6 +34,8 @@ public:
 	void HandleInput(SDL_Event* event);
 
     void SwitchViewPorts();
+
+	void UnselectGameObject(GameObject* go);
 private:
 
 	update_status MenuBar();

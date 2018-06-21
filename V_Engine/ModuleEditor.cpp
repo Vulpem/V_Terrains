@@ -298,6 +298,15 @@ void ModuleEditor::SwitchViewPorts()
 	}
 }
 
+void ModuleEditor::UnselectGameObject(GameObject * go)
+{
+	if (selectedGameObject == go)
+	{
+		go->Unselect();
+		selectedGameObject = nullptr;
+	}
+}
+
 void ModuleEditor::ViewPortUI(const viewPort& port)
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
