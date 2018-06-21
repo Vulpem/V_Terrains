@@ -27,11 +27,17 @@ public:
 
 	void Render(const viewPort& port) override;
 
+	void UpdateTurrets();
+	void UpdateBullets();
+	void UpdatePlayer();
+	void Input();
+	void DebugKeys();
+
 	void OnChunkLoad(int x, int y);
 	void OnChunkUnload(int x, int y);
 
 	GameObject* player;
-    std::map<std::pair<int, int>, Turret> turrets;
+    std::map<std::pair<int, int>, Building*> turrets;
 };
 
 #endif

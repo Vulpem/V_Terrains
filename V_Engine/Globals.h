@@ -8,6 +8,8 @@
 void log(const char file[], int line, const char* format, ...);
 
 
+#define DEBUG_KEYS true
+
 #define CAP(n) ((n <= 0.0f) ? n=0.0f : (n >= 1.0f) ? n=1.0f : n=n)
 
 #define DEGTORAD 0.0174532925199432957f

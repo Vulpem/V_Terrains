@@ -61,16 +61,19 @@ update_status ModuleTerrainGame::PreUpdate()
 
 update_status ModuleTerrainGame::Update()
 {
-	float3 target = App->camera->GetMovingCamera()->GetPosition();
-	float dt = Time.dt;
-	std::for_each(turrets.begin(), turrets.end(),
-		[dt, target](auto& turret)
-	{ 
-		turret.second.target = target;
-		turret.second.Update(dt);
+	if (Time.PlayMode || DEBUG_KEYS)
+	{
+		Input();
+		UpdateBullets();
+		UpdateTurrets();
+		UpdatePlayer();
 	}
-	);
-    return UPDATE_CONTINUE;
+	if (DEBUG_KEYS)
+	{
+		DebugKeys();
+	}
+
+	return UPDATE_CONTINUE;
 }
 
 // PostUpdate present buffer to screen
@@ -90,50 +93,51 @@ void ModuleTerrainGame::Render(const viewPort & port)
 	
 }
 
+void ModuleTerrainGame::UpdateTurrets()
+{
+	const float dt = Time.dt;
+	std::for_each(turrets.begin(), turrets.end(),
+		[dt](auto& turret)
+	{
+		turret.second->Update(dt);
+	});
+}
+
+void ModuleTerrainGame::UpdateBullets()
+{
+}
+
+void ModuleTerrainGame::UpdatePlayer()
+{
+}
+
+void ModuleTerrainGame::Input()
+{
+}
+
+void ModuleTerrainGame::DebugKeys()
+{
+}
+
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
+	Building* build = nullptr;
 	if (std::rand() % 1000 < 5)
 	{
-		Turret turret;
-		turret.base = App->GO->LoadGO("Assets/Tower/Tower1.fbx").front();
-
-		Transform* trans = turret.base->GetTransform();
-		float sizeDif = 0.5 + (float)(std::rand() % 100) / 100.f;
-
-		float3 pos = float3(
-			x * RPGT::config.chunkSize + (std::rand()%(int)RPGT::config.chunkSize)- RPGT::config.chunkSize/2.f,
-			RPGT::config.maxHeight,
-			y * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f
-		);
-
-		RPGT::GetPoint(pos.x, pos.z, pos.y);
-		pos.y -= 60.f;
-		trans->SetGlobalPos(pos);
-		trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
-
-		turrets[std::make_pair(x, y)] = turret;
+		build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+		float3 p = build->base->GetTransform()->GetGlobalPos();
+		p.y -= 60.f;
+		build->base->GetTransform()->SetGlobalPos(p);
 	}
 	else if (std::rand() % 100 < 20)
 		{
-			Turret turret;
-			turret.base = App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front();
-			turret.barrel = turret.base->childs.front();
-
-			Transform* trans = turret.base->GetTransform();
-
-			float3 pos = float3(
-				x * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f,
-				RPGT::config.maxHeight,
-				y * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f
-			);
-			float3 normal;
-			RPGT::GetPoint(pos.x, pos.z, pos.y, normal.ptr());
-			trans->SetGlobalPos(pos);
-			trans->SetLocalScale(2.f, 2.f, 2.f);
-			trans->SetGlobalRot(Quat::RotateFromTo(float3(0, 1, 0), normal).ToEulerXYZ()*RADTODEG);
-
-			turrets[std::make_pair(x, y)] = turret;
+			build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
 		}
+
+	if (build != nullptr)
+	{
+		turrets[std::make_pair(x, y)] = build;
+	}
 }
 
 void ModuleTerrainGame::OnChunkUnload(int x, int y)
@@ -141,7 +145,7 @@ void ModuleTerrainGame::OnChunkUnload(int x, int y)
 	auto turret = turrets.find(std::make_pair(x, y));
 	if (turret != turrets.end())
 	{
-		turret->second.base->Delete();
+		delete turret->second;
 		turrets.erase(turret);
 	}
 }

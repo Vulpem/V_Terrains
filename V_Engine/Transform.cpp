@@ -369,11 +369,11 @@ math::float3 Transform::GetGlobalScale()
 	return globalTransform.ExtractScale();
 }
 
-void Transform::LookAt(const float3 & Spot)
+void Transform::LookAt(const float3 & Spot, float3 worldUp)
 {
 	if (object->IsStatic() == false)
 	{
-		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
+		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0,0,1), float3(0,1,0), worldUp);
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
 		UpdateEditorValues();
 	}

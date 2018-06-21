@@ -61,7 +61,7 @@ public:
 	//void SetGlobalScale(float x, float y, float z);
 	math::float3 GetGlobalScale();
 
-	void LookAt(const float3 &Spot);
+	void LookAt(const float3 &Spot, float3 worldUp = float3(0,1,0));
 
 	float3 Up();
 	float3 Down();
