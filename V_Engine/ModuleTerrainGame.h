@@ -4,6 +4,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Turret.h"
+#include "Ship.h"
 
 #include "../V_Terrain/Code/Include.h"
 
@@ -36,8 +37,8 @@ public:
 	void OnChunkLoad(int x, int y);
 	void OnChunkUnload(int x, int y);
 
-	GameObject* player;
     std::map<std::pair<int, int>, Building*> turrets;
+	Ship player;
 };
 
 #endif

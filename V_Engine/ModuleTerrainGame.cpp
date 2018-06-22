@@ -43,13 +43,8 @@ bool ModuleTerrainGame::Start()
 	RPGT::config.chunkLoaded = [this](int x, int y) { this->OnChunkLoad(x, y); };
 	RPGT::config.chunkUnloaded = [this](int x, int y) { this->OnChunkUnload(x, y); };
 
-	//App->GO->LoadGO("Assets/Spaceships/MechaT.fbx");
-
-	player = App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front();
-	player->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
-	player->GetTransform()->SetGlobalPos(float3(40, 0, 0));
-
-	//GameObject* turret = App->GO->LoadGO("Assets/Turrets/Turret01/Turret.fbx").front();
+	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front());
+	player.ship->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
 	return ret;
 }
 
@@ -109,6 +104,7 @@ void ModuleTerrainGame::UpdateBullets()
 
 void ModuleTerrainGame::UpdatePlayer()
 {
+	player.Update(Time.dt);
 }
 
 void ModuleTerrainGame::Input()
