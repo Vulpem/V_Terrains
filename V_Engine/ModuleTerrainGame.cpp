@@ -43,7 +43,7 @@ bool ModuleTerrainGame::Start()
 	RPGT::config.chunkLoaded = [this](int x, int y) { this->OnChunkLoad(x, y); };
 	RPGT::config.chunkUnloaded = [this](int x, int y) { this->OnChunkUnload(x, y); };
 
-	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front());
+	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front(), App->camera->GetDefaultCam()->object);
 	player.ship->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
 	return ret;
 }
@@ -56,7 +56,13 @@ update_status ModuleTerrainGame::PreUpdate()
 
 update_status ModuleTerrainGame::Update()
 {
-	if (Time.PlayMode || DEBUG_KEYS)
+
+	if (App->input->GetKey(SDL_SCANCODE_KP_0) == KEY_DOWN)
+	{
+		Time.PlayMode = !Time.PlayMode;
+	}
+
+	if (Time.PlayMode)
 	{
 		Input();
 		UpdateBullets();

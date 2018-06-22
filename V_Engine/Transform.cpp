@@ -268,6 +268,7 @@ void Transform::SetLocalRot(float x, float y, float z)
 		localRotation = math::Quat::FromEulerXYZ(x, y, z);
 
 		object->UpdateTransformMatrix();
+		UpdateEditorValues();
 	}
 }
 
@@ -293,11 +294,12 @@ math::float3 Transform::GetLocalRot()
 	ret.y *= RADTODEG;
 	ret.z *= RADTODEG;
 
-	while (ret.x < 0) { ret.x += 360; }
-	while (ret.y < 0) { ret.y += 360; }
-	while (ret.z < 0) { ret.z += 360; }
-
 	return ret;
+}
+
+Quat Transform::GetLocalRotQuat()
+{
+	return localRotation;
 }
 
 void Transform::SetGlobalRot(float x, float y, float z)
@@ -326,6 +328,16 @@ void Transform::SetGlobalRot(float x, float y, float z)
 void Transform::SetGlobalRot(float3 rotation)
 {
 	SetGlobalRot(rotation.x, rotation.y, rotation.z);
+}
+
+void Transform::RotateLocal(float3 rotation)
+{
+	if(rotation.x != 0.f || rotation.y != 0.f || rotation.z != 0.f)
+	{
+		localRotation = localRotation * Quat::FromEulerXYZ(rotation.x * DEGTORAD, rotation.y* DEGTORAD, rotation.z* DEGTORAD);
+		object->UpdateTransformMatrix();
+		UpdateEditorValues();
+	}
 }
 
 math::Quat Transform::GetGlobalRotQuat()

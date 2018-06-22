@@ -49,9 +49,11 @@ public:
 	void SetLocalRot(float3 rot);
 	void SetLocalRot(float x, float y, float z, float w);
 	math::float3 GetLocalRot();
+	Quat GetLocalRotQuat();
 
 	void SetGlobalRot(float x, float y, float z);
 	void SetGlobalRot(float3 rotation);
+	void RotateLocal(float3 rotation);
 	math::Quat GetGlobalRotQuat();
 	math::float3 GetGlobalRot();
 

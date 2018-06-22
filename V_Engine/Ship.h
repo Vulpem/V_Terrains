@@ -10,12 +10,16 @@ public:
 	Ship();
 	~Ship();
 
-	void Init(GameObject* go);
+	void Init(GameObject* go, GameObject* cam);
 
 	void Update(float dt);
 	void HandleInput();
 
 	int health = 100;
 
+	float3 targetRotation;
+
+	GameObject* controller = nullptr;
 	GameObject* ship = nullptr;
+	GameObject* camera = nullptr;
 };

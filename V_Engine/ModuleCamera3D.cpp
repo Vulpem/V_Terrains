@@ -52,29 +52,30 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 update_status ModuleCamera3D::Update()
 {
-
-	MoveWithKeys();
-	// Mouse motion ----------------
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+	if (Time.PlayMode == false)
 	{
-		int dx = -App->input->GetMouseXMotion();
-		int dy = -App->input->GetMouseYMotion();
-		if (dx != 0 || dy != 0)
+		MoveWithKeys();
+		// Mouse motion ----------------
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 		{
-			float Sensitivity = 0.04;
-			Transform* cam = GetMovingCamera()->object->GetTransform();
-			
-			float3 toLook = cam->GetGlobalPos();
-			toLook += cam->Forward() * 10;
+			int dx = -App->input->GetMouseXMotion();
+			int dy = -App->input->GetMouseYMotion();
+			if (dx != 0 || dy != 0)
+			{
+				float Sensitivity = 0.04;
+				Transform* cam = GetMovingCamera()->object->GetTransform();
 
-			toLook += (float)dy * Sensitivity *cam->Up();
+				float3 toLook = cam->GetGlobalPos();
+				toLook += cam->Forward() * 10;
 
-			toLook += (float)dx * Sensitivity * cam->Left();
+				toLook += (float)dy * Sensitivity *cam->Up();
 
-			LookAt(toLook);
+				toLook += (float)dx * Sensitivity * cam->Left();
+
+				LookAt(toLook);
+			}
 		}
 	}
-
     if (m_followCamera)
     {
         math::float3 pos = defaultCameraGO->GetTransform()->GetGlobalPos();
@@ -199,11 +200,11 @@ void ModuleCamera3D::MoveWithKeys()
 		}
 	}
 
-    if (App->input->GetMouseButton(2))
-    {
-        lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt * App->input->GetMouseXMotion();
-        lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt * App->input->GetMouseYMotion();
-    }
+	if (App->input->GetMouseButton(2))
+	{
+		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt * App->input->GetMouseXMotion();
+		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt * App->input->GetMouseYMotion();
+	}
 
 	//Forward Backward
 	//In Ortographic mode, moving the camera forward or backward is meaningless. Instead we'll change the FOV to change the zoom lvl
@@ -226,7 +227,7 @@ void ModuleCamera3D::MoveWithKeys()
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed*  10.f * Time.dt);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed * 10.f * Time.dt);
 		}
 	}
 
