@@ -12,6 +12,7 @@
 #include "ModuleInput.h"
 
 #include "AllResources.h"
+#include "AllComponents.h"
 
 #include "GlobalFunctions.h"
 
@@ -45,6 +46,9 @@ bool ModuleTerrainGame::Start()
 
 	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front(), App->camera->GetDefaultCam()->object);
 	player.ship->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
+
+	InitBullets();
+
 	return ret;
 }
 
@@ -150,4 +154,23 @@ void ModuleTerrainGame::OnChunkUnload(int x, int y)
 		delete turret->second;
 		turrets.erase(turret);
 	}
+}
+
+void ModuleTerrainGame::InitBullets()
+{
+	GameObject* bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
+	Material* mat = bullet->GetComponent<Material>().front();
+	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
+	mat->SetAlphaTest(0.63f);
+	mat->SetColor(0.9137, 0.074, 0.074, 0.9137);
+
+	mat = bullet->childs[0]->GetComponent<Material>().front();
+	mat->SetColor(1, 0, 0);
+	mat->ReadRes<R_Material>()->AssignShader("bullet2");
+
+	mat = bullet->childs[1]->GetComponent<Material>().front();
+	mat->SetColor(0.9, 0, 1);
+	mat->SetAlphaType(AlphaTestTypes::ALPHA_DISCARD);
+	mat->SetAlphaTest(0.4f);
+	mat->ReadRes<R_Material>()->AssignShader("bullet");
 }

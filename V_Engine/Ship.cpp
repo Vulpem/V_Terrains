@@ -31,6 +31,7 @@ void Ship::Init(GameObject * go, GameObject* cam)
 	controller->childs.push_back(ship);
 	ship->parent->childs.erase(std::find(ship->parent->childs.begin(), ship->parent->childs.end(), ship));
 	ship->parent = controller;
+	rotation = float3::zero;
 
 }
 
@@ -44,12 +45,11 @@ void Ship::Update(float dt)
 	
 	const float  rotSpeed = 50.f;
 
-	float3 controllerRotation = float3(targetRotation.x, targetRotation.y, 0.f);
-	float3 shipRotation = float3(0.f, 0.f, targetRotation.z);
+	rotation += targetRotation * rotSpeed * dt;
 
 
-	controllerT->RotateLocal(controllerRotation * rotSpeed * dt);
-	//shipT->RotateLocal(shipRotation * rotSpeed * dt);
+	controllerT->SetLocalRot(float3(targetRotation.x, rotation.y, 0.f));
+	shipT->RotateLocal(float3(0.f,0.f,rotation.z));
 
 	controllerT->SetGlobalPos(controllerT->GetGlobalPos() + controllerT->Forward() * 2000 * dt);
 
@@ -58,7 +58,6 @@ void Ship::Update(float dt)
 		shipT->Up() * 50;
 
 	camera->GetTransform()->SetGlobalPos(Lerp(camera->GetTransform()->GetGlobalPos(), cameraTarget, 1));
-
 	camera->GetTransform()->LookAt(shipT->GetGlobalPos() + shipT->Forward() * 200.f);
 }
 

@@ -37,6 +37,8 @@ public:
 	void OnChunkLoad(int x, int y);
 	void OnChunkUnload(int x, int y);
 
+	void InitBullets();
+
     std::map<std::pair<int, int>, Building*> turrets;
 	Ship player;
 };
