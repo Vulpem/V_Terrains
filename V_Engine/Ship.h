@@ -16,6 +16,7 @@ public:
 	void HandleInput();
 
 	int health = 100;
+	float speed = 700;
 
 	float3 targetRotation;
 	float3 rotation;

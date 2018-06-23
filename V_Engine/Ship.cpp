@@ -54,7 +54,7 @@ void Ship::Update(float dt)
 	controllerT->SetLocalRot(float3(targetRotation.x, rotation.y, 0.f));
 	shipT->RotateLocal(float3(0.f,0.f,rotation.z));
 
-	controllerT->SetGlobalPos(controllerT->GetGlobalPos() + controllerT->Forward() * 2000 * dt);
+	controllerT->SetGlobalPos(controllerT->GetGlobalPos() + controllerT->Forward() * speed * dt);
 
 	float3 cameraTarget = shipT->GetGlobalPos() +
 		-shipT->Forward() * 100 +

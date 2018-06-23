@@ -88,15 +88,21 @@ void Turret::VirtualUpdate(float dt)
 	target = App->camera->GetDefaultCam()->object;
 	if (barrel != nullptr && target != nullptr)
 	{
-			barrel->GetTransform()->LookAt(target->GetTransform()->GetGlobalPos(), base->GetTransform()->Up());
-			if (timer.Read()/1000 > reloadTime)
-			{
-				timer.Start();
-				if (target->GetTransform()->GetGlobalPos().DistanceSq(base->GetTransform()->GetGlobalPos()) < shootingDistance * shootingDistance)
-				{
-					App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
-				}
-			}
+		float3 t = target->GetTransform()->GetGlobalPos() + target->GetTransform()->Forward() * 500;
+		barrel->GetTransform()->LookAt(t, base->GetTransform()->Up());
+		Shoot();
+	}
+}
+
+void Turret::Shoot()
+{
+	if (timer.Read() / 1000 > reloadTime)
+	{
+		timer.Start();
+		if (target->GetTransform()->GetGlobalPos().DistanceSq(base->GetTransform()->GetGlobalPos()) < shootingDistance * shootingDistance)
+		{
+			App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
+		}
 	}
 }
 

@@ -54,6 +54,16 @@ bool ModuleTerrainGame::Start()
 // PreUpdate: clear buffer
 update_status ModuleTerrainGame::PreUpdate()
 {
+	if (setShip)
+	{
+		float3 pos = float3::zero;
+		RPGT::GetPoint(pos.x, pos.z, pos.y);
+		if (pos.y != 0)
+		{
+			player.controller->GetTransform()->SetGlobalPos(pos.x, pos.y + 400, pos.z);
+			setShip = false;
+		}
+	}
 	return UPDATE_CONTINUE;
 }
 
@@ -135,7 +145,7 @@ void ModuleTerrainGame::DebugKeys()
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
 	Building* build = nullptr;
-	if (x + y > 5)
+	if (math::Abs(x) + math::Abs(y) > 5)
 	{
 		if (std::rand() % 1000 < 5)
 		{
@@ -169,6 +179,8 @@ void ModuleTerrainGame::OnChunkUnload(int x, int y)
 void ModuleTerrainGame::InitBullets()
 {
 	GameObject* bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
+	bullet->GetTransform()->SetGlobalPos(10, -100000, 0);
+
 	Material* mat = bullet->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
 	mat->SetAlphaTest(0.63f);

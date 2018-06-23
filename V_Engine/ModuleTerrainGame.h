@@ -46,6 +46,7 @@ public:
 	int bulletN = 0;
 	Ship player;
 	bool debugTurrets = false;
+	bool setShip = true;
 };
 
 #endif

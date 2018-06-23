@@ -29,6 +29,8 @@ public:
 	~Turret();
 	void VirtualUpdate(float dt);
 
+	void Shoot();
+
 	GameObject* target = nullptr;
 	GameObject* barrel = nullptr;
 	GameObject* spawner = nullptr;

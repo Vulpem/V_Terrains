@@ -75,13 +75,15 @@ ModuleTerrain::~ModuleTerrain()
 bool ModuleTerrain::Init()
 {
     bool ret = true;
+
 	return ret;
 }
 
 bool ModuleTerrain::Start()
 {
+	RPGT::Init();
+
 	bool ret = true;
-    RPGT::Init();
 
     App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();

@@ -10,6 +10,7 @@ Bullet::Bullet()
 {
 	bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
 	bullet->HideFromOutliner();
+	bullet->GetTransform()->SetGlobalPos(0, -100000, 0);
 
 	Material* mat = bullet->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
