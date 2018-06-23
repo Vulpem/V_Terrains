@@ -17,7 +17,7 @@ void main()
 	if(has_texture != 0)
 	{
 		vec2 coord = TexCoord;
-		coord.x -= time / 6;
+		coord.x -= time / 2;
 		color = ourColor * texture(ourTexture, coord);
 	}
 	else

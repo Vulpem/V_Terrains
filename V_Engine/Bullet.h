@@ -1,6 +1,7 @@
 #pragma once
 #include "Globals.h"
 #include "Math.h"
+#include "Timer.h"
 
 class GameObject;
 
@@ -15,7 +16,9 @@ public:
 	void Update(float dt);
 
 	bool loaded = false;
-	float speed = 100.f;
+	float speed = 300.f;
 	float3 direction;
 	GameObject* bullet;
+
+	Timer timer;
 };

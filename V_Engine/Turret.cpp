@@ -92,7 +92,10 @@ void Turret::VirtualUpdate(float dt)
 			if (timer.Read()/1000 > reloadTime)
 			{
 				timer.Start();
-				App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
+				if (target->GetTransform()->GetGlobalPos().DistanceSq(base->GetTransform()->GetGlobalPos()) < shootingDistance * shootingDistance)
+				{
+					App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
+				}
 			}
 	}
 }

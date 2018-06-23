@@ -4,6 +4,7 @@
 #include "Application.h"
 #include "ModuleGOmanager.h"
 #include "R_Material.h"
+#include "../V_Terrain/Code/Include.h"
 
 Bullet::Bullet()
 {
@@ -46,6 +47,17 @@ void Bullet::Update(float dt)
 {
 	if (loaded)
 	{
-		bullet->GetTransform()->SetGlobalPos(bullet->GetTransform()->GetGlobalPos() + direction * speed * dt);
+		const float3 pos = bullet->GetTransform()->GetGlobalPos();
+		bullet->GetTransform()->SetGlobalPos(pos + direction * speed * dt);
+		if (timer.Read() > 250)
+		{
+			timer.Start();
+			float height = 0;
+			RPGT::GetPoint(pos.x, pos.z, height);
+			if (height > pos.y)
+			{
+				Despawn();
+			}
+		}
 	}
 }

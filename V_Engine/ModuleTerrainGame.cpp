@@ -184,7 +184,7 @@ void ModuleTerrainGame::InitBullets()
 	mat->SetAlphaTest(0.4f);
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
-	bullets.resize(1024);
+	bullets.resize(512);
 	bulletN = 0;
 }
 

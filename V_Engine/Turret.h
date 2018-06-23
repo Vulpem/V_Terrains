@@ -34,6 +34,7 @@ public:
 	GameObject* spawner = nullptr;
 	float rotateSpeed = 90.f;
 	float reloadTime = 0.7f;
+	float shootingDistance = 5000.f;
 
 	Timer timer;
 };
