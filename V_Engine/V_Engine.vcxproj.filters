@@ -444,6 +444,9 @@
     <ClInclude Include="Bullet.h">
       <Filter>Terrains\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">

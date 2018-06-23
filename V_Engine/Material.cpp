@@ -262,7 +262,7 @@ void Material::SetBlendType(int blendType)
 	ReadRes<R_Material>()->blendType = blendType;
 }
 
-int Material::GetShader()
+Shader Material::GetShader()
 {
 	return ReadRes<R_Material>()->GetShaderProgram();
 }

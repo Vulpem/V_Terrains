@@ -6,6 +6,7 @@
 #include "R_Shader.h"
 #include "ModuleResourceManager.h"
 #include "Mesh_RenderInfo.h"
+#include "Shader.h"
 
 class R_Material : public Resource
 {
@@ -40,7 +41,7 @@ public:
 		shader = res;
 	}
 
-	GLuint GetShaderProgram()
+	Shader GetShaderProgram()
 	{
 		if (shader != 0)
 		{			

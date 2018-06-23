@@ -34,7 +34,7 @@ public:
 	int GetBlendType();
 	void SetBlendType(int blendType);
 
-	int GetShader();
+	Shader GetShader();
 
 	std::vector<uint> texturesToRemove;
 

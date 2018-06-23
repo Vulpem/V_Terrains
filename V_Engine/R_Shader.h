@@ -13,15 +13,15 @@ public:
 
 	~R_Shader()
 	{
-		if (shaderProgram != 0)
+		if (shaderProgram.program != 0)
 		{
-			glDeleteProgram(shaderProgram);
+			glDeleteProgram(shaderProgram.program);
 		}
 	}
 
 	Component::Type GetType() { return Component::Type::C_Shader; }
 
-	GLuint shaderProgram = 0;
+	Shader shaderProgram;
 };
 
 #endif

@@ -374,53 +374,23 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	}
 	}
 
-	glUseProgram(meshInfo.shader);
+	glUseProgram(meshInfo.shader.program);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.dataBuffer);
 
 	// ------ Setting uniforms -------------------------
-	//Model Matrix
-	GLint modelLoc = glGetUniformLocation(meshInfo.shader, "model_matrix");
-	if (modelLoc != -1) { glUniformMatrix4fv(modelLoc, 1, GL_FALSE, meshInfo.transform.ptr()); }
+	glUniformMatrix4fv(meshInfo.shader.modelMatrix, 1, GL_FALSE, meshInfo.transform.ptr());
+	glUniformMatrix4fv(meshInfo.shader.viewMatrix, 1, GL_FALSE, currentViewPort->camera->GetViewMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.shader.projectionMatrix, 1, GL_FALSE, currentViewPort->camera->GetProjectionMatrix().ptr());
 
-	//View matrix
-	GLint viewLoc = glGetUniformLocation(meshInfo.shader, "view_matrix");
-	if (viewLoc != -1) { glUniformMatrix4fv(viewLoc, 1, GL_FALSE, currentViewPort->camera->GetViewMatrix().ptr()); }
+	glUniform1f(meshInfo.shader.time, (float)Time.AppRuntime);
 
-	//Projection Matrix
-	GLint projectionLoc = glGetUniformLocation(meshInfo.shader, "projection_matrix");
-	if (projectionLoc != -1) { glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, currentViewPort->camera->GetProjectionMatrix().ptr()); }
-
-	//Material color
-	GLint colorLoc = glGetUniformLocation(meshInfo.shader, "material_color");
-
-	//Has texture bool
-	GLint hasTextLoc = glGetUniformLocation(meshInfo.shader, "has_texture");
-
-	//UseLight
-	GLint useLightLoc = glGetUniformLocation(meshInfo.shader, "use_light");
-
-	//Time
-	GLint timeLoc = glGetUniformLocation(meshInfo.shader, "time");
-	if (timeLoc != -1) { glUniform1f(timeLoc, (float)Time.AppRuntime); }
-
-	//Ambient color
-	GLint ambientColorLoc = glGetUniformLocation(meshInfo.shader, "ambient_color");
-	if (ambientColorLoc != -1) { glUniform4fv(ambientColorLoc, 1, ambientLight.ptr()); }
-
-	//Global light direction
-	GLint globalLightDirLoc = glGetUniformLocation(meshInfo.shader, "global_light_direction");
-	if (globalLightDirLoc != -1) { glUniform3fv(globalLightDirLoc, 1, sunDirection.ptr()); }
-
-	GLint fogDistance = glGetUniformLocation(meshInfo.shader, "fog_distance");
-	if (fogDistance != -1) { glUniform1i(fogDistance, RPGT::config.fogDistance); }
-
-	GLint fogColor = glGetUniformLocation(meshInfo.shader, "fog_color");
-	if (fogColor != -1) { glUniform3fv(fogColor, 1, RPGT::config.fogColor); }
-
-	GLint maxHeight = glGetUniformLocation(meshInfo.shader, "max_height");
-	if (maxHeight != -1) { glUniform1f(maxHeight, RPGT::config.maxHeight); }
+	glUniform4fv(meshInfo.shader.ambientColor, 1, ambientLight.ptr());
+	glUniform3fv(meshInfo.shader.globalLightDir, 1, sunDirection.ptr());
+	glUniform1i(meshInfo.shader.fogDistance, RPGT::config.fogDistance);
+	glUniform3fv(meshInfo.shader.fogColor, 1, RPGT::config.fogColor);
+	glUniform1f(meshInfo.shader.maxHeight, RPGT::config.maxHeight);
 	
 	// ------ Setting data format -------------------------
 
@@ -435,19 +405,19 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.renderNormals)
 	{
-		if (colorLoc != -1) { glUniform4fv(colorLoc, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr()); }
+		glUniform4fv(meshInfo.shader.materialColor, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr());
 		RenderNormals(meshInfo);
 	}
 
 	if (meshInfo.wired)
 	{
-		if (colorLoc != -1) { glUniform4fv(colorLoc, 1, meshInfo.wiresColor.ptr()); }
+		glUniform4fv(meshInfo.shader.materialColor, 1, meshInfo.wiresColor.ptr());
 		RenderMeshWired(meshInfo);
 	}
 
-	if (useLightLoc != -1) { glUniform1i(useLightLoc, currentViewPort->useLighting); }
+	glUniform1i(meshInfo.shader.useLight, currentViewPort->useLighting);
 
-	if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
+	glUniform1i(meshInfo.shader.hasTexture, (meshInfo.textureBuffer != 0));
 	if (meshInfo.textureBuffer > 0)
 	{
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
@@ -455,7 +425,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.filled)
 	{
-		if (colorLoc != -1) { glUniform4fv(colorLoc, 1, meshInfo.meshColor.ptr()); }
+		glUniform4fv(meshInfo.shader.materialColor, 1, meshInfo.meshColor.ptr());
 		RenderMeshFilled(meshInfo);
 	}
 

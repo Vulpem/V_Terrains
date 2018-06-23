@@ -922,12 +922,26 @@ bool ModuleResourceManager::GenerateDefaultShader()
 
 	if (shaderProgram != 0 && error == false)
 	{
-		if (defaultShader != 0)
+		if (defaultShader.program != 0)
 		{
-			glDeleteProgram(defaultShader);
+			glDeleteProgram(defaultShader.program);
 		}
-		defaultShader = shaderProgram;
+		defaultShader.program = shaderProgram;
 	}	
+
+	defaultShader.modelMatrix = glGetUniformLocation(defaultShader.program,"model_matrix");
+	defaultShader.viewMatrix = glGetUniformLocation(defaultShader.program, "view_matrix");
+	defaultShader.projectionMatrix = glGetUniformLocation(defaultShader.program, "projection_matrix");
+
+	defaultShader.materialColor = glGetUniformLocation(defaultShader.program, "material_color");
+	defaultShader.hasTexture = glGetUniformLocation(defaultShader.program, "has_texture");
+	defaultShader.useLight = glGetUniformLocation(defaultShader.program, "use_light");
+	defaultShader.time = glGetUniformLocation(defaultShader.program, "time");
+	defaultShader.ambientColor = glGetUniformLocation(defaultShader.program, "ambient_color");
+	defaultShader.globalLightDir = glGetUniformLocation(defaultShader.program, "global_light_direction");
+	defaultShader.fogDistance = glGetUniformLocation(defaultShader.program, "fog_distance");
+	defaultShader.fogColor = glGetUniformLocation(defaultShader.program, "fog_color");
+	defaultShader.maxHeight = glGetUniformLocation(defaultShader.program, "max_height");
 
 	glDetachShader(shaderProgram, vertexShader);
 	glDetachShader(shaderProgram, fragmentShader);

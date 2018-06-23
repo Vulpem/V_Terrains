@@ -89,10 +89,7 @@ void Turret::VirtualUpdate(float dt)
 	if (barrel != nullptr && target != nullptr)
 	{
 			barrel->GetTransform()->LookAt(target->GetTransform()->GetGlobalPos(), base->GetTransform()->Up());
-
-			int a = timer.Read();
-
-			if (timer.Read() > reloadTime)
+			if (timer.Read()/1000 > reloadTime)
 			{
 				timer.Start();
 				App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());

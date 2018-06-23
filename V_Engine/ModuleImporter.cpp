@@ -1209,10 +1209,26 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 				memcpy(&length, fileIt, sizeof(GLint));
 				fileIt += sizeof(GLint);
 
-				ret->shaderProgram = glCreateProgram();
+				ret->shaderProgram.program = glCreateProgram();
+				Shader& shader = ret->shaderProgram;
+				int program = ret->shaderProgram.program;
 
-				glProgramBinary(ret->shaderProgram, binaryFormat, fileIt, length);
+				glProgramBinary(ret->shaderProgram.program, binaryFormat, fileIt, length);
 				RELEASE_ARRAY(file);
+
+				shader.modelMatrix = glGetUniformLocation(shader.program, "model_matrix");
+				shader.viewMatrix = glGetUniformLocation(shader.program, "view_matrix");
+				shader.projectionMatrix = glGetUniformLocation(shader.program, "projection_matrix");
+
+				shader.materialColor = glGetUniformLocation(shader.program, "material_color");
+				shader.hasTexture = glGetUniformLocation(shader.program, "has_texture");
+				shader.useLight = glGetUniformLocation(shader.program, "use_light");
+				shader.time = glGetUniformLocation(shader.program, "time");
+				shader.ambientColor = glGetUniformLocation(shader.program, "ambient_color");
+				shader.globalLightDir = glGetUniformLocation(shader.program, "global_light_direction");
+				shader.fogDistance = glGetUniformLocation(shader.program, "fog_distance");
+				shader.fogColor = glGetUniformLocation(shader.program, "fog_color");
+				shader.maxHeight = glGetUniformLocation(shader.program, "max_height");
 			}
 		}
 	}

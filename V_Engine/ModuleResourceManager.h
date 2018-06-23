@@ -5,6 +5,7 @@
 #include "Globals.h"
 
 #include "Component.h"
+#include "Shader.h"
 
 #include <map>
 
@@ -141,10 +142,10 @@ public:
 
 	std::string shadersResult;
 
-	uint GetDefaultShader() { return defaultShader; }
+	Shader GetDefaultShader() { return defaultShader; }
 
 	private:	
-	uint defaultShader = 0;
+	Shader defaultShader;
 };
 
 #endif

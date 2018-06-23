@@ -200,6 +200,7 @@
     <ClInclude Include="R_Resource.h" />
     <ClInclude Include="R_Shader.h" />
     <ClInclude Include="R_Texture.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Timers.h" />

@@ -2,6 +2,7 @@
 #define ___MESH_RENDERINFO__
 
 #include "Math.h"
+#include "Shader.h"
 
 class R_mesh;
 
@@ -38,7 +39,7 @@ struct Mesh_RenderInfo
 	int blendType = 0;
 	float alphaTest = 0.2f;
 
-	uint shader = 0;
+	Shader shader;
 
 	float4x4 transform;
 };
