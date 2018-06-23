@@ -22,5 +22,7 @@ public:
 
 	GameObject* controller = nullptr;
 	GameObject* ship = nullptr;
+	GameObject* cannon = nullptr;
+	std::vector<GameObject*> thrusters;
 	GameObject* camera = nullptr;
 };

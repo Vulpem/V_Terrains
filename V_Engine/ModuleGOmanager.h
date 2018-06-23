@@ -124,7 +124,8 @@ private:
 template<typename C>
 inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 {
-	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
+	std::vector<GameObject*> ret;// = quadTree.FilterCollisions(col);
+	ret.reserve(dynamicGO.size());
 
 	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
 	{

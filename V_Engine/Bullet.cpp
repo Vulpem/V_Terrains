@@ -5,11 +5,10 @@
 #include "ModuleGOmanager.h"
 #include "R_Material.h"
 
-Bullet::Bullet(float3 pos, float3 dir)
+Bullet::Bullet()
 {
 	bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
-
-	bullet->GetTransform()->SetGlobalPos(pos);
+	bullet->HideFromOutliner();
 
 	Material* mat = bullet->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -30,7 +29,23 @@ Bullet::~Bullet()
 	bullet->Delete();
 }
 
+void Bullet::Spawn(float3 pos, float3 dir)
+{
+	bullet->GetTransform()->SetGlobalPos(pos);
+	direction = dir;
+	loaded = true;
+}
+
+void Bullet::Despawn()
+{
+	bullet->GetTransform()->SetGlobalPos(0, -100, 0);
+	loaded = false;
+}
+
 void Bullet::Update(float dt)
 {
-	bullet->GetTransform()->SetGlobalPos(bullet->GetTransform()->GetGlobalPos() + direction * speed * dt);
+	if (loaded)
+	{
+		bullet->GetTransform()->SetGlobalPos(bullet->GetTransform()->GetGlobalPos() + direction * speed * dt);
+	}
 }

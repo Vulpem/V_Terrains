@@ -594,7 +594,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObject*>& exclusiveGOs)
 {
-	std::unordered_set<GameObject*> toRender;
+	std::vector<GameObject*> toRender;
 
 	//This vector will generally be empty. It is only used when we send certain GOs we want to render exclusively
 	if (exclusiveGOs.empty() == true)
@@ -622,18 +622,15 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			if (((Camera*)(it->second))->HasCulling())
 			{
 				aCamHadCulling = true;
-				std::vector<GameObject*> GOs;
 				//If a camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
 				if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 				{
-					GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+					toRender = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
 				}
 				else
 				{
-					GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+					toRender = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
 				}
-				toRender.reserve(GOs.size());
-				std::for_each(GOs.begin(), GOs.end(), [&toRender](GameObject* g) {toRender.insert(g); });
 			}
 		}
 
@@ -643,19 +640,11 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			std::vector<GameObject*> GOs;
 			if (port.camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 			{
-				GOs = FilterCollisions(*port.camera->GetFrustum());
+				toRender = FilterCollisions(*port.camera->GetFrustum());
 			}
 			else
 			{
-				GOs = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
-			}
-			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
-			{
-				toRender.insert(*toInsert);
-				if ((*toInsert)->selected > 1)
-				{
-					int a = 0;
-				}
+				toRender = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
 			}
 		}
 		TIMER_READ_MS_MAX("Cam culling longest");
@@ -665,18 +654,19 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 		App->renderer3D->SetViewPort(*App->renderer3D->FindViewPort(port.ID));
 		for (std::vector<GameObject*>::const_iterator toInsert = exclusiveGOs.begin(); toInsert != exclusiveGOs.end(); toInsert++)
 		{
-			toRender.insert(*toInsert);
+			toRender.push_back(*toInsert);
 		}
 	}
 
 	TIMER_START("GO render longest");
 	//And now, we render them
 	TIMER_RESET_STORED("Mesh slowest");
-	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
+	std::for_each(toRender.begin(), toRender.end(),
+		[&](GameObject* go)
 	{
-		if ((*it)->HasComponent(Component::Type::C_mesh))
+		if (go->HasComponent(Component::Type::C_mesh))
 		{
-			std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
+			std::vector<mesh*> meshes = go->GetComponent<mesh>();
 			if (meshes.empty() == false)
 			{
 				for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
@@ -697,6 +687,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			}
 		}
 	}
+	);
 	TIMER_READ_MS_MAX("GO render longest");
 }
 

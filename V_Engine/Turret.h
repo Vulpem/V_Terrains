@@ -1,6 +1,7 @@
 #pragma once
 #include "Globals.h"
 #include "Math.h"
+#include "Timer.h"
 
 class GameObject;
 
@@ -30,5 +31,9 @@ public:
 
 	GameObject* target = nullptr;
 	GameObject* barrel = nullptr;
-	float speed = 90.f;
+	GameObject* spawner = nullptr;
+	float rotateSpeed = 90.f;
+	float reloadTime = 0.7f;
+
+	Timer timer;
 };

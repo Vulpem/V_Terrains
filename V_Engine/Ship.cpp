@@ -24,13 +24,16 @@ Ship::~Ship()
 
 void Ship::Init(GameObject * go, GameObject* cam)
 {
-	ship = go;
 	camera = cam;
 
-	controller = App->GO->CreateEmpty("ShipController");
-	controller->childs.push_back(ship);
-	ship->parent->childs.erase(std::find(ship->parent->childs.begin(), ship->parent->childs.end(), ship));
-	ship->parent = controller;
+	controller = go;
+	ship = go->childs.front();
+	cannon = ship->childs.front();
+	for (int n = 1; n < ship->childs.size(); n++)
+	{
+		thrusters.push_back(ship->childs[n]);
+	}
+
 	rotation = float3::zero;
 
 }

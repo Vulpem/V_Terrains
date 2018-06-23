@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "Turret.h"
 #include "Ship.h"
+#include "Bullet.h"
 
 #include "../V_Terrain/Code/Include.h"
 
@@ -38,9 +39,13 @@ public:
 	void OnChunkUnload(int x, int y);
 
 	void InitBullets();
+	void SpawnBullet(float3 pos, float3 dir);
 
     std::map<std::pair<int, int>, Building*> turrets;
+	std::vector<Bullet> bullets;
+	int bulletN = 0;
 	Ship player;
+	bool debugTurrets = false;
 };
 
 #endif

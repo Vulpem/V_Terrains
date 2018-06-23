@@ -8,7 +8,11 @@
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
 
+#include "ModuleTerrainGame.h"
+
 #include "../V_Terrain/Code/Include.h"
+
+#include "Bullet.h"
 
 Building::Building(GameObject * go, int x, int y) :
 	base (go)
@@ -67,6 +71,10 @@ Turret::Turret(GameObject * go, int x, int y)
 
 	barrel->GetTransform()->SetGlobalPos(barrelPos);
 	barrel->GetTransform()->SetLocalScale(barrelScale.x, barrelScale.y, barrelScale.z);
+
+	spawner = barrel->childs.front();
+
+	timer.Start();
 }
 
 Turret::~Turret()
@@ -81,6 +89,14 @@ void Turret::VirtualUpdate(float dt)
 	if (barrel != nullptr && target != nullptr)
 	{
 			barrel->GetTransform()->LookAt(target->GetTransform()->GetGlobalPos(), base->GetTransform()->Up());
+
+			int a = timer.Read();
+
+			if (timer.Read() > reloadTime)
+			{
+				timer.Start();
+				App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
+			}
 	}
 }
 

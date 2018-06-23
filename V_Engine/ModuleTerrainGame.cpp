@@ -45,7 +45,6 @@ bool ModuleTerrainGame::Start()
 	RPGT::config.chunkUnloaded = [this](int x, int y) { this->OnChunkUnload(x, y); };
 
 	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front(), App->camera->GetDefaultCam()->object);
-	player.ship->GetTransform()->SetLocalScale(0.05f, 0.05f, 0.05f);
 
 	InitBullets();
 
@@ -60,18 +59,15 @@ update_status ModuleTerrainGame::PreUpdate()
 
 update_status ModuleTerrainGame::Update()
 {
-
-	if (App->input->GetKey(SDL_SCANCODE_KP_0) == KEY_DOWN)
+	if (Time.PlayMode || debugTurrets)
 	{
-		Time.PlayMode = !Time.PlayMode;
-	}
-
-	if (Time.PlayMode)
-	{
-		Input();
+		if (Time.PlayMode)
+		{
+			Input();
+			UpdatePlayer();
+		}
 		UpdateBullets();
 		UpdateTurrets();
-		UpdatePlayer();
 	}
 	if (DEBUG_KEYS)
 	{
@@ -110,6 +106,9 @@ void ModuleTerrainGame::UpdateTurrets()
 
 void ModuleTerrainGame::UpdateBullets()
 {
+	const float dt = Time.dt;
+	std::for_each(bullets.begin(), bullets.end(),
+		[dt](Bullet& b) { b.Update(dt); });
 }
 
 void ModuleTerrainGame::UpdatePlayer()
@@ -123,26 +122,37 @@ void ModuleTerrainGame::Input()
 
 void ModuleTerrainGame::DebugKeys()
 {
+	if (App->input->GetKey(SDL_SCANCODE_KP_0) == KEY_DOWN)
+	{
+		Time.PlayMode = !Time.PlayMode;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_KP_1) == KEY_DOWN)
+	{
+		debugTurrets = !debugTurrets;
+	}
 }
 
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
 	Building* build = nullptr;
-	if (std::rand() % 1000 < 5)
+	if (x + y > 5)
 	{
-		build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
-		float3 p = build->base->GetTransform()->GetGlobalPos();
-		p.y -= 60.f;
-		build->base->GetTransform()->SetGlobalPos(p);
-	}
-	else if (std::rand() % 100 < 20)
+		if (std::rand() % 1000 < 5)
+		{
+			build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+			float3 p = build->base->GetTransform()->GetGlobalPos();
+			p.y -= 60.f;
+			build->base->GetTransform()->SetGlobalPos(p);
+		}
+		else if (std::rand() % 100 < 20)
 		{
 			build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
 		}
 
-	if (build != nullptr)
-	{
-		turrets[std::make_pair(x, y)] = build;
+		if (build != nullptr)
+		{
+			turrets[std::make_pair(x, y)] = build;
+		}
 	}
 }
 
@@ -173,4 +183,16 @@ void ModuleTerrainGame::InitBullets()
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_DISCARD);
 	mat->SetAlphaTest(0.4f);
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
+
+	bullets.resize(1024);
+	bulletN = 0;
+}
+
+void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir)
+{
+	if (bulletN >= bullets.size())
+	{
+		bulletN = 0;
+	}
+	bullets[bulletN++].Spawn(pos, dir);
 }
