@@ -40,6 +40,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	, m_wantRegen(false)
 	, m_globalLightHeight(25)
 	, m_globalLightDir(-40)
+	, terrainConfigName("Default")
 {
 	moduleName = "ModuleTerrainTests";
 
@@ -156,6 +157,11 @@ update_status ModuleTerrain::Update()
         {
             RPGT::SetSeed(time(NULL));
         }
+		ImGui::Separator();
+		ImGui::InputText("ConfigName", terrainConfigName, 256);
+		if (ImGui::Button("Save terrain config")) { SaveTerrainConfig(terrainConfigName); }
+		ImGui::NewLine();
+		if (ImGui::Button("Load terrain config")) { LoadTerrainConfig(terrainConfigName); }
 
         ImGui::NewLine();
         ImGui::Separator();
@@ -530,10 +536,65 @@ void ModuleTerrain::LoadTerrainConfig(std::string configName)
 	inStream.open(dir.data());
 	if (inStream.is_open())
 	{
-		char file[1024];
-		inStream.read(file, 1024);
+		inStream.read((char*)&RPGT::config.maxChunks, sizeof(unsigned int));
+		inStream.read((char*)&RPGT::config.chunkSize, sizeof(float));
+		inStream.read((char*)&RPGT::config.chunkHeightmapResolution, sizeof(unsigned int));
+		inStream.read((char*)&RPGT::config.chunkMinDensity, sizeof(unsigned int));
+
+		inStream.read((char*)&RPGT::config.maxHeight, sizeof(float));
+		m_maxHeight = RPGT::config.maxHeight;
+		inStream.read((char*)&RPGT::config.waterHeight, sizeof(float));
+
+		inStream.read((char*)&RPGT::config.fogDistance, sizeof(float));
+		m_fogDistance = RPGT::config.fogDistance;
+		inStream.read((char*)RPGT::config.fogColor, sizeof(float) * 3);
+
+		inStream.read((char*)&RPGT::config.ambientLight, sizeof(float));
+		inStream.read((char*)RPGT::config.globalLight, sizeof(float) * 3);
+		inStream.read((char*)&RPGT::config.singleSidedFaces, sizeof(bool));
+
+		inStream.read((char*)&RPGT::config.noise.ridgedDepth, sizeof(unsigned int));
+		inStream.read((char*)&RPGT::config.noise.frequency, sizeof(float));
+		m_frequency = RPGT::config.noise.frequency;
+		inStream.read((char*)&RPGT::config.noise.octaves, sizeof(unsigned int));
+		m_octaves = RPGT::config.noise.octaves;
+		inStream.read((char*)&RPGT::config.noise.lacunarity, sizeof(float));
+		m_lacunarity = RPGT::config.noise.lacunarity;
+		inStream.read((char*)&RPGT::config.noise.persistency, sizeof(float));
+		m_persistance = RPGT::config.noise.persistency;
+
+		for (int n = 0; n < 10; n++)
+		{
+			RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
+			inStream.read((char*)tex.color, sizeof(float) * 3);
+			inStream.read((char*)&tex.minSlope, sizeof(float));
+			inStream.read((char*)&tex.maxSlope, sizeof(float));
+			inStream.read((char*)&tex.minHeight, sizeof(float));
+			inStream.read((char*)&tex.maxHeight, sizeof(float));
+			inStream.read((char*)&tex.sizeMultiplier, sizeof(float));
+			inStream.read((char*)&tex.heightFade, sizeof(float));
+			inStream.read((char*)&tex.slopeFade, sizeof(float));
+			
+			char img[1024];
+			memset(img, '\0', 1024);
+			int size = textures[n].size();
+			inStream.read((char*)&size, sizeof(int));
+			inStream.read(img, size);
+			textures[n] = img;
+			SetImage(n, textures[n]);
+
+			memset(img, '\0', 1024);
+			size = heightmaps[n].size();
+			inStream.read((char*)&size, sizeof(int));
+			inStream.read(img, size);
+			heightmaps[n] = img;
+			SetHeightmap(n, heightmaps[n]);
+		}
+		inStream.close();
+
+		RPGT::RegenerateMesh();
+		RPGT::CleanChunks();
 	}
-	inStream.close();
 }
 
 void ModuleTerrain::SetImage(int n, std::string textureFile)
@@ -630,11 +691,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_water", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_water_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    RPGT::SetTexture(0, tex);
+	RPGT::SetTexture(0, tex);
+	SetImage(0, "Assets/A_Textures/a_water.png");
+	SetHeightmap(0, "Assets/A_Textures/a_water_hm.png");
 
     //Sand
     tex.minHeight = 0.f;
@@ -644,11 +703,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_sand", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_sand_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(1, tex);
+	SetImage(1, "Assets/A_Textures/a_sand.png");
+	SetHeightmap(1, "Assets/A_Textures/a_sand_hm.png");
 
     //Grass
     tex.color[0] = 108.f / 255.f;
@@ -661,11 +718,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 0.82f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(4, tex);
+	SetImage(4, "Assets/A_Textures/a_grass.png");
+	SetHeightmap(4, "Assets/A_Textures/a_grass_hm.png");
 
     //Gravel
     tex.color[0] = 158.f / 255.f;
@@ -678,11 +733,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 0.882f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_gravel", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_gravel_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(5, tex);
+	SetImage(5, "Assets/A_Textures/a_gravel.png");
+	SetHeightmap(5, "Assets/A_Textures/a_gravel_hm.png");
 
     //GreyRock
     tex.color[0] = 122.f / 255.f;
@@ -695,11 +748,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 0.95f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(6, tex);
+	SetImage(6, "Assets/A_Textures/a_rock_grey.png");
+	SetHeightmap(6, "Assets/A_Textures/a_rock_grey_hm.png");
 
     //Snow
     tex.color[0] = 1.f;
@@ -712,11 +763,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 0.88f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_snow", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_snow_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(7, tex);
+	SetImage(7, "Assets/A_Textures/a_snow.png");
+	SetHeightmap(7, "Assets/A_Textures/a_snow_hm.png");
 
     //Grey rock
     tex.minHeight = 0.f;
@@ -726,11 +775,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_rock_grey", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_rock_grey_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(8, tex);
+	SetImage(8, "Assets/A_Textures/a_rock_grey.png");
+	SetHeightmap(8, "Assets/A_Textures/a_rock_grey_hm.png");
 
     //Grass
     tex.minHeight = 0.f;
@@ -740,11 +787,9 @@ void ModuleTerrain::SetDefaultTextures()
     tex.maxSlope = 1.f;
     tex.slopeFade = 0.05f;
     tex.sizeMultiplier = 4.f;
-    UID = App->resources->LinkResource("a_grass", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_diffuse = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
-    UID = App->resources->LinkResource("a_grass_hm", Component::Type::C_Texture);
-    if (UID != 0) { tex.buf_heightmap = App->resources->Peek(UID)->Read<R_Texture>()->bufferID; }
     RPGT::SetTexture(9, tex);
+	SetImage(9, "Assets/A_Textures/a_grass.png");
+	SetHeightmap(9, "Assets/A_Textures/a_grass_hm.png");
 }
 
 void ModuleTerrain::GenMap()

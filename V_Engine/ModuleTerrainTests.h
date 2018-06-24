@@ -83,6 +83,8 @@ public:
 
 	std::string textures[10];
 	std::string heightmaps[10];
+
+	char terrainConfigName[256];
 };
 
 #endif
