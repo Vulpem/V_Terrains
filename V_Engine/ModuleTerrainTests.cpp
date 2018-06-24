@@ -111,6 +111,31 @@ update_status ModuleTerrain::Update()
 	RPGT::config.fogColor[1] = App->renderer3D->clearColor.y;
 	RPGT::config.fogColor[2] = App->renderer3D->clearColor.z;
 
+	if (m_regening)
+	{
+		int ms = m_smoothRegen.Read();
+		if (ms < 750)
+		{
+			RPGT::config.fogDistance = m_fogDistance * (float)(1 - ms / 750.f);
+		}
+		else if (ms < 1750)
+		{
+			if (!m_generatedMap)
+			{
+				GenMap();
+				m_generatedMap = true;
+			}
+		}
+		else if (ms < 2500)
+		{
+			RPGT::config.fogDistance = m_fogDistance * (float)((ms - 1750) / 750.f);
+		}
+		else
+		{
+			m_regening = false;
+		}
+	}
+
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
 
@@ -458,7 +483,10 @@ update_status ModuleTerrain::Update()
 	{
 		m_regenTimer.Stop();
 		m_wantRegen = false;
-		GenMap();
+		m_generatedMap = false;
+		m_regening = true;
+		m_smoothRegen.Start();
+		m_variableFogDistance = m_fogDistance;
 	}
 	m_calcCollisions = false;
     return UPDATE_CONTINUE;
@@ -554,8 +582,7 @@ void ModuleTerrain::LoadTerrainConfig(std::string configName)
 		inStream.read((char*)&RPGT::config.chunkHeightmapResolution, sizeof(unsigned int));
 		inStream.read((char*)&RPGT::config.chunkMinDensity, sizeof(unsigned int));
 
-		inStream.read((char*)&RPGT::config.maxHeight, sizeof(float));
-		m_maxHeight = RPGT::config.maxHeight;
+		inStream.read((char*)&m_maxHeight, sizeof(float));
 		inStream.read((char*)&RPGT::config.waterHeight, sizeof(float));
 
 		inStream.read((char*)&RPGT::config.fogDistance, sizeof(float));
@@ -605,8 +632,7 @@ void ModuleTerrain::LoadTerrainConfig(std::string configName)
 		}
 		inStream.close();
 
-		RPGT::RegenerateMesh();
-		RPGT::CleanChunks();
+		WantRegen();
 	}
 }
 
@@ -811,6 +837,7 @@ void ModuleTerrain::GenMap()
     RPGT::config.noise.octaves = m_octaves;
     RPGT::config.noise.lacunarity = m_lacunarity;
     RPGT::config.noise.persistency = m_persistance;
+	RPGT::config.maxHeight = m_maxHeight;
 
     RPGT::RegenerateMesh();
     RPGT::CleanChunks();

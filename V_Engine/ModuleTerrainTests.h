@@ -66,6 +66,10 @@ public:
 
     float m_maxHeight;
 	float m_fogDistance;
+	float m_variableFogDistance;
+	Timer m_smoothRegen;
+	bool m_regening = false;
+	bool m_generatedMap = false;
 
     uint m_shaderProgram;
 
