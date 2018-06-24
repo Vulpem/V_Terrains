@@ -122,7 +122,14 @@ update_status ModuleTerrain::Update()
 		{
 			if (!m_generatedMap)
 			{
-				GenMap();
+				if (terrainToLoad.empty())
+				{
+					GenMap();
+				}
+				else
+				{
+					LoadTerrainNow(terrainToLoad);
+				}
 				m_generatedMap = true;
 			}
 		}
@@ -566,6 +573,12 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 
 void ModuleTerrain::LoadTerrainConfig(std::string configName)
 {
+	terrainToLoad = configName;
+	WantRegen();
+}
+
+void ModuleTerrain::LoadTerrainNow(std::string configName)
+{
 	TCHAR pwd[MAX_PATH];
 	GetCurrentDirectory(MAX_PATH, pwd);
 
@@ -585,8 +598,7 @@ void ModuleTerrain::LoadTerrainConfig(std::string configName)
 		inStream.read((char*)&m_maxHeight, sizeof(float));
 		inStream.read((char*)&RPGT::config.waterHeight, sizeof(float));
 
-		inStream.read((char*)&RPGT::config.fogDistance, sizeof(float));
-		m_fogDistance = RPGT::config.fogDistance;
+		inStream.read((char*)&m_fogDistance, sizeof(float));
 		inStream.read((char*)RPGT::config.fogColor, sizeof(float) * 3);
 
 		inStream.read((char*)&RPGT::config.ambientLight, sizeof(float));
@@ -632,8 +644,9 @@ void ModuleTerrain::LoadTerrainConfig(std::string configName)
 		}
 		inStream.close();
 
-		WantRegen();
+		GenMap();
 	}
+	terrainToLoad.clear();
 }
 
 void ModuleTerrain::SetImage(int n, std::string textureFile)

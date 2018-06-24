@@ -28,6 +28,7 @@ public:
 
 	void SaveTerrainConfig(std::string configName);
 	void LoadTerrainConfig(std::string configName);
+	void LoadTerrainNow(std::string configName);
 
 	void SetImage(int n, std::string textureFile);
 	void SetHeightmap(int n, std::string hmfile);
@@ -80,6 +81,7 @@ public:
 
     float m_globalLightDir = 0.f;
     float m_globalLightHeight = 0.f;
+	std::string terrainToLoad;
 
 	bool m_calcCollisions = false;
 	float3 m_terrainPos[COL_N][COL_N];
