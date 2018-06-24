@@ -633,7 +633,7 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			
 			char img[1024];
 			memset(img, '\0', 1024);
-			int size = textures[n].size();
+			int size = 0;
 			inStream.read((char*)&size, sizeof(int));
 			inStream.read(img, size);
 			textures[n] = img;
