@@ -11,7 +11,8 @@ public:
 	Bullet();
 	~Bullet();
 
-	void Spawn(float3 pos, float3 dir);
+	void Init(bool player = false);
+	void Spawn(float3 pos, float3 dir, bool playerBullet = false);
 	void Despawn();
 	void Update(float dt);
 
@@ -22,4 +23,5 @@ public:
 	GameObject* bullet;
 
 	Timer timer;
+	bool playerBullet = false;
 };

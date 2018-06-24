@@ -133,7 +133,7 @@ void ModuleTerrainGame::UpdateGame()
 				portPos.y = portPos.y / (port->size.y / 2) - 1;
 				LineSegment selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
 				Ray ray = selectRay.ToRay();
-				float t = -ray.pos.y / ray.dir.y;
+				float t = (player.controller->GetTransform()->GetGlobalPos().y -ray.pos.y) / ray.dir.y;
 				mousePos = ray.pos + ray.dir * t;
 
 			}
@@ -143,18 +143,35 @@ void ModuleTerrainGame::UpdateGame()
 
 void ModuleTerrainGame::UpdateTurrets()
 {
+	std::stack<std::pair<int, int>> toErase;
 	const float dt = Time.dt;
-	std::for_each(turrets.begin(), turrets.end(),
-		[dt](auto& turret)
+	for(std::map<std::pair<int, int>, Building*>::iterator it = turrets.begin(); it != turrets.end(); it++)
 	{
-		turret.second->Update(dt);
-	});
+		it->second->Update(dt);
+		if (it->second->Destroyed())
+		{
+			toErase.push(it->first);
+		}
+	}
+	while (toErase.empty() == false)
+	{
+		std::pair<int, int> t = toErase.top();
+		toErase.pop();
+		auto turret = turrets.find(t);
+		if (turret != turrets.end())
+		{
+			delete turret->second;
+			turrets.erase(turret);
+		}
+	}
 }
 
 void ModuleTerrainGame::UpdateBullets()
 {
 	const float dt = Time.dt;
 	std::for_each(bullets.begin(), bullets.end(),
+		[dt](Bullet& b) { b.Update(dt); });
+	std::for_each(playerBullets.begin(), playerBullets.end(),
 		[dt](Bullet& b) { b.Update(dt); });
 }
 
@@ -237,7 +254,7 @@ void ModuleTerrainGame::OnChunkUnload(int x, int y)
 void ModuleTerrainGame::InitBullets()
 {
 	GameObject* bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
-	bullet->GetTransform()->SetGlobalPos(10, -100000, 0);
+	bullet->GetTransform()->SetGlobalPos(15, -15, 0);
 
 	Material* mat = bullet->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -254,15 +271,49 @@ void ModuleTerrainGame::InitBullets()
 	mat->SetAlphaTest(0.4f);
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
+	GameObject* bullet2 = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet2.fbx").front();
+	bullet2->GetTransform()->SetGlobalPos(-15, -15, 0);
+
+	mat = bullet2->GetComponent<Material>().front();
+	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
+	mat->SetAlphaTest(0.63f);
+	mat->SetColor(0.074, 0.074, 0.9137, 0.9137);
+
+	mat = bullet2->childs[0]->GetComponent<Material>().front();
+	mat->SetColor(0, 0, 1);
+	mat->ReadRes<R_Material>()->AssignShader("bullet2");
+
+	mat = bullet2->childs[1]->GetComponent<Material>().front();
+	mat->SetColor(0.8, 0, 1);
+	mat->SetAlphaType(AlphaTestTypes::ALPHA_DISCARD);
+	mat->SetAlphaTest(0.4f);
+	mat->ReadRes<R_Material>()->AssignShader("bullet");
+
 	bullets.resize(512);
+	std::for_each(bullets.begin(), bullets.end(), [](Bullet& b) {b.Init(false); });
+	playerBullets.resize(64);
+	std::for_each(playerBullets.begin(), playerBullets.end(), [](Bullet& b) {b.Init(true); });
+
 	bulletN = 0;
+	playerBulletN = 0;
 }
 
-void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir)
+void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet)
 {
-	if (bulletN >= bullets.size())
+	if (playerBullet == false)
 	{
-		bulletN = 0;
+		if (bulletN >= bullets.size())
+		{
+			bulletN = 0;
+		}
+		bullets[bulletN++].Spawn(pos, dir, playerBullet);
 	}
-	bullets[bulletN++].Spawn(pos, dir);
+	else
+	{
+		if (playerBulletN >= playerBullets.size())
+		{
+			playerBulletN = 0;
+		}
+		playerBullets[playerBulletN++].Spawn(pos, dir, playerBullet);
+	}
 }

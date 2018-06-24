@@ -13,7 +13,8 @@ public:
 
 	void Update(float dt);
 	void Destroy();
-	int health = 100;
+	void Hit(int amount);
+	int health = 1000;
 
 	GameObject* target = nullptr;
 	GameObject* base = nullptr;

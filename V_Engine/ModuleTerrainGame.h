@@ -48,11 +48,14 @@ public:
 	void OnChunkUnload(int x, int y);
 
 	void InitBullets();
-	void SpawnBullet(float3 pos, float3 dir);
+	void SpawnBullet(float3 pos, float3 dir, bool playerBullet = false);
 
     std::map<std::pair<int, int>, Building*> turrets;
 	std::vector<Bullet> bullets;
+	std::vector<Bullet> playerBullets;
+
 	int bulletN = 0;
+	int playerBulletN = 0;
 	Ship player;
 	bool debugTurrets = false;
 	bool setShip = true;

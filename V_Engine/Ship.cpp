@@ -80,7 +80,15 @@ void Ship::Update(float dt)
 	if (App->game->game == GameType::BulletHell)
 	{
 		
-		ship->GetTransform()->LookAt(App->game->mousePos);
+		ship->GetTransform()->LookAt(float3(App->game->mousePos.x, controller->GetTransform()->GetGlobalPos().y,App->game->mousePos.z));
+		if (App->input->GetMouseButton(1))
+		{
+			if (reloadTimer.Read() > reloadTime * 1000.f)
+			{
+				App->game->SpawnBullet(cannon->GetTransform()->GetGlobalPos(), cannon->GetTransform()->Forward(), true);
+				reloadTimer.Start();
+			}
+		}
 
 		if (desiredMovement.x != currentMovement.x || desiredMovement.y != currentMovement.y || desiredMovement.z != currentMovement.z)
 		{

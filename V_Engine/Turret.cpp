@@ -56,10 +56,20 @@ void Building::Destroy()
 	destroyed = true;
 }
 
+void Building::Hit(int amount)
+{
+	health -= amount;
+	if (health < amount)
+	{
+		Destroy();
+	}
+}
+
 
 Turret::Turret(GameObject * go, int x, int y)
 	: Building(go, x, y)
 {
+	health = 100;
 	barrel = base->childs.front();
 
 	float3 normal;

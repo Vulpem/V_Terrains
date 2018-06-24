@@ -36,4 +36,6 @@ public:
 	int immunityTime = 750;
 
 	Timer hitTimer;
+	Timer reloadTimer;
+	float reloadTime = 0.1f;
 };
