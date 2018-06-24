@@ -12,6 +12,7 @@
 #include "imGUI\imgui.h"
 
 #include "AllResources.h"
+#include "ModuleFileSystem.h"
 
 #include "OpenGL.h"
 
@@ -90,7 +91,7 @@ bool ModuleTerrain::Start()
 
     App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
-
+	App->fs->CreateDir("Assets/Terrains");
 	SetDefaultTextures();
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_maxTexturesGL);
@@ -160,8 +161,20 @@ update_status ModuleTerrain::Update()
 		ImGui::Separator();
 		ImGui::InputText("ConfigName", terrainConfigName, 256);
 		if (ImGui::Button("Save terrain config")) { SaveTerrainConfig(terrainConfigName); }
-		ImGui::NewLine();
-		if (ImGui::Button("Load terrain config")) { LoadTerrainConfig(terrainConfigName); }
+		ImGui::SameLine();
+		if (ImGui::BeginMenu("Load Terrain"))
+		{
+			std::vector<std::string> folders, files;
+			App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
+			for (int n = 0; n < files.size(); n++)
+			{
+				if (ImGui::MenuItem(files[n].data()))
+				{
+					LoadTerrainConfig(files[n].substr(0, files[n].size()-5));
+				}
+			}
+			ImGui::EndMenu();
+		}
 
         ImGui::NewLine();
         ImGui::Separator();
