@@ -864,6 +864,7 @@ void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
 	m_regenTimer.Start();
+	previousFogColor = wantedFogColor = App->renderer3D->clearColor;
 }
 
 void ModuleTerrain::ShaderEditor()
