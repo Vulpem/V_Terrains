@@ -5,6 +5,12 @@
 #include "ModuleGOmanager.h"
 #include "R_Material.h"
 #include "../V_Terrain/Code/Include.h"
+#include "ModuleTerrainGame.h"
+#include "Ship.h"
+#include "Camera.h"
+#include "ModuleCamera3D.h"
+
+float Bullet::publicSpeed = float();
 
 Bullet::Bullet()
 {
@@ -24,6 +30,7 @@ Bullet::Bullet()
 	mat->SetColor(0.9, 0, 1);
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_DISCARD);
 	mat->SetAlphaTest(0.4f);
+	publicSpeed = speed;
 }
 
 Bullet::~Bullet()
@@ -50,12 +57,22 @@ void Bullet::Update(float dt)
 	{
 		const float3 pos = bullet->GetTransform()->GetGlobalPos();
 		bullet->GetTransform()->SetGlobalPos(pos + direction * speed * dt);
-		if (timer.Read() > 250)
+
+		if (timer.Read() > 100)
 		{
 			timer.Start();
+			Line ray;
+			ray.pos = bullet->GetTransform()->GetGlobalPos();
+			ray.dir = bullet->GetTransform()->GetGlobalPos() - App->camera->GetDefaultCam()->GetPosition();
+			if (ray.Intersects(App->game->player.ship->obb))
+			{
+				App->game->player.Hit(25);
+				Despawn();
+			}
+
 			float height = 0;
 			RPGT::GetPoint(pos.x, pos.z, height);
-			if (height > pos.y)
+			if (pos.y > App->game->cameraHeight || height > pos.y)
 			{
 				Despawn();
 			}

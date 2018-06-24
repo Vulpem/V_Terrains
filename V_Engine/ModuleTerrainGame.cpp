@@ -18,6 +18,7 @@
 
 #include <time.h>
 #include <algorithm>
+#include "Transform.h"
 
 ModuleTerrainGame::ModuleTerrainGame(Application* app, bool start_enabled) :
     Module(app, start_enabled)
@@ -73,6 +74,7 @@ update_status ModuleTerrainGame::Update()
 	{
 		if (Time.PlayMode)
 		{
+			UpdateGame();
 			Input();
 			UpdatePlayer();
 		}
@@ -102,6 +104,41 @@ bool ModuleTerrainGame::CleanUp()
 void ModuleTerrainGame::Render(const viewPort & port)
 {
 	
+}
+
+void ModuleTerrainGame::UpdateGame()
+{
+	if (game == GameType::BulletHell)
+	{
+		float3 p = gamePos + float3(0, cameraHeight, -1600);
+		Transform* camT = App->camera->GetDefaultCam()->object->GetTransform();
+		camT->SetGlobalPos(p);
+		camT->LookAt(gamePos);
+
+		Transform* shipT = player.controller->GetTransform();
+		p = shipT->GetGlobalPos();
+		p.z += verticalSpeed * Time.dt;
+		p.y = RPGT::config.maxHeight + 10;
+		shipT->SetGlobalPos(p);
+
+		gamePos.z += verticalSpeed * Time.dt;
+
+			viewPort* port = nullptr;
+			float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
+			//Checking the click was made on a port
+			if (port != nullptr)
+			{
+				//Normalizing the mouse position in port to [-1,1]
+				portPos.x = portPos.x / (port->size.x / 2) - 1;
+				portPos.y = portPos.y / (port->size.y / 2) - 1;
+				LineSegment selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+				Ray ray = selectRay.ToRay();
+				float t = -ray.pos.y / ray.dir.y;
+				mousePos = ray.pos + ray.dir * t;
+
+			}
+
+	}
 }
 
 void ModuleTerrainGame::UpdateTurrets()
@@ -145,24 +182,45 @@ void ModuleTerrainGame::DebugKeys()
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
 	Building* build = nullptr;
-	if (math::Abs(x) + math::Abs(y) > 5)
-	{
-		if (std::rand() % 1000 < 5)
-		{
-			build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
-			float3 p = build->base->GetTransform()->GetGlobalPos();
-			p.y -= 60.f;
-			build->base->GetTransform()->SetGlobalPos(p);
-		}
-		else if (std::rand() % 100 < 20)
-		{
-			build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
-		}
 
-		if (build != nullptr)
+	if (game != GameType::BulletHell)
+	{
+		if (math::Abs(x) + math::Abs(y) > 5)
 		{
-			turrets[std::make_pair(x, y)] = build;
+			if (std::rand() % 1000 < 5)
+			{
+				build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+				float3 p = build->base->GetTransform()->GetGlobalPos();
+				p.y -= 80.f;
+				build->base->GetTransform()->SetGlobalPos(p);
+			}
+			else if (std::rand() % 100 < 20)
+			{
+				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+			}
 		}
+	}
+	else
+	{
+		if (y > 3 && abs(x) <= 1)
+		{
+			if (std::rand() % 100 < 5)
+			{
+				build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+				float3 p = build->base->GetTransform()->GetGlobalPos();
+				p.y -= 80.f;
+				build->base->GetTransform()->SetGlobalPos(p);
+			}
+			else if (std::rand() % 100 < 20 + 80 * (Time.GameRuntime / 120))
+			{
+				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+			}
+		}
+	}
+
+	if (build != nullptr)
+	{
+		turrets[std::make_pair(x, y)] = build;
 	}
 }
 

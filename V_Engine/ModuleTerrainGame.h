@@ -14,6 +14,14 @@
 
 class GameObject;
 
+
+enum class GameType
+{
+	Exploration,
+	BulletHell
+};
+
+
 class ModuleTerrainGame : public Module
 {
 public:
@@ -29,6 +37,7 @@ public:
 
 	void Render(const viewPort& port) override;
 
+	void UpdateGame();
 	void UpdateTurrets();
 	void UpdateBullets();
 	void UpdatePlayer();
@@ -47,6 +56,15 @@ public:
 	Ship player;
 	bool debugTurrets = false;
 	bool setShip = true;
+
+	float3 gamePos = float3::zero;
+	GameType game = GameType::BulletHell;
+
+	float verticalSpeed = 400.f;
+
+	float3 mousePos = float3::zero;
+
+	float cameraHeight = 2300;
 };
 
 #endif

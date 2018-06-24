@@ -15,6 +15,7 @@ public:
 	void Destroy();
 	int health = 100;
 
+	GameObject* target = nullptr;
 	GameObject* base = nullptr;
 	bool Destroyed() { return destroyed; }
 private:
@@ -31,12 +32,11 @@ public:
 
 	void Shoot();
 
-	GameObject* target = nullptr;
 	GameObject* barrel = nullptr;
 	GameObject* spawner = nullptr;
 	float rotateSpeed = 90.f;
-	float reloadTime = 0.7f;
-	float shootingDistance = 5000.f;
+	float reloadTime = 0.75f;
+	float shootingDistance = 3500.f;
 
 	Timer timer;
 };

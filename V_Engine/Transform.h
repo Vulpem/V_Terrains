@@ -44,6 +44,8 @@ public:
 	void SetGlobalPos(float x, float y, float z);
 	void SetGlobalPos(float3 pos);
 	math::float3 GetGlobalPos();
+	void Translate(float x, float y, float z);
+	void Translate(float3 m);
 
 	void SetLocalRot(float x, float y, float z);
 	void SetLocalRot(float3 rot);

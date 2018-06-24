@@ -253,6 +253,16 @@ math::float3 Transform::GetGlobalPos()
 	return p.TranslatePart();
 }
 
+void Transform::Translate(float x, float y, float z)
+{
+	Translate(float3(x, y, z));
+}
+
+void Transform::Translate(float3 m)
+{
+	SetGlobalPos(GetGlobalPos() + m);
+}
+
 void Transform::SetLocalRot(float x, float y, float z)
 {
 	if (object->IsStatic() == false && allowRotation)

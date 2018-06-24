@@ -28,6 +28,8 @@ Building::Building(GameObject * go, int x, int y) :
 	RPGT::GetPoint(pos.x, pos.z, pos.y);
 	trans->SetGlobalPos(pos);
 	trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
+
+	target = App->game->player.ship;
 }
 
 Building::~Building()
@@ -41,6 +43,10 @@ void Building::Update(float dt)
 	if (health <= 0)
 	{
 		Destroy();
+	}
+	if (base->aabb.Contains(target->GetTransform()->GetGlobalPos()))
+	{
+		App->game->player.Hit(25);
 	}
 	VirtualUpdate(dt);
 }
@@ -85,10 +91,18 @@ Turret::~Turret()
 
 void Turret::VirtualUpdate(float dt)
 {
-	target = App->camera->GetDefaultCam()->object;
+	if (!App->game->debugTurrets)
+	{
+		target = App->game->player.ship;
+	}
+	else
+	{
+		target = App->camera->GetDefaultCam()->object;
+	}
 	if (barrel != nullptr && target != nullptr)
 	{
-		float3 t = target->GetTransform()->GetGlobalPos() + target->GetTransform()->Forward() * 500;
+		float3 t = target->GetTransform()->GetGlobalPos()
+			+ float3(0,0,1) * App->game->verticalSpeed;
 		barrel->GetTransform()->LookAt(t, base->GetTransform()->Up());
 		Shoot();
 	}
