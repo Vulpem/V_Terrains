@@ -132,6 +132,8 @@ update_status ModuleTerrain::Update()
 				}
 				m_generatedMap = true;
 			}
+			float3 currentFogColor = Lerp(previousFogColor, wantedFogColor, (ms - 750.f) / 1000.f);
+			App->renderer3D->clearColor = currentFogColor;
 		}
 		else if (ms < 2500)
 		{
@@ -574,6 +576,7 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 void ModuleTerrain::LoadTerrainConfig(std::string configName)
 {
 	terrainToLoad = configName;
+	memcpy(terrainConfigName, configName.data(), configName.size() + 1);
 	WantRegen();
 }
 
@@ -599,7 +602,8 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 		inStream.read((char*)&RPGT::config.waterHeight, sizeof(float));
 
 		inStream.read((char*)&m_fogDistance, sizeof(float));
-		inStream.read((char*)RPGT::config.fogColor, sizeof(float) * 3);
+		previousFogColor = float3(RPGT::config.fogColor[0], RPGT::config.fogColor[1], RPGT::config.fogColor[2]);
+		inStream.read((char*)&wantedFogColor[0], sizeof(float) * 3);
 
 		inStream.read((char*)&RPGT::config.ambientLight, sizeof(float));
 		inStream.read((char*)RPGT::config.globalLight, sizeof(float) * 3);

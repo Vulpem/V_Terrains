@@ -51,6 +51,8 @@ public:
     std::string m_TCS;
     std::string m_TES;
     std::string m_fragment;
+	float3 previousFogColor;
+	float3 wantedFogColor;
 
     int m_maxTexturesGL;
 
