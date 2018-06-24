@@ -26,6 +26,12 @@ public:
 	update_status PostUpdate() override;
 	bool CleanUp();
 
+	void SaveTerrainConfig(std::string configName);
+	void LoadTerrainConfig(std::string configName);
+
+	void SetImage(int n, std::string textureFile);
+	void SetHeightmap(int n, std::string hmfile);
+
 	void Render(const viewPort& port) override;
 
 	void SetDefaultTextures();
@@ -74,6 +80,9 @@ public:
 	bool m_calcCollisions = false;
 	float3 m_terrainPos[COL_N][COL_N];
 	float3 m_terrainNormal[COL_N][COL_N];
+
+	std::string textures[10];
+	std::string heightmaps[10];
 };
 
 #endif

@@ -16,6 +16,8 @@
 #include "OpenGL.h"
 
 #include <time.h>
+#include <fstream>
+#include <algorithm>
 
 void ShowError(const char * message)
 {
@@ -365,29 +367,24 @@ update_status ModuleTerrain::Update()
 					ImGui::Separator();
 					if (ImGui::SliderFloat((std::string("TextureSizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
 					ImGui::Separator();
+					if (changed)
+					{
+						RPGT::SetTexture(n, tex);
+					}
 
 #pragma region AddTexturePopup
                     if (ImGui::BeginPopup((std::string("Set Diffuse") + tmp).data()))
                     {
 						if (ImGui::MenuItem((std::string("None##DIFF") + tmp).data()))
 						{
-							tex.buf_diffuse = 0;
-							changed = true;
+							SetImage(n, "");
 						}
                         std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
-                        std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
-                        for (; fileIt != meshRes.end(); fileIt++)
+                        for (auto fileIt = meshRes.begin(); fileIt != meshRes.end(); fileIt++)
                         {
                             if (ImGui::MenuItem(fileIt->first.data()))
                             {
-                                uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
-								Resource* res = App->resources->Peek(UID);
-								if (res)
-								{
-									tex.buf_diffuse = res->Read<R_Texture>()->bufferID;
-									changed = true;
-								}
-                                break;
+								SetImage(n, fileIt->first);
                             }
                         }
                         ImGui::EndPopup();
@@ -399,22 +396,14 @@ update_status ModuleTerrain::Update()
                     {
 						if (ImGui::MenuItem((std::string("None##HM") + tmp).data()))
 						{
-							tex.buf_heightmap = 0;
-							changed = true;
+							SetHeightmap(n, "");
 						}
                         std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
-                        std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
-                        for (; fileIt != meshRes.end(); fileIt++)
+                        for (auto fileIt = meshRes.begin(); fileIt != meshRes.end(); fileIt++)
                         {
                             if (ImGui::MenuItem(fileIt->first.data()))
                             {
-                                uint64_t UID = App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture);
-								Resource* res = App->resources->Peek(UID);
-								if (res)
-								{
-									tex.buf_heightmap = res->Read<R_Texture>()->bufferID;
-									changed = true;
-								}
+								SetHeightmap(n, fileIt->first);
                                 break;
                             }
                         }
@@ -436,10 +425,6 @@ update_status ModuleTerrain::Update()
                     ImGui::SameLine();
                     ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(125, 125));
 
-                    if (changed)
-                    {
-                        RPGT::SetTexture(n, tex);
-                    }
                     ImGui::EndMenu();
                 }
 			}
@@ -470,6 +455,139 @@ update_status ModuleTerrain::PostUpdate()
 bool ModuleTerrain::CleanUp()
 {
 	return true;
+}
+
+void ModuleTerrain::SaveTerrainConfig(std::string configName)
+{
+	TCHAR pwd[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, pwd);
+
+	std::string dir(pwd);
+	dir += "/Assets/Terrains/";
+	dir += configName;
+	dir += ".rpgt";
+	std::string ret;
+	std::ofstream outStream;
+	outStream.open(dir.data());
+
+	if (outStream.is_open())
+	{
+		outStream.write((char*)&RPGT::config.maxChunks, sizeof(unsigned int));
+		outStream.write((char*)&RPGT::config.chunkSize, sizeof(float));
+		outStream.write((char*)&RPGT::config.chunkHeightmapResolution, sizeof(unsigned int));
+		outStream.write((char*)&RPGT::config.chunkMinDensity, sizeof(unsigned int));
+
+		outStream.write((char*)&RPGT::config.maxHeight, sizeof(float));
+		outStream.write((char*)&RPGT::config.waterHeight, sizeof(float));
+
+		outStream.write((char*)&RPGT::config.fogDistance, sizeof(float));
+		outStream.write((char*)RPGT::config.fogColor, sizeof(float)*3);
+
+		outStream.write((char*)&RPGT::config.ambientLight, sizeof(float));
+		outStream.write((char*)RPGT::config.globalLight, sizeof(float)*3);
+		outStream.write((char*)&RPGT::config.singleSidedFaces, sizeof(bool));
+
+		outStream.write((char*)&RPGT::config.noise.ridgedDepth, sizeof(unsigned int));
+		outStream.write((char*)&RPGT::config.noise.frequency, sizeof(float));
+		outStream.write((char*)&RPGT::config.noise.octaves, sizeof(unsigned int));
+		outStream.write((char*)&RPGT::config.noise.lacunarity, sizeof(float));
+		outStream.write((char*)&RPGT::config.noise.persistency, sizeof(float));
+
+		for (int n = 0; n < 10; n++)
+		{
+			RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
+			outStream.write((char*)tex.color, sizeof(float)*3);
+			outStream.write((char*)&tex.minSlope, sizeof(float));
+			outStream.write((char*)&tex.maxSlope, sizeof(float));
+			outStream.write((char*)&tex.minHeight, sizeof(float));
+			outStream.write((char*)&tex.maxHeight, sizeof(float));
+			outStream.write((char*)&tex.sizeMultiplier, sizeof(float));
+			outStream.write((char*)&tex.heightFade, sizeof(float));
+			outStream.write((char*)&tex.slopeFade, sizeof(float));
+
+			int size = textures[n].size();
+			outStream.write((char*)&size, sizeof(int));
+			outStream.write(textures[n].data(), size);
+
+			size = heightmaps[n].size();
+			outStream.write((char*)&size, sizeof(int));
+			outStream.write(heightmaps[n].data(), size);
+		}
+		outStream.close();
+	}
+}
+
+void ModuleTerrain::LoadTerrainConfig(std::string configName)
+{
+	TCHAR pwd[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, pwd);
+
+	std::string dir(pwd);
+	dir += "/Assets/Terrains/";
+	dir += configName;
+	dir += ".rpgt";
+	std::ifstream inStream;
+	inStream.open(dir.data());
+	if (inStream.is_open())
+	{
+		char file[1024];
+		inStream.read(file, 1024);
+	}
+	inStream.close();
+}
+
+void ModuleTerrain::SetImage(int n, std::string textureFile)
+{
+	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
+	if (textureFile.length() > 2)
+	{
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		auto res = std::find_if(texRes.begin(), texRes.end(), [textureFile](auto res) { return (textureFile.compare(res.first) == 0); });
+		if (res != texRes.end())
+		{
+			uint64_t UID = App->resources->LinkResource(res->second.front(), Component::Type::C_Texture);
+			Resource* resource = App->resources->Peek(UID);
+			if (resource != nullptr)
+			{
+				t.buf_diffuse = resource->Read<R_Texture>()->bufferID;
+				textures[n] = textureFile;
+				RPGT::SetTexture(n, t);
+			}
+		}
+	}
+	else
+	{
+		t.buf_diffuse = 0;
+		textures[n] = "";
+		RPGT::SetTexture(n, t);
+	}
+}
+
+void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
+{
+	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
+	if (hmfile.length() > 2)
+	{
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		auto res = std::find_if(texRes.begin(), texRes.end(), [hmfile](auto res) { return (hmfile.compare(res.first) == 0); });
+		if (res != texRes.end())
+		{
+			uint64_t UID = App->resources->LinkResource(res->second.front(), Component::Type::C_Texture);
+			Resource* resource = App->resources->Peek(UID);
+			if (resource != nullptr)
+			{
+				t.buf_heightmap = resource->Read<R_Texture>()->bufferID;
+				heightmaps[n] = hmfile;
+				RPGT::SetTexture(n, t);
+			}
+		}
+	}
+	else
+	{
+		t.buf_heightmap = 0;
+		heightmaps[n] = "";
+		RPGT::SetTexture(n, t);
+	}
 }
 
 void ModuleTerrain::Render(const viewPort & port)
