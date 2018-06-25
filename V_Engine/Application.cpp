@@ -142,7 +142,7 @@ void Application::PrepareUpdate()
 
 	//Time managing
 	Time.dt = ms_timer.ReadMs() / 1000.0f;
-	if (Time.PlayMode && Time.Pause == false)
+	if (Time.PlayMode != Play::Stop && Time.Pause == false)
 	{
 		Time.gdt = Time.dt / Time.gdtModifier;
 		Time.GameRuntime += Time.dt;
@@ -301,16 +301,23 @@ void Application::OnScreenResize(int width, int heigth)
 	}
 }
 
-void Application::Play()
+void Application::Play(bool debug)
 {
-	Time.PlayMode = true;
+	if (!debug)
+	{
+		Time.PlayMode = Play::Play;
+	}
+	else
+	{
+		Time.PlayMode = Play::DebugPlay;
+	}
 	std::for_each(list_modules.begin(), list_modules.end(),
 		[](Module* m) {m->OnPlay(); });
 }
 
 void Application::Stop()
 {
-	Time.PlayMode = false;
+	Time.PlayMode = Play::Stop;
 	std::for_each(list_modules.begin(), list_modules.end(),
 		[](Module* m) {m->OnStop(); });
 }

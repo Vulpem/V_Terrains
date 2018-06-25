@@ -84,7 +84,7 @@ public:
 	const char* GetTitle();
 
 	void OnScreenResize(int width, int heigth);
-	void Play();
+	void Play(bool debug = false);
 	void Stop();
 private:
 

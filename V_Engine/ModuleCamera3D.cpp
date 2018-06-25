@@ -52,7 +52,7 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 update_status ModuleCamera3D::Update()
 {
-	if (Time.PlayMode == false)
+	if (Time.PlayMode == Play::Stop)
 	{
 		MoveWithKeys();
 		// Mouse motion ----------------

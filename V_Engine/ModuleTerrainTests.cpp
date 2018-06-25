@@ -167,348 +167,6 @@ update_status ModuleTerrain::Update()
 			}
 		}
 	}
-    ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
-
-    ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20)/4*3-20));
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-
-    if (ImGui::Begin("TerrainTests", 0, flags))
-    {
-        ImGui::Text(
-            "Use WASD to move the camera around.\n"
-            "Q and E to move up and down.\n"
-            "Hold right click to pan.\n"
-            "Hold shift to move faster.\n"
-            "Press space for top view.");
-        ImGui::Separator();
-        ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
-        ImGui::Separator();
-        const int HMresolution = static_cast<int>(RPGT::config.chunkSize);
-        int p[2] = {
-            floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
-            floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
-        };
-        ImGui::Text("Current chunk:\nX: %i,   Z: %i", p[0], p[1]);
-        ImGui::NewLine();
-        if (ImGui::Button("Generate new random seed"))
-        {
-            RPGT::SetSeed(time(NULL));
-        }
-		ImGui::Separator();
-		ImGui::InputText("ConfigName", terrainConfigName, 256);
-		if (ImGui::Button("Save terrain config")) { SaveTerrainConfig(terrainConfigName); }
-		ImGui::SameLine();
-		if (ImGui::BeginMenu("Load Terrain"))
-		{
-			std::vector<std::string> folders, files;
-			App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
-			for (int n = 0; n < files.size(); n++)
-			{
-				if (ImGui::MenuItem(files[n].data()))
-				{
-					LoadTerrainConfig(files[n].substr(0, files[n].size()-5));
-				}
-			}
-			ImGui::EndMenu();
-		}
-
-        ImGui::NewLine();
-        ImGui::Separator();
-        ImGui::Separator();
-		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
-		if (ImGui::CollapsingHeader("Render"))
-		{
-			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
-			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
-			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
-			ImGui::NewLine();
-			ImGui::Text("Global light:");
-			bool lightDirChanged = false;
-			if (ImGui::SliderFloat("Direction", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
-			if (ImGui::SliderFloat("Height", &m_globalLightHeight, 0, 90)) { lightDirChanged = true; }
-
-			if (lightDirChanged)
-			{
-				float3 tmp(1.f, 0.f, 0.f);
-				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight * DEGTORAD, 0.f);
-				tmp = rot * tmp;
-				RPGT::config.globalLight[0] = tmp.x;
-				RPGT::config.globalLight[1] = tmp.y;
-				RPGT::config.globalLight[2] = tmp.z;
-				App->renderer3D->sunDirection = tmp;
-			}
-
-			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
-			ImGui::NewLine();
-		}
-		if (ImGui::CollapsingHeader("Terrain generation"))
-		{
-			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { RPGT::config.maxHeight = m_maxHeight; }
-			ImGui::Separator();
-			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { RPGT::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
-			if (ImGui::DragFloat("Chunk Size", &RPGT::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
-            if (ImGui::DragInt("Min chunk polys", &(int)RPGT::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
-
-			ImGui::Separator();
-
-			if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.0001f, 2.f)) { WantRegen(); }
-			if (ImGui::DragFloat("Frequency", &m_frequency, 0.01f, 0.0001f, 2.f)) { WantRegen(); }
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(
-					"Wavelength of the noise generation.\n"
-					"Will reset all chunks.");
-			ImGui::Separator();
-
-			if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 15)) { WantRegen(); }
-			if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 15)) { WantRegen(); }
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(
-					"Amount of noisemaps generated and\n"
-					"overlapped to generate the final result.\n"
-					"Will reset all chunks.");
-			ImGui::Separator();
-
-			if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.01f, 8.f)) { WantRegen(); }
-			if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.01f, 0.01f, 8.f)) { WantRegen(); }
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(
-					"Octave frequency multiplier.\n"
-					"Will reset all chunks.");
-			ImGui::Separator();
-
-			if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
-			if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(
-					"Strength multiplier for each octave.\n"
-					"Will reset all chunks.");
-			ImGui::Separator();
-			if (ImGui::SliderInt("Ridged depth", &(int)RPGT::config.noise.ridgedDepth, 0, RPGT::config.noise.octaves)) { WantRegen(); }
-			ImGui::Separator();
-			if (ImGui::BeginMenu("Set Height Curve"))
-			{
-				ImGui::InputInt("P", &m_curvePow);
-				ImGui::Text("Functions:");
-				ImGui::Separator();
-				if (ImGui::MenuItem(
-					"float func (float x)\n"
-					"{ return x; }"
-				))
-				{
-					m_currentHeightCurve =
-						"float func (float x)\n"
-						"{ return x; }";
-                    RPGT::config.m_heightCurve = ([](float x) {return x; });
-                    WantRegen();
-				}
-				ImGui::Separator();
-				if (ImGui::MenuItem(
-					"float func(float x)\n"
-					"{ return pow(x, P); }"
-				))
-				{
-					m_setCurvePow = m_curvePow;
-					m_currentHeightCurve =
-						"float func(float x)\n"
-						"{ return pow(x, %i); }";
-					int n = m_curvePow;
-                    RPGT::config.m_heightCurve = ([n](float x) {return pow(x, n); });
-                    WantRegen();
-				}
-				ImGui::Separator();
-				if (ImGui::MenuItem(
-					"float func(float x)\n"
-					"{\n"
-					"   x = x * 2.f - 1.f;\n"
-					"   return (pow(x, P) + 1.f) * 0.5f;\n"
-					"}"
-				))
-				{
-					m_setCurvePow = m_curvePow;
-					m_currentHeightCurve =
-						"float func(float x)\n"
-						"{\n"
-						"   x = x * 2.f - 1.f;\n"
-						"   return (pow(x, %i) + 1.f) * 0.5f;\n"
-						"}";
-					int n = m_curvePow;
-                    RPGT::config.m_heightCurve = ([n](float x)
-					{
-						x = x * 2.f - 1.f;
-						return (pow(x, n) + 1.f) * 0.5f;
-					});
-                    WantRegen();
-				}
-                ImGui::Separator();
-                if (ImGui::MenuItem(
-                    "float func(float x)\n"
-                    "{\n"
-                    "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
-                    "}"
-                ))
-                {
-                    m_setCurvePow = m_curvePow;
-                    m_currentHeightCurve =
-                        "float func(float x)\n"
-                        "{\n"
-                        "   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
-                        "}";
-                    int n = m_curvePow;
-                    RPGT::config.m_heightCurve = ([n](float x)
-                    {
-                        return 1.f / (1.f + exp((float)(-n)*(x * 2.f - 1.f)));
-                    });
-                    WantRegen();
-                }
-
-				ImGui::EndMenu();
-			}
-			ImGui::Separator();
-			ImGui::Text(m_currentHeightCurve.data(), m_setCurvePow);
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip(
-					"Function that will be applied to.\n"
-					"all heightmap pixels.\n"
-					"Recieves a value from 0 to 1 and\n"
-					"returns another one in the same range.\n"
-					"Will reset all chunks.");
-		}
-		if (ImGui::CollapsingHeader("Debug visualization"))
-		{
-			if (ImGui::Button("Reset Camera Height"))
-			{
-				float3 pos = App->camera->GetDefaultCam()->GetPosition();
-				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
-			}
-			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
-
-			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
-			{
-				App->Editor->SwitchViewPorts();
-			}
-			if (App->Editor->multipleViews)
-			{
-				ImGui::Spacing();
-				ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
-			}
-
-		}
-		if (ImGui::CollapsingHeader("Textures"))
-		{
-			for (int n = 0; n < 10; n++)
-			{
-				RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
-                bool changed = false;
-                char tmp[8];
-                sprintf_s(tmp, "##%i", n);
-
-				ImGui::ColorButton(tmp, ImVec4(tex.color[0], tex.color[1], tex.color[2], 1.f));
-				ImGui::SameLine();
-				ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(20, 20));
-				ImGui::SameLine();
-				ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(20, 20));
-				ImGui::SameLine();
-                if (ImGui::BeginMenu((std::string("Texture ") + tmp).data()))
-                {
-                    if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color)) { changed = true; }
-					ImGui::Separator();
-                    if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, 1.0f)) { changed = true; }
-                    if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, 1.0f)) { changed = true; }
-					if (ImGui::SliderFloat((std::string("HeightFadeDistance") + tmp).data(), &tex.heightFade, 0.f, 1.0f)) { changed = true; }
-					ImGui::Separator();
-                    if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
-                    if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
-					if (ImGui::SliderFloat((std::string("SlopeFadeDistance") + tmp).data(), &tex.slopeFade, 0.f, 1.f)) { changed = true; }
-					ImGui::Separator();
-					if (ImGui::SliderFloat((std::string("TextureSizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
-					ImGui::Separator();
-					if (changed)
-					{
-						RPGT::SetTexture(n, tex);
-					}
-
-                    if (ImGui::Button((std::string("Diffuse##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
-                    {
-						char file[MAX_PATH];
-						OPENFILENAME ofn;
-						ZeroMemory(&ofn, sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.lpstrFile = file;
-						ofn.lpstrFile[0] = '\0';
-						ofn.nMaxFile = MAX_PATH;
-						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
-						//ofn.nFilterIndex = 1;
-						TCHAR pwd[MAX_PATH];
-						
-						GetCurrentDirectory(MAX_PATH, pwd);
-						std::string dir(pwd);
-						int workingDirLentgh = dir.length();
-						dir += "\\Assets";
-						ofn.lpstrInitialDir = dir.data();
-						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
-						if (GetOpenFileName(&ofn))
-						{
-							std::string f = file;
-							f = f.substr(workingDirLentgh + 1);
-							int pos = f.find("\\");
-							while (pos != std::string::npos)
-							{
-								f[pos] = '/';
-								pos = f.find("\\");
-							}
-							SetImage(n, f);
-						}
-                    }
-                    ImGui::SameLine();
-					if (ImGui::Button("X##RemoveDiff", ImVec2(20, 20))) { SetImage(n, ""); }
-					ImGui::SameLine();
-                    if (ImGui::Button((std::string("Heightmap##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
-                    {
-						char file[MAX_PATH];
-						OPENFILENAME ofn;
-						ZeroMemory(&ofn, sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.lpstrFile = file;
-						ofn.lpstrFile[0] = '\0';
-						ofn.nMaxFile = MAX_PATH;
-						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
-						//ofn.nFilterIndex = 1;
-						TCHAR pwd[MAX_PATH];
-						GetCurrentDirectory(MAX_PATH, pwd);
-						std::string dir(pwd);
-						int workingDirLentgh = dir.length();
-						dir += "\\Assets";
-						ofn.lpstrInitialDir = dir.data();
-						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
-						if (GetOpenFileName(&ofn))
-						{
-							std::string f = file;
-							f = f.substr(workingDirLentgh + 1);
-							int pos = f.find("\\");
-							while (pos != std::string::npos)
-							{
-								f[pos] = '/';
-								pos = f.find("\\");
-							}
-							SetHeightmap(n, f);
-						}
-                    }
-					ImGui::SameLine();
-					if (ImGui::Button("X##RemoveHM", ImVec2(20, 20))) { SetHeightmap(n, ""); }
-                    ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(125, 125));
-                    ImGui::SameLine();
-                    ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(125, 125));
-
-                    ImGui::EndMenu();
-                }
-			}
-		}
-
-		ImGui::End();
-    }
-
-    ShaderEditor();
 
 	if (m_wantRegen && m_regenTimer.Read() > 2000.0f)
 	{
@@ -526,6 +184,10 @@ update_status ModuleTerrain::Update()
 // PostUpdate present buffer to screen
 update_status ModuleTerrain::PostUpdate()
 {
+	if (Time.PlayMode != Play::Play)
+	{
+		DrawUI();
+	}
 	return UPDATE_CONTINUE;
 }
 
@@ -673,6 +335,352 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 		GenMap();
 	}
 	terrainToLoad.clear();
+}
+
+void ModuleTerrain::DrawUI()
+{
+	ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
+
+	ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20) / 4 * 3 - 20));
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	float3 pos = App->camera->GetDefaultCam()->GetPosition();
+
+	if (ImGui::Begin("TerrainTests", 0, flags))
+	{
+		ImGui::Text(
+			"Use WASD to move the camera around.\n"
+			"Q and E to move up and down.\n"
+			"Hold right click to pan.\n"
+			"Hold shift to move faster.\n"
+			"Press space for top view.");
+		ImGui::Separator();
+		ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
+		ImGui::Separator();
+		const int HMresolution = static_cast<int>(RPGT::config.chunkSize);
+		int p[2] = {
+			floor((pos.x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
+			floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
+		};
+		ImGui::Text("Current chunk:\nX: %i,   Z: %i", p[0], p[1]);
+		ImGui::NewLine();
+		if (ImGui::Button("Generate new random seed"))
+		{
+			RPGT::SetSeed(time(NULL));
+		}
+		ImGui::Separator();
+		ImGui::InputText("ConfigName", terrainConfigName, 256);
+		if (ImGui::Button("Save terrain config")) { SaveTerrainConfig(terrainConfigName); }
+		ImGui::SameLine();
+		if (ImGui::BeginMenu("Load Terrain"))
+		{
+			std::vector<std::string> folders, files;
+			App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
+			for (int n = 0; n < files.size(); n++)
+			{
+				if (ImGui::MenuItem(files[n].data()))
+				{
+					LoadTerrainConfig(files[n].substr(0, files[n].size() - 5));
+				}
+			}
+			ImGui::EndMenu();
+		}
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::Separator();
+		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
+		if (ImGui::CollapsingHeader("Render"))
+		{
+			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
+			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
+			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
+			ImGui::NewLine();
+			ImGui::Text("Global light:");
+			bool lightDirChanged = false;
+			if (ImGui::SliderFloat("Direction", &m_globalLightDir, -360, 360)) { lightDirChanged = true; }
+			if (ImGui::SliderFloat("Height", &m_globalLightHeight, 0, 90)) { lightDirChanged = true; }
+
+			if (lightDirChanged)
+			{
+				float3 tmp(1.f, 0.f, 0.f);
+				Quat rot = Quat::FromEulerYZX(m_globalLightDir * DEGTORAD, m_globalLightHeight * DEGTORAD, 0.f);
+				tmp = rot * tmp;
+				RPGT::config.globalLight[0] = tmp.x;
+				RPGT::config.globalLight[1] = tmp.y;
+				RPGT::config.globalLight[2] = tmp.z;
+				App->renderer3D->sunDirection = tmp;
+			}
+
+			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
+			ImGui::NewLine();
+		}
+		if (ImGui::CollapsingHeader("Terrain generation"))
+		{
+			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { RPGT::config.maxHeight = m_maxHeight; }
+			ImGui::Separator();
+			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { RPGT::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
+			if (ImGui::DragFloat("Chunk Size", &RPGT::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
+			if (ImGui::DragInt("Min chunk polys", &(int)RPGT::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
+
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Frequency", &m_frequency, 0.0001f, 2.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Frequency", &m_frequency, 0.01f, 0.0001f, 2.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Wavelength of the noise generation.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderInt("##Octaves", &m_octaves, 1, 15)) { WantRegen(); }
+			if (ImGui::DragInt("Octaves", &m_octaves, 1, 1, 15)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Amount of noisemaps generated and\n"
+					"overlapped to generate the final result.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Lacunarity", &m_lacunarity, 0.01f, 8.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Lacunarity", &m_lacunarity, 0.01f, 0.01f, 8.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Octave frequency multiplier.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+
+			if (ImGui::SliderFloat("##Persistance", &m_persistance, 0.001f, 1.f)) { WantRegen(); }
+			if (ImGui::DragFloat("Persistance", &m_persistance, 0.01f, 0.01f, 1.f)) { WantRegen(); }
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Strength multiplier for each octave.\n"
+					"Will reset all chunks.");
+			ImGui::Separator();
+			if (ImGui::SliderInt("Ridged depth", &(int)RPGT::config.noise.ridgedDepth, 0, RPGT::config.noise.octaves)) { WantRegen(); }
+			ImGui::Separator();
+			if (ImGui::BeginMenu("Set Height Curve"))
+			{
+				ImGui::InputInt("P", &m_curvePow);
+				ImGui::Text("Functions:");
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func (float x)\n"
+					"{ return x; }"
+				))
+				{
+					m_currentHeightCurve =
+						"float func (float x)\n"
+						"{ return x; }";
+					RPGT::config.m_heightCurve = ([](float x) {return x; });
+					WantRegen();
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func(float x)\n"
+					"{ return pow(x, P); }"
+				))
+				{
+					m_setCurvePow = m_curvePow;
+					m_currentHeightCurve =
+						"float func(float x)\n"
+						"{ return pow(x, %i); }";
+					int n = m_curvePow;
+					RPGT::config.m_heightCurve = ([n](float x) {return pow(x, n); });
+					WantRegen();
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func(float x)\n"
+					"{\n"
+					"   x = x * 2.f - 1.f;\n"
+					"   return (pow(x, P) + 1.f) * 0.5f;\n"
+					"}"
+				))
+				{
+					m_setCurvePow = m_curvePow;
+					m_currentHeightCurve =
+						"float func(float x)\n"
+						"{\n"
+						"   x = x * 2.f - 1.f;\n"
+						"   return (pow(x, %i) + 1.f) * 0.5f;\n"
+						"}";
+					int n = m_curvePow;
+					RPGT::config.m_heightCurve = ([n](float x)
+					{
+						x = x * 2.f - 1.f;
+						return (pow(x, n) + 1.f) * 0.5f;
+					});
+					WantRegen();
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem(
+					"float func(float x)\n"
+					"{\n"
+					"   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
+					"}"
+				))
+				{
+					m_setCurvePow = m_curvePow;
+					m_currentHeightCurve =
+						"float func(float x)\n"
+						"{\n"
+						"   return 1.f / (1.f + exp(-P*(x * 2.f - 1.f)));\n"
+						"}";
+					int n = m_curvePow;
+					RPGT::config.m_heightCurve = ([n](float x)
+					{
+						return 1.f / (1.f + exp((float)(-n)*(x * 2.f - 1.f)));
+					});
+					WantRegen();
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::Separator();
+			ImGui::Text(m_currentHeightCurve.data(), m_setCurvePow);
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip(
+					"Function that will be applied to.\n"
+					"all heightmap pixels.\n"
+					"Recieves a value from 0 to 1 and\n"
+					"returns another one in the same range.\n"
+					"Will reset all chunks.");
+		}
+		if (ImGui::CollapsingHeader("Debug visualization"))
+		{
+			if (ImGui::Button("Reset Camera Height"))
+			{
+				float3 pos = App->camera->GetDefaultCam()->GetPosition();
+				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+			}
+			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
+
+			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
+			{
+				App->Editor->SwitchViewPorts();
+			}
+			if (App->Editor->multipleViews)
+			{
+				ImGui::Spacing();
+				ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
+			}
+
+		}
+		if (ImGui::CollapsingHeader("Textures"))
+		{
+			for (int n = 0; n < 10; n++)
+			{
+				RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
+				bool changed = false;
+				char tmp[8];
+				sprintf_s(tmp, "##%i", n);
+
+				ImGui::ColorButton(tmp, ImVec4(tex.color[0], tex.color[1], tex.color[2], 1.f));
+				ImGui::SameLine();
+				ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(20, 20));
+				ImGui::SameLine();
+				ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(20, 20));
+				ImGui::SameLine();
+				if (ImGui::BeginMenu((std::string("Texture ") + tmp).data()))
+				{
+					if (ImGui::ColorEdit3((std::string("Color") + tmp).data(), tex.color)) { changed = true; }
+					ImGui::Separator();
+					if (ImGui::SliderFloat((std::string("MinHeight") + tmp).data(), &tex.minHeight, 0.f, 1.0f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("MaxHeight") + tmp).data(), &tex.maxHeight, 0.f, 1.0f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("HeightFadeDistance") + tmp).data(), &tex.heightFade, 0.f, 1.0f)) { changed = true; }
+					ImGui::Separator();
+					if (ImGui::SliderFloat((std::string("MinSlope") + tmp).data(), &tex.minSlope, 0.f, 1.f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("MaxSlope") + tmp).data(), &tex.maxSlope, 0.f, 1.f)) { changed = true; }
+					if (ImGui::SliderFloat((std::string("SlopeFadeDistance") + tmp).data(), &tex.slopeFade, 0.f, 1.f)) { changed = true; }
+					ImGui::Separator();
+					if (ImGui::SliderFloat((std::string("TextureSizeMultiplier") + tmp).data(), &tex.sizeMultiplier, 1.f, 10.f)) { changed = true; }
+					ImGui::Separator();
+					if (changed)
+					{
+						RPGT::SetTexture(n, tex);
+					}
+
+					if (ImGui::Button((std::string("Diffuse##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
+					{
+						char file[MAX_PATH];
+						OPENFILENAME ofn;
+						ZeroMemory(&ofn, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.lpstrFile = file;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
+						//ofn.nFilterIndex = 1;
+						TCHAR pwd[MAX_PATH];
+
+						GetCurrentDirectory(MAX_PATH, pwd);
+						std::string dir(pwd);
+						int workingDirLentgh = dir.length();
+						dir += "\\Assets";
+						ofn.lpstrInitialDir = dir.data();
+						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+						if (GetOpenFileName(&ofn))
+						{
+							std::string f = file;
+							f = f.substr(workingDirLentgh + 1);
+							int pos = f.find("\\");
+							while (pos != std::string::npos)
+							{
+								f[pos] = '/';
+								pos = f.find("\\");
+							}
+							SetImage(n, f);
+						}
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("X##RemoveDiff", ImVec2(20, 20))) { SetImage(n, ""); }
+					ImGui::SameLine();
+					if (ImGui::Button((std::string("Heightmap##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
+					{
+						char file[MAX_PATH];
+						OPENFILENAME ofn;
+						ZeroMemory(&ofn, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.lpstrFile = file;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
+						//ofn.nFilterIndex = 1;
+						TCHAR pwd[MAX_PATH];
+						GetCurrentDirectory(MAX_PATH, pwd);
+						std::string dir(pwd);
+						int workingDirLentgh = dir.length();
+						dir += "\\Assets";
+						ofn.lpstrInitialDir = dir.data();
+						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+						if (GetOpenFileName(&ofn))
+						{
+							std::string f = file;
+							f = f.substr(workingDirLentgh + 1);
+							int pos = f.find("\\");
+							while (pos != std::string::npos)
+							{
+								f[pos] = '/';
+								pos = f.find("\\");
+							}
+							SetHeightmap(n, f);
+						}
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("X##RemoveHM", ImVec2(20, 20))) { SetHeightmap(n, ""); }
+					ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(125, 125));
+					ImGui::SameLine();
+					ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(125, 125));
+
+					ImGui::EndMenu();
+				}
+			}
+		}
+
+		ImGui::End();
+	}
+
+	ShaderEditor();
 }
 
 void ModuleTerrain::SetImage(int n, std::string textureFile)

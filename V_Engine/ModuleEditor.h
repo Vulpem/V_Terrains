@@ -25,6 +25,9 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 
+	void OnPlay() override;
+	void OnStop() override;
+
 	bool CleanUp();
 
 	void Render(const viewPort& port);

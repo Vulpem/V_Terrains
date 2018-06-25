@@ -71,9 +71,9 @@ update_status ModuleTerrainGame::PreUpdate()
 
 update_status ModuleTerrainGame::Update()
 {
-	if (Time.PlayMode || debugTurrets)
+	if (Time.PlayMode != Play::Stop || debugTurrets)
 	{
-		if (Time.PlayMode)
+		if (Time.PlayMode != Play::Stop)
 		{
 			UpdateGame();
 			Input();
@@ -189,16 +189,27 @@ void ModuleTerrainGame::DebugKeys()
 {
 	if (App->input->GetKey(SDL_SCANCODE_KP_0) == KEY_DOWN)
 	{
-		if (Time.PlayMode)
+		if (Time.PlayMode != Play::Stop)
 		{
 			App->Stop();
 		}
 		else
 		{
-			App->Play();
+			App->Play(false);
 		}
 	}
 	if (App->input->GetKey(SDL_SCANCODE_KP_1) == KEY_DOWN)
+	{
+		if (Time.PlayMode != Play::Stop)
+		{
+			App->Stop();
+		}
+		else
+		{
+			App->Play(true);
+		}
+	}
+	if (App->input->GetKey(SDL_SCANCODE_KP_2) == KEY_DOWN)
 	{
 		debugTurrets = !debugTurrets;
 	}

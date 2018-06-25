@@ -30,6 +30,8 @@ public:
 	void LoadTerrainConfig(std::string configName);
 	void LoadTerrainNow(std::string configName);
 
+	void DrawUI();
+
 	void SetImage(int n, std::string textureFile);
 	void SetHeightmap(int n, std::string hmfile);
 

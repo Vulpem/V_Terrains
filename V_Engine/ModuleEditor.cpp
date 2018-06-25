@@ -62,66 +62,80 @@ bool ModuleEditor::Start()
 update_status ModuleEditor::PreUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
-
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
-
-	ImGuiIO IO = ImGui::GetIO();
-	App->input->ignoreMouse = IO.WantCaptureMouse;
-
-	if (IO.WantCaptureKeyboard || IO.WantTextInput)
+	if (Time.PlayMode != Play::Play)
 	{
-		App->input->ignoreKeyboard = true;
+
+		ImGuiIO IO = ImGui::GetIO();
+		App->input->ignoreMouse = IO.WantCaptureMouse;
+
+		if (IO.WantCaptureKeyboard || IO.WantTextInput)
+		{
+			App->input->ignoreKeyboard = true;
+		}
+		else
+		{
+			App->input->ignoreKeyboard = false;
+		}
 	}
-	else
 	{
 		App->input->ignoreKeyboard = false;
 	}
-
 	return ret;
 }
 
 update_status ModuleEditor::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
-
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	if (Time.PlayMode != Play::Play)
 	{
-		viewPort* port = App->renderer3D->HoveringViewPort();
-		if (port != nullptr)
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 		{
-			App->camera->SetMovingCamera(port->camera);
+			viewPort* port = App->renderer3D->HoveringViewPort();
+			if (port != nullptr)
+			{
+				App->camera->SetMovingCamera(port->camera);
+			}
+		}
+
+		SelectByViewPort();
+
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+		{
+			multipleViews = !multipleViews;
+			SwitchViewPorts();
 		}
 	}
-
-	SelectByViewPort();
-
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
-	{
-		multipleViews = !multipleViews;
-		SwitchViewPorts();
-	}
-
 	return ret;
 }
 
 update_status ModuleEditor::PostUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
-
-	if (IsOpenTestWindow)
+	if (Time.PlayMode != Play::Play)
 	{
-		ImGui::ShowTestWindow();
-	}
+		if (IsOpenTestWindow)
+		{
+			ImGui::ShowTestWindow();
+		}
 
-	ret = MenuBar();
-	Editor();
-	//Console();
-	//PlayButtons();
-	Outliner();
-	AttributeWindow();
-	//SaveLoadPopups();
-	
+		ret = MenuBar();
+		Editor();
+		//Console();
+		//PlayButtons();
+		Outliner();
+		AttributeWindow();
+		//SaveLoadPopups();
+	}
 	return ret;
+}
+
+void ModuleEditor::OnPlay()
+{
+}
+
+void ModuleEditor::OnStop()
+{
 }
 
 // Called before quitting
@@ -136,16 +150,19 @@ bool ModuleEditor::CleanUp()
 // ---- Each viewPort UI -------------------------------------------------------------------
 void ModuleEditor::Render(const viewPort & port)
 {
-	if (port.withUI)
+	if (Time.PlayMode != Play::Play)
 	{
-		//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
-		ViewPortUI(port);
-
-		if (showPlane)
+		if (port.withUI)
 		{
-			P_Plane p(0, 0, 0, 1);
-			p.axis = true;
-			p.Render();
+			//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
+			ViewPortUI(port);
+
+			if (showPlane)
+			{
+				P_Plane p(0, 0, 0, 1);
+				p.axis = true;
+				p.Render();
+			}
 		}
 	}
 }
