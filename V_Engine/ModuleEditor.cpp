@@ -51,6 +51,7 @@ bool ModuleEditor::Start()
 	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 	multipleViewPorts[1] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam());
+	fullScreenViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
@@ -132,10 +133,12 @@ update_status ModuleEditor::PostUpdate()
 
 void ModuleEditor::OnPlay()
 {
+	SwitchViewPorts();
 }
 
 void ModuleEditor::OnStop()
 {
+	SwitchViewPorts();
 }
 
 // Called before quitting
@@ -194,6 +197,10 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	port->pos = viewPortMin;
 	port->pos.y += size.y;
 	port->size = size;
+
+	port = App->renderer3D->FindViewPort(fullScreenViewPort);
+	port->size.x = screenW;
+	port->size.y = screenH;
 }
 
 void ModuleEditor::HandleInput(SDL_Event* event)
@@ -308,10 +315,23 @@ void ModuleEditor::Editor()
 
 void ModuleEditor::SwitchViewPorts()
 {
-	App->renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
-	for (int n = 0; n < 2; n++)
+	if (Time.PlayMode == Play::Play)
 	{
-		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
+		App->renderer3D->FindViewPort(fullScreenViewPort)->active = true;
+		App->renderer3D->FindViewPort(singleViewPort)->active = false;
+		for (int n = 0; n < 2; n++)
+		{
+			App->renderer3D->FindViewPort(multipleViewPorts[n])->active = false;
+		}
+	}
+	else
+	{
+		App->renderer3D->FindViewPort(fullScreenViewPort)->active = false;
+		App->renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
+		for (int n = 0; n < 2; n++)
+		{
+			App->renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
+		}
 	}
 }
 

@@ -68,6 +68,7 @@ private:
 	float2 viewPortMax;
 	uint singleViewPort = 0;
 	uint multipleViewPorts[2] = { 0,0 };
+	uint fullScreenViewPort = 0;
 
 	GameObject* selectedGameObject = nullptr;
 	float selectedPos[3] = { 0,0,0 };
