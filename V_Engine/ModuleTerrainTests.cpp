@@ -246,11 +246,11 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 			outStream.write((char*)&tex.heightFade, sizeof(float));
 			outStream.write((char*)&tex.slopeFade, sizeof(float));
 
-			int size = textures[n].size();
+			int size = textures[n].size() + 1;
 			outStream.write((char*)&size, sizeof(int));
 			outStream.write(textures[n].data(), size);
 
-			size = heightmaps[n].size();
+			size = heightmaps[n].size() + 1;
 			outStream.write((char*)&size, sizeof(int));
 			outStream.write(heightmaps[n].data(), size);
 		}
@@ -318,14 +318,12 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			RPGT::SetTexture(n, tex);
 
 			char img[1024];
-			memset(img, '\0', 1024);
 			int size = 0;
 			inStream.read((char*)&size, sizeof(int));
 			inStream.read(img, size);
 			textures[n] = img;
 			SetImage(n, textures[n]);
 
-			memset(img, '\0', 1024);
 			size = heightmaps[n].size();
 			inStream.read((char*)&size, sizeof(int));
 			inStream.read(img, size);
