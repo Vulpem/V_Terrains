@@ -15,6 +15,7 @@
 #include "ModuleFileSystem.h"
 
 #include "OpenGL.h"
+#include <Windows.h>
 
 #include <time.h>
 #include <fstream>
@@ -425,55 +426,74 @@ update_status ModuleTerrain::Update()
 						RPGT::SetTexture(n, tex);
 					}
 
-#pragma region AddTexturePopup
-                    if (ImGui::BeginPopup((std::string("Set Diffuse") + tmp).data()))
+                    if (ImGui::Button((std::string("Diffuse##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
                     {
-						if (ImGui::MenuItem((std::string("None##DIFF") + tmp).data()))
+						char file[MAX_PATH];
+						OPENFILENAME ofn;
+						ZeroMemory(&ofn, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.lpstrFile = file;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
+						//ofn.nFilterIndex = 1;
+						TCHAR pwd[MAX_PATH];
+						
+						GetCurrentDirectory(MAX_PATH, pwd);
+						std::string dir(pwd);
+						int workingDirLentgh = dir.length();
+						dir += "\\Assets";
+						ofn.lpstrInitialDir = dir.data();
+						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+						if (GetOpenFileName(&ofn))
 						{
-							SetImage(n, "");
+							std::string f = file;
+							f = f.substr(workingDirLentgh + 1);
+							int pos = f.find("\\");
+							while (pos != std::string::npos)
+							{
+								f[pos] = '/';
+								pos = f.find("\\");
+							}
+							SetImage(n, f);
 						}
-                        std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
-                        for (auto fileIt = meshRes.begin(); fileIt != meshRes.end(); fileIt++)
-                        {
-                            if (ImGui::MenuItem(fileIt->first.data()))
-                            {
-								SetImage(n, fileIt->first);
-                            }
-                        }
-                        ImGui::EndPopup();
-                    }
-#pragma endregion
-
-#pragma region AddTexturePopup
-                    if (ImGui::BeginPopup((std::string("Set Diff Heightmap") + tmp).data()))
-                    {
-						if (ImGui::MenuItem((std::string("None##HM") + tmp).data()))
-						{
-							SetHeightmap(n, "");
-						}
-                        std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
-                        for (auto fileIt = meshRes.begin(); fileIt != meshRes.end(); fileIt++)
-                        {
-                            if (ImGui::MenuItem(fileIt->first.data()))
-                            {
-								SetHeightmap(n, fileIt->first);
-                                break;
-                            }
-                        }
-                        ImGui::EndPopup();
-                    }
-#pragma endregion
-
-                    if (ImGui::Button((std::string("Diffuse##AddTextureButton") + tmp).data(), ImVec2(125, 20)))
-                    {
-                        ImGui::OpenPopup((std::string("Set Diffuse") + tmp).data());
                     }
                     ImGui::SameLine();
-                    if (ImGui::Button((std::string("Heightmap##AddTextureButton") + tmp).data(), ImVec2(125, 20)))
+					if (ImGui::Button("X##RemoveDiff", ImVec2(20, 20))) { SetImage(n, ""); }
+					ImGui::SameLine();
+                    if (ImGui::Button((std::string("Heightmap##AddTextureButton") + tmp).data(), ImVec2(100, 20)))
                     {
-                        ImGui::OpenPopup((std::string("Set Diff Heightmap") + tmp).data());
+						char file[MAX_PATH];
+						OPENFILENAME ofn;
+						ZeroMemory(&ofn, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.lpstrFile = file;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						//ofn.lpstrFilter = "*.png\0*.tga\0*.png\0*.jpg\0*.jpeg\0";
+						//ofn.nFilterIndex = 1;
+						TCHAR pwd[MAX_PATH];
+						GetCurrentDirectory(MAX_PATH, pwd);
+						std::string dir(pwd);
+						int workingDirLentgh = dir.length();
+						dir += "\\Assets";
+						ofn.lpstrInitialDir = dir.data();
+						ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+						if (GetOpenFileName(&ofn))
+						{
+							std::string f = file;
+							f = f.substr(workingDirLentgh + 1);
+							int pos = f.find("\\");
+							while (pos != std::string::npos)
+							{
+								f[pos] = '/';
+								pos = f.find("\\");
+							}
+							SetHeightmap(n, f);
+						}
                     }
-
+					ImGui::SameLine();
+					if (ImGui::Button("X##RemoveHM", ImVec2(20, 20))) { SetHeightmap(n, ""); }
                     ImGui::Image((ImTextureID)tex.buf_diffuse, ImVec2(125, 125));
                     ImGui::SameLine();
                     ImGui::Image((ImTextureID)tex.buf_heightmap, ImVec2(125, 125));
