@@ -70,7 +70,7 @@ public:
 
 	float3 mousePos = float3::zero;
 
-	float cameraHeight = 2300;
+	float cameraHeight = 1300;
 };
 
 #endif

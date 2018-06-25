@@ -80,17 +80,18 @@ void Bullet::Update(float dt)
 {
 	if (loaded)
 	{
-		const float3 pos = bullet->GetTransform()->GetGlobalPos();
-		bullet->GetTransform()->SetGlobalPos(pos + direction * speed * dt + float3(0,0,1) * App->game->verticalSpeed * dt * (playerBullet? 1:0));
+		float3 pos = bullet->GetTransform()->GetGlobalPos();
+		pos += direction * speed * dt + float3(0, 0, 1) * App->game->verticalSpeed * dt * (playerBullet ? 1 : 0);
+		bullet->GetTransform()->SetGlobalPos(pos);
 
 		if (timer.Read() > 100)
 		{
 			timer.Start();
-			Line ray;
-			ray.pos = bullet->GetTransform()->GetGlobalPos();
-			ray.dir = bullet->GetTransform()->GetGlobalPos() - App->camera->GetDefaultCam()->GetPosition();
 			if (!playerBullet)
 			{
+				Line ray;
+				ray.pos = pos;
+				ray.dir = pos - App->camera->GetDefaultCam()->GetPosition();
 				if (ray.Intersects(App->game->player.ship->obb))
 				{
 					App->game->player.Hit(20);
@@ -99,20 +100,28 @@ void Bullet::Update(float dt)
 			}
 			else
 			{
-				for (std::map<std::pair<int, int>, Building*>::iterator it = App->game->turrets.begin(); it != App->game->turrets.end(); it++)
+				Line rays[4];
+				rays[0].pos = pos + float3( 15, 0, 0);
+				rays[1].pos = pos + float3(-15, 0, 0);
+				rays[2].pos = pos + float3(0,   0, 15);
+				rays[3].pos = pos + float3(0,   0,-15);
+				for (int n = 0; n < 4; n++)
 				{
-					if (ray.Intersects(it->second->base->obb))
+					rays[n].dir = rays[n].pos - App->camera->GetDefaultCam()->GetPosition();
+					for (std::map<std::pair<int, int>, Building*>::iterator it = App->game->turrets.begin(); it != App->game->turrets.end(); it++)
 					{
-						it->second->Hit(25);
-						Despawn();
-						break;
+						if (rays[n].Intersects(it->second->base->obb))
+						{
+							it->second->Hit(25);
+							Despawn();
+							break;
+						}
 					}
 				}
 			}
-
 			float height = 0;
 			RPGT::GetPoint(pos.x, pos.z, height);
-			if (pos.y > App->game->cameraHeight || height > pos.y)
+			if (pos.y > App->game->cameraHeight + RPGT::config.maxHeight || pos.y < height)
 			{
 				Despawn();
 			}

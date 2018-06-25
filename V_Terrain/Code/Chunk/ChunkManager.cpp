@@ -228,6 +228,10 @@ namespace RPGT
 				normal[1] = n.y();
 				normal[2] = n.z();
 			}
+			if (height < config.waterHeight)
+			{
+				height = config.waterHeight;
+			}
 			height *= config.maxHeight;
         }
         else

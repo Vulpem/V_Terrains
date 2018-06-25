@@ -58,7 +58,7 @@ update_status ModuleTerrainGame::PreUpdate()
 	if (setShip)
 	{
 		float3 pos = gamePos;
-		gamePos.z += 1200;
+		gamePos.z += (RPGT::config.maxHeight + cameraHeight);
 		RPGT::GetPoint(pos.x, pos.z, pos.y);
 		if (pos.y != 0)
 		{
@@ -111,7 +111,7 @@ void ModuleTerrainGame::UpdateGame()
 {
 	if (game == GameType::BulletHell)
 	{
-		float3 p = gamePos + float3(0, cameraHeight, -1600);
+		float3 p = gamePos + float3(0, RPGT::config.maxHeight + cameraHeight, -(RPGT::config.maxHeight + cameraHeight)*1.5f);
 		Transform* camT = App->camera->GetDefaultCam()->object->GetTransform();
 		camT->SetGlobalPos(p);
 		camT->LookAt(gamePos);
