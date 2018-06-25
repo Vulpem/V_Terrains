@@ -18,7 +18,6 @@ public:
 
 	bool loaded = false;
 	float speed = 500.f;
-	static float publicSpeed;
 	float3 direction;
 	GameObject* bullet;
 

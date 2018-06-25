@@ -144,6 +144,7 @@ update_status ModuleTerrain::Update()
 		}
 		else
 		{
+			RPGT::config.fogDistance = m_fogDistance;
 			m_regening = false;
 		}
 	}
@@ -314,7 +315,8 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			inStream.read((char*)&tex.sizeMultiplier, sizeof(float));
 			inStream.read((char*)&tex.heightFade, sizeof(float));
 			inStream.read((char*)&tex.slopeFade, sizeof(float));
-			
+			RPGT::SetTexture(n, tex);
+
 			char img[1024];
 			memset(img, '\0', 1024);
 			int size = 0;

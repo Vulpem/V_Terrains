@@ -51,7 +51,7 @@ public:
 	void OnChunkUnload(int x, int y);
 
 	void InitBullets();
-	void SpawnBullet(float3 pos, float3 dir, bool playerBullet = false);
+	Bullet& SpawnBullet(float3 pos, float3 dir, bool playerBullet = false);
 
     std::map<std::pair<int, int>, Building*> turrets;
 	std::vector<Bullet> bullets;

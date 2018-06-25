@@ -85,7 +85,8 @@ void Ship::Update(float dt)
 		{
 			if (reloadTimer.Read() > reloadTime * 1000.f)
 			{
-				App->game->SpawnBullet(cannon->GetTransform()->GetGlobalPos(), cannon->GetTransform()->Forward(), true);
+				App->game->SpawnBullet(cannon->GetTransform()->GetGlobalPos(), cannon->GetTransform()->Forward(), true).speed = speedBulletHell * 2.f;
+
 				reloadTimer.Start();
 			}
 		}

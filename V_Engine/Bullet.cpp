@@ -11,11 +11,8 @@
 #include "ModuleCamera3D.h"
 #include <algorithm>
 
-float Bullet::publicSpeed = float();
-
 Bullet::Bullet()
 {
-	publicSpeed = speed;
 }
 
 Bullet::~Bullet()
@@ -96,7 +93,7 @@ void Bullet::Update(float dt)
 			{
 				if (ray.Intersects(App->game->player.ship->obb))
 				{
-					App->game->player.Hit(25);
+					App->game->player.Hit(20);
 					Despawn();
 				}
 			}
@@ -106,7 +103,7 @@ void Bullet::Update(float dt)
 				{
 					if (ray.Intersects(it->second->base->obb))
 					{
-						it->second->Hit(55);
+						it->second->Hit(25);
 						Despawn();
 						break;
 					}

@@ -37,5 +37,5 @@ public:
 
 	Timer hitTimer;
 	Timer reloadTimer;
-	float reloadTime = 0.1f;
+	float reloadTime = 0.18f;
 };

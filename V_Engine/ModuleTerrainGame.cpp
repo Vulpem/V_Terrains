@@ -328,16 +328,16 @@ void ModuleTerrainGame::InitBullets()
 	mat->SetAlphaTest(0.4f);
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
-	bullets.resize(256);
+	bullets.resize(200);
 	std::for_each(bullets.begin(), bullets.end(), [](Bullet& b) {b.Init(false); });
-	playerBullets.resize(64);
+	playerBullets.resize(40);
 	std::for_each(playerBullets.begin(), playerBullets.end(), [](Bullet& b) {b.Init(true); });
 
 	bulletN = 0;
 	playerBulletN = 0;
 }
 
-void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet)
+Bullet& ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet)
 {
 	if (playerBullet == false)
 	{
@@ -346,6 +346,7 @@ void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet)
 			bulletN = 0;
 		}
 		bullets[bulletN++].Spawn(pos, dir, playerBullet);
+		return bullets[bulletN - 1];
 	}
 	else
 	{
@@ -354,5 +355,6 @@ void ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet)
 			playerBulletN = 0;
 		}
 		playerBullets[playerBulletN++].Spawn(pos, dir, playerBullet);
+		return playerBullets[playerBulletN - 1];
 	}
 }
