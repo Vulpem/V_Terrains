@@ -17,6 +17,7 @@
 #include "ModuleResourceManager.h"
 #include "ModuleTerrainTests.h"
 #include "ModuleTerrainGame.h"
+#include <algorithm>
 
 #include "Timers.h"
 
@@ -298,6 +299,20 @@ void Application::OnScreenResize(int width, int heigth)
 	{
 		(*it)->OnScreenResize(width, heigth);
 	}
+}
+
+void Application::Play()
+{
+	Time.PlayMode = true;
+	std::for_each(list_modules.begin(), list_modules.end(),
+		[](Module* m) {m->OnPlay(); });
+}
+
+void Application::Stop()
+{
+	Time.PlayMode = false;
+	std::for_each(list_modules.begin(), list_modules.end(),
+		[](Module* m) {m->OnStop(); });
 }
 
 void Application::AddModule(Module* mod)

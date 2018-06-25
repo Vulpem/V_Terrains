@@ -17,6 +17,8 @@
 #include "OpenGL.h"
 #include <Windows.h>
 
+#include "ModuleTerrainGame.h"
+
 #include <time.h>
 #include <fstream>
 #include <algorithm>
@@ -875,6 +877,9 @@ void ModuleTerrain::GenMap()
     RPGT::config.noise.lacunarity = m_lacunarity;
     RPGT::config.noise.persistency = m_persistance;
 	RPGT::config.maxHeight = m_maxHeight;
+
+	App->game->OnStop();
+	App->game->OnPlay();
 
     RPGT::RegenerateMesh();
     RPGT::CleanChunks();

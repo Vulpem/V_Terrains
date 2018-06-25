@@ -57,7 +57,8 @@ update_status ModuleTerrainGame::PreUpdate()
 {
 	if (setShip)
 	{
-		float3 pos = float3::zero;
+		float3 pos = gamePos;
+		gamePos.z += 1200;
 		RPGT::GetPoint(pos.x, pos.z, pos.y);
 		if (pos.y != 0)
 		{
@@ -188,11 +189,38 @@ void ModuleTerrainGame::DebugKeys()
 {
 	if (App->input->GetKey(SDL_SCANCODE_KP_0) == KEY_DOWN)
 	{
-		Time.PlayMode = !Time.PlayMode;
+		if (Time.PlayMode)
+		{
+			App->Stop();
+		}
+		else
+		{
+			App->Play();
+		}
 	}
 	if (App->input->GetKey(SDL_SCANCODE_KP_1) == KEY_DOWN)
 	{
 		debugTurrets = !debugTurrets;
+	}
+}
+
+void ModuleTerrainGame::OnPlay()
+{
+	gamePos = float3::zero;
+	setShip = true;
+}
+
+void ModuleTerrainGame::OnStop()
+{
+	if (bullets.empty() == false)
+	{
+		std::for_each(bullets.begin(), bullets.end(),
+			[](Bullet& b) {b.Despawn(); });
+	}
+	if(playerBullets.empty() == false)
+	{
+		std::for_each(playerBullets.begin(), playerBullets.end(),
+			[](Bullet& b) {b.Despawn(); });
 	}
 }
 
@@ -289,7 +317,7 @@ void ModuleTerrainGame::InitBullets()
 	mat->SetAlphaTest(0.4f);
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
-	bullets.resize(512);
+	bullets.resize(256);
 	std::for_each(bullets.begin(), bullets.end(), [](Bullet& b) {b.Init(false); });
 	playerBullets.resize(64);
 	std::for_each(playerBullets.begin(), playerBullets.end(), [](Bullet& b) {b.Init(true); });

@@ -44,6 +44,9 @@ public:
 	void Input();
 	void DebugKeys();
 
+	void OnPlay() override;
+	void OnStop() override;
+
 	void OnChunkLoad(int x, int y);
 	void OnChunkUnload(int x, int y);
 

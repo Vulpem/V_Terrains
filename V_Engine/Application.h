@@ -84,6 +84,8 @@ public:
 	const char* GetTitle();
 
 	void OnScreenResize(int width, int heigth);
+	void Play();
+	void Stop();
 private:
 
 	void AddModule(Module* mod);

@@ -88,6 +88,9 @@ public:
 		return true; 
 	}
 
+	virtual void OnPlay() {}
+	virtual void OnStop() {}
+
 	std::string GetName()
 	{
 		return moduleName;
