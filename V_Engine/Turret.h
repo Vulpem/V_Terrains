@@ -37,8 +37,7 @@ public:
 	GameObject* barrel = nullptr;
 	GameObject* spawner = nullptr;
 	float rotateSpeed = 90.f;
-	float reloadTime = 0.9f;
-	float shootingDistance = 3500.f;
+	float reloadTime = 1f;
 
 	Timer timer;
 };
