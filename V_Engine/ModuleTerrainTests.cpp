@@ -222,10 +222,10 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 		outStream.write((char*)&RPGT::config.waterHeight, sizeof(float));
 
 		outStream.write((char*)&RPGT::config.fogDistance, sizeof(float));
-		outStream.write((char*)RPGT::config.fogColor, sizeof(float)*3);
+		outStream.write((char*)RPGT::config.fogColor, sizeof(float) * 3);
 
 		outStream.write((char*)&RPGT::config.ambientLight, sizeof(float));
-		outStream.write((char*)RPGT::config.globalLight, sizeof(float)*3);
+		outStream.write((char*)RPGT::config.globalLight, sizeof(float) * 3);
 		outStream.write((char*)&RPGT::config.singleSidedFaces, sizeof(bool));
 
 		outStream.write((char*)&RPGT::config.noise.ridgedDepth, sizeof(unsigned int));
@@ -237,7 +237,7 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 		for (int n = 0; n < 10; n++)
 		{
 			RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
-			outStream.write((char*)tex.color, sizeof(float)*3);
+			outStream.write((char*)tex.color, sizeof(float) * 3);
 			outStream.write((char*)&tex.minSlope, sizeof(float));
 			outStream.write((char*)&tex.maxSlope, sizeof(float));
 			outStream.write((char*)&tex.minHeight, sizeof(float));
@@ -248,11 +248,18 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 
 			int size = textures[n].size() + 1;
 			outStream.write((char*)&size, sizeof(int));
-			outStream.write(textures[n].data(), size);
+			if (size > 1)
+			{
+				outStream.write(textures[n].data(), size);
+			}
 
 			size = heightmaps[n].size() + 1;
+
 			outStream.write((char*)&size, sizeof(int));
-			outStream.write(heightmaps[n].data(), size);
+			if (size > 1)
+			{
+				outStream.write(heightmaps[n].data(), size);
+			}
 		}
 		outStream.close();
 	}
@@ -317,18 +324,29 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			inStream.read((char*)&tex.slopeFade, sizeof(float));
 			RPGT::SetTexture(n, tex);
 
-			char img[1024];
+			char img[2024];
 			int size = 0;
 			inStream.read((char*)&size, sizeof(int));
-			inStream.read(img, size);
-			textures[n] = img;
-			SetImage(n, textures[n]);
+			if (size > 1)
+			{
+				inStream.read(img, size);
+				SetImage(n, img);
+			}
+			else
+			{
+				SetImage(n, "");
+			}
 
-			size = heightmaps[n].size();
 			inStream.read((char*)&size, sizeof(int));
-			inStream.read(img, size);
-			heightmaps[n] = img;
-			SetHeightmap(n, heightmaps[n]);
+			if (size > 1)
+			{
+				inStream.read(img, size);
+				SetHeightmap(n, img);
+			}
+			else
+			{
+				SetHeightmap(n, "");
+			}
 		}
 		inStream.close();
 
@@ -568,6 +586,28 @@ void ModuleTerrain::DrawUI()
 		}
 		if (ImGui::CollapsingHeader("Textures"))
 		{
+			if (ImGui::Button("Reset All##Textures"))
+			{
+				for(int n = 0; n < 10; n++)
+				{
+					RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
+					tex.heightFade = 0.05f;
+					tex.maxHeight = 0.f;
+					tex.minHeight = 0.f;
+					tex.slopeFade = 0.05f;
+					tex.maxSlope = 1.f;
+					tex.minSlope = 0.f;
+
+					tex.color[0] = 1.f;
+					tex.color[1] = 1.f;
+					tex.color[2] = 1.f;
+
+					tex.sizeMultiplier = 4.f;
+					RPGT::SetTexture(n, tex);
+					SetImage(n, "");
+					SetHeightmap(n, "");
+				}
+			}
 			for (int n = 0; n < 10; n++)
 			{
 				RPGT::ConditionalTexture tex = RPGT::GetTexture(n);
