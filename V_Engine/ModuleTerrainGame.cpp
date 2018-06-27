@@ -15,10 +15,13 @@
 #include "AllComponents.h"
 
 #include "GlobalFunctions.h"
+#include "ModuleFileSystem.h"
 
 #include <time.h>
 #include <algorithm>
+#include <string>
 #include "Transform.h"
+#include "ModuleTerrainTests.h"
 
 ModuleTerrainGame::ModuleTerrainGame(Application* app, bool start_enabled) :
     Module(app, start_enabled)
@@ -258,19 +261,25 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 	}
 	else
 	{
+		if (std::rand() % 100 < 5.f + 10.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
+		{
+			build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+			float3 p = build->base->GetTransform()->GetGlobalPos();
+			p.y -= 80.f;
+			build->base->GetTransform()->SetGlobalPos(p);
+			build->base->GetTransform()->RotateLocal(float3(0, (float)(std::rand() % 360), 0));
+		}
 		if (y > 3 && abs(x) <= 1)
 		{
-			if (std::rand() % 100 < 5)
-			{
-				build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
-				float3 p = build->base->GetTransform()->GetGlobalPos();
-				p.y -= 80.f;
-				build->base->GetTransform()->SetGlobalPos(p);
-			}
-			else if (std::rand() % 100 < 20 + 80 * (Time.GameRuntime / 120))
+			if (std::rand() % 100 < 20.f + 50.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
 			{
 				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
 			}
+		}
+		if (Time.GameRuntime - lastSceneChange > 120)
+		{
+			lastSceneChange = Time.GameRuntime;
+			ChangeEnviroment();
 		}
 	}
 
@@ -357,4 +366,13 @@ Bullet& ModuleTerrainGame::SpawnBullet(float3 pos, float3 dir, bool playerBullet
 		playerBullets[playerBulletN++].Spawn(pos, dir, playerBullet);
 		return playerBullets[playerBulletN - 1];
 	}
+}
+
+void ModuleTerrainGame::ChangeEnviroment()
+{
+	std::vector<std::string> folders, files;
+	App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
+	App->terrain->LoadTerrainConfig(files[currentTerrainConfig].substr(0, files[currentTerrainConfig].size() - 5));
+	currentTerrainConfig++;
+	if (currentTerrainConfig >= files.size()) { currentTerrainConfig = 0; }
 }

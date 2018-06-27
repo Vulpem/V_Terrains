@@ -52,6 +52,7 @@ public:
 
 	void InitBullets();
 	Bullet& SpawnBullet(float3 pos, float3 dir, bool playerBullet = false);
+	void ChangeEnviroment();
 
     std::map<std::pair<int, int>, Building*> turrets;
 	std::vector<Bullet> bullets;
@@ -71,6 +72,8 @@ public:
 	float3 mousePos = float3::zero;
 
 	float cameraHeight = 1300;
+	int lastSceneChange = 0;
+	int currentTerrainConfig = 0;
 };
 
 #endif
