@@ -668,7 +668,9 @@
     <ClCompile Include="Ship.cpp">
       <Filter>Terrains\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Terrains\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Math\Matrix.inl">

@@ -70,6 +70,7 @@ Turret::Turret(GameObject * go, int x, int y)
 	: Building(go, x, y)
 {
 	health = 100;
+	vulnerable = true;
 	barrel = base->childs.front();
 
 	float3 normal;

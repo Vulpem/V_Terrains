@@ -18,6 +18,7 @@ public:
 
 	GameObject* target = nullptr;
 	GameObject* base = nullptr;
+	bool vulnerable = false;
 	bool Destroyed() { return destroyed; }
 private:
 	virtual void VirtualUpdate(float dt) {};
@@ -36,7 +37,7 @@ public:
 	GameObject* barrel = nullptr;
 	GameObject* spawner = nullptr;
 	float rotateSpeed = 90.f;
-	float reloadTime = 0.75f;
+	float reloadTime = 0.9f;
 	float shootingDistance = 3500.f;
 
 	Timer timer;

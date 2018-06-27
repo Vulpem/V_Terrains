@@ -17,7 +17,7 @@ public:
 	void Update(float dt);
 
 	bool loaded = false;
-	float speed = 500.f;
+	float speed = 700.f;
 	float3 direction;
 	GameObject* bullet;
 

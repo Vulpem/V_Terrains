@@ -84,7 +84,7 @@ void Bullet::Update(float dt)
 		pos += direction * speed * dt + float3(0, 0, 1) * App->game->verticalSpeed * dt * (playerBullet ? 1 : 0);
 		bullet->GetTransform()->SetGlobalPos(pos);
 
-		if (timer.Read() > 100)
+		if (timer.Read() > 150)
 		{
 			timer.Start();
 			if (!playerBullet)
@@ -101,18 +101,34 @@ void Bullet::Update(float dt)
 			else
 			{
 				Line rays[4];
-				rays[0].pos = pos + float3( 15, 0, 0);
+				rays[0].pos = pos + float3(15, 0, 0);
 				rays[1].pos = pos + float3(-15, 0, 0);
-				rays[2].pos = pos + float3(0,   0, 15);
-				rays[3].pos = pos + float3(0,   0,-15);
-				for (int n = 0; n < 4; n++)
+				rays[2].pos = pos + float3(0, 0, 15);
+				rays[3].pos = pos + float3(0, 0, -15);
+				rays[0].dir = rays[0].pos - App->camera->GetDefaultCam()->GetPosition();
+				rays[1].dir = rays[1].pos - App->camera->GetDefaultCam()->GetPosition();
+				rays[2].dir = rays[2].pos - App->camera->GetDefaultCam()->GetPosition();
+				rays[3].dir = rays[3].pos - App->camera->GetDefaultCam()->GetPosition();
+
+
+				for (std::map<std::pair<int, int>, Building*>::iterator it = App->game->turrets.begin(); it != App->game->turrets.end(); it++)
 				{
-					rays[n].dir = rays[n].pos - App->camera->GetDefaultCam()->GetPosition();
-					for (std::map<std::pair<int, int>, Building*>::iterator it = App->game->turrets.begin(); it != App->game->turrets.end(); it++)
+					if (it->second->vulnerable)
 					{
-						if (rays[n].Intersects(it->second->base->obb))
+						for (int n = 0; n < 4; n++)
 						{
-							it->second->Hit(25);
+							if (rays[n].Intersects(it->second->base->obb))
+							{
+								it->second->Hit(25);
+								Despawn();
+								break;
+							}
+						}
+					}
+					else
+					{
+						if (it->second->base->obb.Contains(pos))
+						{
 							Despawn();
 							break;
 						}

@@ -231,6 +231,12 @@ namespace RPGT
 			if (height < config.waterHeight)
 			{
 				height = config.waterHeight;
+				if (normal != nullptr)
+				{
+					normal[0] = 0.f;
+					normal[1] = 1.f;
+					normal[2] = 0.f;
+				}
 			}
 			height *= config.maxHeight;
         }
