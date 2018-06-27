@@ -132,6 +132,11 @@ inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 		if ((*it)->IsActive() && (*it)->aabb.IsFinite() && (*it)->aabb.Intersects(col) == true)
 		{
 			ret.push_back(*it);
+			(*it)->beingRendered = true;
+		}
+		else
+		{
+			(*it)->beingRendered = false;
 		}
 	}
 	return ret;

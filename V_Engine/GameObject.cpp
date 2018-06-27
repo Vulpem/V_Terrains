@@ -214,51 +214,58 @@ void GameObject::DrawOnEditor()
 
 void GameObject::DrawLocator()
 {
-	float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
-	if (selected)
+	if (Time.PlayMode != Play::Play)
 	{
-		if (parent->selected)
+		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
+		if (selected)
 		{
-			color = float4(0, 0.5f, 0.5f, 1);
-		}
-		else {
-			color = float4(0, 0.8f, 0.8f, 1);
-		}
-	}
-
-	App->renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
-
-	if (childs.empty() == false)
-	{
-		for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
-		{
-			if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
+			if (parent->selected)
 			{
-				math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
-				App->renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
+				color = float4(0, 0.5f, 0.5f, 1);
+			}
+			else {
+				color = float4(0, 0.8f, 0.8f, 1);
+			}
+		}
+		App->renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
+
+		if (childs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
+				{
+					math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
+					App->renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
+				}
 			}
 		}
 	}
-
 }
 
 void GameObject::DrawAABB()
 {
-	if (aabb.IsFinite())
+	if (Time.PlayMode != Play::Play)
 	{
-		math::float3 corners[8];
-		aabb.GetCornerPoints(corners);
-		App->renderer3D->DrawBox(corners);
+		if (aabb.IsFinite())
+		{
+			math::float3 corners[8];
+			aabb.GetCornerPoints(corners);
+			App->renderer3D->DrawBox(corners);
+		}
 	}
 }
 
 void GameObject::DrawOBB()
 {
-	if (obb.IsFinite())
+	if (Time.PlayMode != Play::Play)
 	{
-		math::float3 corners[8];
-		obb.GetCornerPoints(corners);
-		App->renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
+		if (obb.IsFinite())
+		{
+			math::float3 corners[8];
+			obb.GetCornerPoints(corners);
+			App->renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
+		}
 	}
 }
 

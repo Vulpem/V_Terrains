@@ -123,7 +123,7 @@ void Turret::Shoot()
 	if (timer.Read() / 1000 > reloadTime)
 	{
 		timer.Start();
-		if (target->GetTransform()->GetGlobalPos().DistanceSq(base->GetTransform()->GetGlobalPos()) < shootingDistance * shootingDistance)
+		if (base->beingRendered)// target->GetTransform()->GetGlobalPos().DistanceSq(base->GetTransform()->GetGlobalPos()) < shootingDistance * shootingDistance)
 		{
 			App->game->SpawnBullet(spawner->GetTransform()->GetGlobalPos(), barrel->GetTransform()->Forward());
 		}

@@ -89,6 +89,8 @@ public:
 	//For system use, do not call please
 	void RemoveComponent(Component* comp);
 
+	bool beingRendered = false;
+
 #pragma region GetComponents
 	//GetComponent function
 	template <typename typeComp>
