@@ -145,6 +145,7 @@ update_status ModuleTerrain::Update()
 		else
 		{
 			RPGT::config.fogDistance = m_fogDistance;
+			App->renderer3D->clearColor = wantedFogColor;
 			m_regening = false;
 		}
 	}
