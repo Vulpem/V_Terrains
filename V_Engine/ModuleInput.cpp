@@ -155,14 +155,14 @@ update_status ModuleInput::PreUpdate()
 		ImGui_ImplSdlGL3_ProcessEvent(&e);
 	}
 
-	if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	/*if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 		captureMouse = true;
 	}
 	else if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
 	{
 		captureMouse = false;
-	}
+	}*/
 
 	if (quit == true)
 		return UPDATE_STOP;

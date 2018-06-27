@@ -69,18 +69,12 @@ update_status ModuleEditor::PreUpdate()
 
 		ImGuiIO IO = ImGui::GetIO();
 		App->input->ignoreMouse = IO.WantCaptureMouse;
-
-		if (IO.WantCaptureKeyboard || IO.WantTextInput)
-		{
-			App->input->ignoreKeyboard = true;
-		}
-		else
-		{
-			App->input->ignoreKeyboard = false;
-		}
+		App->input->ignoreKeyboard = (IO.WantCaptureKeyboard || IO.WantTextInput);
 	}
+	else
 	{
 		App->input->ignoreKeyboard = false;
+		App->input->ignoreMouse = false;
 	}
 	return ret;
 }

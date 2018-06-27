@@ -29,12 +29,12 @@ public:
 
 	KEY_STATE GetKey(int id) const
 	{
-		return keyboard[id];
+			return keyboard[id];
 	}
 
 	KEY_STATE GetMouseButton(int id) const
 	{
-		return mouse_buttons[id];
+			return mouse_buttons[id];
 	}
 
 	int GetMouseX() const
