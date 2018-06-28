@@ -361,6 +361,8 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
 			ImGui::Checkbox("Render Terrain", &editPort->renderTerrain);
 			ImGui::Checkbox("Render Terrain collision", &editPort->renderTerrainCollisions);
+			ImGui::Checkbox("Render chunk borders", &editPort->renderChunkBorders);
+			ImGui::Checkbox("Render Bounding boxes", &editPort->renderBoundingBoxes);
 
 			ImGui::EndMenu();
 		}

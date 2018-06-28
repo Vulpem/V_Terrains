@@ -269,11 +269,13 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 			build->base->GetTransform()->SetGlobalPos(p);
 			build->base->GetTransform()->RotateLocal(float3(0, (float)(std::rand() % 360), 0));
 		}
-		if (y > 3 && abs(x) <= 1)
+		if (y > 3 && abs(x) <= 1 && build == nullptr)
 		{
 			if (std::rand() % 100 < 20.f + 50.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
 			{
 				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+				build->base->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
+				((Turret*)build)->barrel->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
 			}
 		}
 		if (Time.GameRuntime - lastSceneChange > 120)

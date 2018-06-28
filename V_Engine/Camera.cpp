@@ -56,7 +56,7 @@ float3 Camera::GetPosition()
     return object->GetTransform()->GetGlobalPos();
 }
 
-void Camera::Draw()
+void Camera::Draw(const viewPort & port)
 {
 	if (object->HiddenFromOutliner() == false)
 	{

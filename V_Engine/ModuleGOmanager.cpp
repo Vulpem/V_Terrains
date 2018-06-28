@@ -605,7 +605,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 		{
 			if (comp->second->object->IsActive())
 			{
-				comp->second->Draw();
+				comp->second->Draw(port);
 				if (comp->second->object->HasComponent(Component::Type::C_Billboard))
 				{
 					Transform* camTransform = port.camera->object->GetTransform();

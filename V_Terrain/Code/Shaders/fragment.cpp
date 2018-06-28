@@ -147,7 +147,7 @@ vec4 GetTerrainColor()
 				&& slope > GetVal(n, minSlope) - GetVal(n, slopeFade)
 				&& slope <= GetVal(n, maxSlope) + GetVal(n, slopeFade))
 			{
-				float h = SampleDiff(n, UV * int(GetVal(n, sizeMultiplier))).x;
+				float h = SampleHM(n, UV * int(GetVal(n, sizeMultiplier))).x;
 				//texture is in it's range
 				if (height > GetVal(n, minHeight)
 					&& height <= GetVal(n, maxHeight)
@@ -218,3 +218,4 @@ void main()
 {
 	color = GetTerrainColor();
 }
+

@@ -18,32 +18,32 @@ namespace RPGT
 {
     struct Shader
     {
-        unsigned int m_program = 0u;
+        int m_program = 0u;
 
-        unsigned int attrib_vertex = 0u;
-        unsigned int attrib_UV = 0u;
+        int attrib_vertex = 0u;
+        int attrib_UV = 0u;
 
-        unsigned int loc_view_matrix = 0u;
-        unsigned int loc_projection_matrix = 0u;
-		unsigned int loc_model_matrix = 0u;
+        int loc_view_matrix = 0u;
+        int loc_projection_matrix = 0u;
+		int loc_model_matrix = 0u;
 
-        unsigned int loc_fog_distance = 0u;
-        unsigned int loc_water_height = 0u;
-        unsigned int loc_global_light_direction = 0u;
-        unsigned int loc_ambient_color = 0u;
-        unsigned int loc_fog_color = 0u;
+        int loc_fog_distance = 0u;
+        int loc_water_height = 0u;
+        int loc_global_light_direction = 0u;
+        int loc_ambient_color = 0u;
+        int loc_fog_color = 0u;
 
-        unsigned int loc_hmRes = 0u;
+        int loc_hmRes = 0u;
 
-        unsigned int loc_render_heightmap = 0u;
-        unsigned int loc_render_chunk_borders = 0u;
-		unsigned int loc_render_light = 0u;
+        int loc_render_heightmap = 0u;
+        int loc_render_chunk_borders = 0u;
+		int loc_render_light = 0u;
 
 		struct textureLocs
 		{
-			unsigned int loc_diffuse = 0u;
-			unsigned int loc_heightmap = 0u;
-			unsigned int data = 0u;
+			int loc_diffuse = 0u;
+			int loc_heightmap = 0u;
+			int data = 0u;
 		}textures[10];
 
 		unsigned int loc_heightmap = 0u;

@@ -569,10 +569,9 @@ void ModuleTerrain::DrawUI()
 		{
 			if (ImGui::Button("Reset Camera Height"))
 			{
-				float3 pos = App->camera->GetDefaultCam()->GetPosition();
+				float3 pos = App->camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
-			ImGui::Checkbox("Chunk Borders", &RPGT::config.debug.renderChunkBorders);
 
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
@@ -784,6 +783,7 @@ void ModuleTerrain::Render(const viewPort & port)
 	RPGT::config.debug.renderLight = port.useLighting;
 	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
 	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
+	RPGT::config.debug.renderChunkBorders = port.renderChunkBorders;
 	if (port.renderTerrain)
 	{
 		RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());

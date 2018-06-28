@@ -5,6 +5,7 @@
 #include "Camera.h"
 
 #include "imGUI\imgui.h"
+#include "ViewPort.h"
 
 
 Transform::Transform(GameObject* linkedTo):Component(linkedTo, C_transform)
@@ -68,7 +69,7 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 }
 
-void Transform::Draw()
+void Transform::Draw(const viewPort & port)
 {
 	if (!object->HasComponent(Component::Type::C_mesh))
 	{
@@ -76,11 +77,11 @@ void Transform::Draw()
 	}
 	//Drawing AABB independantly of object transform
 	//REMOVED
-	/*if (object->selected)
+	if (port.renderBoundingBoxes)
 	{
 		object->DrawAABB();
 		object->DrawOBB();
-	}*/
+	}
 }
 
 void Transform::EditorContent()

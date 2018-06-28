@@ -124,10 +124,10 @@ namespace RPGT
 
 			glUniform1fv(m_shader.textures[n].data, 11, m_textures[n].Get());
 
-            glActiveTexture(GL_TEXTURE1 + n * 2);
+            glActiveTexture(GL_TEXTURE0 + n * 2 + 1);
             glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_diffuse);
 
-            glActiveTexture(GL_TEXTURE1 + n * 2 + 1);
+            glActiveTexture(GL_TEXTURE0 + n * 2 + 2);
             glBindTexture(GL_TEXTURE_2D, m_textures[n].buf_heightmap);
         }
 

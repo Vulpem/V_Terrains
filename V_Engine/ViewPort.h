@@ -19,6 +19,8 @@ struct viewPort
 	bool renderHeightMap = false;
 	bool renderTerrain = true;
 	bool renderTerrainCollisions = false;
+	bool renderBoundingBoxes = false;
+	bool renderChunkBorders = false;
 
 	Camera* camera = nullptr;
 	float2 pos = float2::zero;

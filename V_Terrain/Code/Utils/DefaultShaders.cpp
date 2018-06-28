@@ -203,7 +203,7 @@ uniform float[nTextures *TexNVariables] textures;\n\
 						&& slope > GetVal(n, minSlope) - GetVal(n, slopeFade)\
 						&& slope <= GetVal(n, maxSlope) + GetVal(n, slopeFade))\
 					{\n\
-						float h = SampleDiff(n, UV * int(GetVal(n, sizeMultiplier))).x;\n\
+						float h = SampleHM(n, UV * int(GetVal(n, sizeMultiplier))).x;\n\
 						//texture is in it's range\n\
 						if (height > GetVal(n, minHeight)\n\
 							&& height <= GetVal(n, maxHeight)\n\
