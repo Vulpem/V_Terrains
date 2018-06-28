@@ -286,6 +286,29 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 	inStream.open(dir.data());
 	if (inStream.is_open())
 	{
+		if (configName.compare("Tech") == 0)
+		{
+			RPGT::config.m_heightCurve = ([](float x)
+			{
+				float ret = 0.f;
+				for (float n = 4.f; n <= 4.5f; n += 4.f)
+				{
+					float a = x * n * n;
+					int b = a / n;
+					ret += ((float)b) / n;
+				}
+				//ret /= 4.f;
+				return ret;
+			});
+		}
+		else
+		{
+			RPGT::config.m_heightCurve = (
+				[](float x) {
+				return pow(x, 2.f);
+			});
+		}
+
 		inStream.read((char*)&RPGT::config.maxChunks, sizeof(unsigned int));
 		inStream.read((char*)&RPGT::config.chunkSize, sizeof(float));
 		inStream.read((char*)&RPGT::config.chunkHeightmapResolution, sizeof(unsigned int));

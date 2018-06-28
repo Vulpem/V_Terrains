@@ -49,6 +49,7 @@ bool ModuleTerrainGame::Start()
 	RPGT::config.chunkUnloaded = [this](int x, int y) { this->OnChunkUnload(x, y); };
 
 	player.Init(App->GO->LoadGO("Assets/Spaceships/MK6/MK6.fbx").front(), App->camera->GetDefaultCam()->object);
+	player.ship->GetTransform()->SetLocalScale(1.5f, 1.5f, 1.5f);
 
 	InitBullets();
 
@@ -269,7 +270,7 @@ void ModuleTerrainGame::OnChunkLoad(int x, int y)
 			build->base->GetTransform()->SetGlobalPos(p);
 			build->base->GetTransform()->RotateLocal(float3(0, (float)(std::rand() % 360), 0));
 		}
-		if (y > 3 && abs(x) <= 1 && build == nullptr)
+		if (y > 3 && abs(x) <= 2 && build == nullptr)
 		{
 			if (std::rand() % 100 < 20.f + 50.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
 			{
