@@ -18,7 +18,7 @@ Building::Building(GameObject * go, int x, int y) :
 	base (go)
 {
 	Transform* trans = base->GetTransform();
-	float sizeDif = 0.5 + (float)(std::rand() % 100) / 100.f;
+	float sizeDif = 0.65 + 0.35f * (float)(std::rand() % 100) / 100.f;
 
 	float3 pos = float3(
 		x * RPGT::config.chunkSize + (std::rand() % (int)RPGT::config.chunkSize) - RPGT::config.chunkSize / 2.f,
@@ -27,7 +27,7 @@ Building::Building(GameObject * go, int x, int y) :
 	);
 	RPGT::GetPoint(pos.x, pos.z, pos.y);
 	trans->SetGlobalPos(pos);
-	trans->SetLocalScale(2.f * sizeDif, 2.f * sizeDif, 2.f * sizeDif);
+	trans->SetLocalScale(3.f * sizeDif, 3.f * sizeDif, 3.f * sizeDif);
 
 	target = App->game->player.ship;
 }

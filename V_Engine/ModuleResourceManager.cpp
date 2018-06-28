@@ -54,7 +54,7 @@ bool ModuleResourceManager::Start()
 		"   if (use_light != 0)\n"
 		"   {\n"
 		"		vec3 norm = mat3(model_matrix) * normal;\n"
-		"		float light_intensity = dot(global_light_direction, norm);\n"
+		"		float light_intensity = dot(global_light_direction, normalize(norm));\n"
 		"		light_intensity = max(light_intensity,ambient_color.x);\n"
 		"		ourColor = material_color * light_intensity;\n"
 		"		ourColor.w = material_color.w;\n"

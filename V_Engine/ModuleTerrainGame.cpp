@@ -53,6 +53,16 @@ bool ModuleTerrainGame::Start()
 
 	InitBullets();
 
+	{
+		std::vector<std::string> folders, files;
+		App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
+		if (files.size() > 0)
+		{
+			std::string terr = files[0].substr(0, files[0].size() - 5);
+			App->terrain->LoadTerrainNow(terr);
+			memcpy(App->terrain->terrainConfigName, terr.data(), terr.size() + 1);
+		}
+	}
 	return ret;
 }
 
@@ -217,6 +227,10 @@ void ModuleTerrainGame::DebugKeys()
 	{
 		debugTurrets = !debugTurrets;
 	}
+	if (App->input->GetKey(SDL_SCANCODE_KP_3) == KEY_DOWN)
+	{
+		ChangeEnviroment();
+	}
 }
 
 void ModuleTerrainGame::OnPlay()
@@ -375,7 +389,10 @@ void ModuleTerrainGame::ChangeEnviroment()
 {
 	std::vector<std::string> folders, files;
 	App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
-	App->terrain->LoadTerrainConfig(files[currentTerrainConfig].substr(0, files[currentTerrainConfig].size() - 5));
-	currentTerrainConfig++;
-	if (currentTerrainConfig >= files.size()) { currentTerrainConfig = 0; }
+	if (files.size() > 0)
+	{
+		currentTerrainConfig++;
+		if (currentTerrainConfig >= files.size()) { currentTerrainConfig = 0; }
+		App->terrain->LoadTerrainConfig(files[currentTerrainConfig].substr(0, files[currentTerrainConfig].size() - 5));
+	}
 }

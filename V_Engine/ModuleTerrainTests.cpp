@@ -286,7 +286,7 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 	inStream.open(dir.data());
 	if (inStream.is_open())
 	{
-		if (configName.compare("Tech") == 0)
+		if (configName.compare("3_Tech") == 0)
 		{
 			RPGT::config.m_heightCurve = ([](float x)
 			{
@@ -308,6 +308,7 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 				return pow(x, 2.f);
 			});
 		}
+		App->game->gamePos = float3::zero; 
 
 		inStream.read((char*)&RPGT::config.maxChunks, sizeof(unsigned int));
 		inStream.read((char*)&RPGT::config.chunkSize, sizeof(float));
