@@ -45,7 +45,7 @@ public:
 	bool CleanUp();
 
 	//Chooses either we want the files to refresh automatically or not
-	bool autoRefresh = true;
+	bool autoRefresh = false;
 
 	//Number of seconds between file refreshes
 	int refreshDelay = 10;

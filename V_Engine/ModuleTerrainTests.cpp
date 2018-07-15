@@ -265,7 +265,7 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 			}
 		}
 
-		outStream.write((char*)&RPGT::config.tesselationStrength, sizeof(float));
+		outStream.write((char*)&RPGT::config.tesselationTriangleSize, sizeof(float));
 		outStream.close();
 	}
 }
@@ -445,7 +445,7 @@ void ModuleTerrain::DrawUI()
 		{
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
-			ImGui::SliderFloat("Tesselation level", &RPGT::config.tesselationStrength, 0.1f, 30.f);
+			ImGui::SliderFloat("Tesselation Triangle Size", &RPGT::config.tesselationTriangleSize, 0.1f, 30.f);
 			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");

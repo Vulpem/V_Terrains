@@ -116,7 +116,7 @@ namespace RPGT
         glUniform1i(m_shader.loc_render_heightmap, config.debug.renderHeightmap);
         glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
-		glUniform1f(m_shader.loc_triSize, config.tesselationStrength);
+		glUniform1f(m_shader.loc_triSize, config.tesselationTriangleSize);
 		glUniform2f(m_shader.loc_viewPortSize, config.screenWidth, config.screenHeight);
 
         for (int n = 0; n < 10; n++)

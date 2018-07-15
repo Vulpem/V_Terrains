@@ -34,7 +34,7 @@ namespace RPGT
 		float globalLight[3] = { 0.2f, -0.2f, 0.2f };
         bool singleSidedFaces = true;
 
-		float tesselationStrength = 3.4f;
+		float tesselationTriangleSize = 3.4f;
 		int screenWidth = 1920;
 		int screenHeight = 1080;
 
