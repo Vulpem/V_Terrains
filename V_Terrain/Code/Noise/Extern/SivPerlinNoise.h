@@ -174,7 +174,16 @@ namespace siv
 				amp *= persistance;
 			}
             result2 = std::abs(result2);
-			return min((result1 + result2), 0.999999f);
+			float ret = result1 + result2;
+			if (ret >= 1.f)
+			{
+				ret = 1.f - (ret - 1.f);
+			}
+			if (ret <= 0.f)
+			{
+				ret = 0.f;
+			}
+			return ret;
 		}
 
         float octaveNoise(float x, float y, float z, std::int32_t octaves, float lacunarity = 2.f, float persistance = 0.25f) const

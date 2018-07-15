@@ -50,7 +50,7 @@ namespace RPGT
     float PerlinNoise::GetValue(int x, int y)  const
     {
         const float dp = (config.chunkHeightmapResolution / config.noise.frequency);
-		const float ret = config.m_heightCurve(m_perlin.ridgedNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.ridgedDepth, config.noise.lacunarity, config.noise.persistency));
-		return  ((ret >= 0.99999999f ? 0.99999999f : ret) < 0.f ? 0.f : ret);
+		float ret = config.m_heightCurve(m_perlin.ridgedNoise0_1(x / dp, y / dp, config.noise.octaves, config.noise.ridgedDepth, config.noise.lacunarity, config.noise.persistency));
+		return  ret;
     }
 }
