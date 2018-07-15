@@ -286,9 +286,8 @@ uniform float[nTextures *TexNVariables] textures;\n\
         return std::string(
 "#version 430 core\n\
 \n\
-//TODO send as uniforms\n\
-float triSize = 6.5f;\n\
-        vec2 viewport = vec2(1920, 1080);\n\
+uniform float triSize;\n\
+uniform vec2 viewport;\n\
 \n\
 \n\
         layout(vertices = 4) out;\n\

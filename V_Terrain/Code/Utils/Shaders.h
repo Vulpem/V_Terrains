@@ -39,6 +39,9 @@ namespace RPGT
         int loc_render_chunk_borders = 0u;
 		int loc_render_light = 0u;
 
+		int loc_triSize = 0u;
+		int loc_viewPortSize = 0u;
+
 		struct textureLocs
 		{
 			int loc_diffuse = 0u;

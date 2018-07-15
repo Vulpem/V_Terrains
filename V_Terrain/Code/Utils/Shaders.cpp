@@ -120,6 +120,9 @@ namespace RPGT
                 ret.loc_render_heightmap = glGetUniformLocation(program, "render_heightmap");
                 ret.loc_render_light = glGetUniformLocation(program, "render_light");
 
+				ret.loc_triSize = glGetUniformLocation(program, "triSize");
+				ret.loc_viewPortSize = glGetUniformLocation(program, "viewport");
+
                 for (int n = 0; n < 10; n++)
                 {
                     char val[28];

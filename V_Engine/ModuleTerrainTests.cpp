@@ -30,7 +30,6 @@ void ShowError(const char * message)
 
 ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	Module(app, start_enabled)
-	, m_resolution(RPGT::config.chunkHeightmapResolution)
 	, m_frequency(RPGT::config.noise.frequency)
 	, m_octaves(RPGT::config.noise.octaves)
 	, m_lacunarity(RPGT::config.noise.lacunarity)
@@ -149,6 +148,9 @@ update_status ModuleTerrain::Update()
 			m_regening = false;
 		}
 	}
+	RPGT::config.screenWidth = App->window->GetWindowSize().x;
+	RPGT::config.screenWidth = App->window->GetWindowSize().y;
+
 
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	RPGT::Update(pos.x, pos.z);
@@ -262,6 +264,8 @@ void ModuleTerrain::SaveTerrainConfig(std::string configName)
 				outStream.write(heightmaps[n].data(), size);
 			}
 		}
+
+		outStream.write((char*)&RPGT::config.tesselationStrength, sizeof(float));
 		outStream.close();
 	}
 }
@@ -291,7 +295,7 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			RPGT::config.m_heightCurve = ([](float x)
 			{
 				float ret = 0.f;
-				for (float n = 4.f; n <= 4.5f; n += 4.f)
+				for (float n = 9.f; n <= 9.5f; n += 9.f)
 				{
 					float a = x * n * n;
 					int b = a / n;
@@ -300,6 +304,8 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 				//ret /= 4.f;
 				return ret;
 			});
+			RPGT::config.chunkHeightmapResolution = 64;
+			RPGT::config.chunkSize = 2024;
 		}
 		else
 		{
@@ -307,6 +313,8 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 				[](float x) {
 				return pow(x, 2.f);
 			});
+			RPGT::config.chunkHeightmapResolution = 32;
+			RPGT::config.chunkSize = 1024;
 		}
 		App->game->gamePos = float3::zero; 
 
@@ -405,6 +413,7 @@ void ModuleTerrain::DrawUI()
 			floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
 		};
 		ImGui::Text("Current chunk:\nX: %i,   Z: %i", p[0], p[1]);
+		ImGui::Text("Screen Size: %f, %f", App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 		ImGui::NewLine();
 		if (ImGui::Button("Generate new random seed"))
 		{
@@ -436,6 +445,7 @@ void ModuleTerrain::DrawUI()
 		{
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
+			ImGui::SliderFloat("Tesselation level", &RPGT::config.tesselationStrength, 0.1f, 30.f);
 			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
@@ -461,7 +471,7 @@ void ModuleTerrain::DrawUI()
 		{
 			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { RPGT::config.maxHeight = m_maxHeight; }
 			ImGui::Separator();
-			if (ImGui::DragInt("Heigtmap resolution", &m_resolution, 1.f, 4, 1024)) { RPGT::config.chunkHeightmapResolution = m_resolution; WantRegen(); }
+			if (ImGui::DragInt("Heigtmap resolution", &(int)RPGT::config.chunkHeightmapResolution, 1.f, 4, 1024)) { WantRegen(); }
 			if (ImGui::DragFloat("Chunk Size", &RPGT::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
 			if (ImGui::DragInt("Min chunk polys", &(int)RPGT::config.chunkMinDensity, 1.f, 1, 64)) { WantRegen(); }
 

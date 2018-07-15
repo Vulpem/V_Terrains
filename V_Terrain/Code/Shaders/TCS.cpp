@@ -1,8 +1,7 @@
 #version 410 core
 
-//TODO send as uniforms
-float triSize = 5.f;
-vec2 viewport = vec2(1920, 1080);
+uniform float triSize;
+uniform vec2 viewport;
 
 
 layout(vertices = 4) out;
