@@ -29,8 +29,8 @@ void Ship::Init(GameObject * go, GameObject* cam)
 
 	controller = go;
 	ship = go->childs.front();
-	cannon = ship->childs.front();
-	for (int n = 1; n < ship->childs.size(); n++)
+	cannon = ship->childs.back();
+	for (int n = 0; n < ship->childs.size() - 1; n++)
 	{
 		thrusters.push_back(ship->childs[n]);
 	}
