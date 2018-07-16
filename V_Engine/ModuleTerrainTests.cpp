@@ -610,14 +610,14 @@ void ModuleTerrain::DrawUI()
 					"returns another one in the same range.\n"
 					"Will reset all chunks.");
 		}
-		if (ImGui::CollapsingHeader("Debug visualization"))
+		if (ImGui::CollapsingHeader("Debug"))
 		{
 			if (ImGui::Button("Reset Camera Height"))
 			{
 				float3 pos = App->camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
-			ImGui::Checkbox("Force player position to 0", &m_forcePositionTo0);
+			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
 				App->Editor->SwitchViewPorts();

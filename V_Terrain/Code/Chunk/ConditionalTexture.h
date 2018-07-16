@@ -19,7 +19,6 @@ namespace RPGT
 	public:
 		const float* Get() const
 		{
-            //Please ignore this ugly cheat
             *(float*)&hasTexture = (buf_diffuse != 0 ? 10.f : 0.f);
 			return color;
 		}
