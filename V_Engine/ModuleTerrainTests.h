@@ -96,6 +96,7 @@ public:
 	std::string heightmaps[10];
 
 	char terrainConfigName[256];
+	bool m_forcePositionTo0 = false;
 };
 
 #endif

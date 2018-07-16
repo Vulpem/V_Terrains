@@ -153,7 +153,14 @@ update_status ModuleTerrain::Update()
 
 
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
-	RPGT::Update(pos.x, pos.z);
+	if (!m_forcePositionTo0)
+	{
+		RPGT::Update(pos.x, pos.z);
+	}
+	else
+	{
+		RPGT::Update(0,0);
+	}
 
 	if (m_calcCollisions)
 	{
@@ -609,7 +616,7 @@ void ModuleTerrain::DrawUI()
 				float3 pos = App->camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
 				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
-
+			ImGui::Checkbox("Force player position to 0", &m_forcePositionTo0);
 			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
 			{
 				App->Editor->SwitchViewPorts();

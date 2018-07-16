@@ -26,7 +26,6 @@ void Bullet::Init(bool player)
 	{
 		bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
 		bullet->HideFromOutliner();
-		bullet->GetTransform()->SetGlobalPos(0, -100000, 0);
 
 		Material* mat = bullet->GetComponent<Material>().front();
 		mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -45,7 +44,6 @@ void Bullet::Init(bool player)
 	{
  		bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet2.fbx").front();
 		bullet->HideFromOutliner();
-		bullet->GetTransform()->SetGlobalPos(0, -100000, 0);
 
 		Material* mat = bullet->GetComponent<Material>().front();
 		mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -60,6 +58,7 @@ void Bullet::Init(bool player)
 		mat->SetAlphaType(AlphaTestTypes::ALPHA_DISCARD);
 		mat->SetAlphaTest(0.4f);
 	}
+	bullet->GetTransform()->SetGlobalPos(0, -100000, 0);
 }
 
 void Bullet::Spawn(float3 pos, float3 dir, bool player)
@@ -72,7 +71,7 @@ void Bullet::Spawn(float3 pos, float3 dir, bool player)
 
 void Bullet::Despawn()
 {
-	bullet->GetTransform()->SetGlobalPos(0, -100, 0);
+	bullet->GetTransform()->SetGlobalPos(0, -10000, 0);
 	loaded = false;
 }
 

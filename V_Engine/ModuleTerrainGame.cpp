@@ -321,7 +321,7 @@ void ModuleTerrainGame::OnChunkUnload(int x, int y)
 void ModuleTerrainGame::InitBullets()
 {
 	GameObject* bullet = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet.fbx").front();
-	bullet->GetTransform()->SetGlobalPos(15, -15, 0);
+	bullet->GetTransform()->SetGlobalPos(15, -15000, 0);
 
 	Material* mat = bullet->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -339,7 +339,7 @@ void ModuleTerrainGame::InitBullets()
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
 	GameObject* bullet2 = App->GO->LoadGO("Assets/Turrets/Bullet/Bullet2.fbx").front();
-	bullet2->GetTransform()->SetGlobalPos(-15, -15, 0);
+	bullet2->GetTransform()->SetGlobalPos(-15, -15000, 0);
 
 	mat = bullet2->GetComponent<Material>().front();
 	mat->SetAlphaType(AlphaTestTypes::ALPHA_BLEND);
@@ -357,9 +357,9 @@ void ModuleTerrainGame::InitBullets()
 	mat->ReadRes<R_Material>()->AssignShader("bullet");
 
 	bullets.resize(200);
-	std::for_each(bullets.begin(), bullets.end(), [](Bullet& b) {b.Init(false); });
+	std::for_each(bullets.begin(), bullets.end(), [](Bullet& b) {b.Init(false); b.Despawn(); });
 	playerBullets.resize(40);
-	std::for_each(playerBullets.begin(), playerBullets.end(), [](Bullet& b) {b.Init(true); });
+	std::for_each(playerBullets.begin(), playerBullets.end(), [](Bullet& b) {b.Init(true); b.Despawn(); });
 
 	bulletN = 0;
 	playerBulletN = 0;
