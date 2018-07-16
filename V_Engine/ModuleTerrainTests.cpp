@@ -151,7 +151,7 @@ update_status ModuleTerrain::Update()
 	RPGT::config.screenWidth = App->window->GetWindowSize().x;
 	RPGT::config.screenWidth = App->window->GetWindowSize().y;
 
-
+	TIMER_START_PERF("0 Terrain Update");
     float3 pos = App->camera->GetDefaultCam()->GetPosition();
 	if (!m_forcePositionTo0)
 	{
@@ -161,6 +161,7 @@ update_status ModuleTerrain::Update()
 	{
 		RPGT::Update(0,0);
 	}
+	TIMER_READ_MS("0 Terrain Update");
 
 	if (m_calcCollisions)
 	{
@@ -830,7 +831,9 @@ void ModuleTerrain::Render(const viewPort & port)
 	RPGT::config.debug.renderChunkBorders = port.renderChunkBorders;
 	if (port.renderTerrain)
 	{
+		TIMER_START_PERF("0 Terrain Render");
 		RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+		TIMER_READ_MS("0 Terrain Render");
 	}
 	if (port.renderTerrainCollisions)
 	{

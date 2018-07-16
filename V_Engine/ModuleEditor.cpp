@@ -154,7 +154,7 @@ void ModuleEditor::Render(const viewPort & port)
 			//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
 			ViewPortUI(port);
 
-			if (showPlane)
+			if (false && showPlane)
 			{
 				P_Plane p(0, 0, 0, 1);
 				p.axis = true;
