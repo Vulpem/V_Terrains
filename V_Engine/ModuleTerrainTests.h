@@ -75,6 +75,7 @@ public:
 	Timer m_smoothRegen;
 	bool m_regening = false;
 	bool m_generatedMap = false;
+	bool spawnBuildings = true;
 
     uint m_shaderProgram;
 

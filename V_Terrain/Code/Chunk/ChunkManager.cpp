@@ -190,6 +190,8 @@ namespace RPGT
 			chunk.Free();
 		});
         m_factory.ClearRequests();
+		m_chunks.clear();
+		m_chunks.resize(config.maxChunks);
         AddChunksToRegen(m_lastOffPos);
     }
 
@@ -264,6 +266,14 @@ namespace RPGT
     void ChunkManager::AddChunksToRegen(Vec2<int> pos)
     {
 		//TODO draw a circle instead of a square
+		if (config.maxChunks > m_chunks.size())
+		{
+			m_chunks.resize(config.maxChunks);
+		}
+		if (config.maxChunks < m_chunks.size())
+		{
+			CleanChunks();
+		}
 		int maxDist = 0;
 		uint nChunks = 1;
 		while (nChunks < config.maxChunks)

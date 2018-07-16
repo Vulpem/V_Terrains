@@ -256,53 +256,55 @@ void ModuleTerrainGame::OnStop()
 void ModuleTerrainGame::OnChunkLoad(int x, int y)
 {
 	Building* build = nullptr;
-
-	if (game != GameType::BulletHell)
+	if (App->terrain->spawnBuildings)
 	{
-		if (math::Abs(x) + math::Abs(y) > 5)
+		if (game != GameType::BulletHell)
 		{
-			if (std::rand() % 1000 < 5)
+			if (math::Abs(x) + math::Abs(y) > 5)
+			{
+				if (std::rand() % 1000 < 5)
+				{
+					build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
+					float3 p = build->base->GetTransform()->GetGlobalPos();
+					p.y -= 80.f;
+					build->base->GetTransform()->SetGlobalPos(p);
+				}
+				else if (std::rand() % 100 < 20)
+				{
+					build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+				}
+			}
+		}
+		else
+		{
+			if (std::rand() % 100 < 5.f + 10.f * ((Time.GameRuntime - lastSceneChange) / 120.f))
 			{
 				build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
 				float3 p = build->base->GetTransform()->GetGlobalPos();
 				p.y -= 80.f;
 				build->base->GetTransform()->SetGlobalPos(p);
+				build->base->GetTransform()->RotateLocal(float3(0, (float)(std::rand() % 360), 0));
 			}
-			else if (std::rand() % 100 < 20)
+			if (y > 3 && abs(x) <= 2 && build == nullptr)
 			{
-				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+				if (std::rand() % 100 < 20.f + 50.f * ((Time.GameRuntime - lastSceneChange) / 120.f))
+				{
+					build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
+					build->base->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
+					((Turret*)build)->barrel->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
+				}
 			}
-		}
-	}
-	else
-	{
-		if (std::rand() % 100 < 5.f + 10.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
-		{
-			build = new Building(App->GO->LoadGO("Assets/Tower/Tower1.fbx").front(), x, y);
-			float3 p = build->base->GetTransform()->GetGlobalPos();
-			p.y -= 80.f;
-			build->base->GetTransform()->SetGlobalPos(p);
-			build->base->GetTransform()->RotateLocal(float3(0, (float)(std::rand() % 360), 0));
-		}
-		if (y > 3 && abs(x) <= 2 && build == nullptr)
-		{
-			if (std::rand() % 100 < 20.f + 50.f * ((Time.GameRuntime- lastSceneChange) / 120.f))
+			if (Time.GameRuntime - lastSceneChange > 120)
 			{
-				build = new Turret(App->GO->LoadGO("Assets/Turrets/turret/turret.fbx").front(), x, y);
-				build->base->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
-				((Turret*)build)->barrel->GetTransform()->SetLocalScale(3.f, 3.f, 3.f);
+				lastSceneChange = Time.GameRuntime;
+				ChangeEnviroment();
 			}
 		}
-		if (Time.GameRuntime - lastSceneChange > 120)
-		{
-			lastSceneChange = Time.GameRuntime;
-			ChangeEnviroment();
-		}
-	}
 
-	if (build != nullptr)
-	{
-		turrets[std::make_pair(x, y)] = build;
+		if (build != nullptr)
+		{
+			turrets[std::make_pair(x, y)] = build;
+		}
 	}
 }
 

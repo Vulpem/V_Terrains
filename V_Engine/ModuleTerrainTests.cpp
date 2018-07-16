@@ -441,11 +441,13 @@ void ModuleTerrain::DrawUI()
 		ImGui::Separator();
 		ImGui::Separator();
 		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
+		ImGui::Checkbox("Spawn buildings", &spawnBuildings);
+
 		if (ImGui::CollapsingHeader("Render"))
 		{
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
-			ImGui::SliderFloat("Tesselation Triangle Size", &RPGT::config.tesselationTriangleSize, 0.1f, 30.f);
+			ImGui::SliderFloat("Tesselation Triangle Size", &RPGT::config.tesselationTriangleSize, 0.1f, 200.f, "%.2f", 4.f);
 			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
@@ -470,6 +472,7 @@ void ModuleTerrain::DrawUI()
 		if (ImGui::CollapsingHeader("Terrain generation"))
 		{
 			if (ImGui::SliderFloat("MaxHeight", &m_maxHeight, 0.0f, 8000.f, "%.3f", 3.f)) { RPGT::config.maxHeight = m_maxHeight; }
+			ImGui::SliderInt("MaxChunks", &(int)RPGT::config.maxChunks, 1, 2048);
 			ImGui::Separator();
 			if (ImGui::DragInt("Heigtmap resolution", &(int)RPGT::config.chunkHeightmapResolution, 1.f, 4, 1024)) { WantRegen(); }
 			if (ImGui::DragFloat("Chunk Size", &RPGT::config.chunkSize, 1.f, 5.f, 2048.f)) { WantRegen(); }
