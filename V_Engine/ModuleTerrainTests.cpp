@@ -190,6 +190,31 @@ update_status ModuleTerrain::Update()
 		m_variableFogDistance = m_fogDistance;
 	}
 	m_calcCollisions = false;
+
+	if (m_movingForward)
+	{
+		Transform* camTrans = App->camera->GetMovingCamera()->object->GetTransform();
+		float3 p = camTrans->GetGlobalPos() + float3(0, 0, m_forwardSpeed * Time.dt);
+		camTrans->SetGlobalPos(p);
+	}
+	if (m_movingHeight)
+	{
+		float height = 0;
+		const float heightSpeed = 200.f;
+		Transform* camTrans = App->camera->GetMovingCamera()->object->GetTransform();
+		float3 p = camTrans->GetGlobalPos();
+
+		p.y += currentVSpeed * Time.dt;
+		camTrans->SetGlobalPos(p);
+
+		RPGT::GetPoint(p.x, p.z + 300, height);
+		height += m_verticalOffset;
+
+			currentVSpeed += m_verticalAcceleration * (height - p.y)/100.f * Time.dt;
+			if (currentVSpeed < -m_verticalSpeed) { currentVSpeed = -m_verticalSpeed; }
+			if (currentVSpeed > m_verticalSpeed) { currentVSpeed = m_verticalSpeed; }
+	}
+
     return UPDATE_CONTINUE;
 }
 
@@ -627,6 +652,12 @@ void ModuleTerrain::DrawUI()
 				ImGui::Spacing();
 				ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
 			}
+			ImGui::InputFloat("ForwardSpeedDebug", &m_forwardSpeed);
+			ImGui::InputFloat("VerticalSpeedDebug", &m_verticalSpeed);
+			ImGui::InputFloat("VerticalOffsetDebug", &m_verticalOffset);
+
+			ImGui::Checkbox("MoveForward", &m_movingForward);
+			ImGui::Checkbox("AdaptCamHeight", &m_movingHeight);
 
 		}
 		if (ImGui::CollapsingHeader("Textures"))

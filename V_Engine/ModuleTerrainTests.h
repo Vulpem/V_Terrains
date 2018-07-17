@@ -97,6 +97,13 @@ public:
 
 	char terrainConfigName[256];
 	bool m_forcePositionTo0 = false;
+	float m_forwardSpeed = 400.f;
+	float m_verticalSpeed = 100.f;
+	float m_verticalOffset = 500.f;
+	float currentVSpeed = 0.f;
+	float m_verticalAcceleration = 80.f;
+	bool m_movingForward = false;
+	bool m_movingHeight = false;
 };
 
 #endif
