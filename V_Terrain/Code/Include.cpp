@@ -95,7 +95,7 @@ namespace RPGT
 
     void GetPoint(float x, float y, float& height, float* normal)
     {
-        chunkManager.GetPoint(x, y, height, normal);
+        chunkManager.GetPoint(x, y - 1.7f, height, normal);
     }
 
 	bool RayCast(float * origin, float * direction, float * hitPoint, float * hitNormal)

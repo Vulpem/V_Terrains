@@ -49,7 +49,7 @@ public:
 
 	float ms_frame[EDITOR_FRAME_SAMPLES];
 	float framerate[EDITOR_FRAME_SAMPLES];
-	int maxFPS = 0;
+	int maxFPS = 30;
 
 	TimerManager* timers;
 

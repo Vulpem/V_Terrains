@@ -436,7 +436,13 @@ void ModuleTerrain::DrawUI()
 			"Q and E to move up and down.\n"
 			"Hold right click to pan.\n"
 			"Hold shift to move faster.\n"
-			"Press space for top view.");
+			"Press space for top view.\n"
+			"\n"
+			"Keypad numbers:\n"
+			"0: Play game\n"
+			"1: Debug play game\n"
+			"2: Debug turrets\n"
+			"3: Change terrain");
 		ImGui::Separator();
 		ImGui::Text("Max Fragment textures: %i", m_maxTexturesGL);
 		ImGui::Separator();

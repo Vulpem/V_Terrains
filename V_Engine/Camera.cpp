@@ -28,7 +28,7 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, C_camera)
 		}
 	}
 	frustum.nearPlaneDistance = 4;
-	frustum.farPlaneDistance = 500;
+	frustum.farPlaneDistance = 50000.0;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
 	float2 screenSize = App->window->GetWindowSize();
@@ -194,7 +194,7 @@ void Camera::EditorContent()
 	{
 		SetHorizontalFOV(frustum.horizontalFov);
 	}
-	if (ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 4000.0f))
+	if (ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 400000.0f, "%.3f", 3));
 	{
 		SetHorizontalFOV(frustum.horizontalFov);
 	}
