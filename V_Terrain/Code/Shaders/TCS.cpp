@@ -99,14 +99,15 @@ void main()
     }
     else
     {
-        gl_TessLevelOuter[0] = calcPowEdgeTessellationSphere(p[3], p[0], sphereDiam);
-        gl_TessLevelOuter[1] = calcPowEdgeTessellationSphere(p[0], p[1], sphereDiam);
-        gl_TessLevelOuter[2] = calcPowEdgeTessellationSphere(p[1], p[2], sphereDiam);
-        gl_TessLevelOuter[3] = calcPowEdgeTessellationSphere(p[2], p[3], sphereDiam);
+        gl_TessLevelOuter[0] = calcEdgeTessellationSphere(p[3], p[0], sphereDiam);
+        gl_TessLevelOuter[1] = calcEdgeTessellationSphere(p[0], p[1], sphereDiam);
+        gl_TessLevelOuter[2] = calcEdgeTessellationSphere(p[1], p[2], sphereDiam);
+        gl_TessLevelOuter[3] = calcEdgeTessellationSphere(p[2], p[3], sphereDiam);
 
         gl_TessLevelInner[1] = gl_TessLevelInner[0] = gl_TessLevelOuter[0];
     }
 }
+
 
 
 

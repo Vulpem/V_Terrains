@@ -1,6 +1,6 @@
 #version 410 core
 
-layout(quads, ccw) in;
+layout(quads, ccw, fractional_odd_spacing) in;
 
 in vec3 position[];
 in vec2 UVs[];
@@ -33,6 +33,7 @@ void main(void)
 
     gl_Position = projection_matrix * view_matrix * vec4(pos, 1);
 }
+
 
 
 
