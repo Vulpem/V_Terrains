@@ -17,8 +17,6 @@
 #include "OpenGL.h"
 #include <Windows.h>
 
-#include "ModuleTerrainGame.h"
-
 #include <time.h>
 #include <fstream>
 #include <algorithm>
@@ -349,7 +347,6 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 			RPGT::config.chunkHeightmapResolution = 32;
 			RPGT::config.chunkSize = 1024;
 		}
-		App->game->gamePos = float3::zero; 
 
 		inStream.read((char*)&RPGT::config.maxChunks, sizeof(unsigned int));
 		inStream.read((char*)&RPGT::config.chunkSize, sizeof(float));
@@ -1010,9 +1007,6 @@ void ModuleTerrain::GenMap()
     RPGT::config.noise.lacunarity = m_lacunarity;
     RPGT::config.noise.persistency = m_persistance;
 	RPGT::config.maxHeight = m_maxHeight;
-
-	App->game->OnStop();
-	App->game->OnPlay();
 
     RPGT::RegenerateMesh();
     RPGT::CleanChunks();

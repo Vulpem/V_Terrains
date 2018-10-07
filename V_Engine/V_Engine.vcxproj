@@ -85,7 +85,6 @@
     <ClInclude Include="AllResources.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Billboard.h" />
-    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
@@ -102,7 +101,6 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Mesh_RenderInfo.h" />
     <ClInclude Include="ModuleResourceManager.h" />
-    <ClInclude Include="ModuleTerrainGame.h" />
     <ClInclude Include="ModuleTerrainTests.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="PugiXml\src\pugiconfig.hpp" />
@@ -201,17 +199,14 @@
     <ClInclude Include="R_Shader.h" />
     <ClInclude Include="R_Texture.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Ship.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Timers.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="Turret.h" />
     <ClInclude Include="ViewPort.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Billboard.cpp" />
-    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -268,7 +263,6 @@
     <ClCompile Include="ModuleGOmanager.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleResourceManager.cpp" />
-    <ClCompile Include="ModuleTerrainGame.cpp" />
     <ClCompile Include="ModuleTerrainTests.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
@@ -277,12 +271,10 @@
     <ClCompile Include="PugiXml\src\pugixml.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="ResourcedComponent.cpp" />
-    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="timerFunctions.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Geometry\KDTree.inl" />
