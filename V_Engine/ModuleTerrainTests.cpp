@@ -477,7 +477,6 @@ void ModuleTerrain::DrawUI()
 		ImGui::Separator();
 		ImGui::Separator();
 		ImGui::Checkbox("Open shader editor", &m_openShaderEditor);
-		ImGui::Checkbox("Spawn buildings", &spawnBuildings);
 
 		if (ImGui::CollapsingHeader("Render"))
 		{
