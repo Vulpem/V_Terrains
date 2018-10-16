@@ -40,7 +40,7 @@ bool ModuleRenderer3D::Init()
 	bool ret = true;
 
 	//Create context
-	context = SDL_GL_CreateContext(App->window->GetWindow());
+	context = SDL_GL_CreateContext(App->m_window->GetWindow());
 	if (context == nullptr)
 	{
 		LOG("OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -146,7 +146,7 @@ bool ModuleRenderer3D::Init()
 
 		glLineWidth(1.0f);
 
-		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->camera->GetDefaultCam(), viewPorts.size()));
+		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->m_camera->GetDefaultCam(), viewPorts.size()));
 
 	}
 
@@ -194,7 +194,7 @@ update_status ModuleRenderer3D::PostUpdate()
 		lights[i].Render();
 	}
 
-	viewPorts.front().camera = App->camera->GetDefaultCam();
+	viewPorts.front().camera = App->m_camera->GetDefaultCam();
 	TIMER_START("ViewPorts render");
 	if (viewPorts.empty() == false)
 	{
@@ -221,7 +221,7 @@ update_status ModuleRenderer3D::PostUpdate()
 	ImGui::Render();
 #endif
 
-	SDL_GL_SwapWindow(App->window->GetWindow());
+	SDL_GL_SwapWindow(App->m_window->GetWindow());
 	return UPDATE_CONTINUE;
 }
 
@@ -341,7 +341,7 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 
 void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 {
-	App->renderer3D->DrawLocator((float4x4::FromTRS(position, float4x4::identity, float3(1, 1, 1))).Transposed(), color);
+	App->m_renderer3D->DrawLocator((float4x4::FromTRS(position, float4x4::identity, float3(1, 1, 1))).Transposed(), color);
 }
 
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
@@ -446,8 +446,8 @@ viewPort* ModuleRenderer3D::HoveringViewPort()
 	{
 		if (it->active)
 		{
-			if (App->input->GetMouseX() > it->pos.x && App->input->GetMouseX() < it->pos.x + it->size.x &&
-				App->input->GetMouseY() > it->pos.y && App->input->GetMouseY() < it->pos.y + it->size.y)
+			if (App->m_input->GetMouseX() > it->pos.x && App->m_input->GetMouseX() < it->pos.x + it->size.x &&
+				App->m_input->GetMouseY() > it->pos.y && App->m_input->GetMouseY() < it->pos.y + it->size.y)
 			{
 				return &*it;
 			}
@@ -511,7 +511,7 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 {
 	currentViewPort = &port;
 	port.SetCameraMatrix();
-	glViewport(port.pos.x, App->window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);
+	glViewport(port.pos.x, App->m_window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);
 	UpdateProjectionMatrix(port.camera);
 
 	glMatrixMode(GL_MODELVIEW);

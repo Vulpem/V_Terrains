@@ -73,11 +73,11 @@ update_status ModuleGoManager::PreUpdate()
 
 update_status ModuleGoManager::Update()
 {
-	if (App->input->file_was_dropped)
+	if (App->m_input->file_was_dropped)
 	{
 		char droppedFile[1024];
-		strcpy(droppedFile, App->input->dropped_file);
-		std::string file = App->importer->NormalizePath(droppedFile);
+		strcpy(droppedFile, App->m_input->dropped_file);
+		std::string file = App->m_importer->NormalizePath(droppedFile);
 		LoadGO(file.data());
 	}
 
@@ -184,7 +184,7 @@ update_status ModuleGoManager::PostUpdate()
 
 void ModuleGoManager::Render(const viewPort& port)
 {
-	App->GO->RenderGOs(port);
+	App->m_goManager->RenderGOs(port);
 	if (drawQuadTree)
 	{
 		TIMER_START("QuadTree drawTime");
@@ -239,7 +239,7 @@ GameObject * ModuleGoManager::DuplicateGO(GameObject * toCopy)
 
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	GameObject* sceneRoot = App->importer->LoadVgo(fileName, "RootNode");
+	GameObject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
 	std::vector<GameObject*> ret;
 	if (sceneRoot && sceneRoot->childs.empty() == false)
 	{
@@ -322,7 +322,7 @@ void ModuleGoManager::SaveSceneNow()
 	std::stringstream stream;
 	data.save(stream);
 	// we are done, so write data to disk
-	App->fs->Save(path, stream.str().c_str(), stream.str().length());
+	App->m_fileSystem->Save(path, stream.str().c_str(), stream.str().length());
 	LOG("Scene saved: %s", path);
 
 	data.reset();
@@ -337,7 +337,7 @@ void ModuleGoManager::LoadSceneNow()
 
 
 	char* buffer;
-	uint size = App->fs->Load(scenePath, &buffer);
+	uint size = App->m_fileSystem->Load(scenePath, &buffer);
 
 	if (size > 0)
 	{
@@ -435,8 +435,8 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 			{
 				SetStatic(true, GO->parent);
 			}
-			App->GO->quadTree.Add(GO);
-			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
+			App->m_goManager->quadTree.Add(GO);
+			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
 			{
 				if ((*it) == GO)
 				{
@@ -487,7 +487,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	float3 out_normal = float3::zero;
 
 	//Obtaining all the AABB collisions, and sorting them by distance of the AABB
-	std::vector<GameObject*> colls = App->GO->FilterCollisions(ray);
+	std::vector<GameObject*> colls = App->m_goManager->FilterCollisions(ray);
 	std::map<float, GameObject*> candidates;
 	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end() && colls.empty() == false; GO++)
 	{
@@ -587,7 +587,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 	if (ret.shader.program == -1)
 	{
-		ret.shader = App->resources->GetDefaultShader();
+		ret.shader = App->m_resourceManager->GetDefaultShader();
 	}
 	return ret;
 }
@@ -651,7 +651,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 	}
 	else
 	{
-		App->renderer3D->SetViewPort(*App->renderer3D->FindViewPort(port.ID));
+		App->m_renderer3D->SetViewPort(*App->m_renderer3D->FindViewPort(port.ID));
 		for (std::vector<GameObject*>::const_iterator toInsert = exclusiveGOs.begin(); toInsert != exclusiveGOs.end(); toInsert++)
 		{
 			toRender.push_back(*toInsert);
@@ -680,7 +680,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 							info.filled = false;
 							info.wired = true;
 						}
-						App->renderer3D->DrawMesh(info);
+						App->m_renderer3D->DrawMesh(info);
 						TIMER_READ_MS_MAX("Mesh slowest");
 					}
 				}

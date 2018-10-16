@@ -155,19 +155,19 @@ Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component
 	{
 	case (Component::C_mesh):
 		{
-			return (Resource*)App->importer->LoadMesh(resName.data());
+			return (Resource*)App->m_importer->LoadMesh(resName.data());
 		}
 	case (Component::C_material):
 		{
-			return (Resource*)App->importer->LoadMaterial(resName.data());
+			return (Resource*)App->m_importer->LoadMaterial(resName.data());
 		}
 	case (Component::C_Texture):
 		{
-			return (Resource*)App->importer->LoadTexture(resName.data());
+			return (Resource*)App->m_importer->LoadTexture(resName.data());
 		}
 	case (Component::C_Shader):
 	{
-		return (Resource*)App->importer->LoadShader(resName.data());
+		return (Resource*)App->m_importer->LoadShader(resName.data());
 	}
 	}
 	return nullptr;
@@ -175,14 +175,14 @@ Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component
 
 void ModuleResourceManager::CreateLibraryDirs()
 {
-	App->fs->CreateDir("Library");
-	App->fs->CreateDir("Library/Meshes");
-	App->fs->CreateDir("Library/Textures");
-	App->fs->CreateDir("Library/vGOs");
-	App->fs->CreateDir("Library/Materials");
-	App->fs->CreateDir("Library/Meta");
-	App->fs->CreateDir("Library/Shaders");
-	App->fs->CreateDir("Assets/Scenes");
+	App->m_fileSystem->CreateDir("Library");
+	App->m_fileSystem->CreateDir("Library/Meshes");
+	App->m_fileSystem->CreateDir("Library/Textures");
+	App->m_fileSystem->CreateDir("Library/vGOs");
+	App->m_fileSystem->CreateDir("Library/Materials");
+	App->m_fileSystem->CreateDir("Library/Meta");
+	App->m_fileSystem->CreateDir("Library/Shaders");
+	App->m_fileSystem->CreateDir("Assets/Scenes");
 }
 
 void ModuleResourceManager::ReimportAll()
@@ -208,7 +208,7 @@ void ModuleResourceManager::ReimportAll()
 			path += "/";
 			path += it->data();
 
-			std::vector<MetaInf> toAdd = App->importer->Import(path.data());
+			std::vector<MetaInf> toAdd = App->m_importer->Import(path.data());
 			if (toAdd.empty() == false)
 			{
 				std::multimap<Component::Type, MetaInf> tmp;
@@ -218,7 +218,7 @@ void ModuleResourceManager::ReimportAll()
 				}
 				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
 
-				meta_lastMod.insert(std::pair<std::string, Date>(path, App->fs->ReadFileDate(path.data())));
+				meta_lastMod.insert(std::pair<std::string, Date>(path, App->m_fileSystem->ReadFileDate(path.data())));
 			}
 		}
 
@@ -231,14 +231,14 @@ void ModuleResourceManager::ReimportAll()
 
 void ModuleResourceManager::ClearLibrary()
 {
-	App->fs->DelDir("Library");
+	App->m_fileSystem->DelDir("Library");
 	CreateLibraryDirs();
 }
 
 void ModuleResourceManager::SaveMetaData()
 {
-	App->fs->DelDir("Library/Meta");
-	App->fs->CreateDir("Library/Meta");
+	App->m_fileSystem->DelDir("Library/Meta");
+	App->m_fileSystem->CreateDir("Library/Meta");
 
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
 	for (; fileIt != metaData.end(); fileIt++)
@@ -254,10 +254,10 @@ void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Com
 
 	uint n = 0;
 	char fileName[524];
-	sprintf(fileName, "Library/Meta/%s%u%s", App->importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
-	while (App->fs->Exists(fileName) == true)
+	sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
+	while (App->m_fileSystem->Exists(fileName) == true)
 	{
-		sprintf(fileName, "Library/Meta/%s%u%s", App->importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
+		sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
 		n++;
 	}
 
@@ -287,7 +287,7 @@ void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Com
 	std::stringstream stream;
 	data.save(stream);
 	// we are done, so write data to disk
-	App->fs->Save(fileName, stream.str().c_str(), stream.str().length());
+	App->m_fileSystem->Save(fileName, stream.str().c_str(), stream.str().length());
 	LOG("Created: %s", fileName);
 
 	data.reset();
@@ -303,14 +303,14 @@ void ModuleResourceManager::LoadMetaData()
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
-	App->fs->GetFilesIn("Library/Meta", &folders, &files);
+	App->m_fileSystem->GetFilesIn("Library/Meta", &folders, &files);
 
 	for (std::vector<std::string>::iterator fileIt = files.begin(); fileIt != files.end(); fileIt++)
 	{
 		char* buffer;
 		std::string path("Library/Meta/");
 		path += fileIt->data();
-		uint size = App->fs->Load(path.data(), &buffer);
+		uint size = App->m_fileSystem->Load(path.data(), &buffer);
 
 		if (size > 0)
 		{
@@ -397,7 +397,7 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
-		std::string tmp("." + App->importer->FileFormat(filesToCheck.front().data()));
+		std::string tmp("." + App->m_importer->FileFormat(filesToCheck.front().data()));
 		if (tmp != SCENE_FORMAT && tmp != ".txt")
 		{
 			totalFiles++;
@@ -407,7 +407,7 @@ void ModuleResourceManager::Refresh()
 			if (it != meta_lastMod.end())
 			{
 				//The file exists in meta
-				if (it->second != App->fs->ReadFileDate(filesToCheck.front().data()))
+				if (it->second != App->m_fileSystem->ReadFileDate(filesToCheck.front().data()))
 				{
 					//File existed, but has been modified
 					overwrite = true;
@@ -423,7 +423,7 @@ void ModuleResourceManager::Refresh()
 			if (wantToImport)
 			{
 				LOG("Reimporting %s", filesToCheck.front().data());
-				std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data(), overwrite);
+				std::vector<MetaInf> toAdd = App->m_importer->Import(filesToCheck.front().data(), overwrite);
 				if (toAdd.empty() == false)
 				{
 					std::multimap<Component::Type, MetaInf> tmp;
@@ -449,7 +449,7 @@ void ModuleResourceManager::Refresh()
 					}
 
 					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
-					meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
+					meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->m_fileSystem->ReadFileDate(filesToCheck.front().data())));
 
 					if (overwrite)
 					{
@@ -563,11 +563,11 @@ void ModuleResourceManager::RefreshFolder(const char * path)
 */
 R_Folder ModuleResourceManager::ReadFolder(const char * path)
 {
-	R_Folder ret(App->importer->FileName(path).data(), path);
+	R_Folder ret(App->m_importer->FileName(path).data(), path);
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
-	App->fs->GetFilesIn(path, &folders, &files);
+	App->m_fileSystem->GetFilesIn(path, &folders, &files);
 
 	for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
 	{
@@ -611,7 +611,7 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 	std::stringstream stream;
 	data.save(stream);
 	// we are done, so write data to disk
-	App->fs->Save(fileName.data(), stream.str().c_str(), stream.str().length());
+	App->m_fileSystem->Save(fileName.data(), stream.str().c_str(), stream.str().length());
 	LOG("Created: %s", fileName.data());
 
 	data.reset();
@@ -622,7 +622,7 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 	char* buffer;
 	std::string _path = path;
 	_path += META_FORMAT;
-	uint size = App->fs->Load(_path.data(), &buffer);
+	uint size = App->m_fileSystem->Load(_path.data(), &buffer);
 
 	if (size > 0)
 	{

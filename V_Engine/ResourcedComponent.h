@@ -19,7 +19,7 @@ public:
 	}
 
 	template <typename T>
-	T* ReadRes() const { return (T*)App->resources->Peek(resource); }
+	T* ReadRes() const { return (T*)App->m_resourceManager->Peek(resource); }
 
 	virtual bool MissingComponent() { return (resource == 0); }
 

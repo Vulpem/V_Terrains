@@ -132,7 +132,7 @@ void mesh::EditorContent()
 
 void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->resources->Peek(resource);
+	Resource* res = App->m_resourceManager->Peek(resource);
 	myNode.append_attribute("res") = res->name.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
 	myNode.append_attribute("Wired") = wires;
@@ -141,7 +141,7 @@ void mesh::SaveSpecifics(pugi::xml_node& myNode)
 void mesh::LoadSpecifics(pugi::xml_node & myNode)
 {
 	std::string resName = myNode.attribute("res").as_string();
-	resource = App->resources->LinkResource(resName.data(), GetType());
+	resource = App->m_resourceManager->LinkResource(resName.data(), GetType());
 
 	wires = myNode.attribute("Wired").as_bool();
 	texMaterialIndex = myNode.attribute("TextureIndex").as_int();

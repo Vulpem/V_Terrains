@@ -24,12 +24,12 @@ bool ModuleCamera3D::Start()
 	camSpeed = 200.f;
 	camSprintMultiplier = 10.f;
 
-	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
+	defaultCameraGO = App->m_goManager->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
 	defaultCamera->SetFarPlane(50000.0);
 	defaultCameraGO->HideFromOutliner();
 
-	topView = App->GO->CreateCamera("TopView");
+	topView = App->m_goManager->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 1000, 0);
 	topView->GetTransform()->SetLocalRot(90, 0, 0);
 	topView->GetTransform()->allowRotation = false;
@@ -56,10 +56,10 @@ update_status ModuleCamera3D::Update()
 	{
 		MoveWithKeys();
 		// Mouse motion ----------------
-		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+		if (App->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 		{
-			int dx = -App->input->GetMouseXMotion();
-			int dy = -App->input->GetMouseYMotion();
+			int dx = -App->m_input->GetMouseXMotion();
+			int dy = -App->m_input->GetMouseYMotion();
 			if (dx != 0 || dy != 0)
 			{
 				float Sensitivity = 0.04;
@@ -182,12 +182,12 @@ void ModuleCamera3D::MoveWithKeys()
 	float speed = camSpeed;
 	float3 lastCamPos = cam->object->GetTransform()->GetGlobalPos();
 	float3 camPos = lastCamPos;
-	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
 		speed *= camSprintMultiplier;
 	}
 
-	int mouseWheel = App->input->GetMouseZ();
+	int mouseWheel = App->m_input->GetMouseZ();
 	if (mouseWheel != 0)
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
@@ -200,15 +200,15 @@ void ModuleCamera3D::MoveWithKeys()
 		}
 	}
 
-	if (App->input->GetMouseButton(2))
+	if (App->m_input->GetMouseButton(2))
 	{
-		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt * App->input->GetMouseXMotion();
-		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt * App->input->GetMouseYMotion();
+		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt * App->m_input->GetMouseXMotion();
+		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt * App->m_input->GetMouseYMotion();
 	}
 
 	//Forward Backward
 	//In Ortographic mode, moving the camera forward or backward is meaningless. Instead we'll change the FOV to change the zoom lvl
-	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
@@ -219,7 +219,7 @@ void ModuleCamera3D::MoveWithKeys()
 			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * 10.f * Time.dt);
 		}
 	}
-	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
@@ -232,21 +232,21 @@ void ModuleCamera3D::MoveWithKeys()
 	}
 
 	//Right Left
-	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
 		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt;
 	}
-	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
 		lastCamPos += cam->object->GetTransform()->Right() * speed* Time.dt;
 	}
 
 	//Up Down
-	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
 		lastCamPos += cam->object->GetTransform()->Down() * speed* Time.dt;
 	}
-	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+	if (App->m_input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
 		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt;
 	}

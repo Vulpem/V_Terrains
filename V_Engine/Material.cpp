@@ -26,13 +26,13 @@ void Material::EditorContent()
 #pragma region AddTexturePopup
 	if (ImGui::BeginPopup("Add New Texture"))
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 		for (; fileIt != meshRes.end(); fileIt++)
 		{
 			if (ImGui::MenuItem(fileIt->first.data()))
 			{
-				res->textures.push_back(App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
+				res->textures.push_back(App->m_resourceManager->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
 				break;
 			}
 		}
@@ -45,10 +45,10 @@ void Material::EditorContent()
 	{
 		if (ImGui::MenuItem("Default shader"))
 		{
-			App->resources->UnlinkResource(res->shader);
+			App->m_resourceManager->UnlinkResource(res->shader);
 			res->shader = 0;
 		}
-		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->resources->GetAvaliableResources(Component::Type::C_Shader);
+		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Shader);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
 		for (; fileIt != shadersRes.end(); fileIt++)
 		{
@@ -64,7 +64,7 @@ void Material::EditorContent()
 	uint64_t currentShader = res->shader;
 	if (currentShader != 0)
 	{
-		ImGui::Text("Current shader: %s", App->resources->Peek(currentShader)->name.data());
+		ImGui::Text("Current shader: %s", App->m_resourceManager->Peek(currentShader)->name.data());
 	}
 	else
 	{
@@ -142,14 +142,14 @@ void Material::EditorContent()
 			{
 				texturesToRemove.push_back(n);
 			}
-			Resource* resText = App->resources->Peek(res->textures.at(n));
+			Resource* resText = App->m_resourceManager->Peek(res->textures.at(n));
 			if (resText != nullptr)
 			{
 				ImGui::SameLine();
 				sprintf(tmp, "Id: %i    %s", n, resText->name.data());
 				if (ImGui::TreeNode(tmp))
 				{
-					ImTextureID image = (void*)App->resources->Peek(res->textures.at(n))->Read<R_Texture>()->bufferID;
+					ImTextureID image = (void*)App->m_resourceManager->Peek(res->textures.at(n))->Read<R_Texture>()->bufferID;
 					ImGui::Image(image, ImVec2(270, 270));
 
 					ImGui::TreePop();
@@ -161,7 +161,7 @@ void Material::EditorContent()
 
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->resources->Peek(resource);
+	Resource* res = App->m_resourceManager->Peek(resource);
 	myNode.append_attribute("res") = res->name.data();
 	pugi::xml_node color_n = myNode.append_child("Color");
 	color_n.append_attribute("R") = ReadRes<R_Material>()->color[0];
@@ -173,7 +173,7 @@ void Material::SaveSpecifics(pugi::xml_node& myNode)
 void Material::LoadSpecifics(pugi::xml_node & myNode)
 {
 	std::string resName = myNode.attribute("res").as_string();
-	resource = App->resources->LinkResource(resName.data(),GetType());
+	resource = App->m_resourceManager->LinkResource(resName.data(),GetType());
 
 	pugi::xml_node col = myNode.child("Color");
 
@@ -201,7 +201,7 @@ int Material::GetTexture(uint n)
 			R_Material* mat = ReadRes<R_Material>();
 			if (mat)
 			{
-				R_Texture* tex = App->resources->Peek(mat->textures.at(n))->Read<R_Texture>();
+				R_Texture* tex = App->m_resourceManager->Peek(mat->textures.at(n))->Read<R_Texture>();
 				if (tex)
 				{
 					return tex->bufferID;
@@ -215,7 +215,7 @@ int Material::GetTexture(uint n)
 bool Material::AddTexture(std::string fileName)
 {
 	R_Material* res = ReadRes<R_Material>();
-	res->textures.push_back(App->resources->LinkResource(fileName, Component::Type::C_Texture));
+	res->textures.push_back(App->m_resourceManager->LinkResource(fileName, Component::Type::C_Texture));
 	return true;
 }
 
@@ -281,7 +281,7 @@ void Material::RemoveTexturesNow()
 				{
 					if (m == texturesToRemove[n])
 					{
-						App->resources->UnlinkResource(matRes->textures[m]);
+						App->m_resourceManager->UnlinkResource(matRes->textures[m]);
 						matRes->textures.erase(it);
 						break;
 					}

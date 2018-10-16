@@ -124,7 +124,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 	LOG("Importing 3D scene: %s", filePath);
 
 	//Loading the aiScene from Assimp
-	const aiScene* scene = aiImportFileEx(filePath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
+	const aiScene* scene = aiImportFileEx(filePath, aiProcessPreset_TargetRealtime_MaxQuality, App->m_fileSystem->GetAssimpIO());
 
 	if (scene != nullptr)
 	{
@@ -133,7 +133,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 			uint64_t uid = 0;
 			if (overWritting == true)
 			{
-				const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_GO, "RootNode");
+				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_GO, "RootNode");
 				if (inf) { uid = inf->uid; }
 			}
 			ret = ImportGameObject(filePath, scene->mRootNode, scene, uid, overWritting);
@@ -172,7 +172,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 	char* buffer = nullptr;
 	uint size;
 
-	size = App->fs->Load(filePath, &buffer);
+	size = App->m_fileSystem->Load(filePath, &buffer);
 	if (size > 0)
 	{
 		ILuint image;
@@ -197,7 +197,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 					uint64_t uid = 0;
 					if (overWritting)
 					{
-						const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_Texture, FileName(filePath).data());
+						const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Texture, FileName(filePath).data());
 						if (inf)
 						{
 							uid = inf->uid;
@@ -212,7 +212,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 					char toCreate[524];
 					sprintf(toCreate, "Library/Textures/%llu%s", uid, TEXTURE_FORMAT);
 
-					App->fs->Save(toCreate, (const char*)data, newSize);
+					App->m_fileSystem->Save(toCreate, (const char*)data, newSize);
 
 					MetaInf tmp;
 					tmp.name = FileName(filePath);
@@ -264,7 +264,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 	if (overWritting == false)
 	{
 		//If already exists a shader with this name, this won't be imported
-		const MetaInf* existingShader = App->resources->GetMetaData(Component::Type::C_Shader, shaderName.data());
+		const MetaInf* existingShader = App->m_resourceManager->GetMetaData(Component::Type::C_Shader, shaderName.data());
 		if (existingShader != nullptr)
 		{
 			ret.push_back(*existingShader);
@@ -282,8 +282,8 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 	char* fragmentBuffer = nullptr;
 	uint fragmentSize;
 
-	vertexSize = App->fs->Load(vertexFile.data(), &vertexBuffer) + 1;
-	fragmentSize = App->fs->Load(fragmentFile.data(), &fragmentBuffer) + 1;
+	vertexSize = App->m_fileSystem->Load(vertexFile.data(), &vertexBuffer) + 1;
+	fragmentSize = App->m_fileSystem->Load(fragmentFile.data(), &fragmentBuffer) + 1;
 	if (vertexBuffer != nullptr) { vertexBuffer[vertexSize - 1] = '\0'; }
 	if (fragmentBuffer != nullptr) { fragmentBuffer[fragmentSize - 1] = '\0'; }
 
@@ -312,7 +312,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 			uint64_t uid = 0;
 			if (overWritting)
 			{
-				const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_Shader, FileName(filePath).data());
+				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Shader, FileName(filePath).data());
 				if (inf)
 				{
 					uid = inf->uid;
@@ -327,7 +327,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 			char toCreate[524];
 			sprintf(toCreate, "Library/Shaders/%llu%s", uid, SHADER_PROGRAM_FORMAT);
 
-			App->fs->Save(toCreate, binaryProgram, binaryLength + sizeof(GLenum) + sizeof(GLint));
+			App->m_fileSystem->Save(toCreate, binaryProgram, binaryLength + sizeof(GLenum) + sizeof(GLint));
 
 			MetaInf tmp;
 			tmp.name = shaderName;
@@ -341,11 +341,11 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 		char* resultLog = new char[compilationResult.length() + 1];
 		strcpy(resultLog, compilationResult.data());
 		char toCreate[524];
-		sprintf(toCreate, "%s%s", App->importer->RemoveFormat(filePath).data(), "_result.txt");
-		App->fs->Save(toCreate, resultLog, compilationResult.length() + 1);
+		sprintf(toCreate, "%s%s", App->m_importer->RemoveFormat(filePath).data(), "_result.txt");
+		App->m_fileSystem->Save(toCreate, resultLog, compilationResult.length() + 1);
 
-		sprintf(toCreate, "%s%s%s", "Library/Shaders/", App->importer->FileName(filePath).data(), "_result.txt");
-		App->fs->Save(toCreate, resultLog, compilationResult.length() + 1);
+		sprintf(toCreate, "%s%s%s", "Library/Shaders/", App->m_importer->FileName(filePath).data(), "_result.txt");
+		App->m_fileSystem->Save(toCreate, resultLog, compilationResult.length() + 1);
 		RELEASE_ARRAY(resultLog);
 	}
 
@@ -408,7 +408,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		uint64_t meshUid = 0;
 		if (overWritting)
 		{
-			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_mesh, meshName);
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_mesh, meshName);
 			if (inf)
 			{
 				meshUid = inf->uid;
@@ -430,7 +430,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		uint64_t matUid = 0;
 		if (overWritting)
 		{
-			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_mesh, vGoName.data());
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_mesh, vGoName.data());
 			if (inf)
 			{
 				matUid = inf->uid;
@@ -462,7 +462,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		childs[n] = 0;
 		if (overWritting == true)
 		{
-			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_GO, NodetoLoad->mChildren[n]->mName.data);
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_GO, NodetoLoad->mChildren[n]->mName.data);
 			if (inf != nullptr)
 			{
 				childs[n] = inf->uid;
@@ -519,7 +519,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	char toCreate[524];
 	sprintf(toCreate, "Library/vGOs/%llu%s", uid, GO_FORMAT);
 
-	App->fs->Save(toCreate, realFile, realFileSize);
+	App->m_fileSystem->Save(toCreate, realFile, realFileSize);
 
 	RELEASE_ARRAY(realFile);
 
@@ -693,7 +693,7 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	char toCreate[524];
 	sprintf(toCreate, "Library/Meshes/%llu%s", uid, MESH_FORMAT);
 
-	App->fs->Save(toCreate, mesh, meshSize);
+	App->m_fileSystem->Save(toCreate, mesh, meshSize);
 
 	RELEASE_ARRAY(mesh);
 
@@ -759,7 +759,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 		char toCreate[524];
 		sprintf(toCreate, "Library/Materials/%llu%s", uid, MATERIAL_FORMAT);
 
-		App->fs->Save(toCreate, realMat, realSize);	
+		App->m_fileSystem->Save(toCreate, realMat, realSize);	
 
 		for (int n = 0; n < matsIndex.size(); n++)
 		{
@@ -780,7 +780,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 
 GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
 {
-	const MetaInf* meta = App->resources->GetMetaData(fileName, Component::C_GO, vGoName);
+	const MetaInf* meta = App->m_resourceManager->GetMetaData(fileName, Component::C_GO, vGoName);
 	if (meta != nullptr)
 	{
 		char path[1024];
@@ -795,9 +795,9 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 
 		LOG("Loading vgo %s", vGoName);
 
-		if (App->fs->Exists(path))
+		if (App->m_fileSystem->Exists(path))
 		{
-			int size = App->fs->Load(path, &file);
+			int size = App->m_fileSystem->Load(path, &file);
 			if (file != nullptr && size > 0)
 			{
 				char* It = file;
@@ -842,7 +842,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					bytes = sizeof(uint64_t);
 					memcpy(&meshUID, It, bytes);
 					It += bytes;
-					std::string meshName = App->resources->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
+					std::string meshName = App->m_resourceManager->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
 					ret->AddComponent(Component::Type::C_mesh, meshName);
 					ret->SetOriginalAABB();
 				}
@@ -879,7 +879,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					std::vector<uint64_t>::iterator childsUID = childs.begin();
 					while (childsUID != childs.end())
 					{
-						const MetaInf* inf = App->resources->GetMetaData(fileName, Component::C_GO, *childsUID);
+						const MetaInf* inf = App->m_resourceManager->GetMetaData(fileName, Component::C_GO, *childsUID);
 						if (inf != nullptr)
 						{
 							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
@@ -917,7 +917,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 {
 	char* file = nullptr;
 	R_mesh* newMesh = nullptr;
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_mesh, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_mesh, resName);
 	if (inf != nullptr)
 	{
 		char filePath[526];
@@ -925,9 +925,9 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 
 		LOG("Loading mesh %s", inf->name.data());
 
-		if (App->fs->Exists(filePath))
+		if (App->m_fileSystem->Exists(filePath))
 		{
-			int size = App->fs->Load(filePath, &file);
+			int size = App->m_fileSystem->Load(filePath, &file);
 			if (file != nullptr && size > 0)
 			{
 				char* It = file;
@@ -1061,7 +1061,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 {
 	char* file = nullptr;
 	
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_material, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_material, resName);
 
 	R_Material* mat = nullptr;
 
@@ -1072,9 +1072,9 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 
 		LOG("Loading material %s", inf->name.data());
 
-		if (App->fs->Exists(filePath))
+		if (App->m_fileSystem->Exists(filePath))
 		{
-			int size = App->fs->Load(filePath, &file);
+			int size = App->m_fileSystem->Load(filePath, &file);
 			if (file != nullptr && size > 0)
 			{
 				char* It = file;
@@ -1107,7 +1107,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 						memcpy(textureName, It, bytes);
 						It += bytes;
 						std::string path(textureName);
-						uint64_t toAdd = App->resources->LinkResource(path.data(), Component::C_Texture);
+						uint64_t toAdd = App->m_resourceManager->LinkResource(path.data(), Component::C_Texture);
 						if (toAdd != 0)
 						{
 							mat->textures.push_back(toAdd);
@@ -1144,12 +1144,12 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 		return ret;
 	}
 
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_Texture, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_Texture, resName);
 	if (inf != nullptr)
 	{
 		glActiveTexture(0);
 		char fullPath[526];
-		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->fs->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
+		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->m_fileSystem->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
 
 		LOG("Loading Texture %s", inf->name.data());
 
@@ -1185,15 +1185,15 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 	char* file = nullptr;
 	R_Shader* ret = nullptr;
 
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_Shader, resName);
 	LOG("Loading shader %s", inf->name.data());
 	if (inf != nullptr)
 	{
 		char filePath[526];
 		sprintf(filePath, "Library/Shaders/%llu%s", inf->uid, SHADER_PROGRAM_FORMAT);
-		if (App->fs->Exists(filePath))
+		if (App->m_fileSystem->Exists(filePath))
 		{
-			int size = App->fs->Load(filePath, &file);
+			int size = App->m_fileSystem->Load(filePath, &file);
 			if (file != nullptr && size > 0)
 			{
 				ret = new R_Shader(inf->uid);
@@ -1381,7 +1381,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (vertexBuf == nullptr)
 	{
 		ret += "- No vertex shader found. Using default vertex shader.\n";
-		vertexBuf = App->resources->defaultVertexBuf.c_str();
+		vertexBuf = App->m_resourceManager->defaultVertexBuf.c_str();
 	}
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -1406,7 +1406,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (fragmentBuf == nullptr)
 	{
 		ret += "- No fragment shader found. Using default fragment shader.\n";
-		fragmentBuf = App->resources->defaultFragmentBuf.c_str();
+		fragmentBuf = App->m_resourceManager->defaultFragmentBuf.c_str();
 	}
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

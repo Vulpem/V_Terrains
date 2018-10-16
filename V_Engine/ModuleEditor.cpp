@@ -37,23 +37,23 @@ bool ModuleEditor::Init()
 	bool ret = true;
 LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
 //Linking ImGUI and the window
-ImGui_ImplSdlGL3_Init(App->window->GetWindow());
+ImGui_ImplSdlGL3_Init(App->m_window->GetWindow());
 
 return ret;
 }
 
 bool ModuleEditor::Start()
 {
-	//ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
+	//ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
-	App->renderer3D->FindViewPort(0)->active = false;
+	App->m_renderer3D->FindViewPort(0)->active = false;
 
-	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
-	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
-	multipleViewPorts[1] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam());
-	fullScreenViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
+	singleViewPort = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
+	multipleViewPorts[0] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
+	multipleViewPorts[1] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetTopCam());
+	fullScreenViewPort = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
 
-	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
+	OnScreenResize(App->m_window->GetWindowSize().x, App->m_window->GetWindowSize().y);
 	SwitchViewPorts();
 
 	return true;
@@ -63,18 +63,18 @@ bool ModuleEditor::Start()
 update_status ModuleEditor::PreUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
-	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
+	ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 	if (Time.PlayMode != Play::Play)
 	{
 
 		ImGuiIO IO = ImGui::GetIO();
-		App->input->ignoreMouse = IO.WantCaptureMouse;
-		App->input->ignoreKeyboard = (IO.WantCaptureKeyboard || IO.WantTextInput);
+		App->m_input->ignoreMouse = IO.WantCaptureMouse;
+		App->m_input->ignoreKeyboard = (IO.WantCaptureKeyboard || IO.WantTextInput);
 	}
 	else
 	{
-		App->input->ignoreKeyboard = false;
-		App->input->ignoreMouse = false;
+		App->m_input->ignoreKeyboard = false;
+		App->m_input->ignoreMouse = false;
 	}
 	return ret;
 }
@@ -84,18 +84,18 @@ update_status ModuleEditor::Update()
 	update_status ret = UPDATE_CONTINUE;
 	if (Time.PlayMode != Play::Play)
 	{
-		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+		if (App->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 		{
-			viewPort* port = App->renderer3D->HoveringViewPort();
+			viewPort* port = App->m_renderer3D->HoveringViewPort();
 			if (port != nullptr)
 			{
-				App->camera->SetMovingCamera(port->camera);
+				App->m_camera->SetMovingCamera(port->camera);
 			}
 		}
 
 		SelectByViewPort();
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+		if (App->m_input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 		{
 			multipleViews = !multipleViews;
 			SwitchViewPorts();
@@ -176,23 +176,23 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	viewPortMin.y = 20;
 
 	//Setting the single viewPort data
-	viewPort* port = App->renderer3D->FindViewPort(singleViewPort);
+	viewPort* port = App->m_renderer3D->FindViewPort(singleViewPort);
 	port->pos = viewPortMin;
 	port->size.x = viewPortMax.x - viewPortMin.x;
 	port->size.y = viewPortMax.y - viewPortMin.y;
 
 	//Setting the multiple viewPort data
 	float2 size((viewPortMax.x - viewPortMin.x), (viewPortMax.y - viewPortMin.y) / 2);
-	port = App->renderer3D->FindViewPort(multipleViewPorts[0]);
+	port = App->m_renderer3D->FindViewPort(multipleViewPorts[0]);
 	port->pos = viewPortMin;
 	port->size = size;
 
-	port = App->renderer3D->FindViewPort(multipleViewPorts[1]);
+	port = App->m_renderer3D->FindViewPort(multipleViewPorts[1]);
 	port->pos = viewPortMin;
 	port->pos.y += size.y;
 	port->size = size;
 
-	port = App->renderer3D->FindViewPort(fullScreenViewPort);
+	port = App->m_renderer3D->FindViewPort(fullScreenViewPort);
 	port->size.x = screenW;
 	port->size.y = screenH;
 }
@@ -263,28 +263,28 @@ void ModuleEditor::Editor()
 			ImGui::Text("Time since startup: %f", Time.AppRuntime);
 			ImGui::Text("Game Time: %f", Time.GameRuntime);
 
-			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+			ImGui::InputInt("Max Framerate:", &App->m_maxFps, 15);
 			char tmp[256];
-			sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
-			ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+			sprintf(tmp, "Framerate: %i", int(App->m_framerate[EDITOR_FRAME_SAMPLES - 1]));
+			ImGui::PlotHistogram("##Framerate:", App->m_framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
 			char tmp2[256];
-			sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-			ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+			sprintf(tmp2, "Ms: %i", int(App->m_msFrame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+			ImGui::PlotHistogram("##ms", App->m_msFrame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
 		}
 		
 		if (ImGui::CollapsingHeader("Camera##CameraModule"))
 		{
 			ImGui::Text("Camera speed");
-			ImGui::DragFloat("##camSpeed", &App->camera->camSpeed, 0.1f);
+			ImGui::DragFloat("##camSpeed", &App->m_camera->camSpeed, 0.1f);
 			ImGui::Text("Sprint speed multiplier");
-			ImGui::DragFloat("##camsprint", &App->camera->camSprintMultiplier, 0.1f);
+			ImGui::DragFloat("##camsprint", &App->m_camera->camSprintMultiplier, 0.1f);
 
 		}
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
 		{
-			std::vector<std::pair<std::string, float>> timers = App->timers->GetLastReads();
+			std::vector<std::pair<std::string, float>> timers = App->m_timers->GetLastReads();
 			if (timers.empty() == false)
 			{
 				char lastLetter = '0';
@@ -311,20 +311,20 @@ void ModuleEditor::SwitchViewPorts()
 {
 	if (Time.PlayMode == Play::Play)
 	{
-		App->renderer3D->FindViewPort(fullScreenViewPort)->active = true;
-		App->renderer3D->FindViewPort(singleViewPort)->active = false;
+		App->m_renderer3D->FindViewPort(fullScreenViewPort)->active = true;
+		App->m_renderer3D->FindViewPort(singleViewPort)->active = false;
 		for (int n = 0; n < 2; n++)
 		{
-			App->renderer3D->FindViewPort(multipleViewPorts[n])->active = false;
+			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->active = false;
 		}
 	}
 	else
 	{
-		App->renderer3D->FindViewPort(fullScreenViewPort)->active = false;
-		App->renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
+		App->m_renderer3D->FindViewPort(fullScreenViewPort)->active = false;
+		App->m_renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
 		for (int n = 0; n < 2; n++)
 		{
-			App->renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
+			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
 		}
 	}
 }
@@ -354,7 +354,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 		sprintf(tmp, "Display##ViewPort%i", port.ID);
 		if (ImGui::BeginMenu(tmp))
 		{
-			viewPort* editPort = App->renderer3D->FindViewPort(port.ID);
+			viewPort* editPort = App->m_renderer3D->FindViewPort(port.ID);
 			ImGui::Checkbox("Wired", &editPort->useOnlyWires);
 			ImGui::Checkbox("Lightning", &editPort->useLighting);
 			ImGui::Checkbox("Render Heightmap", &editPort->renderHeightMap);
@@ -377,7 +377,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 				ImGui::NewLine();
 				if (ImGui::MenuItem("Switch view type"))
 				{
-					App->renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
+					App->m_renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
 				}
 				if (ImGui::Button("Select active camera"))
 				{
@@ -386,13 +386,13 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
-			std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
-			for (; comp != App->GO->components.end() && comp->first == Component::Type::C_camera; comp++)
+			std::multimap<Component::Type, Component*>::iterator comp = App->m_goManager->components.find(Component::Type::C_camera);
+			for (; comp != App->m_goManager->components.end() && comp->first == Component::Type::C_camera; comp++)
 			{
 				Camera* cam = (Camera*)&*comp->second;
 				if (ImGui::MenuItem(cam->object->name))
 				{
-					App->renderer3D->FindViewPort(port.ID)->camera = cam;
+					App->m_renderer3D->FindViewPort(port.ID)->camera = cam;
 					int a = 0;
 				}
 			}
@@ -422,13 +422,13 @@ void ModuleEditor::AttributeWindow()
 			if (ImGui::Button("Look at"))
 			{
 				float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
-				App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
+				App->m_camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
 			}
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");
 			if (ImGui::Button("Delete##DeleteGO"))
 			{
-				App->GO->DeleteGameObject(selectedGameObject);
+				App->m_goManager->DeleteGameObject(selectedGameObject);
 				selectedGameObject = nullptr;
 			}
 		}
@@ -438,10 +438,10 @@ void ModuleEditor::AttributeWindow()
 
 void ModuleEditor::SelectByViewPort()
 {
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	if (App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 		viewPort* port = nullptr;
-		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
+		float2 portPos = App->m_renderer3D->ScreenToViewPort(float2(App->m_input->GetMouseX(), App->m_input->GetMouseY()), &port);
 		//Checking the click was made on a port
 		if (port != nullptr)
 		{
@@ -453,7 +453,7 @@ void ModuleEditor::SelectByViewPort()
 
 			GameObject* out_go = NULL;
 
-			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal, false))
+			if (App->m_goManager->RayCast(selectRay, &out_go, &out_pos, &out_normal, false))
 			{
 				SelectGameObject(out_go);
 			}
@@ -488,8 +488,8 @@ void ModuleEditor::Outliner()
 
 	ImGui::Begin("Outliner", 0, flags);
 
-	std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
-	while (node != App->GO->GetRoot()->childs.end())
+	std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->childs.begin();
+	while (node != App->m_goManager->GetRoot()->childs.end())
 	{
 		SceneTreeGameObject((*node));
 		node++;

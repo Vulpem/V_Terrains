@@ -18,25 +18,25 @@ public:
 	{
 		if (shader != 0)
 		{
-			App->resources->UnlinkResource(shader);
+			App->m_resourceManager->UnlinkResource(shader);
 		}
 
 		if (textures.empty() == false)
 		{
 			for (std::vector<uint64_t>::iterator it = textures.begin(); it != textures.end(); it++)
 			{
-				App->resources->UnlinkResource(*it);
+				App->m_resourceManager->UnlinkResource(*it);
 			}
 		}
 	}
 
 	bool AssignShader(std::string shaderName)
 	{
-		uint64_t res = App->resources->LinkResource(shaderName, Component::Type::C_Shader);
+		uint64_t res = App->m_resourceManager->LinkResource(shaderName, Component::Type::C_Shader);
 		if (res == 0) { return false; }
 		if (shader != 0)
 		{
-			App->resources->UnlinkResource(shader);
+			App->m_resourceManager->UnlinkResource(shader);
 		}
 		shader = res;
 	}
@@ -45,9 +45,9 @@ public:
 	{
 		if (shader != 0)
 		{			
-			return ((R_Shader*)App->resources->Peek(shader))->shaderProgram;
+			return ((R_Shader*)App->m_resourceManager->Peek(shader))->shaderProgram;
 		}
-		return App->resources->GetDefaultShader();
+		return App->m_resourceManager->GetDefaultShader();
 	}
 	
 

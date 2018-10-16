@@ -115,7 +115,7 @@ update_status ModulePhysics3D::PreUpdate()
 // ---------------------------------------------------------
 update_status ModulePhysics3D::Update()
 {
-	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
+	if(App->m_input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 
 	if(debug == true)

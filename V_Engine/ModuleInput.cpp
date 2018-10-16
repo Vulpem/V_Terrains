@@ -201,29 +201,29 @@ std::string ModuleInput::DroppedFileFormat()
 bool ModuleInput::CaptureMouse(SDL_Event& e)
 {
 	bool ret = false;
-	float2 windowSize = App->window->GetWindowSize();
+	float2 windowSize = App->m_window->GetWindowSize();
 	if (mouse_x + e.motion.xrel >= windowSize.x)
 	{
-		SDL_WarpMouseInWindow(App->window->GetWindow(), 1, e.motion.y);
+		SDL_WarpMouseInWindow(App->m_window->GetWindow(), 1, e.motion.y);
 		e.motion.xrel = 0;
 		ret = true;
 	}
 	else if (mouse_x + e.motion.xrel <= 0)
 	{
-		SDL_WarpMouseInWindow(App->window->GetWindow(), windowSize.x - 1, e.motion.y);
+		SDL_WarpMouseInWindow(App->m_window->GetWindow(), windowSize.x - 1, e.motion.y);
 		e.motion.xrel = 0;
 		ret = true;
 	}
 
 	if (mouse_y + e.motion.yrel >= windowSize.y)
 	{
-		SDL_WarpMouseInWindow(App->window->GetWindow(), e.motion.x, 1);
+		SDL_WarpMouseInWindow(App->m_window->GetWindow(), e.motion.x, 1);
 		e.motion.yrel = 0;
 		ret = true;
 	}
 	else if (mouse_y + e.motion.yrel <= 0)
 	{
-		SDL_WarpMouseInWindow(App->window->GetWindow(), e.motion.x, windowSize.y - 1);
+		SDL_WarpMouseInWindow(App->m_window->GetWindow(), e.motion.x, windowSize.y - 1);
 		e.motion.yrel = 0;
 		ret = true;
 	}

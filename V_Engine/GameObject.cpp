@@ -24,7 +24,7 @@ GameObject::GameObject()
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
-	App->GO->dynamicGO.push_back(this);
+	App->m_goManager->dynamicGO.push_back(this);
 }
 
 GameObject::GameObject(uint64_t Uid)
@@ -37,20 +37,20 @@ GameObject::GameObject(uint64_t Uid)
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
-	App->GO->dynamicGO.push_back(this);
+	App->m_goManager->dynamicGO.push_back(this);
 }
 
 GameObject::~GameObject()
 {
 	if (IsStatic() == false)
 	{
-		if (App->GO->dynamicGO.empty() == false)
+		if (App->m_goManager->dynamicGO.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
+			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
 			{
 				if ((*it) == this)
 				{
-					App->GO->dynamicGO.erase(it);
+					App->m_goManager->dynamicGO.erase(it);
 					break;
 				}
 			}
@@ -58,7 +58,7 @@ GameObject::~GameObject()
 	}
 	else
 	{
-		App->GO->quadTree.Remove(this);
+		App->m_goManager->quadTree.Remove(this);
 	}
 
 	if (parent != nullptr)
@@ -74,12 +74,12 @@ GameObject::~GameObject()
 	std::vector<Component*>::reverse_iterator comp = components.rbegin();
 	while (comp != components.rend())
 	{
-		std::multimap<Component::Type, Component*>::iterator it = App->GO->components.find((*comp)->GetType());
+		std::multimap<Component::Type, Component*>::iterator it = App->m_goManager->components.find((*comp)->GetType());
 		for (; it->first == (*comp)->GetType(); it++)
 		{
 			if (it->second->GetUID() == (*comp)->GetUID())
 			{
-				App->GO->components.erase(it);
+				App->m_goManager->components.erase(it);
 				break;
 			}
 		}
@@ -110,7 +110,7 @@ void GameObject::DrawOnEditor()
 	{
 		if (ImGui::BeginMenu("Mesh##add"))
 		{
-			std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_mesh);
+			std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_mesh);
 			std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 			for (; fileIt != meshRes.end(); fileIt++)
 			{
@@ -138,7 +138,7 @@ void GameObject::DrawOnEditor()
 			}
 			else
 			{
-				std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_material);
+				std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_material);
 				std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 				for (; fileIt != meshRes.end(); fileIt++)
 				{
@@ -193,16 +193,16 @@ void GameObject::DrawOnEditor()
 	ImGui::SameLine();
 	bool isStatic = Static;
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != Static && App->GO->setting == nullptr)
+	if (isStatic != Static && App->m_goManager->setting == nullptr)
 	{
 		if (childs.empty() == true)
 		{
-			App->GO->SetStatic(isStatic, this);
+			App->m_goManager->SetStatic(isStatic, this);
 		}
 		else
 		{
-			App->GO->setting = this;
-			App->GO->settingStatic = isStatic;
+			App->m_goManager->setting = this;
+			App->m_goManager->settingStatic = isStatic;
 		}
 	}
 
@@ -227,7 +227,7 @@ void GameObject::DrawLocator()
 				color = float4(0, 0.8f, 0.8f, 1);
 			}
 		}
-		App->renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
+		App->m_renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
 
 		if (childs.empty() == false)
 		{
@@ -236,7 +236,7 @@ void GameObject::DrawLocator()
 				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 				{
 					math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
-					App->renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
+					App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
 				}
 			}
 		}
@@ -251,7 +251,7 @@ void GameObject::DrawAABB()
 		{
 			math::float3 corners[8];
 			aabb.GetCornerPoints(corners);
-			App->renderer3D->DrawBox(corners);
+			App->m_renderer3D->DrawBox(corners);
 		}
 	}
 }
@@ -264,7 +264,7 @@ void GameObject::DrawOBB()
 		{
 			math::float3 corners[8];
 			obb.GetCornerPoints(corners);
-			App->renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
+			App->m_renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
 		}
 	}
 }
@@ -464,7 +464,7 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 		{
 			HasComponents[toAdd->GetType()] += 1;
 			components.push_back(toAdd);
-			App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
+			App->m_goManager->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
 			if (toAdd->GetType() == Component::Type::C_mesh)
 			{
 				SetOriginalAABB();
@@ -497,8 +497,8 @@ Transform * GameObject::GetTransform()
 
 void GameObject::Delete()
 {
-	App->Editor->UnselectGameObject(this);
-	App->GO->DeleteGameObject(this);
+	App->m_editor->UnselectGameObject(this);
+	App->m_goManager->DeleteGameObject(this);
 }
 
 void GameObject::Save(pugi::xml_node& node)
@@ -541,12 +541,12 @@ void GameObject::RemoveComponent(Component * comp)
 	{
 		if ((*it) == comp)
 		{
-			std::map<Component::Type, Component*>::iterator mapIt = App->GO->components.find((*it)->GetType());
-			for (; mapIt != App->GO->components.end() && mapIt->first == (*it)->GetType(); mapIt++)
+			std::map<Component::Type, Component*>::iterator mapIt = App->m_goManager->components.find((*it)->GetType());
+			for (; mapIt != App->m_goManager->components.end() && mapIt->first == (*it)->GetType(); mapIt++)
 			{
 				if (mapIt->second == comp)
 				{
-					App->GO->components.erase(mapIt);
+					App->m_goManager->components.erase(mapIt);
 					break;
 				}
 			}

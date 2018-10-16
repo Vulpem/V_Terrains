@@ -90,7 +90,7 @@ void QuadNode::Draw()
 {
 	float3 corners[8];
 	box.GetCornerPoints(corners);
-	App->renderer3D->DrawBox(corners);
+	App->m_renderer3D->DrawBox(corners);
 	
 	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
 	{

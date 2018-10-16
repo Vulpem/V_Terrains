@@ -68,7 +68,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	RPGT::config.globalLight[0] = tmp.x;
 	RPGT::config.globalLight[1] = tmp.y;
 	RPGT::config.globalLight[2] = tmp.z;
-	App->renderer3D->sunDirection = tmp;
+	App->m_renderer3D->sunDirection = tmp;
 }
 
 // Destructor
@@ -89,9 +89,9 @@ bool ModuleTerrain::Start()
 
 	bool ret = true;
 
-    App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
+    App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
-	App->fs->CreateDir("Assets/Terrains");
+	App->m_fileSystem->CreateDir("Assets/Terrains");
 	SetDefaultTextures();
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_maxTexturesGL);
@@ -107,9 +107,9 @@ update_status ModuleTerrain::PreUpdate()
 
 update_status ModuleTerrain::Update()
 {
-	RPGT::config.fogColor[0] = App->renderer3D->clearColor.x;
-	RPGT::config.fogColor[1] = App->renderer3D->clearColor.y;
-	RPGT::config.fogColor[2] = App->renderer3D->clearColor.z;
+	RPGT::config.fogColor[0] = App->m_renderer3D->clearColor.x;
+	RPGT::config.fogColor[1] = App->m_renderer3D->clearColor.y;
+	RPGT::config.fogColor[2] = App->m_renderer3D->clearColor.z;
 
 	if (m_regening)
 	{
@@ -133,7 +133,7 @@ update_status ModuleTerrain::Update()
 				m_generatedMap = true;
 			}
 			float3 currentFogColor = Lerp(previousFogColor, wantedFogColor, (ms - 750.f) / 1000.f);
-			App->renderer3D->clearColor = currentFogColor;
+			App->m_renderer3D->clearColor = currentFogColor;
 		}
 		else if (ms < 2500)
 		{
@@ -142,15 +142,15 @@ update_status ModuleTerrain::Update()
 		else
 		{
 			RPGT::config.fogDistance = m_fogDistance;
-			App->renderer3D->clearColor = wantedFogColor;
+			App->m_renderer3D->clearColor = wantedFogColor;
 			m_regening = false;
 		}
 	}
-	RPGT::config.screenWidth = App->window->GetWindowSize().x;
-	RPGT::config.screenWidth = App->window->GetWindowSize().y;
+	RPGT::config.screenWidth = App->m_window->GetWindowSize().x;
+	RPGT::config.screenWidth = App->m_window->GetWindowSize().y;
 
 	TIMER_START_PERF("0 Terrain Update");
-    float3 pos = App->camera->GetDefaultCam()->GetPosition();
+    float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 	if (!m_forcePositionTo0)
 	{
 		RPGT::Update(pos.x, pos.z);
@@ -191,7 +191,7 @@ update_status ModuleTerrain::Update()
 
 	if (m_movingForward)
 	{
-		Transform* camTrans = App->camera->GetMovingCamera()->object->GetTransform();
+		Transform* camTrans = App->m_camera->GetMovingCamera()->object->GetTransform();
 		float3 p = camTrans->GetGlobalPos() + float3(0, 0, m_forwardSpeed * Time.dt);
 		camTrans->SetGlobalPos(p);
 	}
@@ -199,7 +199,7 @@ update_status ModuleTerrain::Update()
 	{
 		float height = 0;
 		const float heightSpeed = 200.f;
-		Transform* camTrans = App->camera->GetMovingCamera()->object->GetTransform();
+		Transform* camTrans = App->m_camera->GetMovingCamera()->object->GetTransform();
 		float3 p = camTrans->GetGlobalPos();
 
 		p.y += currentVSpeed * Time.dt;
@@ -422,9 +422,9 @@ void ModuleTerrain::DrawUI()
 {
 	ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
-	ImGui::SetNextWindowSize(ImVec2(350, (App->window->GetWindowSize().y - 20) / 4 * 3 - 20));
+	ImGui::SetNextWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-	float3 pos = App->camera->GetDefaultCam()->GetPosition();
+	float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 
 	if (ImGui::Begin("TerrainTests", 0, flags))
 	{
@@ -449,7 +449,7 @@ void ModuleTerrain::DrawUI()
 			floor((pos.z - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
 		};
 		ImGui::Text("Current chunk:\nX: %i,   Z: %i", p[0], p[1]);
-		ImGui::Text("Screen Size: %f, %f", App->window->GetWindowSize().x, App->window->GetWindowSize().y);
+		ImGui::Text("Screen Size: %f, %f", App->m_window->GetWindowSize().x, App->m_window->GetWindowSize().y);
 		ImGui::NewLine();
 		if (ImGui::Button("Generate new random seed"))
 		{
@@ -462,7 +462,7 @@ void ModuleTerrain::DrawUI()
 		if (ImGui::BeginMenu("Load Terrain"))
 		{
 			std::vector<std::string> folders, files;
-			App->fs->GetFilesIn("Assets/Terrains", &folders, &files);
+			App->m_fileSystem->GetFilesIn("Assets/Terrains", &folders, &files);
 			for (int n = 0; n < files.size(); n++)
 			{
 				if (ImGui::MenuItem(files[n].data()))
@@ -484,7 +484,7 @@ void ModuleTerrain::DrawUI()
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
 			ImGui::SliderFloat("Tesselation Triangle Size", &RPGT::config.tesselationTriangleSize, 0.1f, 200.f, "%.2f", 4.f);
-			ImGui::ColorPicker3("Background Color", App->renderer3D->clearColor.ptr());
+			ImGui::ColorPicker3("Background Color", App->m_renderer3D->clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;
@@ -499,7 +499,7 @@ void ModuleTerrain::DrawUI()
 				RPGT::config.globalLight[0] = tmp.x;
 				RPGT::config.globalLight[1] = tmp.y;
 				RPGT::config.globalLight[2] = tmp.z;
-				App->renderer3D->sunDirection = tmp;
+				App->m_renderer3D->sunDirection = tmp;
 			}
 
 			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
@@ -642,18 +642,18 @@ void ModuleTerrain::DrawUI()
 		{
 			if (ImGui::Button("Reset Camera Height"))
 			{
-				float3 pos = App->camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
-				App->camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+				float3 pos = App->m_camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
+				App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
-			if (ImGui::Checkbox("Multiple viewports", &App->Editor->multipleViews))
+			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->multipleViews))
 			{
-				App->Editor->SwitchViewPorts();
+				App->m_editor->SwitchViewPorts();
 			}
-			if (App->Editor->multipleViews)
+			if (App->m_editor->multipleViews)
 			{
 				ImGui::Spacing();
-				ImGui::Checkbox("Auto follow top cam", &App->camera->m_followCamera);
+				ImGui::Checkbox("Auto follow top cam", &App->m_camera->m_followCamera);
 			}
 			ImGui::InputFloat("ForwardSpeedDebug", &m_forwardSpeed);
 			ImGui::InputFloat("VerticalSpeedDebug", &m_verticalSpeed);
@@ -807,12 +807,12 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
 	if (textureFile.length() > 2)
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
 		auto res = std::find_if(texRes.begin(), texRes.end(), [textureFile](auto res) { return (textureFile.compare(res.first) == 0); });
 		if (res != texRes.end())
 		{
-			uint64_t UID = App->resources->LinkResource(res->second.front(), Component::Type::C_Texture);
-			Resource* resource = App->resources->Peek(UID);
+			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), Component::Type::C_Texture);
+			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
 				t.buf_diffuse = resource->Read<R_Texture>()->bufferID;
@@ -834,12 +834,12 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
 	if (hmfile.length() > 2)
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
 		auto res = std::find_if(texRes.begin(), texRes.end(), [hmfile](auto res) { return (hmfile.compare(res.first) == 0); });
 		if (res != texRes.end())
 		{
-			uint64_t UID = App->resources->LinkResource(res->second.front(), Component::Type::C_Texture);
-			Resource* resource = App->resources->Peek(UID);
+			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), Component::Type::C_Texture);
+			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
 				t.buf_heightmap = resource->Read<R_Texture>()->bufferID;
@@ -876,12 +876,12 @@ void ModuleTerrain::Render(const viewPort & port)
 		{
 			for (int x = 0; x < COL_N - 1; x++)
 			{
-				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x] + m_terrainNormal[y][x] * 10, float4(1, 0, 1, 1));
+				App->m_renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x] + m_terrainNormal[y][x] * 10, float4(1, 0, 1, 1));
 
-				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x + 1], float4(0, 1, 1, 1));
-				App->renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y + 1][x], float4(0, 1, 1, 1));
+				App->m_renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y][x + 1], float4(0, 1, 1, 1));
+				App->m_renderer3D->DrawLine(m_terrainPos[y][x], m_terrainPos[y + 1][x], float4(0, 1, 1, 1));
 
-				App->renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
+				App->m_renderer3D->DrawLocator(m_terrainPos[y][x], float4(0, 1, 1, 1));
 			}
 		}
 	}
@@ -1016,7 +1016,7 @@ void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
 	m_regenTimer.Start();
-	previousFogColor = wantedFogColor = App->renderer3D->clearColor;
+	previousFogColor = wantedFogColor = App->m_renderer3D->clearColor;
 }
 
 void ModuleTerrain::ShaderEditor()

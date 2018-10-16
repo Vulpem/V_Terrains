@@ -31,7 +31,7 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, C_camera)
 	frustum.farPlaneDistance = 50000.0;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
-	float2 screenSize = App->window->GetWindowSize();
+	float2 screenSize = App->m_window->GetWindowSize();
 	aspectRatio = (screenSize.x / screenSize.y);
 
 	SetHorizontalFOV(60*DEGTORAD);
@@ -40,9 +40,9 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, C_camera)
 
 Camera::~Camera()
 {
-	if (App->camera->GetMovingCamera() == this)
+	if (App->m_camera->GetMovingCamera() == this)
 	{
-		App->camera->SetMovingCamera();
+		App->m_camera->SetMovingCamera();
 	}
 }
 
@@ -248,7 +248,7 @@ void Camera::DrawFrustum()
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);
-		App->renderer3D->DrawBox(corners, float4(0.49f, 0.85f, 1.0f, 1.0f));
+		App->m_renderer3D->DrawBox(corners, float4(0.49f, 0.85f, 1.0f, 1.0f));
 	}
 }
 
