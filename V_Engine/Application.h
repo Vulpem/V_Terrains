@@ -22,7 +22,6 @@ class ModuleImporter;
 class ModuleResourceManager;
 class TimerManager;
 class ModuleTerrain;
-class ModuleTerrainGame;
 
 struct viewPort;
 
@@ -31,47 +30,47 @@ struct viewPort;
 class Application
 {
 public:
-	ModuleWindow* window;
-	ModuleInput* input;
-	ModuleAudio* audio;
-	ModuleFileSystem* fs;
+	//All accessible modules
+	ModuleWindow * m_window;
+	ModuleInput* m_input;
+	ModuleAudio* m_audio;
+	ModuleFileSystem* m_fileSystem;
 
-	ModuleRenderer3D* renderer3D;
-	ModuleCamera3D* camera;
+	ModuleRenderer3D* m_renderer3D;
+	ModuleCamera3D* m_camera;
 
-	ModuleEditor* Editor;
-	ModuleResourceManager* resources;
-	ModuleImporter* importer;
-	ModuleGoManager* GO;
-	ModulePhysics3D* physics;
-    ModuleTerrain* terrain;
-	ModuleTerrainGame* game;
+	ModuleEditor* m_editor;
+	ModuleResourceManager* m_resourceManager;
+	ModuleImporter* m_importer;
+	ModuleGoManager* m_goManager;
+	ModulePhysics3D* m_physics;
+	ModuleTerrain* m_terrain;
 
-	float ms_frame[EDITOR_FRAME_SAMPLES];
-	float framerate[EDITOR_FRAME_SAMPLES];
-	int maxFPS = 30;
+	//Other variables
+	float m_msFrame[EDITOR_FRAME_SAMPLES];
+	float m_framerate[EDITOR_FRAME_SAMPLES];
+	int m_maxFps = 30;
 
-	TimerManager* timers;
+	TimerManager* m_timers;
+	Timer m_totalTime;
 
 private:
+	PerfTimer	m_msTimer;
+	std::vector<Module*> m_modules;
+	int m_frameCount = 0;
+	Timer	m_fpsTimer;
+	float m_frameTime = -1.0f;
+	int m_previousMaxFps = m_maxFps;
+	bool m_gameRunning = false;
 
-	PerfTimer	ms_timer;
-	std::vector<Module*> list_modules;
-	int frameCount = 0;
-	Timer	FPS_Timer;
-	float FrameTime = -1.0f;
-	int previous_maxFPS = maxFPS;
-	bool gameRunning = false;
-
-	std::string title;
-	std::string organisation;
+	std::string m_title;
+	std::string m_organisation;
 
 public:
 
 	Application();
 	~Application();
 
-	Timer totalTimer;
 	bool Init();
 	update_status Update();
 	bool CleanUp();

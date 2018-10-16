@@ -21,68 +21,65 @@
 #include "Timers.h"
 
 Application::Application()
+	: m_gameRunning(false)
+	, m_title(TITLE)
+	, m_organisation(ORGANISATION)
 {
-	gameRunning = false;
+	m_window = new ModuleWindow(this);
+	m_input = new ModuleInput(this);
+	m_audio = new ModuleAudio(this, true);
+	m_fileSystem = new ModuleFileSystem(this);
 
-	title = TITLE;
-	organisation = ORGANISATION;
-
-	window = new ModuleWindow(this);
-	input = new ModuleInput(this);
-	audio = new ModuleAudio(this, true);
-	fs = new ModuleFileSystem(this);
-
-	renderer3D = new ModuleRenderer3D(this);
-	camera = new ModuleCamera3D(this);
-	physics = new ModulePhysics3D(this);
+	m_renderer3D = new ModuleRenderer3D(this);
+	m_camera = new ModuleCamera3D(this);
+	m_physics = new ModulePhysics3D(this);
 #if USE_EDITOR
-		Editor = new ModuleEditor(this);
+	m_editor = new ModuleEditor(this);
 #endif
-	resources = new ModuleResourceManager(this);
-	GO = new ModuleGoManager(this);
-	importer = new ModuleImporter(this);
+	m_resourceManager = new ModuleResourceManager(this);
+	m_goManager = new ModuleGoManager(this);
+	m_importer = new ModuleImporter(this);
+	m_terrain = new ModuleTerrain(this);
 
-	timers = new TimerManager();
-
-    terrain = new ModuleTerrain(this);
+	m_timers = new TimerManager();
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
 	// They will CleanUp() in reverse order
 
 	// Main Modules
-	AddModule(window);
-	AddModule(input);
-	AddModule(camera);
+	AddModule(m_window);
+	AddModule(m_input);
+	AddModule(m_camera);
 #if USE_EDITOR
-		AddModule(Editor);
+		AddModule(m_editor);
 #endif
-	AddModule(fs);
-	AddModule(audio);
-	AddModule(physics);
-	AddModule(importer);
-	AddModule(resources);
-	AddModule(GO);
-    AddModule(terrain);
+	AddModule(m_fileSystem);
+	AddModule(m_audio);
+	AddModule(m_physics);
+	AddModule(m_importer);
+	AddModule(m_resourceManager);
+	AddModule(m_goManager);
+    AddModule(m_terrain);
 
 	// Renderer last!
-	AddModule(renderer3D);
+	AddModule(m_renderer3D);
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES; n++)
 	{
-		ms_frame[n] = 0;
-		framerate[n] = 0;
+		m_msFrame[n] = 0;
+		m_framerate[n] = 0;
 	}
-	FrameTime = -1.0f;
+	m_frameTime = -1.0f;
 
 	srand(time(NULL));
 }
 
 Application::~Application()
 {
-	std::vector<Module*>::reverse_iterator item = list_modules.rbegin();
+	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
 
-	while(item != list_modules.rend())
+	while(item != m_modules.rend())
 	{
 		delete *item;
 		item++;
@@ -92,11 +89,10 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
-	totalTimer.Start();
 	// Call Init() in all modules
-	std::vector<Module*>::iterator item = list_modules.begin();
+	std::vector<Module*>::iterator item = m_modules.begin();
 
-	while(item != list_modules.end() && ret == true)
+	while(item != m_modules.end() && ret == true)
 	{
 		ret = (*item)->Init();
 		item++;
@@ -104,12 +100,12 @@ bool Application::Init()
 
 	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
-	item = list_modules.begin();
+	item = m_modules.begin();
 
 	//Variable used to determine if LOG's can be shown on console
-	gameRunning = true;
+	m_gameRunning = true;
 
-	while(item != list_modules.end() && ret == true)
+	while(item != m_modules.end() && ret == true)
 	{
 		if ((*item)->IsEnabled())
 		{
@@ -117,10 +113,11 @@ bool Application::Init()
 		}
 		item++;
 	}
-	maxFPS = 0;
+	m_maxFps = 0;
 
-	ms_timer.Start();
-	FPS_Timer.Start();
+	m_msTimer.Start();
+	m_fpsTimer.Start();
+	m_totalTime.Start();
 
 	//TMP
 	TIMER_CREATE("__Timer");
@@ -135,10 +132,10 @@ bool Application::Init()
 void Application::PrepareUpdate()
 {
 	TIMER_START_PERF("App PreUpdate");
-	frameCount++;
+	m_frameCount++;
 
 	//Time managing
-	Time.dt = ms_timer.ReadMs() / 1000.0f;
+	Time.dt = m_msTimer.ReadMs() / 1000.0f;
 	if (Time.PlayMode != Play::Stop && Time.Pause == false)
 	{
 		Time.gdt = Time.dt / Time.gdtModifier;
@@ -148,40 +145,40 @@ void Application::PrepareUpdate()
 	{
 		Time.gdt = 0.0f;
 	}
-	Time.AppRuntime = totalTimer.Read() / 1000.0f;
+	Time.AppRuntime = m_totalTime.Read() / 1000.0f;
 	//
 
-	ms_timer.Start();
+	m_msTimer.Start();
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 	{
-		ms_frame[n] = ms_frame[n + 1];
+		m_msFrame[n] = m_msFrame[n + 1];
 	}
-	ms_frame[EDITOR_FRAME_SAMPLES - 1] = Time.dt;
+	m_msFrame[EDITOR_FRAME_SAMPLES - 1] = Time.dt;
 
-	float tmp = FPS_Timer.Read();
-	if (FPS_Timer.Read() > 1000.0f)
+	float tmp = m_fpsTimer.Read();
+	if (m_fpsTimer.Read() > 1000.0f)
 	{
 		for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 		{
-			framerate[n] = framerate[n + 1];
+			m_framerate[n] = m_framerate[n + 1];
 		}
-		framerate[EDITOR_FRAME_SAMPLES-1] = frameCount;
-		frameCount = 0;
-		FPS_Timer.Start();
+		m_framerate[EDITOR_FRAME_SAMPLES-1] = m_frameCount;
+		m_frameCount = 0;
+		m_fpsTimer.Start();
 	}
 	
-	if (maxFPS != previous_maxFPS)
+	if (m_maxFps != m_previousMaxFps)
 	{
-		if (maxFPS < 5)
+		if (m_maxFps < 5)
 		{
-			FrameTime = -1.0f;
+			m_frameTime = -1.0f;
 		}
 		else
 		{
-			FrameTime = 1000.0f / maxFPS;
+			m_frameTime = 1000.0f / m_maxFps;
 		}
-		previous_maxFPS = maxFPS;
+		m_previousMaxFps = m_maxFps;
 	}
 }
 
@@ -196,9 +193,9 @@ update_status Application::Update()
 	update_status ret = UPDATE_CONTINUE;
 	PrepareUpdate();
 	
-	std::vector<Module*>::iterator item = list_modules.begin();
+	std::vector<Module*>::iterator item = m_modules.begin();
 	
-	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
+	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
 	{
 		if ((*item)->IsEnabled())
 		{
@@ -208,9 +205,9 @@ update_status Application::Update()
 	}
 	TIMER_READ_MS("App PreUpdate");
 	TIMER_START_PERF("App Update");
-	item = list_modules.begin();
+	item = m_modules.begin();
 
-	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
+	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
 	{
 		if ((*item)->IsEnabled())
 		{
@@ -219,9 +216,9 @@ update_status Application::Update()
 		item++;
 	}
 	TIMER_READ_MS("App Update");
-	item = list_modules.begin();
+	item = m_modules.begin();
 	TIMER_START_PERF("App PostUpdate");
-	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
+	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
 	{
 		if ((*item)->IsEnabled())
 		{
@@ -232,9 +229,9 @@ update_status Application::Update()
 	TIMER_READ_MS("App PostUpdate");
 	FinishUpdate();
 
-	if (FrameTime > 0.0001f)
+	if (m_frameTime > 0.0001f)
 	{
-		while (ms_timer.ReadMs() < FrameTime)
+		while (m_msTimer.ReadMs() < m_frameTime)
 		{
 		}
 	}
@@ -243,26 +240,26 @@ update_status Application::Update()
 
 bool Application::CleanUp()
 {
-	gameRunning = false;
+	m_gameRunning = false;
 
 	bool ret = true;
-	std::vector<Module*>::reverse_iterator item = list_modules.rbegin();
+	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
 
-	while(item != list_modules.rend() && ret == true)
+	while(item != m_modules.rend() && ret == true)
 	{
 		ret = (*item)->CleanUp();
 		item++;
 	}
-	RELEASE(timers);
+	RELEASE(m_timers);
 
 	return ret;
 }
 
 void Application::Render(const viewPort& port)
 {
-	std::vector<Module*>::iterator item = list_modules.begin();
+	std::vector<Module*>::iterator item = m_modules.begin();
 
-	while (item != list_modules.end())
+	while (item != m_modules.end())
 	{
 		if ((*item)->IsEnabled())
 		{
@@ -282,17 +279,17 @@ bool Application::OpenBrowser(const char* link)
 
 const char* Application::GetOrganization()
 {
-	return organisation.data();
+	return m_organisation.data();
 }
 
 const char* Application::GetTitle()
 {
-	return title.data();
+	return m_title.data();
 }
 
 void Application::OnScreenResize(int width, int heigth)
 {
-	for (std::vector<Module*>::iterator it = list_modules.begin(); it != list_modules.end(); it++)
+	for (std::vector<Module*>::iterator it = m_modules.begin(); it != m_modules.end(); it++)
 	{
 		(*it)->OnScreenResize(width, heigth);
 	}
@@ -308,18 +305,18 @@ void Application::Play(bool debug)
 	{
 		Time.PlayMode = Play::DebugPlay;
 	}
-	std::for_each(list_modules.begin(), list_modules.end(),
+	std::for_each(m_modules.begin(), m_modules.end(),
 		[](Module* m) {m->OnPlay(); });
 }
 
 void Application::Stop()
 {
 	Time.PlayMode = Play::Stop;
-	std::for_each(list_modules.begin(), list_modules.end(),
+	std::for_each(m_modules.begin(), m_modules.end(),
 		[](Module* m) {m->OnStop(); });
 }
 
 void Application::AddModule(Module* mod)
 {
-	list_modules.push_back(mod);
+	m_modules.push_back(mod);
 }
