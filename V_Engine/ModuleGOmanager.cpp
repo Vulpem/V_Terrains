@@ -225,9 +225,9 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 
 GameObject* ModuleGoManager::CreateCamera(const char* name)
 {
-	GameObject* camera = CreateEmpty(name);
-	camera->AddComponent(Component::Type::C_camera);
-	return camera;
+	GameObject* m_camera = CreateEmpty(name);
+	m_camera->AddComponent(Component::Type::C_camera);
+	return m_camera;
 }
 
 GameObject * ModuleGoManager::DuplicateGO(GameObject * toCopy)
@@ -608,7 +608,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 				comp->second->Draw(port);
 				if (comp->second->object->HasComponent(Component::Type::C_Billboard))
 				{
-					Transform* camTransform = port.camera->object->GetTransform();
+					Transform* camTransform = port.m_camera->object->GetTransform();
 					comp->second->object->GetComponent<Billboard>().front()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 				}
 			}
@@ -622,7 +622,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			if (((Camera*)(it->second))->HasCulling())
 			{
 				aCamHadCulling = true;
-				//If a camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
+				//If a m_camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
 				if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 				{
 					toRender = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
@@ -634,24 +634,24 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			}
 		}
 
-		//If no cameras had culling active, we'll cull from the Current Active camera
+		//If no cameras had culling active, we'll cull from the Current Active m_camera
 		if (aCamHadCulling == false)
 		{
 			std::vector<GameObject*> GOs;
-			if (port.camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+			if (port.m_camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 			{
-				toRender = FilterCollisions(*port.camera->GetFrustum());
+				toRender = FilterCollisions(*port.m_camera->GetFrustum());
 			}
 			else
 			{
-				toRender = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
+				toRender = FilterCollisions(port.m_camera->GetFrustum()->MinimalEnclosingAABB());
 			}
 		}
 		TIMER_READ_MS_MAX("Cam culling longest");
 	}
 	else
 	{
-		App->m_renderer3D->SetViewPort(*App->m_renderer3D->FindViewPort(port.ID));
+		App->m_renderer3D->SetViewPort(*App->m_renderer3D->FindViewPort(port.m_ID));
 		for (std::vector<GameObject*>::const_iterator toInsert = exclusiveGOs.begin(); toInsert != exclusiveGOs.end(); toInsert++)
 		{
 			toRender.push_back(*toInsert);
@@ -675,7 +675,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 					{
 						TIMER_START("Mesh slowest");
 						Mesh_RenderInfo info = GetMeshData(*mesh);
-						if (port.useOnlyWires)
+						if (port.m_useOnlyWires)
 						{
 							info.filled = false;
 							info.wired = true;

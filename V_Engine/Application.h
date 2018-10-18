@@ -64,7 +64,6 @@ private:
 	bool m_gameRunning = false;
 
 	std::string m_title;
-	std::string m_organisation;
 
 public:
 
@@ -79,7 +78,6 @@ public:
 
 	bool OpenBrowser(const char* link);
 
-	const char* GetOrganization();
 	const char* GetTitle();
 
 	void OnScreenResize(int width, int heigth);

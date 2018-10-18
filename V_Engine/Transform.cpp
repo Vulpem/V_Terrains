@@ -77,7 +77,7 @@ void Transform::Draw(const viewPort & port)
 	}
 	//Drawing AABB independantly of object transform
 	//REMOVED
-	if (port.renderBoundingBoxes)
+	if (port.m_renderBoundingBoxes)
 	{
 		object->DrawAABB();
 		object->DrawOBB();

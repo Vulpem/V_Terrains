@@ -46,7 +46,7 @@ bool ModuleEditor::Start()
 {
 	//ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
-	App->m_renderer3D->FindViewPort(0)->active = false;
+	App->m_renderer3D->FindViewPort(0)->m_active = false;
 
 	singleViewPort = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
 	multipleViewPorts[0] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
@@ -89,7 +89,7 @@ update_status ModuleEditor::Update()
 			viewPort* port = App->m_renderer3D->HoveringViewPort();
 			if (port != nullptr)
 			{
-				App->m_camera->SetMovingCamera(port->camera);
+				App->m_camera->SetMovingCamera(port->m_camera);
 			}
 		}
 
@@ -149,9 +149,9 @@ void ModuleEditor::Render(const viewPort & port)
 {
 	if (Time.PlayMode != Play::Play)
 	{
-		if (port.withUI)
+		if (port.m_withUI)
 		{
-			//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
+			//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's m_active
 			ViewPortUI(port);
 
 			if (false && showPlane)
@@ -177,24 +177,24 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 
 	//Setting the single viewPort data
 	viewPort* port = App->m_renderer3D->FindViewPort(singleViewPort);
-	port->pos = viewPortMin;
-	port->size.x = viewPortMax.x - viewPortMin.x;
-	port->size.y = viewPortMax.y - viewPortMin.y;
+	port->m_pos = viewPortMin;
+	port->m_size.x = viewPortMax.x - viewPortMin.x;
+	port->m_size.y = viewPortMax.y - viewPortMin.y;
 
 	//Setting the multiple viewPort data
-	float2 size((viewPortMax.x - viewPortMin.x), (viewPortMax.y - viewPortMin.y) / 2);
+	float2 m_size((viewPortMax.x - viewPortMin.x), (viewPortMax.y - viewPortMin.y) / 2);
 	port = App->m_renderer3D->FindViewPort(multipleViewPorts[0]);
-	port->pos = viewPortMin;
-	port->size = size;
+	port->m_pos = viewPortMin;
+	port->m_size = m_size;
 
 	port = App->m_renderer3D->FindViewPort(multipleViewPorts[1]);
-	port->pos = viewPortMin;
-	port->pos.y += size.y;
-	port->size = size;
+	port->m_pos = viewPortMin;
+	port->m_pos.y += m_size.y;
+	port->m_size = m_size;
 
 	port = App->m_renderer3D->FindViewPort(fullScreenViewPort);
-	port->size.x = screenW;
-	port->size.y = screenH;
+	port->m_size.x = screenW;
+	port->m_size.y = screenH;
 }
 
 void ModuleEditor::HandleInput(SDL_Event* event)
@@ -311,20 +311,20 @@ void ModuleEditor::SwitchViewPorts()
 {
 	if (Time.PlayMode == Play::Play)
 	{
-		App->m_renderer3D->FindViewPort(fullScreenViewPort)->active = true;
-		App->m_renderer3D->FindViewPort(singleViewPort)->active = false;
+		App->m_renderer3D->FindViewPort(fullScreenViewPort)->m_active = true;
+		App->m_renderer3D->FindViewPort(singleViewPort)->m_active = false;
 		for (int n = 0; n < 2; n++)
 		{
-			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->active = false;
+			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->m_active = false;
 		}
 	}
 	else
 	{
-		App->m_renderer3D->FindViewPort(fullScreenViewPort)->active = false;
-		App->m_renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
+		App->m_renderer3D->FindViewPort(fullScreenViewPort)->m_active = false;
+		App->m_renderer3D->FindViewPort(singleViewPort)->m_active = !multipleViews;
 		for (int n = 0; n < 2; n++)
 		{
-			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
+			App->m_renderer3D->FindViewPort(multipleViewPorts[n])->m_active = multipleViews;
 		}
 	}
 }
@@ -342,46 +342,46 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
 
-	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
-	ImGui::SetNextWindowSize(ImVec2(port.size.x, 0));
+	ImGui::SetNextWindowPos(ImVec2(port.m_pos.x, port.m_pos.y));
+	ImGui::SetNextWindowSize(ImVec2(port.m_size.x, 0));
 
 	char tmp[256];
-	sprintf(tmp, "ViewPortMenu##%i", port.ID);
+	sprintf(tmp, "ViewPortMenu##%i", port.m_ID);
 
 	ImGui::Begin(tmp, 0, flags);
 	if (ImGui::BeginMenuBar())
 	{
-		sprintf(tmp, "Display##ViewPort%i", port.ID);
+		sprintf(tmp, "Display##ViewPort%i", port.m_ID);
 		if (ImGui::BeginMenu(tmp))
 		{
-			viewPort* editPort = App->m_renderer3D->FindViewPort(port.ID);
-			ImGui::Checkbox("Wired", &editPort->useOnlyWires);
-			ImGui::Checkbox("Lightning", &editPort->useLighting);
-			ImGui::Checkbox("Render Heightmap", &editPort->renderHeightMap);
-			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
-			ImGui::Checkbox("Render Terrain", &editPort->renderTerrain);
-			ImGui::Checkbox("Render Terrain collision", &editPort->renderTerrainCollisions);
-			ImGui::Checkbox("Render chunk borders", &editPort->renderChunkBorders);
-			ImGui::Checkbox("Render Bounding boxes", &editPort->renderBoundingBoxes);
+			viewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
+			ImGui::Checkbox("Wired", &editPort->m_useOnlyWires);
+			ImGui::Checkbox("Lightning", &editPort->m_useLighting);
+			ImGui::Checkbox("Render Heightmap", &editPort->m_renderHeightMap);
+			ImGui::Checkbox("Single sided faces", &editPort->m_useSingleSidedFaces);
+			ImGui::Checkbox("Render Terrain", &editPort->m_renderTerrain);
+			ImGui::Checkbox("Render Terrain collision", &editPort->m_renderTerrainCollisions);
+			ImGui::Checkbox("Render chunk borders", &editPort->m_renderChunkBorders);
+			ImGui::Checkbox("Render Bounding boxes", &editPort->m_renderBoundingBoxes);
 
 			ImGui::EndMenu();
 		}
-		sprintf(tmp, "Camera##ViewPort%i", port.ID);
+		sprintf(tmp, "Camera##ViewPort%i", port.m_ID);
 		if (ImGui::BeginMenu(tmp))
 		{
 			if (ImGui::BeginMenu("Current Camera"))
 			{
 				ImGui::Text("Name:");
-				ImGui::Text(port.camera->object->name);
+				ImGui::Text(port.m_camera->object->name);
 				ImGui::Separator();
 				ImGui::NewLine();
 				if (ImGui::MenuItem("Switch view type"))
 				{
-					App->m_renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
+					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera->SwitchViewType();
 				}
-				if (ImGui::Button("Select active camera"))
+				if (ImGui::Button("Select m_active m_camera"))
 				{
-					SelectGameObject(port.camera->object);
+					SelectGameObject(port.m_camera->object);
 				}
 				ImGui::EndMenu();
 			}
@@ -392,13 +392,13 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 				Camera* cam = (Camera*)&*comp->second;
 				if (ImGui::MenuItem(cam->object->name))
 				{
-					App->m_renderer3D->FindViewPort(port.ID)->camera = cam;
+					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
 					int a = 0;
 				}
 			}
 			ImGui::EndMenu();
 		}
-		sprintf(tmp, "Switch View Type:##%i", port.ID);
+		sprintf(tmp, "Switch View Type:##%i", port.m_ID);
 
 		ImGui::EndMenuBar();
 	}
@@ -446,10 +446,10 @@ void ModuleEditor::SelectByViewPort()
 		if (port != nullptr)
 		{
 			//Normalizing the mouse position in port to [-1,1]
-			portPos.x = portPos.x / (port->size.x / 2) - 1;
-			portPos.y = portPos.y / (port->size.y / 2) - 1;
+			portPos.x = portPos.x / (port->m_size.x / 2) - 1;
+			portPos.y = portPos.y / (port->m_size.y / 2) - 1;
 			//Generating the LineSegment we'll check for collisions
-			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+			selectRay = port->m_camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
 
 			GameObject* out_go = NULL;
 

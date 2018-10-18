@@ -857,18 +857,18 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 
 void ModuleTerrain::Render(const viewPort & port)
 {
-	RPGT::config.debug.wiredRender = port.useOnlyWires;
-	RPGT::config.debug.renderLight = port.useLighting;
-	RPGT::config.singleSidedFaces = port.useSingleSidedFaces;
-	RPGT::config.debug.renderHeightmap = port.renderHeightMap;
-	RPGT::config.debug.renderChunkBorders = port.renderChunkBorders;
-	if (port.renderTerrain)
+	RPGT::config.debug.wiredRender = port.m_useOnlyWires;
+	RPGT::config.debug.renderLight = port.m_useLighting;
+	RPGT::config.singleSidedFaces = port.m_useSingleSidedFaces;
+	RPGT::config.debug.renderHeightmap = port.m_renderHeightMap;
+	RPGT::config.debug.renderChunkBorders = port.m_renderChunkBorders;
+	if (port.m_renderTerrain)
 	{
 		TIMER_START_PERF("0 Terrain Render");
-		RPGT::Render(port.camera->GetViewMatrix().ptr(), port.camera->GetProjectionMatrix().ptr());
+		RPGT::Render(port.m_camera->GetViewMatrix().ptr(), port.m_camera->GetProjectionMatrix().ptr());
 		TIMER_READ_MS("0 Terrain Render");
 	}
-	if (port.renderTerrainCollisions)
+	if (port.m_renderTerrainCollisions)
 	{
 		m_calcCollisions = true;
 		for (int y = 0; y < COL_N - 1; y++)

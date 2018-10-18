@@ -57,7 +57,6 @@ extern GlobalTime Time;
 #define VSYNC false
 
 #define TITLE "V_Engine"
-#define ORGANISATION "UPC"
 
 //USED WHEN GENERATING THE QUAD TREE SIZE
 #define WORLD_WIDTH 1400

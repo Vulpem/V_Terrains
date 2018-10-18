@@ -23,7 +23,6 @@
 Application::Application()
 	: m_gameRunning(false)
 	, m_title(TITLE)
-	, m_organisation(ORGANISATION)
 {
 	m_window = new ModuleWindow(this);
 	m_input = new ModuleInput(this);
@@ -275,11 +274,6 @@ bool Application::OpenBrowser(const char* link)
 	ShellExecuteA(0, 0, "chrome.exe", link, 0, SW_SHOWMAXIMIZED);
 
 	return true;
-}
-
-const char* Application::GetOrganization()
-{
-	return m_organisation.data();
 }
 
 const char* Application::GetTitle()

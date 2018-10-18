@@ -194,7 +194,7 @@ update_status ModuleRenderer3D::PostUpdate()
 		lights[i].Render();
 	}
 
-	viewPorts.front().camera = App->m_camera->GetDefaultCam();
+	viewPorts.front().m_camera = App->m_camera->GetDefaultCam();
 	TIMER_START("ViewPorts render");
 	if (viewPorts.empty() == false)
 	{
@@ -202,7 +202,7 @@ update_status ModuleRenderer3D::PostUpdate()
 		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
 			TIMER_START_PERF("ViewPorts slowest");
-			if (port->active && port->autoRender)
+			if (port->m_active && port->m_autoRender)
 			{
 				SetViewPort(*port);
 				App->Render(*port);
@@ -238,7 +238,7 @@ bool ModuleRenderer3D::CleanUp()
 
 void ModuleRenderer3D::OnScreenResize(int width, int heigth)
 {
-	viewPorts.front().size = float2(width, heigth);
+	viewPorts.front().m_size = float2(width, heigth);
 }
 
 void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
@@ -352,7 +352,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		//TMP / TODO
 		//This is pretty inaccurate and probably not optimized. But, hey, it works. Sometimes. Maybe.
 		float3 objectPos = meshInfo.transform.Transposed().TranslatePart();
-		float distanceToObject = currentViewPort->camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
+		float distanceToObject = currentViewPort->m_camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
 
 		alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
 		return;
@@ -381,8 +381,8 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	// ------ Setting uniforms -------------------------
 	glUniformMatrix4fv(meshInfo.shader.modelMatrix, 1, GL_FALSE, meshInfo.transform.ptr());
-	glUniformMatrix4fv(meshInfo.shader.viewMatrix, 1, GL_FALSE, currentViewPort->camera->GetViewMatrix().ptr());
-	glUniformMatrix4fv(meshInfo.shader.projectionMatrix, 1, GL_FALSE, currentViewPort->camera->GetProjectionMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.shader.viewMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetViewMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.shader.projectionMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetProjectionMatrix().ptr());
 
 	glUniform1f(meshInfo.shader.time, (float)Time.AppRuntime);
 
@@ -415,7 +415,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		RenderMeshWired(meshInfo);
 	}
 
-	glUniform1i(meshInfo.shader.useLight, currentViewPort->useLighting);
+	glUniform1i(meshInfo.shader.useLight, currentViewPort->m_useLighting);
 
 	glUniform1i(meshInfo.shader.hasTexture, (meshInfo.textureBuffer != 0));
 	if (meshInfo.textureBuffer > 0)
@@ -444,10 +444,10 @@ viewPort* ModuleRenderer3D::HoveringViewPort()
 {
 	for (std::vector<viewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
 	{
-		if (it->active)
+		if (it->m_active)
 		{
-			if (App->m_input->GetMouseX() > it->pos.x && App->m_input->GetMouseX() < it->pos.x + it->size.x &&
-				App->m_input->GetMouseY() > it->pos.y && App->m_input->GetMouseY() < it->pos.y + it->size.y)
+			if (App->m_input->GetMouseX() > it->m_pos.x && App->m_input->GetMouseX() < it->m_pos.x + it->m_size.x &&
+				App->m_input->GetMouseY() > it->m_pos.y && App->m_input->GetMouseY() < it->m_pos.y + it->m_size.y)
 			{
 				return &*it;
 			}
@@ -461,7 +461,7 @@ float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, viewPo
 	*OUT_port = HoveringViewPort();
 	if (*OUT_port != nullptr)
 	{
-		return float2((*OUT_port)->pos + pos_in_ViewPort);
+		return float2((*OUT_port)->m_pos + pos_in_ViewPort);
 	}
 	return float2(-1,-1);
 }
@@ -471,22 +471,22 @@ float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, viewPort
 	*OUT_port = HoveringViewPort();
 	if (*OUT_port != nullptr)
 	{
-		return float2(pos_in_screen - (*OUT_port)->pos);
+		return float2(pos_in_screen - (*OUT_port)->m_pos);
 	}
 	return float2(-1,-1);
 }
 
-uint ModuleRenderer3D::AddViewPort(float2 pos, float2 size, Camera * cam)
+uint ModuleRenderer3D::AddViewPort(float2 m_pos, float2 m_size, Camera * cam)
 {
-	viewPorts.push_back(viewPort(pos, size, cam, viewPorts.size()));
-	return viewPorts.back().ID;
+	viewPorts.push_back(viewPort(m_pos, m_size, cam, viewPorts.size()));
+	return viewPorts.back().m_ID;
 }
 
-viewPort * ModuleRenderer3D::FindViewPort(uint ID)
+viewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
 {
 	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
 	{
-		if (it->ID == ID)
+		if (it->m_ID == m_ID)
 		{
 			return it._Ptr;
 		}
@@ -494,11 +494,11 @@ viewPort * ModuleRenderer3D::FindViewPort(uint ID)
 	return nullptr;
 }
 
-bool ModuleRenderer3D::DeleteViewPort(uint ID)
+bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 {
 	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
 	{
-		if (it->ID == ID)
+		if (it->m_ID == m_ID)
 		{
 			viewPorts.erase(it);
 			return true;
@@ -511,19 +511,19 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 {
 	currentViewPort = &port;
 	port.SetCameraMatrix();
-	glViewport(port.pos.x, App->m_window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);
-	UpdateProjectionMatrix(port.camera);
+	glViewport(port.m_pos.x, App->m_window->GetWindowSize().y - (port.m_size.y + port.m_pos.y), port.m_size.x, port.m_size.y);
+	UpdateProjectionMatrix(port.m_camera);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(port.camera->GetViewMatrix().ptr());
+	glLoadMatrixf(port.m_camera->GetViewMatrix().ptr());
 
-	if (port.useSingleSidedFaces) { glEnable(GL_CULL_FACE); usingSingleSidedFaces = true; }
+	if (port.m_useSingleSidedFaces) { glEnable(GL_CULL_FACE); usingSingleSidedFaces = true; }
 	else { glDisable(GL_CULL_FACE); usingSingleSidedFaces = false; }
 
-	if (port.useLighting) { glEnable(GL_LIGHTING); usingLights = true; }
+	if (port.m_useLighting) { glEnable(GL_LIGHTING); usingLights = true; }
 	else { glDisable(GL_LIGHTING); usingLights = false;}
 
-	if (!port.renderHeightMap) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
+	if (!port.m_renderHeightMap) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
 	else { glDisable(GL_TEXTURE_2D); usingTextures = false;}
 }
 

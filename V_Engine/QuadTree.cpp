@@ -3,15 +3,16 @@
 #include "Application.h"
 #include "ModuleRenderer3D.h"
 
-QuadNode::QuadNode(float3 minPoint, float3 maxPoint): parent(nullptr)
+QuadNode::QuadNode(float3 minPoint, float3 maxPoint)
+	: m_parent(nullptr)
+	, m_box(minPoint, maxPoint)
 {
-	box.minPoint = minPoint;
-	box.maxPoint = maxPoint;
 }
 
-QuadNode::QuadNode(QuadNode* _parent): parent(_parent)
+QuadNode::QuadNode(QuadNode* _parent)
+	: m_parent(_parent)
+	, m_box(m_parent->GetBox())
 {
-	box = parent->GetBox();
 }
 
 QuadNode::~QuadNode()
@@ -20,14 +21,13 @@ QuadNode::~QuadNode()
 
 bool QuadNode::Add(GameObject* GO)
 {
-	bool ret = false;
-	if (box.Intersects(GO->aabb))
+	if (m_box.Intersects(GO->aabb))
 	{
-		if (childs.empty() == true)
+		if (m_childs.empty() == true)
 		{
-			GOs.push_back(GO);
+			m_GOs.push_back(GO);
 
-			if (GOs.size() > QUAD_GO_SIZE)
+			if (m_GOs.size() > QUAD_GO_SIZE)
 			{
 				CreateChilds();
 			}
@@ -35,9 +35,9 @@ bool QuadNode::Add(GameObject* GO)
 		else
 		{
 			std::vector<QuadNode*> collidedWith;
-			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 			{
-				if (it->box.Intersects(GO->aabb))
+				if (it->m_box.Intersects(GO->aabb))
 				{
 					collidedWith.push_back(&*it);
 				}
@@ -48,92 +48,88 @@ bool QuadNode::Add(GameObject* GO)
 			}
 			else if (collidedWith.size() > 1)
 			{
-				GOs.push_back(GO);
+				m_GOs.push_back(GO);
 			}
 		}
-		ret = true;
+		return true;
 	}
-	return ret;
+	return false;
 }
 
 bool QuadNode::Remove(GameObject * GO)
 {
-	bool ret = false;
-	if (GOs.empty() == false)
+	if (m_GOs.empty() == false)
 	{
-		for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+		for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
 		{
 			if ((*it) == GO)
 			{
-				GOs.erase(it);
+				m_GOs.erase(it);
 				Clean();
 				return true;
 			}
 		}
 	}
 
-	if (childs.empty() == false)
+	if (m_childs.empty() == false)
 	{
-		for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+		for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 		{
-			ret = it->Remove(GO);
-			if (ret == true)
+			if (it->Remove(GO))
 			{
-				break;
+				return true;
 			}
 		}
 	}
-	return ret;
+	return false;
 }
 
 void QuadNode::Draw()
 {
 	float3 corners[8];
-	box.GetCornerPoints(corners);
+	m_box.GetCornerPoints(corners);
 	App->m_renderer3D->DrawBox(corners);
-	
-	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+	for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 	{
 		it->Draw();
 	}
-
 }
 
 void QuadNode::SetBox(int n, float3 breakPoint)
 {
-	AABB parentBox = parent->GetBox();
+	AABB parentBox = m_parent->GetBox();
 	switch (n)
 	{
 	case 0:
 	{
-		box.minPoint.x = parentBox.minPoint.x;
-		box.minPoint.z = breakPoint.z;
-		box.maxPoint.x = breakPoint.x;
-		box.maxPoint.z = parentBox.maxPoint.z;
+		m_box.minPoint.x = parentBox.minPoint.x;
+		m_box.minPoint.z = breakPoint.z;
+		m_box.maxPoint.x = breakPoint.x;
+		m_box.maxPoint.z = parentBox.maxPoint.z;
 		break;
 	}
 	case 1:
 	{
-		box.minPoint.x = breakPoint.x;
-		box.minPoint.z = breakPoint.z;
-		box.maxPoint.x = parentBox.maxPoint.x;
-		box.maxPoint.z = parentBox.maxPoint.z;
+		m_box.minPoint.x = breakPoint.x;
+		m_box.minPoint.z = breakPoint.z;
+		m_box.maxPoint.x = parentBox.maxPoint.x;
+		m_box.maxPoint.z = parentBox.maxPoint.z;
 		break;
 	}
 	case 2:
 	{
-		box.minPoint.x = breakPoint.x;
-		box.minPoint.z = parentBox.minPoint.z;
-		box.maxPoint.x = parentBox.maxPoint.x;
-		box.maxPoint.z = breakPoint.z;
+		m_box.minPoint.x = breakPoint.x;
+		m_box.minPoint.z = parentBox.minPoint.z;
+		m_box.maxPoint.x = parentBox.maxPoint.x;
+		m_box.maxPoint.z = breakPoint.z;
 		break;
 	}
 	case 3:
 	{
-		box.minPoint.x = parentBox.minPoint.x;
-		box.minPoint.z = parentBox.minPoint.z;
-		box.maxPoint.x = breakPoint.x;
-		box.maxPoint.z = breakPoint.z;
+		m_box.minPoint.x = parentBox.minPoint.x;
+		m_box.minPoint.z = parentBox.minPoint.z;
+		m_box.maxPoint.x = breakPoint.x;
+		m_box.maxPoint.z = breakPoint.z;
 		break;
 	}
 	}
@@ -143,7 +139,7 @@ void QuadNode::CreateChilds()
 {
 	float3 centerPoint = float3::zero;
 	/*int n = 0;
-	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
 	{
 		centerPoint.x += (*it)->aabb.CenterPoint().x;
 		centerPoint.y += (*it)->aabb.CenterPoint().z;
@@ -152,17 +148,17 @@ void QuadNode::CreateChilds()
 	centerPoint /= n;
 
 	
-	//Checking if GOs collide with the X plane
+	//Checking if m_GOs collide with the X plane
 	float2 newCenterPoint = centerPoint;
-	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
 	{
 		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(0, 0, 1)).Intersects((*it)->aabb) == true)
 		{
 			newCenterPoint.y++;
 		}
 	}
-	//Checking if GOs collide with the Y plane
-	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	//Checking if m_GOs collide with the Y plane
+	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
 	{
 		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(1, 0, 0)).Intersects((*it)->aabb) == true)
 		{
@@ -170,21 +166,21 @@ void QuadNode::CreateChilds()
 		}
 	}
 
-	if (newCenterPoint.x >= box.maxPoint.x || newCenterPoint.y >= box.maxPoint.z)
+	if (newCenterPoint.x >= m_box.maxPoint.x || newCenterPoint.y >= m_box.maxPoint.z)
 	{
-		newCenterPoint.x = box.CenterPoint().x;
-		newCenterPoint.y = box.CenterPoint().z;
+		newCenterPoint.x = m_box.CenterPoint().x;
+		newCenterPoint.y = m_box.CenterPoint().z;
 	}*/
-	float3 newCenterPoint = box.CenterPoint();
+	float3 newCenterPoint = m_box.CenterPoint();
 
 	for (int n = 0; n < 4; n++)
 	{
-		childs.push_back(QuadNode(this));
-		childs.back().SetBox(n, newCenterPoint);
+		m_childs.push_back(QuadNode(this));
+		m_childs.back().SetBox(n, newCenterPoint);
 	}
 
-	std::vector<GameObject*> tmp = GOs;
-	GOs.clear();
+	std::vector<GameObject*> tmp = m_GOs;
+	m_GOs.clear();
 
 	for (std::vector<GameObject*>::iterator it = tmp.begin(); it != tmp.end(); it++)
 	{
@@ -196,15 +192,15 @@ void QuadNode::Clean()
 {
 	bool childsHaveChilds = false;
 	std::vector<GameObject*> childsGOs;
-	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+	for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 	{
-		if (it->childs.empty() == false)
+		if (it->m_childs.empty() == false)
 		{
-			//If a child has childs, we shouldn't erase any of them! Just in case
+			//If a child has m_childs, we shouldn't erase any of them! Just in case
 			childsHaveChilds = true;
 			break;
 		}
-		for (std::vector<GameObject*>::iterator childIt = it->GOs.begin(); childIt != it->GOs.end(); childIt++)
+		for (std::vector<GameObject*>::iterator childIt = it->m_GOs.begin(); childIt != it->m_GOs.end(); childIt++)
 		{
 			childsGOs.push_back(*childIt);
 		}
@@ -214,26 +210,27 @@ void QuadNode::Clean()
 	{
 		if (childsGOs.empty() == true)
 		{
-			childs.clear();
+			m_childs.clear();
 		}
-		else if (childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
+		else if (childsGOs.size() + m_GOs.size() <= QUAD_GO_SIZE)
 		{
 			for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
 			{
-				GOs.push_back(*it);
+				m_GOs.push_back(*it);
 			}
-			childs.clear();
+			m_childs.clear();
 		}
 
-		if (parent != nullptr)
+		if (m_parent != nullptr)
 		{
-			parent->Clean();
+			m_parent->Clean();
 		}
 	}
 }
 
 
-Quad_Tree::Quad_Tree(float3 minPoint, float3 maxPoint): root(minPoint, maxPoint)
+Quad_Tree::Quad_Tree(float3 minPoint, float3 maxPoint)
+	: m_root(minPoint, maxPoint)
 {
 }
 
@@ -245,7 +242,7 @@ void Quad_Tree::Add(GameObject * GO)
 {
 	if (GO->aabb.IsFinite())
 	{
-		root.Add(GO);
+		m_root.Add(GO);
 	}
 }
 
@@ -253,12 +250,12 @@ void Quad_Tree::Remove(GameObject * GO)
 {
 	if (GO->aabb.IsFinite())
 	{
-		root.Remove(GO);
+		m_root.Remove(GO);
 	}
 }
 
 
 void Quad_Tree::Draw()
 {
-	root.Draw();
+	m_root.Draw();
 }
