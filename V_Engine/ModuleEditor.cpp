@@ -157,7 +157,7 @@ void ModuleEditor::Render(const ViewPort & port)
 			if (false && showPlane)
 			{
 				P_Plane p(0, 0, 0, 1);
-				p.axis = true;
+				p.m_axis = true;
 				p.Render();
 			}
 		}

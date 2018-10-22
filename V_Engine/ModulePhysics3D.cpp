@@ -90,15 +90,15 @@ UpdateStatus ModulePhysics3D::PreUpdate()
 
 			if(pbodyA && pbodyB)
 			{
-				std::list<Module*>::iterator item = pbodyA->collision_listeners.begin();
-				while(item != pbodyA->collision_listeners.end())
+				std::list<Module*>::iterator item = pbodyA->m_collisionListeners.begin();
+				while(item != pbodyA->m_collisionListeners.end())
 				{
 					(*item)->OnCollision(pbodyA, pbodyB);
 					item++;
 				}
 
-				item = pbodyB->collision_listeners.begin();
-				while(item != pbodyB->collision_listeners.end())
+				item = pbodyB->m_collisionListeners.begin();
+				while(item != pbodyB->m_collisionListeners.end())
 				{
 					(*item)->OnCollision(pbodyB, pbodyA);
 					item++;
@@ -179,11 +179,11 @@ bool ModulePhysics3D::CleanUp()
 // ---------------------------------------------------------
 PhysBody3D* ModulePhysics3D::AddBody(const P_Sphere& sphere, float mass)
 {
-	btCollisionShape* colShape = new btSphereShape(sphere.radius);
+	btCollisionShape* colShape = new btSphereShape(sphere.m_radius);
 	shapes.push_back(colShape);
 
 	btTransform startTransform;
-	startTransform.setFromOpenGLMatrix(sphere.transform.ptr());
+	startTransform.setFromOpenGLMatrix(sphere.m_transform.ptr());
 
 	btVector3 localInertia(0, 0, 0);
 	if(mass != 0.f)
@@ -206,11 +206,11 @@ PhysBody3D* ModulePhysics3D::AddBody(const P_Sphere& sphere, float mass)
 // ---------------------------------------------------------
 PhysBody3D* ModulePhysics3D::AddBody(const P_Cube& cube, float mass)
 {
-	btCollisionShape* colShape = new btBoxShape(btVector3(cube.size.x*0.5f, cube.size.y*0.5f, cube.size.z*0.5f));
+	btCollisionShape* colShape = new btBoxShape(btVector3(cube.m_size.x*0.5f, cube.m_size.y*0.5f, cube.m_size.z*0.5f));
 	shapes.push_back(colShape);
 
 	btTransform startTransform;
-	startTransform.setFromOpenGLMatrix(cube.transform.ptr());
+	startTransform.setFromOpenGLMatrix(cube.m_transform.ptr());
 
 	btVector3 localInertia(0, 0, 0);
 	if(mass != 0.f)
@@ -232,11 +232,11 @@ PhysBody3D* ModulePhysics3D::AddBody(const P_Cube& cube, float mass)
 // ---------------------------------------------------------
 PhysBody3D* ModulePhysics3D::AddBody(const P_Cylinder& cylinder, float mass)
 {
-	btCollisionShape* colShape = new btCylinderShapeX(btVector3(cylinder.height*0.5f, cylinder.radius, 0.0f));
+	btCollisionShape* colShape = new btCylinderShapeX(btVector3(cylinder.m_height*0.5f, cylinder.m_radius, 0.0f));
 	shapes.push_back(colShape);
 
 	btTransform startTransform;
-	startTransform.setFromOpenGLMatrix(cylinder.transform.ptr());
+	startTransform.setFromOpenGLMatrix(cylinder.m_transform.ptr());
 
 	btVector3 localInertia(0, 0, 0);
 	if(mass != 0.f)
@@ -259,8 +259,8 @@ PhysBody3D* ModulePhysics3D::AddBody(const P_Cylinder& cylinder, float mass)
 void ModulePhysics3D::AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB)
 {
 	btTypedConstraint* p2p = new btPoint2PointConstraint(
-		*(bodyA.body), 
-		*(bodyB.body), 
+		*(bodyA.m_body), 
+		*(bodyB.m_body), 
 		btVector3(anchorA.x, anchorA.y, anchorA.z), 
 		btVector3(anchorB.x, anchorB.y, anchorB.z));
 	world->addConstraint(p2p);
@@ -271,8 +271,8 @@ void ModulePhysics3D::AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, con
 void ModulePhysics3D::AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB, const math::float3& axisA, const math::float3& axisB, bool disable_collision)
 {
 	btHingeConstraint* hinge = new btHingeConstraint(
-		*(bodyA.body), 
-		*(bodyB.body), 
+		*(bodyA.m_body), 
+		*(bodyB.m_body), 
 		btVector3(anchorA.x, anchorA.y, anchorA.z),
 		btVector3(anchorB.x, anchorB.y, anchorB.z),
 		btVector3(axisA.x, axisA.y, axisA.z), 
@@ -288,7 +288,7 @@ void ModulePhysics3D::DeleteBody(PhysBody3D* body)
 	bodies.remove(body);
 	//Warning, untested
 	//bodies.del(bodies.findNode(body));
-	world->removeRigidBody(body->body);
+	world->removeRigidBody(body->m_body);
 	delete body;
 	body = nullptr;
 }
@@ -296,16 +296,16 @@ void ModulePhysics3D::DeleteBody(PhysBody3D* body)
 // =============================================
 void DebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
-	line.origin.Set(from.getX(), from.getY(), from.getZ());
-	line.destination.Set(to.getX(), to.getY(), to.getZ());
-	line.color.Set(color.getX(), color.getY(), color.getZ());
+	line.m_a.Set(from.getX(), from.getY(), from.getZ());
+	line.m_b.Set(to.getX(), to.getY(), to.getZ());
+	line.m_color.Set(color.getX(), color.getY(), color.getZ());
 	line.Render();
 }
 
 void DebugDrawer::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
 {
-	point.transform.Translate(PointOnB.getX(), PointOnB.getY(), PointOnB.getZ());
-	point.color.Set(color.getX(), color.getY(), color.getZ());
+	point.m_transform.Translate(PointOnB.getX(), PointOnB.getY(), PointOnB.getZ());
+	point.m_color.Set(color.getX(), color.getY(), color.getZ());
 	point.Render();
 }
 

@@ -21,15 +21,17 @@ public:
 	void GetPos(float* x, float* y, float* z);
 	void SetAsSensor(bool is_sensor);
 	bool IsSensor() const;
-	bool isResting();
+	bool IsResting();
 	void SetInactive();
 
-private:
-	btRigidBody* body = nullptr;
-	bool is_sensor = false;
-
 public:
-	std::list<Module*> collision_listeners;
+	std::list<Module*> m_collisionListeners;
+
+private:
+	btRigidBody* m_body = nullptr;
+	bool m_isSensor = false;
+
+
 };
 
 #endif // __PhysBody3D_H__

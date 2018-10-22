@@ -2,7 +2,7 @@
 #include "Bullet\include\btBulletDynamicsCommon.h"
 
 // =================================================
-PhysBody3D::PhysBody3D(btRigidBody* body) : body(body)
+PhysBody3D::PhysBody3D(btRigidBody* body) : m_body(body)
 {
 	body->setUserPointer(this);
 }
@@ -10,46 +10,46 @@ PhysBody3D::PhysBody3D(btRigidBody* body) : body(body)
 // ---------------------------------------------------------
 PhysBody3D::~PhysBody3D()
 {
-	delete body;
+	delete m_body;
 }
 
 // ---------------------------------------------------------
 void PhysBody3D::Push(float x, float y, float z)
 {
-	body->applyCentralImpulse(btVector3(x, y, z));
+	m_body->applyCentralImpulse(btVector3(x, y, z));
 }
 
 // ---------------------------------------------------------
 void PhysBody3D::GetTransform(float* matrix) const
 {
-	if(body != nullptr && matrix != NULL)
+	if(m_body != nullptr && matrix != NULL)
 	{
-		body->getWorldTransform().getOpenGLMatrix(matrix);
+		m_body->getWorldTransform().getOpenGLMatrix(matrix);
 	}
 }
 
 // ---------------------------------------------------------
 void PhysBody3D::SetTransform(const float* matrix) const
 {
-	if(body != nullptr && matrix != NULL)
+	if(m_body != nullptr && matrix != NULL)
 	{
 		btTransform t;
 		t.setFromOpenGLMatrix(matrix);
-		body->setWorldTransform(t);
+		m_body->setWorldTransform(t);
 	}
 }
 
 // ---------------------------------------------------------
 void PhysBody3D::SetPos(float x, float y, float z)
 {
-	btTransform t = body->getWorldTransform();
+	btTransform t = m_body->getWorldTransform();
 	t.setOrigin(btVector3(x, y, z));
-	body->setWorldTransform(t);
+	m_body->setWorldTransform(t);
 }
 
 void PhysBody3D::GetPos(float* x, float* y, float* z)
 {
-	btTransform t = body->getWorldTransform();
+	btTransform t = m_body->getWorldTransform();
 	btVector3 pos = t.getOrigin();
 	btVector3FloatData posFloat;
 	pos.serializeFloat(posFloat);
@@ -61,28 +61,28 @@ void PhysBody3D::GetPos(float* x, float* y, float* z)
 // ---------------------------------------------------------
 void PhysBody3D::SetAsSensor(bool is_sensor)
 {
-	if(this->is_sensor != is_sensor)
+	if(this->m_isSensor != is_sensor)
 	{
-		this->is_sensor = is_sensor;
+		this->m_isSensor = is_sensor;
 		if(is_sensor == true)
-			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			m_body->setCollisionFlags(m_body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		else
-			body->setCollisionFlags(body->getCollisionFlags() &~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			m_body->setCollisionFlags(m_body->getCollisionFlags() &~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 }
 
 // ---------------------------------------------------------
 bool PhysBody3D::IsSensor() const
 {
-	return is_sensor;
+	return m_isSensor;
 }
 
-bool PhysBody3D::isResting()
+bool PhysBody3D::IsResting()
 {
-	return !body->isActive();
+	return !m_body->isActive();
 }
 
 void PhysBody3D::SetInactive()
 {
-	body->setActivationState(WANTS_DEACTIVATION);
+	m_body->setActivationState(WANTS_DEACTIVATION);
 }

@@ -29,13 +29,12 @@ public:
 	PrimitiveTypes	GetType() const;
 
 public:
-	
-	Color color;
-	math::float4x4 transform;
-	bool axis,wire;
+	Color m_color;
+	math::float4x4 m_transform;
+	bool m_axis,m_wire;
 
 protected:
-	PrimitiveTypes type;
+	PrimitiveTypes m_type;
 };
 
 // ============================================
@@ -46,7 +45,7 @@ public :
 	P_Cube(float sizeX, float sizeY, float sizeZ);
 	void InnerRender() const;
 public:
-	math::float3 size;
+	math::float3 m_size;
 };
 
 // ============================================
@@ -57,7 +56,7 @@ public:
 	P_Sphere(float radius);
 	void InnerRender() const;
 public:
-	float radius;
+	float m_radius;
 };
 
 // ============================================
@@ -68,8 +67,8 @@ public:
 	P_Cylinder(float radius, float height);
 	void InnerRender() const;
 public:
-	float radius;
-	float height;
+	float m_radius;
+	float m_height;
 };
 
 // ============================================
@@ -80,8 +79,8 @@ public:
 	P_Line(float x, float y, float z);
 	void InnerRender() const;
 public:
-	math::float3 origin;
-	math::float3 destination;
+	math::float3 m_a;
+	math::float3 m_b;
 };
 
 // ============================================
@@ -92,8 +91,8 @@ public:
 	P_Plane(float x, float y, float z, float d);
 	void InnerRender() const;
 public:
-	math::float3 normal;
-	float constant;
+	math::float3 m_normal;
+	float m_constant;
 };
 
 #endif
