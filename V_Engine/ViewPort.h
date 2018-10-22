@@ -11,7 +11,8 @@ struct ViewPort
 		: m_pos(pos)
 		, m_size(size)
 		, m_camera(cam)
-		, m_ID(id) {};
+		, m_ID(id)
+	{};
 
 	bool m_active = true;
 	bool m_withUI = true;

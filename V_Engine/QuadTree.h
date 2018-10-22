@@ -14,13 +14,6 @@ public:
 	QuadNode(QuadNode* parent);
 	~QuadNode();
 
-private:
-	QuadNode* m_parent;
-	std::vector<QuadNode> m_childs;
-	AABB m_box;
-
-	std::vector<GameObject*> m_GOs;
-public:
 	/*Try to add a GO to this Node.
 	Won't be added and return false if the object's aabb doesn't collide with this node
 	Will return true if it's added*/
@@ -34,10 +27,17 @@ public:
 
 	AABB GetBox() { return m_box; }
 	void SetBox(int n, float3 breakPoint);
+
 private:
 	void CreateChilds();
 	void Clean();
 
+private:
+	QuadNode* m_parent;
+	std::vector<QuadNode> m_childs;
+	AABB m_box;
+
+	std::vector<GameObject*> m_GOs;
 };
 
 
@@ -56,7 +56,6 @@ public:
 	void Draw();
 private:
 	QuadNode m_root;
-
 };
 
 //QuadNode
