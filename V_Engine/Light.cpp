@@ -4,40 +4,40 @@
 
 //#include <gl/GLU.h>
 
-Light::Light() : ref(-1), on(false), position(0.0f, 0.0f, 0.0f)
+Light::Light() : m_ref(-1), m_on(false), m_position(0.0f, 0.0f, 0.0f)
 {}
 
 void Light::Init()
 {
-	glLightfv(ref, GL_AMBIENT, &ambient);
-	glLightfv(ref, GL_DIFFUSE, &diffuse);
+	glLightfv(m_ref, GL_AMBIENT, &m_ambient);
+	glLightfv(m_ref, GL_DIFFUSE, &m_diffuse);
 }
 
 void Light::SetPos(float x, float y, float z)
 {
-	position.x = x;
-	position.y = y;
-	position.z = z;
+	m_position.x = x;
+	m_position.y = y;
+	m_position.z = z;
 }
 
 void Light::Render()
 {
-	if(on)
+	if(m_on)
 	{
-		float pos[] = { position.x, position.y, position.z, 1.0f};
-		glLightfv(ref, GL_POSITION, pos);
+		float pos[] = { m_position.x, m_position.y, m_position.z, 1.0f};
+		glLightfv(m_ref, GL_POSITION, pos);
 	}
 }
 
 void Light::Active(bool active)
 {
-	if(on != active)
+	if(m_on != active)
 	{
-		on = !on;
+		m_on = !m_on;
 
-		if(on)
-			glEnable(ref);
+		if(m_on)
+			glEnable(m_ref);
 		else
-			glDisable(ref);
+			glDisable(m_ref);
 	}
 }

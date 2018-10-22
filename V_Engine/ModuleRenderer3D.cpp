@@ -112,18 +112,18 @@ bool ModuleRenderer3D::Init()
 		GLfloat LightModelAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LightModelAmbient);
 
-		lights[0].ref = GL_LIGHT0;
-		lights[1].ref = GL_LIGHT1;
-		lights[2].ref = GL_LIGHT2;
-		lights[3].ref = GL_LIGHT3;
-		lights[4].ref = GL_LIGHT4;
-		lights[5].ref = GL_LIGHT5;
-		lights[6].ref = GL_LIGHT6;
-		lights[7].ref = GL_LIGHT7;
+		lights[0].m_ref = GL_LIGHT0;
+		lights[1].m_ref = GL_LIGHT1;
+		lights[2].m_ref = GL_LIGHT2;
+		lights[3].m_ref = GL_LIGHT3;
+		lights[4].m_ref = GL_LIGHT4;
+		lights[5].m_ref = GL_LIGHT5;
+		lights[6].m_ref = GL_LIGHT6;
+		lights[7].m_ref = GL_LIGHT7;
 		for (int n = 0; n < MAX_LIGHTS; n++)
 		{
-			lights[n].ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
-			lights[n].diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
+			lights[n].m_ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
+			lights[n].m_diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
 			lights[n].SetPos(n * 5, 10, 0);
 			lights[n].Init();
 		}

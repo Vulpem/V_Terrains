@@ -15,12 +15,12 @@ struct Light
 	void Active(bool active);
 	void Render();
 
-	Color ambient;
-	Color diffuse;
-	math::float3 position;
+	Color m_ambient;
+	Color m_diffuse;
+	math::float3 m_position;
 
-	int ref;
-	bool on;
+	int m_ref;
+	bool m_on;
 };
 
 #endif
