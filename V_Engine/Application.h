@@ -23,12 +23,29 @@ class ModuleResourceManager;
 class TimerManager;
 class ModuleTerrain;
 
-struct viewPort;
+struct ViewPort;
 
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
 class Application
 {
+public:
+	Application();
+	~Application();
+
+	bool Init();
+	UpdateStatus Update();
+	bool CleanUp();
+
+	void Render(const ViewPort& port);
+
+	bool OpenBrowser(const char* link);
+
+	const char* GetTitle();
+	void OnScreenResize(int width, int heigth);
+	void Play(bool debug = false);
+	void Stop();
+
 public:
 	//All accessible modules
 	ModuleWindow * m_window;
@@ -55,6 +72,12 @@ public:
 	Timer m_totalTime;
 
 private:
+
+	void AddModule(Module* mod);
+	void PrepareUpdate();
+	void FinishUpdate();
+
+private:
 	PerfTimer	m_msTimer;
 	std::vector<Module*> m_modules;
 	int m_frameCount = 0;
@@ -64,30 +87,6 @@ private:
 	bool m_gameRunning = false;
 
 	std::string m_title;
-
-public:
-
-	Application();
-	~Application();
-
-	bool Init();
-	update_status Update();
-	bool CleanUp();
-
-	void Render(const viewPort& port);
-
-	bool OpenBrowser(const char* link);
-
-	const char* GetTitle();
-
-	void OnScreenResize(int width, int heigth);
-	void Play(bool debug = false);
-	void Stop();
-private:
-
-	void AddModule(Module* mod);
-	void PrepareUpdate();
-	void FinishUpdate();
 };
 
 extern Application* App;

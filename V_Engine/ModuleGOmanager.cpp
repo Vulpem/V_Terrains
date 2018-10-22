@@ -48,9 +48,9 @@ bool ModuleGoManager::Start()
 }
 
 // Called every draw update
-update_status ModuleGoManager::PreUpdate()
+UpdateStatus ModuleGoManager::PreUpdate()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 
 	TIMER_START("Components PreUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
@@ -71,7 +71,7 @@ update_status ModuleGoManager::PreUpdate()
 	return ret;
 }
 
-update_status ModuleGoManager::Update()
+UpdateStatus ModuleGoManager::Update()
 {
 	if (App->m_input->file_was_dropped)
 	{
@@ -132,7 +132,7 @@ update_status ModuleGoManager::Update()
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleGoManager::PostUpdate()
+UpdateStatus ModuleGoManager::PostUpdate()
 {
 	TIMER_START("Components PostUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
@@ -182,7 +182,7 @@ update_status ModuleGoManager::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
-void ModuleGoManager::Render(const viewPort& port)
+void ModuleGoManager::Render(const ViewPort& port)
 {
 	App->m_goManager->RenderGOs(port);
 	if (drawQuadTree)
@@ -565,34 +565,34 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
-	ret.transform = getFrom->object->GetTransform()->GetGlobalTransform();
+	ret.m_transform = getFrom->object->GetTransform()->GetGlobalTransform();
 
 	if (getFrom->object->HasComponent(Component::Type::C_material))
 	{
 		Material* mat = getFrom->object->GetComponent<Material>().front();
 		if (mat->toDelete == false)
 		{
-			ret.meshColor = mat->GetColor();
-			ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
-			ret.alphaType = mat->GetAlphaType();
-			ret.alphaTest = mat->GetAlphaTest();
-			ret.blendType = mat->GetBlendType();
-			ret.shader = mat->GetShader();
+			ret.m_meshColor = mat->GetColor();
+			ret.m_textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
+			ret.m_alphaType = mat->GetAlphaType();
+			ret.m_alphaTest = mat->GetAlphaTest();
+			ret.m_blendType = mat->GetBlendType();
+			ret.m_shader = mat->GetShader();
 		}
 	}
 	else
 	{
-		ret.meshColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		ret.m_meshColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	if (ret.shader.program == -1)
+	if (ret.m_shader.program == -1)
 	{
-		ret.shader = App->m_resourceManager->GetDefaultShader();
+		ret.m_shader = App->m_resourceManager->GetDefaultShader();
 	}
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObject*>& exclusiveGOs)
+void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObject*>& exclusiveGOs)
 {
 	std::vector<GameObject*> toRender;
 
@@ -677,8 +677,8 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 						Mesh_RenderInfo info = GetMeshData(*mesh);
 						if (port.m_useOnlyWires)
 						{
-							info.filled = false;
-							info.wired = true;
+							info.m_drawFilled = false;
+							info.m_drawWired = true;
 						}
 						App->m_renderer3D->DrawMesh(info);
 						TIMER_READ_MS_MAX("Mesh slowest");

@@ -9,7 +9,7 @@
 #define MAX_LIGHTS 8
 
 struct Mesh_RenderInfo;
-struct viewPort;
+struct ViewPort;
 class Camera;
 
 class ModuleRenderer3D : public Module
@@ -20,8 +20,8 @@ public:
 
 	bool Init();
 	bool Start();
-	update_status PreUpdate();
-	update_status PostUpdate();
+	UpdateStatus PreUpdate();
+	UpdateStatus PostUpdate();
 	bool CleanUp();
 
 	void OnScreenResize(int width, int heigth);
@@ -35,21 +35,21 @@ public:
 	void DrawLocator(float3 position, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends = false);
 
-	viewPort* HoveringViewPort();
-	float2 ViewPortToScreen(const float2& pos_in_ViewPort, viewPort** OUT_port = NULL);
-	float2 ScreenToViewPort(const float2& pos_in_screen, viewPort** OUT_port = NULL);
+	ViewPort* HoveringViewPort();
+	float2 ViewPortToScreen(const float2& pos_in_ViewPort, ViewPort** OUT_port = NULL);
+	float2 ScreenToViewPort(const float2& pos_in_screen, ViewPort** OUT_port = NULL);
 
 	uint AddViewPort(float2 pos, float2 size, Camera* cam);
-	viewPort* FindViewPort(uint ID);
+	ViewPort* FindViewPort(uint ID);
 	bool DeleteViewPort(uint ID);
 
-	void SetViewPort(viewPort& port);
+	void SetViewPort(ViewPort& port);
 private:
 	void RenderMeshWired(const Mesh_RenderInfo& data);
 	void RenderMeshFilled(const Mesh_RenderInfo& data);
 	void RenderNormals(const Mesh_RenderInfo& data);
 public:
-	std::vector<viewPort> viewPorts;
+	std::vector<ViewPort> viewPorts;
 	Light lights[MAX_LIGHTS];
 
 	float4 ambientLight = float4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -58,7 +58,7 @@ public:
 
 private:
 	std::multimap<float, Mesh_RenderInfo> alphaObjects;
-	viewPort* currentViewPort = nullptr;
+	ViewPort* currentViewPort = nullptr;
 
 	SDL_GLContext context;
 

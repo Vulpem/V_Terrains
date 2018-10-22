@@ -50,7 +50,7 @@ bool ModuleCamera3D::CleanUp()
 }
 
 // -----------------------------------------------------------------
-update_status ModuleCamera3D::Update()
+UpdateStatus ModuleCamera3D::Update()
 {
 	if (Time.PlayMode == Play::Stop)
 	{

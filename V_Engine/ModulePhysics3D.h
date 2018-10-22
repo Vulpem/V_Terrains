@@ -23,9 +23,9 @@ public:
 
 	bool Init();
 	bool Start();
-	update_status PreUpdate();
-	update_status Update();
-	update_status PostUpdate();
+	UpdateStatus PreUpdate();
+	UpdateStatus Update();
+	UpdateStatus PostUpdate();
 	bool CleanUp();
 
 	PhysBody3D* AddBody(const P_Sphere& sphere, float mass = 1.0f);

@@ -111,7 +111,7 @@ bool ModuleResourceManager::Start()
 }
 
 // Called every draw update
-update_status ModuleResourceManager::Update()
+UpdateStatus ModuleResourceManager::Update()
 {
 	if (autoRefresh)
 	{
@@ -125,7 +125,7 @@ update_status ModuleResourceManager::Update()
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleResourceManager::PostUpdate()
+UpdateStatus ModuleResourceManager::PostUpdate()
 {
 	ReloadNow();
 	DeleteNow();

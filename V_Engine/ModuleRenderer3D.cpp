@@ -16,7 +16,7 @@
 #include "Mesh_RenderInfo.h"
 #include "ViewPort.h"
 
-#include "R_mesh.h"
+#include "R_Mesh.h"
 #include "../V_Terrain/Code/Include.h"
 
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
@@ -146,7 +146,7 @@ bool ModuleRenderer3D::Init()
 
 		glLineWidth(1.0f);
 
-		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->m_camera->GetDefaultCam(), viewPorts.size()));
+		viewPorts.push_back(ViewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->m_camera->GetDefaultCam(), viewPorts.size()));
 
 	}
 
@@ -177,7 +177,7 @@ bool ModuleRenderer3D::Start()
 }
 
 // PreUpdate: clear buffer
-update_status ModuleRenderer3D::PreUpdate()
+UpdateStatus ModuleRenderer3D::PreUpdate()
 {
 	glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -187,7 +187,7 @@ update_status ModuleRenderer3D::PreUpdate()
 }
 
 // PostUpdate present buffer to screen
-update_status ModuleRenderer3D::PostUpdate()
+UpdateStatus ModuleRenderer3D::PostUpdate()
 {
 	for (uint i = 0; i < MAX_LIGHTS; ++i)
 	{
@@ -199,7 +199,7 @@ update_status ModuleRenderer3D::PostUpdate()
 	if (viewPorts.empty() == false)
 	{
 		TIMER_RESET_STORED("ViewPorts slowest");
-		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
+		for (std::vector<ViewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
 			TIMER_START_PERF("ViewPorts slowest");
 			if (port->m_active && port->m_autoRender)
@@ -347,11 +347,11 @@ void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 {
 	glActiveTexture(0);
-	if (meshInfo.alphaType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
+	if (meshInfo.m_alphaType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
 	{
 		//TMP / TODO
 		//This is pretty inaccurate and probably not optimized. But, hey, it works. Sometimes. Maybe.
-		float3 objectPos = meshInfo.transform.Transposed().TranslatePart();
+		float3 objectPos = meshInfo.m_transform.Transposed().TranslatePart();
 		float distanceToObject = currentViewPort->m_camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
 
 		alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
@@ -359,38 +359,38 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	}
 
 	//Setting alpha&&blend
-	switch (meshInfo.alphaType)
+	switch (meshInfo.m_alphaType)
 	{
 	case (AlphaTestTypes::ALPHA_BLEND):
 	{
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, meshInfo.blendType);
+		glBlendFunc(GL_SRC_ALPHA, meshInfo.m_blendType);
 	}
 	case (AlphaTestTypes::ALPHA_DISCARD):
 	{
 		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, meshInfo.alphaTest);
+		glAlphaFunc(GL_GREATER, meshInfo.m_alphaTest);
 		break;
 	}
 	}
 
-	glUseProgram(meshInfo.shader.program);
+	glUseProgram(meshInfo.m_shader.program);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.dataBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.m_indicesBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.m_dataBuffer);
 
 	// ------ Setting uniforms -------------------------
-	glUniformMatrix4fv(meshInfo.shader.modelMatrix, 1, GL_FALSE, meshInfo.transform.ptr());
-	glUniformMatrix4fv(meshInfo.shader.viewMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetViewMatrix().ptr());
-	glUniformMatrix4fv(meshInfo.shader.projectionMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetProjectionMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.modelMatrix, 1, GL_FALSE, meshInfo.m_transform.ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.viewMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetViewMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.projectionMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetProjectionMatrix().ptr());
 
-	glUniform1f(meshInfo.shader.time, (float)Time.AppRuntime);
+	glUniform1f(meshInfo.m_shader.time, (float)Time.AppRuntime);
 
-	glUniform4fv(meshInfo.shader.ambientColor, 1, ambientLight.ptr());
-	glUniform3fv(meshInfo.shader.globalLightDir, 1, sunDirection.ptr());
-	glUniform1i(meshInfo.shader.fogDistance, RPGT::config.fogDistance);
-	glUniform3fv(meshInfo.shader.fogColor, 1, RPGT::config.fogColor);
-	glUniform1f(meshInfo.shader.maxHeight, RPGT::config.maxHeight);
+	glUniform4fv(meshInfo.m_shader.ambientColor, 1, ambientLight.ptr());
+	glUniform3fv(meshInfo.m_shader.globalLightDir, 1, sunDirection.ptr());
+	glUniform1i(meshInfo.m_shader.fogDistance, RPGT::config.fogDistance);
+	glUniform3fv(meshInfo.m_shader.fogColor, 1, RPGT::config.fogColor);
+	glUniform1f(meshInfo.m_shader.maxHeight, RPGT::config.maxHeight);
 	
 	// ------ Setting data format -------------------------
 
@@ -403,29 +403,29 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
-	if (meshInfo.renderNormals)
+	if (meshInfo.m_drawNormals)
 	{
-		glUniform4fv(meshInfo.shader.materialColor, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr());
+		glUniform4fv(meshInfo.m_shader.materialColor, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr());
 		RenderNormals(meshInfo);
 	}
 
-	if (meshInfo.wired)
+	if (meshInfo.m_drawWired)
 	{
-		glUniform4fv(meshInfo.shader.materialColor, 1, meshInfo.wiresColor.ptr());
+		glUniform4fv(meshInfo.m_shader.materialColor, 1, meshInfo.m_wiresColor.ptr());
 		RenderMeshWired(meshInfo);
 	}
 
-	glUniform1i(meshInfo.shader.useLight, currentViewPort->m_useLighting);
+	glUniform1i(meshInfo.m_shader.useLight, currentViewPort->m_useLighting);
 
-	glUniform1i(meshInfo.shader.hasTexture, (meshInfo.textureBuffer != 0));
-	if (meshInfo.textureBuffer > 0)
+	glUniform1i(meshInfo.m_shader.hasTexture, (meshInfo.m_textureBuffer != 0));
+	if (meshInfo.m_textureBuffer > 0)
 	{
-		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
+		glBindTexture(GL_TEXTURE_2D, meshInfo.m_textureBuffer);
 	}
 
-	if (meshInfo.filled)
+	if (meshInfo.m_drawFilled)
 	{
-		glUniform4fv(meshInfo.shader.materialColor, 1, meshInfo.meshColor.ptr());
+		glUniform4fv(meshInfo.m_shader.materialColor, 1, meshInfo.m_meshColor.ptr());
 		RenderMeshFilled(meshInfo);
 	}
 
@@ -440,9 +440,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glUseProgram(0);
 }
 
-viewPort* ModuleRenderer3D::HoveringViewPort()
+ViewPort* ModuleRenderer3D::HoveringViewPort()
 {
-	for (std::vector<viewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
+	for (std::vector<ViewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
 	{
 		if (it->m_active)
 		{
@@ -456,7 +456,7 @@ viewPort* ModuleRenderer3D::HoveringViewPort()
 	return nullptr;
 }
 
-float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, viewPort** OUT_port)
+float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, ViewPort** OUT_port)
 {
 	*OUT_port = HoveringViewPort();
 	if (*OUT_port != nullptr)
@@ -466,7 +466,7 @@ float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, viewPo
 	return float2(-1,-1);
 }
 
-float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, viewPort** OUT_port)
+float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, ViewPort** OUT_port)
 {
 	*OUT_port = HoveringViewPort();
 	if (*OUT_port != nullptr)
@@ -478,13 +478,13 @@ float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, viewPort
 
 uint ModuleRenderer3D::AddViewPort(float2 m_pos, float2 m_size, Camera * cam)
 {
-	viewPorts.push_back(viewPort(m_pos, m_size, cam, viewPorts.size()));
+	viewPorts.push_back(ViewPort(m_pos, m_size, cam, viewPorts.size()));
 	return viewPorts.back().m_ID;
 }
 
-viewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
+ViewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
 {
-	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	for (std::vector<ViewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
 	{
 		if (it->m_ID == m_ID)
 		{
@@ -496,7 +496,7 @@ viewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
 
 bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 {
-	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	for (std::vector<ViewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
 	{
 		if (it->m_ID == m_ID)
 		{
@@ -507,7 +507,7 @@ bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 	return false;
 }
 
-void ModuleRenderer3D::SetViewPort(viewPort& port)
+void ModuleRenderer3D::SetViewPort(ViewPort& port)
 {
 	currentViewPort = &port;
 	port.SetCameraMatrix();
@@ -539,9 +539,9 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glColor4fv(data.wiresColor.ptr());
+	glColor4fv(data.m_wiresColor.ptr());
 
-	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, data.m_nIndices, GL_UNSIGNED_INT, NULL);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -559,19 +559,19 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 void ModuleRenderer3D::RenderMeshFilled(const Mesh_RenderInfo& data)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glColor4fv(data.meshColor.ptr());
-	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
+	glColor4fv(data.m_meshColor.ptr());
+	glDrawElements(GL_TRIANGLES, data.m_nIndices, GL_UNSIGNED_INT, NULL);
 }
 
 void ModuleRenderer3D::RenderNormals(const Mesh_RenderInfo & data)
 {
-	if (data.origin->hasNormals)
+	if (data.m_origin->hasNormals)
 	{
-		for (uint n = 0; n < data.num_vertices; n++)
+		for (uint n = 0; n < data.m_nVertices; n++)
 		{
 			DrawLine(
-				float3(data.origin->vertices[n]),
-				float3(data.origin->vertices[n] + data.origin->normals[n]),
+				float3(data.m_origin->vertices[n]),
+				float3(data.m_origin->vertices[n] + data.m_origin->normals[n]),
 				float4(0.54f, 0.0f, 0.54f, 1.0f));
 		}
 	}

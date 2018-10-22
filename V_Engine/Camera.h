@@ -39,7 +39,7 @@ public:
 	static Type GetType() { return Type::C_camera; }
     float3 GetPosition();
 
-	void Draw(const viewPort & port);
+	void Draw(const ViewPort & port);
 	void DrawFrustum();
 
 	void SetHorizontalFOV(float horizontalFOV);

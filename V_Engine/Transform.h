@@ -81,7 +81,7 @@ public:
 	static float3 WorldForward();
 	static float3 WorldBackward();
 
-	void Draw(const viewPort & port);
+	void Draw(const ViewPort & port);
 
 	static Type GetType() { return Type::C_transform; }
 

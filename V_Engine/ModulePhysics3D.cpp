@@ -71,7 +71,7 @@ bool ModulePhysics3D::Start()
 }
 
 // ---------------------------------------------------------
-update_status ModulePhysics3D::PreUpdate()
+UpdateStatus ModulePhysics3D::PreUpdate()
 {
 //	world->stepSimulation(dt, 15);
 
@@ -113,7 +113,7 @@ update_status ModulePhysics3D::PreUpdate()
 }
 
 // ---------------------------------------------------------
-update_status ModulePhysics3D::Update()
+UpdateStatus ModulePhysics3D::Update()
 {
 	if(App->m_input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
@@ -128,7 +128,7 @@ update_status ModulePhysics3D::Update()
 
 
 // ---------------------------------------------------------
-update_status ModulePhysics3D::PostUpdate()
+UpdateStatus ModulePhysics3D::PostUpdate()
 {
 	return UPDATE_CONTINUE;
 }

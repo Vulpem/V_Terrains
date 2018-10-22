@@ -4,7 +4,7 @@
 #include "Math.h"
 #include "Shader.h"
 
-class R_mesh;
+class R_Mesh;
 
 enum AlphaTestTypes
 {
@@ -15,33 +15,33 @@ enum AlphaTestTypes
 
 struct Mesh_RenderInfo
 {
-	const R_mesh* origin = nullptr;
+	const R_Mesh* m_origin = nullptr;
 
-	bool wired = false;
-	bool filled = false;
-	bool doubleSidedFaces = false;
-	bool renderNormals = false;
+	bool m_drawWired = false;
+	bool m_drawFilled = false;
+	bool m_drawDoubleSidedFaces = false;
+	bool m_drawNormals = false;
 
-	bool hasNormals = false;
-	bool hasUVs = false;
+	bool m_hasNormals = false;
+	bool m_hasUVs = false;
 
-	float4 meshColor = float4::zero;
-	float4 wiresColor = float4::zero;
+	float4 m_meshColor = float4::zero;
+	float4 m_wiresColor = float4::zero;
 
-	unsigned int num_indices = 0;
-	unsigned int num_vertices = 0;
+	unsigned int m_nIndices = 0;
+	unsigned int m_nVertices = 0;
 
-	unsigned int indicesBuffer = 0;
-	unsigned int dataBuffer = 0;
-	unsigned int textureBuffer = 0;
+	unsigned int m_indicesBuffer = 0;
+	unsigned int m_dataBuffer = 0;
+	unsigned int m_textureBuffer = 0;
 
-	AlphaTestTypes alphaType = AlphaTestTypes::ALPHA_OPAQUE;
-	int blendType = 0;
-	float alphaTest = 0.2f;
+	AlphaTestTypes m_alphaType = AlphaTestTypes::ALPHA_OPAQUE;
+	int m_blendType = 0;
+	float m_alphaTest = 0.2f;
 
-	Shader shader;
+	Shader m_shader;
 
-	float4x4 transform;
+	float4x4 m_transform;
 };
 
 #endif // !___MESH_RENDERINFO__

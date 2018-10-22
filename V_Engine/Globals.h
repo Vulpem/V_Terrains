@@ -4,11 +4,7 @@
 #include "GlobalFunctions.h"
 
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
-
 void log(const char file[], int line, const char* format, ...);
-
-
-#define DEBUG_KEYS true
 
 #define CAP(n) ((n <= 0.0f) ? n=0.0f : (n >= 1.0f) ? n=1.0f : n=n)
 
@@ -23,19 +19,16 @@ void log(const char file[], int line, const char* format, ...);
 #define GO_FORMAT ".vgo"
 #define MESH_FORMAT ".vmesh"
 #define MATERIAL_FORMAT ".vmat"
-
 #define SHADER_VERTEX_FORMAT ".vertex"
 #define SHADER_FRAGMENT_FORMAT ".fragment"
-
 #define SHADER_PROGRAM_FORMAT ".vsprogram"
-
 #define META_FORMAT ".vmeta"
 
 typedef unsigned __int32 uint32;
 typedef unsigned __int64 uint64;
 typedef unsigned int uint;
 
-enum update_status
+enum UpdateStatus
 {
 	UPDATE_CONTINUE = 1,
 	UPDATE_STOP,
@@ -55,6 +48,7 @@ extern GlobalTime Time;
 #define WIN_BORDERLESS false
 #define WIN_FULLSCREEN_DESKTOP false
 #define VSYNC false
+#define DEBUG_KEYS true
 
 #define TITLE "V_Engine"
 

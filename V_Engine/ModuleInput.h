@@ -22,7 +22,7 @@ public:
 	~ModuleInput();
 
 	bool Init();
-	update_status PreUpdate();
+	UpdateStatus PreUpdate();
 	bool CleanUp();
 
 	std::string DroppedFileFormat();

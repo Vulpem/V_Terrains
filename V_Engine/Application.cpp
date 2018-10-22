@@ -187,9 +187,9 @@ void Application::FinishUpdate()
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
-update_status Application::Update()
+UpdateStatus Application::Update()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 	PrepareUpdate();
 	
 	std::vector<Module*>::iterator item = m_modules.begin();
@@ -254,7 +254,7 @@ bool Application::CleanUp()
 	return ret;
 }
 
-void Application::Render(const viewPort& port)
+void Application::Render(const ViewPort& port)
 {
 	std::vector<Module*>::iterator item = m_modules.begin();
 

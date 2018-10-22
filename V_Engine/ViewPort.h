@@ -5,9 +5,9 @@
 #include "Camera.h"
 #include "ModuleWindow.h"
 
-struct viewPort
+struct ViewPort
 {
-	viewPort(float2 pos, float2 size, Camera* cam, uint id)
+	ViewPort(float2 pos, float2 size, Camera* cam, uint id)
 		: m_pos(pos)
 		, m_size(size)
 		, m_camera(cam)

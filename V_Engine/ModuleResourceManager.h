@@ -40,8 +40,8 @@ public:
 	~ModuleResourceManager();
 
 	bool Start();
-	update_status Update();
-	update_status PostUpdate();
+	UpdateStatus Update();
+	UpdateStatus PostUpdate();
 	bool CleanUp();
 
 	//Chooses either we want the files to refresh automatically or not

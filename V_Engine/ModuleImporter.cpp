@@ -549,15 +549,15 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName,uint& materialID, uint64_t uid)
 {
 	//Importing vertex
-	uint num_vertices = toLoad->mNumVertices;
-	float* vertices = new float[num_vertices * 3];
-	memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
+	uint m_nVertices = toLoad->mNumVertices;
+	float* vertices = new float[m_nVertices * 3];
+	memcpy_s(vertices, sizeof(float) * m_nVertices * 3, toLoad->mVertices, sizeof(float) * m_nVertices * 3);
 
 	AABB aabb;
 	aabb.SetNegativeInfinity();
 
 	float* it = vertices;
-	for (uint n = 0; n < num_vertices * 3; n += 3)
+	for (uint n = 0; n < m_nVertices * 3; n += 3)
 	{
 		float* x = it;
 		float* y = x;
@@ -573,9 +573,9 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	uint numNormals = 0;
 	if (toLoad->HasNormals())
 	{
-		numNormals = num_vertices;
-		normals = new float[num_vertices * 3];
-		memcpy(normals, toLoad->mNormals, sizeof(float) * num_vertices * 3);
+		numNormals = m_nVertices;
+		normals = new float[m_nVertices * 3];
+		memcpy(normals, toLoad->mNormals, sizeof(float) * m_nVertices * 3);
 	}
 
 	//Importing texture coords
@@ -583,11 +583,11 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	uint numTextureCoords = 0;
 	if (toLoad->HasTextureCoords(0))
 	{
-		numTextureCoords = num_vertices;
-		textureCoords = new float[num_vertices * 2];
+		numTextureCoords = m_nVertices;
+		textureCoords = new float[m_nVertices * 2];
 
 		aiVector3D* tmpVect = toLoad->mTextureCoords[0];
-		for (uint n = 0; n < num_vertices * 2; n += 2)
+		for (uint n = 0; n < m_nVertices * 2; n += 2)
 		{
 			textureCoords[n] = tmpVect->x;
 			textureCoords[n + 1] = tmpVect->y;
@@ -599,17 +599,17 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	materialID = toLoad->mMaterialIndex;
 
 	//Importing index (3 per face)
-	uint num_indices = 0;
+	uint m_nIndices = 0;
 	uint* indices = nullptr;
 
 	aiFace* currentFace = toLoad->mFaces;
 
-	num_indices = toLoad->mNumFaces * 3;
-	indices = new uint[num_indices];
+	m_nIndices = toLoad->mNumFaces * 3;
+	indices = new uint[m_nIndices];
 	//If this boolean is still false at the end of the for bucle, not a single face had been loaded. This mesh is unexistant
 	bool meshExists = false;
 
-	for (uint i = 0; i < num_indices; i += 3)
+	for (uint i = 0; i < m_nIndices; i += 3)
 	{
 		if (currentFace->mNumIndices != 3)
 		{
@@ -629,14 +629,14 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 		//Mesh exists? 
 		sizeof(bool) +
 
-		//num_vertices				   vertices				num_normals   normals
-		sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
+		//m_nVertices				   vertices				num_normals   normals
+		sizeof(uint) + sizeof(float) * m_nVertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
 
 		//num_texture coords  texture Coords		             
 		+ sizeof(uint) + sizeof(float) * numTextureCoords * 2 +
 
 		//num indices								indices
-		+sizeof(uint) + sizeof(uint) * num_indices
+		+sizeof(uint) + sizeof(uint) * m_nIndices
 		//aabb
 		+ sizeof(float) * 6;
 
@@ -647,10 +647,10 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	meshIt = CopyMem<bool>(meshIt, &meshExists);
 
 	//Num vertices
-	meshIt = CopyMem<uint>(meshIt, &num_vertices);
+	meshIt = CopyMem<uint>(meshIt, &m_nVertices);
 
 	//Vertices
-	meshIt = CopyMem<float>(meshIt, vertices, num_vertices * 3);
+	meshIt = CopyMem<float>(meshIt, vertices, m_nVertices * 3);
 
 	//Num Normals
 	meshIt = CopyMem<uint>(meshIt, &numNormals);
@@ -670,11 +670,11 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 		meshIt = CopyMem<float>(meshIt, textureCoords, numTextureCoords * 2);
 	}
 
-	//num_indices
-	meshIt = CopyMem<uint>(meshIt, &num_indices);
+	//m_nIndices
+	meshIt = CopyMem<uint>(meshIt, &m_nIndices);
 
 	//indices
-	meshIt = CopyMem<uint>(meshIt, indices, num_indices);
+	meshIt = CopyMem<uint>(meshIt, indices, m_nIndices);
 
 	//AABB
 	meshIt = CopyMem<float3>(meshIt, &aabb.maxPoint);
@@ -913,10 +913,10 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 	return nullptr;
 }
 
-R_mesh* ModuleImporter::LoadMesh(const char * resName)
+R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 {
 	char* file = nullptr;
-	R_mesh* newMesh = nullptr;
+	R_Mesh* newMesh = nullptr;
 	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_mesh, resName);
 	if (inf != nullptr)
 	{
@@ -940,18 +940,18 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 
 				if (_meshExists == true)
 				{
-					newMesh = new R_mesh(inf->uid);
+					newMesh = new R_Mesh(inf->uid);
 
 					newMesh->name = resName;
 
 					//Num vertices
 					bytes = sizeof(uint);
-					memcpy(&newMesh->num_vertices, It, bytes);
+					memcpy(&newMesh->m_nVertices, It, bytes);
 					It += bytes;
 
 					//Actual vertices
-					newMesh->vertices = new float3[newMesh->num_vertices];
-					bytes = sizeof(float3) * newMesh->num_vertices;
+					newMesh->vertices = new float3[newMesh->m_nVertices];
+					bytes = sizeof(float3) * newMesh->m_nVertices;
 					memcpy(newMesh->vertices, It, bytes);
 					It += bytes;	
 
@@ -989,9 +989,9 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 						newMesh->hasUVs = true;
 					}
 
-					float* data = new float[(3 + 3 + 2) * newMesh->num_vertices];
+					float* data = new float[(3 + 3 + 2) * newMesh->m_nVertices];
 					float* data_it = data;
-					for (uint n = 0; n < newMesh->num_vertices; n++)
+					for (uint n = 0; n < newMesh->m_nVertices; n++)
 					{
 						memcpy(data_it, &newMesh->vertices[n], sizeof(float3));
 						data_it += 3;
@@ -1016,7 +1016,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 					//Generating data buffer
 					glGenBuffers(1, (GLuint*) &(newMesh->id_data));
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_data);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * (3 + 3 + 2), data, GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->m_nVertices * (3 + 3 + 2), data, GL_STATIC_DRAW);
 					//endof Generating vertices buffer
 
 					RELEASE_ARRAY(textureCoords);
@@ -1025,19 +1025,19 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 #pragma region Loading indices
 					//Num indices
 					bytes = sizeof(uint);
-					memcpy(&newMesh->num_indices, It, bytes);
+					memcpy(&newMesh->m_nIndices, It, bytes);
 					It += bytes;
 
 					//Actual indices
-					newMesh->indices = new uint[newMesh->num_indices];
-					bytes = sizeof(uint) * newMesh->num_indices;
+					newMesh->indices = new uint[newMesh->m_nIndices];
+					bytes = sizeof(uint) * newMesh->m_nIndices;
 					memcpy(newMesh->indices, It, bytes);
 					It += bytes;
 
 					//Generating indices buffer
 					glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->m_nIndices, newMesh->indices, GL_STATIC_DRAW);
 					//endOf generating indices buffer
 #pragma endregion
 

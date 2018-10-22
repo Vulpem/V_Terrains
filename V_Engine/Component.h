@@ -7,7 +7,7 @@
 #include "PugiXml\src\pugixml.hpp"
 
 class GameObject;
-class viewPort;
+class ViewPort;
 
 class Component
 {
@@ -36,7 +36,7 @@ public:
 	virtual void PreUpdate() {};
 	virtual void Update() {};
 	virtual void PostUpdate() {};
-	virtual void Draw(const viewPort & port) {};
+	virtual void Draw(const ViewPort & port) {};
 	virtual void DrawOnEditor();
 
 	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS

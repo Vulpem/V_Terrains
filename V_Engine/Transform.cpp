@@ -69,7 +69,7 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 }
 
-void Transform::Draw(const viewPort & port)
+void Transform::Draw(const ViewPort & port)
 {
 	if (!object->HasComponent(Component::Type::C_mesh))
 	{

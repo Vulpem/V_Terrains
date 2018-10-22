@@ -100,12 +100,12 @@ bool ModuleTerrain::Start()
 }
 
 // PreUpdate: clear buffer
-update_status ModuleTerrain::PreUpdate()
+UpdateStatus ModuleTerrain::PreUpdate()
 {
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleTerrain::Update()
+UpdateStatus ModuleTerrain::Update()
 {
 	RPGT::config.fogColor[0] = App->m_renderer3D->clearColor.x;
 	RPGT::config.fogColor[1] = App->m_renderer3D->clearColor.y;
@@ -217,7 +217,7 @@ update_status ModuleTerrain::Update()
 }
 
 // PostUpdate present buffer to screen
-update_status ModuleTerrain::PostUpdate()
+UpdateStatus ModuleTerrain::PostUpdate()
 {
 	if (Time.PlayMode != Play::Play)
 	{
@@ -855,7 +855,7 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	}
 }
 
-void ModuleTerrain::Render(const viewPort & port)
+void ModuleTerrain::Render(const ViewPort & port)
 {
 	RPGT::config.debug.wiredRender = port.m_useOnlyWires;
 	RPGT::config.debug.renderLight = port.m_useLighting;

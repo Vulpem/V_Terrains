@@ -7,7 +7,7 @@
 
 #include "Application.h"
 
-#include "R_mesh.h"
+#include "R_Mesh.h"
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
@@ -27,40 +27,40 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 	{
 		if (wires == true || object->selected)
 		{
-			ret.wired = true;
+			ret.m_drawWired = true;
 			if (wires == true)
 			{
-				ret.doubleSidedFaces = true;
-				ret.wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
+				ret.m_drawDoubleSidedFaces = true;
+				ret.m_wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
 			}
 			if (object->selected)
 			{
 				if (object->parent && object->parent->selected)
 				{
-					ret.wiresColor = float4(0, 0.5f, 0.5f, 1);
+					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}
 				else
 				{
-					ret.wiresColor = float4(0, 0.8f, 0.8f, 1);
+					ret.m_wiresColor = float4(0, 0.8f, 0.8f, 1);
 				}
 			}
 		}
 		if (wires == false)
 		{
-			ret.filled = true;
+			ret.m_drawFilled = true;
 		}
 
-		ret.renderNormals = object->renderNormals;
+		ret.m_drawNormals = object->renderNormals;
 
-		const R_mesh* res = ReadRes<R_mesh>();
+		const R_Mesh* res = ReadRes<R_Mesh>();
 
-		ret.num_indices = res->num_indices;
-		ret.num_vertices = res->num_vertices;
+		ret.m_nIndices = res->m_nIndices;
+		ret.m_nVertices = res->m_nVertices;
 
-		ret.dataBuffer = res->id_data;
-		ret.indicesBuffer = res->id_indices;
+		ret.m_dataBuffer = res->id_data;
+		ret.m_indicesBuffer = res->id_indices;
 
-		ret.origin = res;
+		ret.m_origin = res;
 	}
 	return ret;
 }
@@ -68,52 +68,52 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 const float3* mesh::GetVertices() const
 {
 	/*//Obtaining the vertices data from the buffer
-	float3* ret = new float3[num_vertices];
+	float3* ret = new float3[m_nVertices];
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
-	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * num_vertices, ret);
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * m_nVertices, ret);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-	return ReadRes<R_mesh>()->vertices;
+	return ReadRes<R_Mesh>()->vertices;
 }
 
 const uint mesh::GetNumVertices()
 {
-	return ReadRes<R_mesh>()->num_vertices;
+	return ReadRes<R_Mesh>()->m_nVertices;
 }
 
 const uint* mesh::GetIndices() const
 {
-	return ReadRes<R_mesh>()->indices;
+	return ReadRes<R_Mesh>()->indices;
 }
 
 const uint mesh::GetNumIndices()
 {
-	return ReadRes<R_mesh>()->num_indices;
+	return ReadRes<R_Mesh>()->m_nIndices;
 }
 
 const float3 * mesh::GetNormals() const
 {
-	return ReadRes<R_mesh>()->normals;
+	return ReadRes<R_Mesh>()->normals;
 }
 
 AABB mesh::GetAABB()
 {
-	return ReadRes<R_mesh>()->aabb;
+	return ReadRes<R_Mesh>()->aabb;
 }
 
 void mesh::EditorContent()
 {
-	const R_mesh* res = ReadRes<R_mesh>();
+	const R_Mesh* res = ReadRes<R_Mesh>();
 	char tmp[48];
 	sprintf(tmp, "Wireframe##%llu", uid);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
 	ImGui::Text("Resource: %s", res->name.data());
 
-	ImGui::Text("Indices in memory: %i", res->num_indices);
+	ImGui::Text("Indices in memory: %i", res->indices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
 	ImGui::Text("Buffer: %i", res->id_indices);
 
-	ImGui::Text("Vertices in memory: %i", res->num_vertices);
+	ImGui::Text("Vertices in memory: %i", res->vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
 	
 	if (res->hasNormals)

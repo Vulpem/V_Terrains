@@ -60,9 +60,9 @@ bool ModuleEditor::Start()
 }
 
 // Called every draw update
-update_status ModuleEditor::PreUpdate()
+UpdateStatus ModuleEditor::PreUpdate()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 	if (Time.PlayMode != Play::Play)
 	{
@@ -79,14 +79,14 @@ update_status ModuleEditor::PreUpdate()
 	return ret;
 }
 
-update_status ModuleEditor::Update()
+UpdateStatus ModuleEditor::Update()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 	if (Time.PlayMode != Play::Play)
 	{
 		if (App->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 		{
-			viewPort* port = App->m_renderer3D->HoveringViewPort();
+			ViewPort* port = App->m_renderer3D->HoveringViewPort();
 			if (port != nullptr)
 			{
 				App->m_camera->SetMovingCamera(port->m_camera);
@@ -104,9 +104,9 @@ update_status ModuleEditor::Update()
 	return ret;
 }
 
-update_status ModuleEditor::PostUpdate()
+UpdateStatus ModuleEditor::PostUpdate()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 	if (Time.PlayMode != Play::Play)
 	{
 		if (IsOpenTestWindow)
@@ -144,8 +144,8 @@ bool ModuleEditor::CleanUp()
 }
 
 
-// ---- Each viewPort UI -------------------------------------------------------------------
-void ModuleEditor::Render(const viewPort & port)
+// ---- Each ViewPort UI -------------------------------------------------------------------
+void ModuleEditor::Render(const ViewPort & port)
 {
 	if (Time.PlayMode != Play::Play)
 	{
@@ -175,13 +175,13 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	viewPortMin.x = 350;
 	viewPortMin.y = 20;
 
-	//Setting the single viewPort data
-	viewPort* port = App->m_renderer3D->FindViewPort(singleViewPort);
+	//Setting the single ViewPort data
+	ViewPort* port = App->m_renderer3D->FindViewPort(singleViewPort);
 	port->m_pos = viewPortMin;
 	port->m_size.x = viewPortMax.x - viewPortMin.x;
 	port->m_size.y = viewPortMax.y - viewPortMin.y;
 
-	//Setting the multiple viewPort data
+	//Setting the multiple ViewPort data
 	float2 m_size((viewPortMax.x - viewPortMin.x), (viewPortMax.y - viewPortMin.y) / 2);
 	port = App->m_renderer3D->FindViewPort(multipleViewPorts[0]);
 	port->m_pos = viewPortMin;
@@ -203,11 +203,11 @@ void ModuleEditor::HandleInput(SDL_Event* event)
 }
 
 
-// ---- UI with IMGUI viewPort UI -------------------------------------------------------------------
+// ---- UI with IMGUI ViewPort UI -------------------------------------------------------------------
 
-update_status ModuleEditor::MenuBar()
+UpdateStatus ModuleEditor::MenuBar()
 {
-	update_status ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UPDATE_CONTINUE;
 
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -338,7 +338,7 @@ void ModuleEditor::UnselectGameObject(GameObject * go)
 	}
 }
 
-void ModuleEditor::ViewPortUI(const viewPort& port)
+void ModuleEditor::ViewPortUI(const ViewPort& port)
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
 
@@ -354,7 +354,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 		sprintf(tmp, "Display##ViewPort%i", port.m_ID);
 		if (ImGui::BeginMenu(tmp))
 		{
-			viewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
+			ViewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
 			ImGui::Checkbox("Wired", &editPort->m_useOnlyWires);
 			ImGui::Checkbox("Lightning", &editPort->m_useLighting);
 			ImGui::Checkbox("Render Heightmap", &editPort->m_renderHeightMap);
@@ -440,7 +440,7 @@ void ModuleEditor::SelectByViewPort()
 {
 	if (App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
-		viewPort* port = nullptr;
+		ViewPort* port = nullptr;
 		float2 portPos = App->m_renderer3D->ScreenToViewPort(float2(App->m_input->GetMouseX(), App->m_input->GetMouseY()), &port);
 		//Checking the click was made on a port
 		if (port != nullptr)

@@ -16,7 +16,7 @@ struct aiNode;
 class GameObject;
 class Material;
 class mesh;
-class R_mesh;
+class R_Mesh;
 class R_Material;
 class R_Texture;
 class R_Shader;
@@ -66,7 +66,7 @@ public:
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, const char* vGoName, GameObject* parent = nullptr);
 
-	R_mesh* LoadMesh(const char* resName);
+	R_Mesh* LoadMesh(const char* resName);
 	R_Material* LoadMaterial(const char* resName);
 	R_Texture* LoadTexture(const char* resName);
 	R_Shader* LoadShader(const char* resName);

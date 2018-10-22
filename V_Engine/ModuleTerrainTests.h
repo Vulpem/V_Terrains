@@ -21,9 +21,9 @@ public:
 
 	bool Init();
 	bool Start();
-	update_status PreUpdate() override;
-    update_status Update() override;
-	update_status PostUpdate() override;
+	UpdateStatus PreUpdate() override;
+    UpdateStatus Update() override;
+	UpdateStatus PostUpdate() override;
 	bool CleanUp();
 
 	void SaveTerrainConfig(std::string configName);
@@ -34,7 +34,7 @@ public:
 	void SetImage(int n, std::string textureFile);
 	void SetHeightmap(int n, std::string hmfile);
 
-	void Render(const viewPort& port) override;
+	void Render(const ViewPort& port) override;
 
 	void SetDefaultTextures();
 

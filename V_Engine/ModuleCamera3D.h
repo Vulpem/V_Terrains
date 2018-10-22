@@ -13,7 +13,7 @@ public:
 	~ModuleCamera3D();
 
 	bool Start();
-	update_status Update();
+	UpdateStatus Update();
 	bool CleanUp();
 
 	void LookAt(const float3 &Spot);

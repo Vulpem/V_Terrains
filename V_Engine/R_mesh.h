@@ -5,13 +5,13 @@
 
 #include "OpenGL.h"
 
-class R_mesh : public Resource
+class R_Mesh : public Resource
 {
 public:
-	R_mesh() :Resource() { aabb.SetNegativeInfinity(); }
-	R_mesh(uint64_t UID) : Resource(UID) { aabb.SetNegativeInfinity(); }
+	R_Mesh() :Resource() { aabb.SetNegativeInfinity(); }
+	R_Mesh(uint64_t UID) : Resource(UID) { aabb.SetNegativeInfinity(); }
 
-	~R_mesh()
+	~R_Mesh()
 	{
 		if (id_indices != 0)
 		{
@@ -31,9 +31,9 @@ public:
 
 	uint* indices = nullptr;
 	uint id_indices = 0;
-	uint num_indices = 0;
+	uint m_nIndices = 0;
 
-	uint num_vertices = 0;
+	uint m_nVertices = 0;
 	float3* vertices = nullptr;	
 	float3* normals = nullptr;
 

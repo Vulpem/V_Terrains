@@ -3,7 +3,7 @@
 
 class Application;
 struct PhysBody3D;
-struct viewPort;
+struct ViewPort;
 
 #include "PugiXml\src\pugixml.hpp"
 #include "Globals.h"
@@ -62,22 +62,22 @@ public:
 		return true;
 	}
 
-	virtual update_status PreUpdate()
+	virtual UpdateStatus PreUpdate()
 	{
 		return UPDATE_CONTINUE;
 	}
 
-	virtual update_status Update()
+	virtual UpdateStatus Update()
 	{
 		return UPDATE_CONTINUE;
 	}
 
-	virtual void Render(const viewPort& port)
+	virtual void Render(const ViewPort& port)
 	{
 
 	}
 
-	virtual update_status PostUpdate()
+	virtual UpdateStatus PostUpdate()
 	{
 		return UPDATE_CONTINUE;
 	}
