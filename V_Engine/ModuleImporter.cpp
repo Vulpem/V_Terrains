@@ -809,7 +809,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 				//Setting name
 				ret->SetName(meta->name.data());
 				//Setting parent
-				ret->parent = parent;
+				ret->m_parent = parent;
 
 				//Setting transform
 				float _transform[10];
@@ -885,7 +885,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
 							if (child)
 							{
-								ret->childs.push_back(child);
+								ret->m_childs.push_back(child);
 							}
 						}
 						else

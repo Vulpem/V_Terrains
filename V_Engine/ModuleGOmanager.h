@@ -129,14 +129,14 @@ inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 
 	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
 	{
-		if ((*it)->IsActive() && (*it)->aabb.IsFinite() && (*it)->aabb.Intersects(col) == true)
+		if ((*it)->IsActive() && (*it)->m_aabb.IsFinite() && (*it)->m_aabb.Intersects(col) == true)
 		{
 			ret.push_back(*it);
-			(*it)->beingRendered = true;
+			(*it)->m_beingRendered = true;
 		}
 		else
 		{
-			(*it)->beingRendered = false;
+			(*it)->m_beingRendered = false;
 		}
 	}
 	return ret;

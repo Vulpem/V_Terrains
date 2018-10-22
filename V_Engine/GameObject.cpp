@@ -16,27 +16,27 @@
 
 GameObject::GameObject()
 {
-	uid = GenerateUUID();
-	for (int n = 0; n < nComponentTypes; n++)
+	m_uid = GenerateUUID();
+	for (int n = 0; n < m_nComponentTypes; n++)
 	{
-		HasComponents[n] = false;
+		m_hasComponents[n] = false;
 	}
-	aabb.SetNegativeInfinity();
-	originalAABB.SetNegativeInfinity();
-	strcpy(name, "Unnamed");
+	m_aabb.SetNegativeInfinity();
+	m_originalAABB.SetNegativeInfinity();
+	strcpy(m_name, "Unnamed");
 	App->m_goManager->dynamicGO.push_back(this);
 }
 
 GameObject::GameObject(uint64_t Uid)
 {
-	uid = Uid;
-	for (int n = 0; n < nComponentTypes; n++)
+	m_uid = Uid;
+	for (int n = 0; n < m_nComponentTypes; n++)
 	{
-		HasComponents[n] = false;
+		m_hasComponents[n] = false;
 	}
-	aabb.SetNegativeInfinity();
-	originalAABB.SetNegativeInfinity();
-	strcpy(name, "Unnamed");
+	m_aabb.SetNegativeInfinity();
+	m_originalAABB.SetNegativeInfinity();
+	strcpy(m_name, "Unnamed");
 	App->m_goManager->dynamicGO.push_back(this);
 }
 
@@ -61,18 +61,18 @@ GameObject::~GameObject()
 		App->m_goManager->quadTree.Remove(this);
 	}
 
-	if (parent != nullptr)
+	if (m_parent != nullptr)
 	{
-		std::vector<GameObject*>::iterator it = parent->childs.begin();
+		std::vector<GameObject*>::iterator it = m_parent->m_childs.begin();
 		while ((*it) != this)
 		{
 			it++;
 		}
-		parent->childs.erase(it);
+		m_parent->m_childs.erase(it);
 	}
 
-	std::vector<Component*>::reverse_iterator comp = components.rbegin();
-	while (comp != components.rend())
+	std::vector<Component*>::reverse_iterator comp = m_components.rbegin();
+	while (comp != m_components.rend())
 	{
 		std::multimap<Component::Type, Component*>::iterator it = App->m_goManager->components.find((*comp)->GetType());
 		for (; it->first == (*comp)->GetType(); it++)
@@ -87,18 +87,18 @@ GameObject::~GameObject()
 		delete *comp;
 		comp++;
 	}
-	components.clear();
+	m_components.clear();
 
-	if (childs.empty() == false)
+	if (m_childs.empty() == false)
 	{
-		std::vector<GameObject*>::iterator iterator = childs.begin();
-		while (childs.size() > 0 && iterator != childs.end())
+		std::vector<GameObject*>::iterator iterator = m_childs.begin();
+		while (m_childs.size() > 0 && iterator != m_childs.end())
 		{
 			delete (*iterator);
 			//Erasing a Node will already remove it from the child list in its destructor, so we don't have to empty the list here, it will be done automatically
-			if (childs.size() > 0)
+			if (m_childs.size() > 0)
 			{
-				iterator = childs.begin();
+				iterator = m_childs.begin();
 			}
 		}
 	}
@@ -182,20 +182,20 @@ void GameObject::DrawOnEditor()
 	ImGui::SameLine();
 	ImGui::Text("Name:");
 	ImGui::SameLine();
-	ImGui::InputText("##Name", name, NAME_MAX_LEN);
+	ImGui::InputText("##Name", m_name, NAME_MAX_LEN);
 
 	if (ImGui::Button("Add:"))
 	{
 		ImGui::OpenPopup("Add Component");
 	}
 	ImGui::SameLine();
-	ImGui::Text("Static: ");
+	ImGui::Text("m_static: ");
 	ImGui::SameLine();
-	bool isStatic = Static;
+	bool isStatic = m_static;
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != Static && App->m_goManager->setting == nullptr)
+	if (isStatic != m_static && App->m_goManager->setting == nullptr)
 	{
-		if (childs.empty() == true)
+		if (m_childs.empty() == true)
 		{
 			App->m_goManager->SetStatic(isStatic, this);
 		}
@@ -206,7 +206,7 @@ void GameObject::DrawOnEditor()
 		}
 	}
 
-	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+	for (std::vector<Component*>::iterator it = m_components.begin(); it != m_components.end(); it++)
 	{
 		(*it)->DrawOnEditor();
 	}
@@ -217,9 +217,9 @@ void GameObject::DrawLocator()
 	if (Time.PlayMode != Play::Play)
 	{
 		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
-		if (selected)
+		if (m_selected)
 		{
-			if (parent->selected)
+			if (m_parent->m_selected)
 			{
 				color = float4(0, 0.5f, 0.5f, 1);
 			}
@@ -229,9 +229,9 @@ void GameObject::DrawLocator()
 		}
 		App->m_renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
 
-		if (childs.empty() == false)
+		if (m_childs.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 			{
 				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 				{
@@ -247,10 +247,10 @@ void GameObject::DrawAABB()
 {
 	if (Time.PlayMode != Play::Play)
 	{
-		if (aabb.IsFinite())
+		if (m_aabb.IsFinite())
 		{
 			math::float3 corners[8];
-			aabb.GetCornerPoints(corners);
+			m_aabb.GetCornerPoints(corners);
 			App->m_renderer3D->DrawBox(corners);
 		}
 	}
@@ -260,10 +260,10 @@ void GameObject::DrawOBB()
 {
 	if (Time.PlayMode != Play::Play)
 	{
-		if (obb.IsFinite())
+		if (m_obb.IsFinite())
 		{
 			math::float3 corners[8];
-			obb.GetCornerPoints(corners);
+			m_obb.GetCornerPoints(corners);
 			App->m_renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
 		}
 	}
@@ -271,13 +271,13 @@ void GameObject::DrawOBB()
 
 void GameObject::Select(bool _renderNormals)
 {
-	selected = true;
-	renderNormals = _renderNormals;
+	m_selected = true;
+	m_drawNormals = _renderNormals;
 
 	GetTransform()->UpdateEditorValues();
 
-	std::vector<GameObject*>::iterator childIt = childs.begin();
-	while (childIt != childs.end())
+	std::vector<GameObject*>::iterator childIt = m_childs.begin();
+	while (childIt != m_childs.end())
 	{
 		(*childIt)->Select();
 		childIt++;
@@ -286,12 +286,12 @@ void GameObject::Select(bool _renderNormals)
 
 void GameObject::Unselect()
 {
-	selected = false;
-	renderNormals = false;
-	if (childs.empty() == false)
+	m_selected = false;
+	m_drawNormals = false;
+	if (m_childs.empty() == false)
 	{
-		std::vector<GameObject*>::iterator childIt = childs.begin();
-		while (childIt != childs.end())
+		std::vector<GameObject*>::iterator childIt = m_childs.begin();
+		while (childIt != m_childs.end())
 		{
 			(*childIt)->Unselect();
 			childIt++;
@@ -303,19 +303,19 @@ void GameObject::SetOriginalAABB()
 {
 	if (HasComponent(Component::Type::C_mesh))
 	{
-		originalAABB.SetNegativeInfinity();
+		m_originalAABB.SetNegativeInfinity();
 		std::vector<mesh*> meshes = GetComponent<mesh>();
 
 		for (std::vector<mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
 		{
-			originalAABB.Enclose((*it)->GetAABB().maxPoint);
-			originalAABB.Enclose((*it)->GetAABB().minPoint);
+			m_originalAABB.Enclose((*it)->GetAABB().maxPoint);
+			m_originalAABB.Enclose((*it)->GetAABB().minPoint);
 		}
 	}
 	else
 	{
-		originalAABB.minPoint = float3{ -0.25f,-0.25f,-0.25f };
-		originalAABB.maxPoint = float3{ 0.25f,0.25f,0.25f };
+		m_originalAABB.minPoint = float3{ -0.25f,-0.25f,-0.25f };
+		m_originalAABB.maxPoint = float3{ 0.25f,0.25f,0.25f };
 	}
 
 	UpdateAABB();
@@ -323,13 +323,13 @@ void GameObject::SetOriginalAABB()
 
 void GameObject::UpdateAABB()
 {
-	aabb.SetNegativeInfinity();
-	obb.SetNegativeInfinity();
-	if (originalAABB.IsFinite())
+	m_aabb.SetNegativeInfinity();
+	m_obb.SetNegativeInfinity();
+	if (m_originalAABB.IsFinite())
 	{
-		obb = originalAABB;
-		obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
-		aabb.Enclose(obb);
+		m_obb = m_originalAABB;
+		m_obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
+		m_aabb.Enclose(m_obb);
 	}
 }
 
@@ -354,10 +354,10 @@ void GameObject::UpdateTransformMatrix()
 		}
 	}
 
-	if (childs.empty() == false)
+	if (m_childs.empty() == false)
 	{
-		std::vector<GameObject*>::iterator child = childs.begin();
-		while (child != childs.end())
+		std::vector<GameObject*>::iterator child = m_childs.begin();
+		while (child != m_childs.end())
 		{
 			(*child)->UpdateTransformMatrix();
 			child++;
@@ -368,49 +368,49 @@ void GameObject::UpdateTransformMatrix()
 
 void GameObject::SetActive(bool state, bool justPublic)
 {
-	if (state == publicActive)
+	if (state == m_publicActive)
 	{
 		return;
 	}
-	publicActive = state;
+	m_publicActive = state;
 
-std::vector<GameObject*>::iterator childIt = childs.begin();
-while (childIt != childs.end())
-{
-	(*childIt)->SetActive(state, true);
-	childIt++;
-}
+	std::vector<GameObject*>::iterator childIt = m_childs.begin();
+	while (childIt != m_childs.end())
+	{
+		(*childIt)->SetActive(state, true);
+		childIt++;
+	}
 
-if (justPublic)
-{
-	return;
-}
-active = state;
+	if (justPublic)
+	{
+		return;
+	}
+	m_active = state;
 
-if (state == true && parent)
-{
-	parent->SetActive(true);
-}
+	if (state == true && m_parent)
+	{
+		m_parent->SetActive(true);
+	}
 }
 
 bool GameObject::IsActive()
 {
-	if (active == false)
+	if (m_active == false)
 	{
 		return false;
 	}
-	return publicActive;
+	return m_publicActive;
 }
 
 
 void GameObject::SetName(const char * newName)
 {
-	strcpy(name, newName);
+	strcpy(m_name, newName);
 }
 
 const char * GameObject::GetName()
 {
-	return name;
+	return m_name;
 }
 
 Component* GameObject::AddComponent(Component::Type type, std::string res, bool forceCreation)
@@ -423,7 +423,7 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 		if (HasComponent(Component::C_transform) == false)
 		{
 			toAdd = new Transform(this);
-			transform = (Transform*)toAdd;
+			m_transform = (Transform*)toAdd;
 		}
 		break;
 	}
@@ -462,8 +462,8 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 	{
 		if (toAdd->MissingComponent() == false || forceCreation)
 		{
-			HasComponents[toAdd->GetType()] += 1;
-			components.push_back(toAdd);
+			m_hasComponents[toAdd->GetType()] += 1;
+			m_components.push_back(toAdd);
 			App->m_goManager->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
 			if (toAdd->GetType() == Component::Type::C_mesh)
 			{
@@ -482,17 +482,17 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 
 bool GameObject::HasComponent(Component::Type type)
 {
-	return (HasComponents[type] != 0);
+	return (m_hasComponents[type] != 0);
 }
 
 uint GameObject::AmountOfComponent(Component::Type type)
 {
-	return HasComponents[type];
+	return m_hasComponents[type];
 }
 
 Transform * GameObject::GetTransform()
 {
-	return transform;
+	return m_transform;
 }
 
 void GameObject::Delete()
@@ -503,31 +503,31 @@ void GameObject::Delete()
 
 void GameObject::Save(pugi::xml_node& node)
 {
-	if (hiddenOnOutliner == false)
+	if (m_hiddenOnOutliner == false)
 	{
 		pugi::xml_node GO = node.append_child("GO");
-		GO.append_attribute("Active") = active;
-		GO.append_attribute("Static") = Static;
-		GO.append_attribute("name") = name;
-		if (parent != nullptr)
+		GO.append_attribute("Active") = m_active;
+		GO.append_attribute("m_static") = m_static;
+		GO.append_attribute("m_name") = m_name;
+		if (m_parent != nullptr)
 		{
-			GO.append_attribute("UID") = uid;
-			if (parent->parent != nullptr)
+			GO.append_attribute("UID") = m_uid;
+			if (m_parent->m_parent != nullptr)
 			{
-				GO.append_attribute("parent") = parent->GetUID();
+				GO.append_attribute("m_parent") = m_parent->GetUID();
 			}
 			else
 			{
-				GO.append_attribute("parent") = 0;
+				GO.append_attribute("m_parent") = 0;
 			}
 		}
 		else
 		{
 			GO.append_attribute("UID") = 0;
-			GO.append_attribute("parent") = "0";
+			GO.append_attribute("m_parent") = "0";
 		}
 
-		for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+		for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 		{
 			(*it)->Save(node);
 		}
@@ -536,8 +536,8 @@ void GameObject::Save(pugi::xml_node& node)
 
 void GameObject::RemoveComponent(Component * comp)
 {
-	std::vector<Component*>::iterator it = components.begin();
-	for (; it != components.end(); it++)
+	std::vector<Component*>::iterator it = m_components.begin();
+	for (; it != m_components.end(); it++)
 	{
 		if ((*it) == comp)
 		{
@@ -550,9 +550,9 @@ void GameObject::RemoveComponent(Component * comp)
 					break;
 				}
 			}
-			HasComponents[(*it)->GetType()] -= 1;
+			m_hasComponents[(*it)->GetType()] -= 1;
 			RELEASE(*it);
-			components.erase(it);
+			m_components.erase(it);
 			return;
 		}
 	}

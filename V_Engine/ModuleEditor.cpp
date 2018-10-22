@@ -372,7 +372,7 @@ void ModuleEditor::ViewPortUI(const ViewPort& port)
 			if (ImGui::BeginMenu("Current Camera"))
 			{
 				ImGui::Text("Name:");
-				ImGui::Text(port.m_camera->object->name);
+				ImGui::Text(port.m_camera->object->m_name);
 				ImGui::Separator();
 				ImGui::NewLine();
 				if (ImGui::MenuItem("Switch view type"))
@@ -390,7 +390,7 @@ void ModuleEditor::ViewPortUI(const ViewPort& port)
 			for (; comp != App->m_goManager->components.end() && comp->first == Component::Type::C_camera; comp++)
 			{
 				Camera* cam = (Camera*)&*comp->second;
-				if (ImGui::MenuItem(cam->object->name))
+				if (ImGui::MenuItem(cam->object->m_name))
 				{
 					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
 					int a = 0;
@@ -488,8 +488,8 @@ void ModuleEditor::Outliner()
 
 	ImGui::Begin("Outliner", 0, flags);
 
-	std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->childs.begin();
-	while (node != App->m_goManager->GetRoot()->childs.end())
+	std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->m_childs.begin();
+	while (node != App->m_goManager->GetRoot()->m_childs.end())
 	{
 		SceneTreeGameObject((*node));
 		node++;
@@ -507,7 +507,7 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 		{
 			node_flags += ImGuiTreeNodeFlags_Selected;
 		}
-		if (node->childs.empty())
+		if (node->m_childs.empty())
 		{
 			node_flags += ImGuiTreeNodeFlags_Leaf;
 		}
@@ -521,8 +521,8 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 				SelectGameObject(node);
 			}
 
-			std::vector<GameObject*>::iterator it = node->childs.begin();
-			while (it != node->childs.end())
+			std::vector<GameObject*>::iterator it = node->m_childs.begin();
+			while (it != node->m_childs.end())
 			{
 				SceneTreeGameObject((*it));
 				it++;

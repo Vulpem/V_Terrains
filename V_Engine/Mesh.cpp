@@ -25,7 +25,7 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 	Mesh_RenderInfo ret;
 	if (object->IsActive())
 	{
-		if (wires == true || object->selected)
+		if (wires == true || object->m_selected)
 		{
 			ret.m_drawWired = true;
 			if (wires == true)
@@ -33,9 +33,9 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 				ret.m_drawDoubleSidedFaces = true;
 				ret.m_wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
 			}
-			if (object->selected)
+			if (object->m_selected)
 			{
-				if (object->parent && object->parent->selected)
+				if (object->m_parent && object->m_parent->m_selected)
 				{
 					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}
@@ -50,7 +50,7 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 			ret.m_drawFilled = true;
 		}
 
-		ret.m_drawNormals = object->renderNormals;
+		ret.m_drawNormals = object->m_drawNormals;
 
 		const R_Mesh* res = ReadRes<R_Mesh>();
 

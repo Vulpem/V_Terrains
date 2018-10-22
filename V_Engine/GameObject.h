@@ -16,48 +16,22 @@ class Transform;
 class GameObject
 {
 public:
-	char name[NAME_MAX_LEN];
-	AABB aabb;
-	OBB obb;
-private:
-	uint64_t uid;	
-
-	bool active = true;
-	bool publicActive = true;
-	bool hiddenOnOutliner = false;
-	bool Static = false;
-
-	static const uint nComponentTypes = Component::Type::C_None;
-	int HasComponents[Component::Type::C_None];
-
-	AABB originalAABB;
-
-	Transform* transform = nullptr;
-public:
-
 	GameObject();
 	//Force the gameobject to have a certain UID. For loading purposes
 	GameObject(uint64_t Uid);
 
 	~GameObject();
 
-	const uint64_t GetUID() { return uid; }
-	std::vector<GameObject*> childs;
-	GameObject* parent = nullptr;
-
-	std::vector<Component*> components;
-	bool selected = false;
-	bool renderNormals = false;
+	const uint64_t GetUID() { return m_uid; }
 
 	void DrawOnEditor();
-
 	void DrawLocator();
 	void DrawAABB();
 	void DrawOBB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
-	void HideFromOutliner() { hiddenOnOutliner = true; }
-	bool HiddenFromOutliner() { return hiddenOnOutliner; }
+	void HideFromOutliner() { m_hiddenOnOutliner = true; }
+	bool HiddenFromOutliner() { return m_hiddenOnOutliner; }
 
 	void Select(bool renderNormals = false);
 	void Unselect();
@@ -70,8 +44,8 @@ public:
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive();
 
-	void SetStatic(bool Stat) { Static = Stat; }
-	bool IsStatic() { return Static; }
+	void SetStatic(bool Stat) { m_static = Stat; }
+	bool IsStatic() { return m_static; }
 
 	void SetName(const char* newName);
 	const char* GetName();
@@ -86,21 +60,19 @@ public:
 
 	void Save(pugi::xml_node& node);
 
-	//For system use, do not call please
+	//For system use, do not call
 	void RemoveComponent(Component* comp);
-
-	bool beingRendered = false;
 
 #pragma region GetComponents
 	//GetComponent function
 	template <typename typeComp>
 	std::vector<typeComp*> GetComponent()
-	{  
+	{
 		std::vector<typeComp*> ret;
 		if (HasComponent(typeComp::GetType()))
 		{
-			std::vector<Component*>::iterator it = components.begin();
-			while (it != components.end())
+			std::vector<Component*>::iterator it = m_components.begin();
+			while (it != m_components.end())
 			{
 				//Remember to add a "static GetType()" function to all created components
 				if ((*it)->GetType() == typeComp::GetType())
@@ -113,6 +85,34 @@ public:
 		return ret;
 	}
 #pragma endregion
+
+public:
+	char m_name[NAME_MAX_LEN];
+	AABB m_aabb;
+	OBB m_obb;
+
+	std::vector<GameObject*> m_childs;
+	GameObject* m_parent = nullptr;
+
+	std::vector<Component*> m_components;
+	bool m_selected = false;
+	bool m_drawNormals = false;
+	bool m_beingRendered = false;
+private:
+	uint64_t m_uid;
+
+	bool m_active = true;
+	bool m_publicActive = true;
+	bool m_hiddenOnOutliner = false;
+	bool m_static = false;
+
+	static const uint m_nComponentTypes = Component::Type::C_None;
+	int m_hasComponents[Component::Type::C_None];
+
+	AABB m_originalAABB;
+
+	Transform* m_transform = nullptr;
+
 };
 
 #endif

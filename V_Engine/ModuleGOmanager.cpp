@@ -241,15 +241,15 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
 	GameObject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
 	std::vector<GameObject*> ret;
-	if (sceneRoot && sceneRoot->childs.empty() == false)
+	if (sceneRoot && sceneRoot->m_childs.empty() == false)
 	{
-		for (std::vector<GameObject*>::iterator childs = sceneRoot->childs.begin(); childs != sceneRoot->childs.end(); childs++)
+		for (std::vector<GameObject*>::iterator childs = sceneRoot->m_childs.begin(); childs != sceneRoot->m_childs.end(); childs++)
 		{
 			AddGOtoRoot(*childs);
 			ret.push_back((*childs));
 		}
 		//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
-		sceneRoot->childs.clear();
+		sceneRoot->m_childs.clear();
 		delete sceneRoot;
 		LOG("Loaded %s", fileName);
 	}
@@ -276,10 +276,10 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 
 void ModuleGoManager::ClearSceneNow()
 {
-	if (root->childs.empty() == false)
+	if (root->m_childs.empty() == false)
 	{
-		std::vector<GameObject*>::iterator it = root->childs.begin();
-		for (; it != root->childs.end(); it++)
+		std::vector<GameObject*>::iterator it = root->m_childs.begin();
+		for (; it != root->m_childs.end(); it++)
 		{
 			if ((*it)->HiddenFromOutliner() == false)
 			{
@@ -371,8 +371,8 @@ void ModuleGoManager::LoadSceneNow()
 					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
 					if (parent != UIDlib.end())
 					{
-						toAdd->parent = parent->second;
-						parent->second->childs.push_back(toAdd);
+						toAdd->m_parent = parent->second;
+						parent->second->m_childs.push_back(toAdd);
 					}
 					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
 					if (UID != 0)
@@ -407,12 +407,12 @@ void ModuleGoManager::LoadSceneNow()
 				}
 
 				GameObject* sceneRoot = UIDlib.find(0)->second;
-				for (std::vector<GameObject*>::iterator it = sceneRoot->childs.begin(); it != sceneRoot->childs.end(); it++)
+				for (std::vector<GameObject*>::iterator it = sceneRoot->m_childs.begin(); it != sceneRoot->m_childs.end(); it++)
 				{
 					AddGOtoRoot((*it));
 				}
 				//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
-				sceneRoot->childs.clear();
+				sceneRoot->m_childs.clear();
 				RELEASE(sceneRoot);
 
 				LOG("Scene loaded: %s", sceneName.data());
@@ -431,9 +431,9 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 		GO->SetStatic(Static);
 		if (Static)
 		{
-			if (GO->parent != nullptr)
+			if (GO->m_parent != nullptr)
 			{
-				SetStatic(true, GO->parent);
+				SetStatic(true, GO->m_parent);
 			}
 			App->m_goManager->quadTree.Add(GO);
 			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
@@ -447,9 +447,9 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 		}
 		else
 		{
-			if (GO->childs.empty() == false)
+			if (GO->m_childs.empty() == false)
 			{
-				for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+				for (std::vector<GameObject*>::iterator it = GO->m_childs.begin(); it != GO->m_childs.end(); it++)
 				{
 					SetStatic(false, (*it));
 				}
@@ -465,9 +465,9 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 	SetStatic(Static, GO);
 	if (Static == true)
 	{
-		if (GO->childs.empty() == false)
+		if (GO->m_childs.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+			for (std::vector<GameObject*>::iterator it = GO->m_childs.begin(); it != GO->m_childs.end(); it++)
 			{
 				SetChildsStatic(Static,(*it));
 			}
@@ -494,7 +494,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		float distanceNear;
 		float distanceFar;
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
-		if ((*GO)->obb.Intersects(ray, distanceNear, distanceFar) == true)
+		if ((*GO)->m_obb.Intersects(ray, distanceNear, distanceFar) == true)
 		{
 			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), (*GO)));
 		}
@@ -693,8 +693,8 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 
 void ModuleGoManager::AddGOtoRoot(GameObject * GO)
 {
-	GO->parent = root;
-	root->childs.push_back(GO);
+	GO->m_parent = root;
+	root->m_childs.push_back(GO);
 }
 
 void ModuleGoManager::CreateRootGameObject()
@@ -708,7 +708,7 @@ void ModuleGoManager::CreateRootGameObject()
 		ret->SetName("Root");
 
 		//Setting parent
-		ret->parent = nullptr;
+		ret->m_parent = nullptr;
 
 		//Setting transform
 		math::Quat rot = math::Quat::identity;

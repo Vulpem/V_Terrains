@@ -162,11 +162,11 @@ math::float4x4 Transform::GetLocalTransformMatrix()
 
 void Transform::UpdateGlobalTransform()
 {
-	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
 	{
-		Transform* parent = object->parent->GetTransform();
+		Transform* m_parent = object->m_parent->GetTransform();
 		
-		globalTransform = GetLocalTransformMatrix() * parent->GetGlobalTransform();
+		globalTransform = GetLocalTransformMatrix() * m_parent->GetGlobalTransform();
 	}
 	else
 	{
@@ -222,11 +222,11 @@ void Transform::SetGlobalPos(float x, float y, float z)
 {
 	if (object->IsStatic() == false)
 	{
-		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+		if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
 		{
 			//TODO
 			//Needs cleaning
-			Transform* parentTrans = object->parent->GetTransform();
+			Transform* parentTrans = object->m_parent->GetTransform();
 
 			float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
 			float4x4 parentGlobal = parentTrans->GetGlobalTransform();
@@ -317,7 +317,7 @@ void Transform::SetGlobalRot(float x, float y, float z)
 {
 	if (object->IsStatic() == false && allowRotation)
 	{
-		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+		if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
 		{
 			x *= DEGTORAD;
 			y *= DEGTORAD;
@@ -325,7 +325,7 @@ void Transform::SetGlobalRot(float x, float y, float z)
 
 			//Quat::from
 
-			Transform* parentTrans = object->parent->GetTransform();
+			Transform* parentTrans = object->m_parent->GetTransform();
 			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans->GetGlobalRotQuat().Conjugated();
 			SetLocalRot(local.x, local.y, local.z, local.w);
 		}
