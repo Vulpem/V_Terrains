@@ -81,17 +81,17 @@ void Material::EditorContent()
 		ImGui::OpenPopup("Select Shader");
 	}
 	ImGui::Text("Blend type:");
-	int alphaType = GetAlphaType();
-	int prevAlphaType = alphaType;
-	ImGui::RadioButton("Opaque", &alphaType, AlphaTestTypes::ALPHA_OPAQUE); ImGui::SameLine();
-	ImGui::RadioButton("AlphaTest", &alphaType, AlphaTestTypes::ALPHA_DISCARD); ImGui::SameLine();
-	ImGui::RadioButton("Blend", &alphaType, AlphaTestTypes::ALPHA_BLEND);
+	int alphaType = static_cast<int>(GetAlphaType());
+	int prevAlphaType = static_cast<int>(alphaType);
+	ImGui::RadioButton("Opaque", &alphaType, static_cast<int>(AlphaTestTypes::ALPHA_OPAQUE)); ImGui::SameLine();
+	ImGui::RadioButton("AlphaTest", &alphaType, static_cast<int>(AlphaTestTypes::ALPHA_DISCARD)); ImGui::SameLine();
+	ImGui::RadioButton("Blend", &alphaType, static_cast<int>(AlphaTestTypes::ALPHA_BLEND));
 	if (alphaType != prevAlphaType)
 	{
 		SetAlphaType((AlphaTestTypes)alphaType);
 	}
 
-	if (alphaType != AlphaTestTypes::ALPHA_OPAQUE)
+	if (alphaType != static_cast<int>(AlphaTestTypes::ALPHA_OPAQUE))
 	{
 		ImGui::Text("AlphaTest:");
 		float tmp = GetAlphaTest();
@@ -99,7 +99,7 @@ void Material::EditorContent()
 		{
 			SetAlphaTest(tmp);
 		}
-		if (alphaType == AlphaTestTypes::ALPHA_BLEND)
+		if (alphaType == static_cast<int>(AlphaTestTypes::ALPHA_BLEND))
 		{
 			if (ImGui::CollapsingHeader("Alpha Blend Types"))
 			{

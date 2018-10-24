@@ -4,26 +4,23 @@
 
 struct Color
 {
-	float r, g, b, a;
+	float m_r, m_g, m_b, m_a;
 	
-	Color() : r(0.0f), g(0.0f), b(0.0f), a(1.0f)
+	Color() : m_r(0.0f), m_g(0.0f), m_b(0.0f), m_a(1.0f)
 	{}
 
-	Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a)
+	Color(float r, float g, float b, float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a)
 	{}
 
 	void Set(float r, float g, float b, float a = 1.0f)
 	{
-		this->r = r;
-		this->g = g;
-		this->b = b;
-		this->a = a;
+		m_r = r;
+		m_g = g;
+		m_b = b;
+		m_a = a;
 	}
 
-	float* operator & ()
-	{
-		return (float*)this;
-	}
+	float* Ptr() { return &m_r; }
 };
 
 extern Color Red;

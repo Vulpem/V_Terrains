@@ -9,8 +9,8 @@ Light::Light() : m_ref(-1), m_on(false), m_position(0.0f, 0.0f, 0.0f)
 
 void Light::Init()
 {
-	glLightfv(m_ref, GL_AMBIENT, &m_ambient);
-	glLightfv(m_ref, GL_DIFFUSE, &m_diffuse);
+	glLightfv(m_ref, GL_AMBIENT, m_ambient.Ptr());
+	glLightfv(m_ref, GL_DIFFUSE, m_diffuse.Ptr());
 }
 
 void Light::SetPos(float x, float y, float z)

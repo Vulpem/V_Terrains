@@ -51,7 +51,7 @@ void Primitive::Render() const
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	glColor3f(m_color.r, m_color.g, m_color.b);
+	glColor3f(m_color.m_r, m_color.m_g, m_color.m_b);
 
 	if(m_wire)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		
@@ -116,7 +116,7 @@ void P_Cube::InnerRender() const
 
 #pragma region directMode
 	//Back
-	glColor4f(m_color.r, m_color.g, m_color.b, m_color.a);
+	glColor4f(m_color.m_r, m_color.m_g, m_color.m_b, m_color.m_a);
 
 	glNormal3f(0, 0, -1);
 	glVertex3f(sx, sy, -sz);

@@ -6,7 +6,7 @@
 
 class R_Mesh;
 
-enum AlphaTestTypes
+enum class AlphaTestTypes
 {
 	ALPHA_OPAQUE = 0,
 	ALPHA_DISCARD,
