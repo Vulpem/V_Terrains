@@ -102,12 +102,12 @@ UpdateStatus ModuleInput::PreUpdate()
 		{
 			switch (e.type)
 			{
-				case SDL_MOUSEWHEEL:
+				case SDL_EventType::SDL_MOUSEWHEEL:
 				{
 					mouse_z = e.wheel.y;
 					break;
 				}
-				case SDL_MOUSEMOTION:
+				case SDL_EventType::SDL_MOUSEMOTION:
 				{
 					if (captureMouse)
 					{
@@ -125,7 +125,7 @@ UpdateStatus ModuleInput::PreUpdate()
 					break;
 				}
 
-				case SDL_DROPFILE:
+				case SDL_EventType::SDL_DROPFILE:
 				{
 					strcpy_s(dropped_file, e.drop.file);
 					SDL_free(e.drop.file);
@@ -134,13 +134,13 @@ UpdateStatus ModuleInput::PreUpdate()
 					LOG("File was detected as a %s", DroppedFileFormat().data());
 					break;
 				}
-				case SDL_QUIT:
+				case SDL_EventType::SDL_QUIT:
 				{
 					return UpdateStatus::Stop;
 				}
-				case SDL_WINDOWEVENT:
+				case SDL_EventType::SDL_WINDOWEVENT:
 				{
-					if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+					if (e.window.event == SDL_WindowEventID::SDL_WINDOWEVENT_RESIZED)
 					{
 						App->OnScreenResize(e.window.data1, e.window.data2);
 					}
