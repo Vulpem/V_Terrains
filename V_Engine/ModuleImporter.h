@@ -34,8 +34,8 @@ public:
 
 	bool Init();
 
-	bool Start();
-	bool CleanUp();
+	void Start();
+	void CleanUp();
 
 
 // ------------------------------- IMPORTING ------------------------------- 

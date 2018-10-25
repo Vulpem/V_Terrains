@@ -24,15 +24,13 @@ public:
 	~ModuleGoManager();
 
 	bool Init();
-
-	bool Start();
 	UpdateStatus PreUpdate();
 	UpdateStatus Update();
 	UpdateStatus PostUpdate();
 
 	void Render(const ViewPort& port);
 
-	bool CleanUp();
+	void CleanUp();
 
 
 	// ----------------------- GO Management ------------------------------------------------------

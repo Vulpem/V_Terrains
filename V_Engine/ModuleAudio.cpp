@@ -7,7 +7,6 @@
 
 ModuleAudio::ModuleAudio(Application* app, bool start_enabled) : Module(app, start_enabled)//, music(NULL)
 {
-	moduleName = "ModuleAudio";
 }
 
 // Destructor
@@ -48,7 +47,7 @@ bool ModuleAudio::Init()
 }
 
 // Called before quitting
-bool ModuleAudio::CleanUp()
+void ModuleAudio::CleanUp()
 {
 	/*LOG("Freeing sound FX, closing Mixer and Audio subsystem");
 
@@ -68,7 +67,6 @@ bool ModuleAudio::CleanUp()
 	Mix_CloseAudio();
 	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);*/
-	return true;
 }
 
 // Play a music file

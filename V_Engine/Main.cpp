@@ -6,13 +6,13 @@
 #pragma comment( lib, "SDL/lib/win32/SDL2.lib" )
 #pragma comment( lib, "SDL/lib/win32/SDL2main.lib" )
 
-enum main_states
+enum class MainStates
 {
-	MAIN_CREATION,
-	MAIN_START,
-	MAIN_UPDATE,
-	MAIN_FINISH,
-	MAIN_EXIT
+	Creation,
+	Start,
+	Update,
+	Finish,
+	Exit
 };
 
 Application* App = nullptr;
@@ -22,63 +22,54 @@ int main(int argc, char ** argv)
 	LOG("Starting game '%s'...", TITLE);
 
 	int main_return = EXIT_FAILURE;
-	main_states state = MAIN_CREATION;
-	
+	MainStates state = MainStates::Creation;
 
-	while (state != MAIN_EXIT)
+	while (state != MainStates::Exit)
 	{
 		switch (state)
 		{
-		case MAIN_CREATION:
+		case MainStates::Creation:
 
 			LOG("-------------- Application Creation --------------");
 			App = new Application();
-			state = MAIN_START;
+			state = MainStates::Start;
 			break;
 
-		case MAIN_START:
+		case MainStates::Start:
 
 			LOG("-------------- Application Init --------------");
 			if (App->Init() == false)
 			{
 				LOG("Application Init exits with ERROR");
-				state = MAIN_EXIT;
+				state = MainStates::Exit;
 			}
 			else
 			{
-				state = MAIN_UPDATE;
+				state = MainStates::Update;
 				LOG("\n\n-------------- Application Update --------------\n\n");
 			}
 
 			break;
 
-		case MAIN_UPDATE:
+		case MainStates::Update:
 		{
-			int update_return = App->Update();
-
-			if (update_return == UPDATE_ERROR)
+			UpdateStatus update_return = App->Update();
+			if (update_return == UpdateStatus::Error)
 			{
 				LOG("Application Update exits with ERROR");
-				state = MAIN_EXIT;
+				state = MainStates::Exit;
 			}
-
-			if (update_return == UPDATE_STOP)
-				state = MAIN_FINISH;
+			if (update_return == UpdateStatus::Stop)
+				state = MainStates::Finish;
 		}
 			break;
 
-		case MAIN_FINISH:
+		case MainStates::Finish:
 
 			LOG("-------------- Application CleanUp --------------");
-			if (App->CleanUp() == false)
-			{
-				LOG("Application CleanUp exits with ERROR");
-			}
-			else
-				main_return = EXIT_SUCCESS;
-
-			state = MAIN_EXIT;
-
+			App->CleanUp();
+			main_return = EXIT_SUCCESS;
+			state = MainStates::Exit;
 			break;
 
 		}

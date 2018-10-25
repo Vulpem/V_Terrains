@@ -35,13 +35,13 @@ public:
 
 	bool Init();
 	UpdateStatus Update();
-	bool CleanUp();
+	void CleanUp();
 
-	void Render(const ViewPort& port);
+	void Render(const ViewPort& port) const;
 
-	bool OpenBrowser(const char* link);
+	bool OpenBrowser(const char* link) const;
 
-	const char* GetTitle();
+	const char* GetTitle() const;
 	void OnScreenResize(int width, int heigth);
 	void Play(bool debug = false);
 	void Stop();

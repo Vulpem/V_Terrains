@@ -14,8 +14,6 @@
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleFileSystem";
-
 	// need to be created before Awake so other modules can use it
 	char* base_path = SDL_GetBasePath();
 	PHYSFS_init(base_path);
@@ -66,15 +64,13 @@ bool ModuleFileSystem::Init()
 }
 
 // Called before quitting
-bool ModuleFileSystem::CleanUp()
+void ModuleFileSystem::CleanUp()
 {
 	//LOG("Freeing File System subsystem");
-	if (AssimpIO)
+	if (AssimpIO != nullptr)
 	{
 		delete AssimpIO;
 	}
-
-	return true;
 }
 
 // Add a new zip file or folder

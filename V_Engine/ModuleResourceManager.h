@@ -39,10 +39,10 @@ public:
 	ModuleResourceManager(Application* app, bool start_enabled = true);
 	~ModuleResourceManager();
 
-	bool Start();
+	void Start();
 	UpdateStatus Update();
 	UpdateStatus PostUpdate();
-	bool CleanUp();
+	void CleanUp();
 
 	//Chooses either we want the files to refresh automatically or not
 	bool autoRefresh = false;

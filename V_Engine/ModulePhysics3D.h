@@ -22,11 +22,10 @@ public:
 	~ModulePhysics3D();
 
 	bool Init();
-	bool Start();
+	void Start();
 	UpdateStatus PreUpdate();
 	UpdateStatus Update();
-	UpdateStatus PostUpdate();
-	bool CleanUp();
+	void CleanUp();
 
 	PhysBody3D* AddBody(const P_Sphere& sphere, float mass = 1.0f);
 	PhysBody3D* AddBody(const P_Cube& cube, float mass = 1.0f);

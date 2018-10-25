@@ -12,7 +12,6 @@ ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, s
 // Destructor
 ModuleWindow::~ModuleWindow()
 {
-	moduleName = "ModuleWindow";
 }
 
 // Called before render is available
@@ -83,7 +82,7 @@ bool ModuleWindow::Init()
 }
 
 // Called before quitting
-bool ModuleWindow::CleanUp()
+void ModuleWindow::CleanUp()
 {
 	LOG("Destroying SDL window and quitting all SDL systems");
 
@@ -95,7 +94,6 @@ bool ModuleWindow::CleanUp()
 
 	//Quit SDL subsystems
 	SDL_Quit();
-	return true;
 }
 
 void ModuleWindow::SetTitle(const char* title)

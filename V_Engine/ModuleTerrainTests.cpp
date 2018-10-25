@@ -43,8 +43,6 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	, m_globalLightDir(-40)
 	, terrainConfigName("Default")
 {
-	moduleName = "ModuleTerrainTests";
-
 	RPGT::config.throwErrorFunc = ShowError;
 
 	RPGT::config.m_heightCurve = (
@@ -83,26 +81,15 @@ bool ModuleTerrain::Init()
 	return ret;
 }
 
-bool ModuleTerrain::Start()
+void ModuleTerrain::Start()
 {
 	RPGT::Init();
-
-	bool ret = true;
-
     App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
 	App->m_fileSystem->CreateDir("Assets/Terrains");
 	SetDefaultTextures();
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_maxTexturesGL);
-
-	return ret;
-}
-
-// PreUpdate: clear buffer
-UpdateStatus ModuleTerrain::PreUpdate()
-{
-	return UPDATE_CONTINUE;
 }
 
 UpdateStatus ModuleTerrain::Update()
@@ -213,7 +200,7 @@ UpdateStatus ModuleTerrain::Update()
 			if (currentVSpeed > m_verticalSpeed) { currentVSpeed = m_verticalSpeed; }
 	}
 
-    return UPDATE_CONTINUE;
+    return UpdateStatus::Continue;
 }
 
 // PostUpdate present buffer to screen
@@ -223,13 +210,7 @@ UpdateStatus ModuleTerrain::PostUpdate()
 	{
 		DrawUI();
 	}
-	return UPDATE_CONTINUE;
-}
-
-// Called before quitting
-bool ModuleTerrain::CleanUp()
-{
-	return true;
+	return UpdateStatus::Continue;
 }
 
 void ModuleTerrain::SaveTerrainConfig(std::string configName)

@@ -20,7 +20,7 @@ public:
 
 	bool Init();
 
-	bool Start();
+	void Start();
 	UpdateStatus PreUpdate();
 	UpdateStatus Update();
 	UpdateStatus PostUpdate();
@@ -28,7 +28,7 @@ public:
 	void OnPlay() override;
 	void OnStop() override;
 
-	bool CleanUp();
+	void CleanUp();
 
 	void Render(const ViewPort& port);
 
@@ -41,7 +41,7 @@ public:
 	void UnselectGameObject(GameObject* go);
 private:
 
-	UpdateStatus MenuBar();
+	void MenuBar();
 	void Editor();
     void ViewPortUI(const ViewPort & port);
 	void AttributeWindow();

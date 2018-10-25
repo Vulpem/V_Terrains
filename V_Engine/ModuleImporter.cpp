@@ -31,7 +31,6 @@
 
 ModuleImporter::ModuleImporter(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleImporter";
 }
 
 // DestructorF
@@ -64,21 +63,15 @@ bool ModuleImporter::Init()
 	return ret;
 }
 
-bool ModuleImporter::Start()
+void ModuleImporter::Start()
 {
 	ilutRenderer(ILUT_OPENGL);
-
-	LOG("Importing assets");
-
-	return true;
 }
 
 // Called before quitting
-bool ModuleImporter::CleanUp()
+void ModuleImporter::CleanUp()
 {
 	aiDetachAllLogStreams();
-
-	return true;
 }
 
 

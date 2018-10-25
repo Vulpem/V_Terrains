@@ -24,7 +24,6 @@
 
 ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
-	moduleName = "ModuleGeometry";
 }
 
 ModuleGoManager::~ModuleGoManager()
@@ -42,16 +41,9 @@ bool ModuleGoManager::Init()
 	return ret;
 }
 
-bool ModuleGoManager::Start()
-{
-	return true;
-}
-
 // Called every draw update
 UpdateStatus ModuleGoManager::PreUpdate()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
-
 	TIMER_START("Components PreUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
@@ -68,7 +60,7 @@ UpdateStatus ModuleGoManager::PreUpdate()
 		}
 	}
 	TIMER_READ_MS("Components PreUpdate");
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleGoManager::Update()
@@ -129,7 +121,7 @@ UpdateStatus ModuleGoManager::Update()
 		StaticChildsPopUpIsOpen = false;
 	}
 
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleGoManager::PostUpdate()
@@ -177,9 +169,7 @@ UpdateStatus ModuleGoManager::PostUpdate()
 		wantToLoadScene = false;
 		TIMER_READ_MS("Loading Scene");
 	}
-
-
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 void ModuleGoManager::Render(const ViewPort& port)
@@ -194,14 +184,12 @@ void ModuleGoManager::Render(const ViewPort& port)
 }
 
 // Called before quitting
-bool ModuleGoManager::CleanUp()
+void ModuleGoManager::CleanUp()
 {
 	if (root)
 	{
 		delete root;
 	}
-
-	return true;
 }
 
 

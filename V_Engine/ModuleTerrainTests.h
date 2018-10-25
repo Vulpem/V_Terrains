@@ -20,11 +20,9 @@ public:
 	~ModuleTerrain();
 
 	bool Init();
-	bool Start();
-	UpdateStatus PreUpdate() override;
+	void Start();
     UpdateStatus Update() override;
 	UpdateStatus PostUpdate() override;
-	bool CleanUp();
 
 	void SaveTerrainConfig(std::string configName);
 	void LoadTerrainConfig(std::string configName);

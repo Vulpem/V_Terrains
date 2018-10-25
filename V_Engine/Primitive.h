@@ -4,7 +4,7 @@
 #include "Math.h"
 #include "Color.h"
 
-enum PrimitiveTypes
+enum class PrimitiveTypes
 {
 	Primitive_Point,
 	Primitive_Line,

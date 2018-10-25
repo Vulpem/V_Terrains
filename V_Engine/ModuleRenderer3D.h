@@ -19,10 +19,9 @@ public:
 	~ModuleRenderer3D();
 
 	bool Init();
-	bool Start();
 	UpdateStatus PreUpdate();
 	UpdateStatus PostUpdate();
-	bool CleanUp();
+	void CleanUp();
 
 	void OnScreenResize(int width, int heigth);
 	void UpdateProjectionMatrix(Camera* cam);

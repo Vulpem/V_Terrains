@@ -26,7 +26,6 @@
 
 ModuleRenderer3D::ModuleRenderer3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleRenderer3D";
 }
 
 // Destructor
@@ -169,13 +168,6 @@ bool ModuleRenderer3D::Init()
 	return ret;
 }
 
-bool ModuleRenderer3D::Start()
-{
-	bool ret = true;
-
-	return ret;
-}
-
 // PreUpdate: clear buffer
 UpdateStatus ModuleRenderer3D::PreUpdate()
 {
@@ -183,7 +175,7 @@ UpdateStatus ModuleRenderer3D::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // PostUpdate present buffer to screen
@@ -222,17 +214,14 @@ UpdateStatus ModuleRenderer3D::PostUpdate()
 #endif
 
 	SDL_GL_SwapWindow(App->m_window->GetWindow());
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // Called before quitting
-bool ModuleRenderer3D::CleanUp()
+void ModuleRenderer3D::CleanUp()
 {
 	LOG("Destroying 3D Renderer");
-
 	SDL_GL_DeleteContext(context);
-
-	return true;
 }
 
 

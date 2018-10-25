@@ -22,7 +22,6 @@
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleEditor";
 }
 
 // Destructor
@@ -42,7 +41,7 @@ ImGui_ImplSdlGL3_Init(App->m_window->GetWindow());
 return ret;
 }
 
-bool ModuleEditor::Start()
+void ModuleEditor::Start()
 {
 	//ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
@@ -55,14 +54,11 @@ bool ModuleEditor::Start()
 
 	OnScreenResize(App->m_window->GetWindowSize().x, App->m_window->GetWindowSize().y);
 	SwitchViewPorts();
-
-	return true;
 }
 
 // Called every draw update
 UpdateStatus ModuleEditor::PreUpdate()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 	if (Time.PlayMode != Play::Play)
 	{
@@ -76,12 +72,11 @@ UpdateStatus ModuleEditor::PreUpdate()
 		App->m_input->ignoreKeyboard = false;
 		App->m_input->ignoreMouse = false;
 	}
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleEditor::Update()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
 	if (Time.PlayMode != Play::Play)
 	{
 		if (App->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
@@ -101,12 +96,11 @@ UpdateStatus ModuleEditor::Update()
 			SwitchViewPorts();
 		}
 	}
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleEditor::PostUpdate()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
 	if (Time.PlayMode != Play::Play)
 	{
 		if (IsOpenTestWindow)
@@ -114,7 +108,7 @@ UpdateStatus ModuleEditor::PostUpdate()
 			ImGui::ShowTestWindow();
 		}
 
-		ret = MenuBar();
+		MenuBar();
 		Editor();
 		//Console();
 		//PlayButtons();
@@ -122,7 +116,7 @@ UpdateStatus ModuleEditor::PostUpdate()
 		AttributeWindow();
 		//SaveLoadPopups();
 	}
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 void ModuleEditor::OnPlay()
@@ -136,11 +130,9 @@ void ModuleEditor::OnStop()
 }
 
 // Called before quitting
-bool ModuleEditor::CleanUp()
+void ModuleEditor::CleanUp()
 {
 	ImGui_ImplSdlGL3_Shutdown();
-
-	return true;
 }
 
 
@@ -205,10 +197,8 @@ void ModuleEditor::HandleInput(SDL_Event* event)
 
 // ---- UI with IMGUI ViewPort UI -------------------------------------------------------------------
 
-UpdateStatus ModuleEditor::MenuBar()
+void ModuleEditor::MenuBar()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
-
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("View"))
@@ -245,7 +235,6 @@ UpdateStatus ModuleEditor::MenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
-	return ret;
 }
 
 void ModuleEditor::Editor()

@@ -23,7 +23,7 @@ public:
 
 	bool Init();
 	UpdateStatus PreUpdate();
-	bool CleanUp();
+	void CleanUp();
 
 	std::string DroppedFileFormat();
 

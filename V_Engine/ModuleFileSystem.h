@@ -48,7 +48,7 @@ public:
 	bool Init();
 
 	// Called before quitting
-	bool CleanUp();
+	void CleanUp();
 
 	// Utility functions
 	bool AddPath(const char* path_or_zip, const char* mount_point = nullptr);

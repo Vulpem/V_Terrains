@@ -15,7 +15,6 @@
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
-	moduleName = "ModuleResourceManager";
 }
 
 // Destructor
@@ -24,7 +23,7 @@ ModuleResourceManager::~ModuleResourceManager()
 }
 
 // Called before render is available
-bool ModuleResourceManager::Start()
+void ModuleResourceManager::Start()
 {
 	defaultVertexBuf = std::string(
 		"#version 330 core\n"
@@ -106,8 +105,6 @@ bool ModuleResourceManager::Start()
 	LoadMetaData();
 	Refresh();
 	GenerateDefaultShader();
-
-	return true;
 }
 
 // Called every draw update
@@ -122,31 +119,27 @@ UpdateStatus ModuleResourceManager::Update()
 			Refresh();
 		}
 	}
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleResourceManager::PostUpdate()
 {
 	ReloadNow();
 	DeleteNow();
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // Called before quitting
-bool ModuleResourceManager::CleanUp()
+void ModuleResourceManager::CleanUp()
 {
 	SaveMetaData();
-
-	std::map<uint64_t, Resource*>::iterator it = resources.begin();
-	for (; it != resources.end(); it++)
+	std::for_each(resources.begin(), resources.end(),
+		[](std::pair<uint64_t, Resource*> resource)
 	{
-		RELEASE(it->second);
-	}
-
+		RELEASE(resource.second);
+	});
 	resources.clear();
 	uidLib.clear();
-
-	return true;
 }
 
 Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component::Type type)

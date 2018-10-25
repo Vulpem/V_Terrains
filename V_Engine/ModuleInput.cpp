@@ -12,8 +12,6 @@
 
 ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleInput";
-
 	keyboard = new KEY_STATE[MAX_KEYS + 1];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
 	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
@@ -165,17 +163,16 @@ UpdateStatus ModuleInput::PreUpdate()
 	}*/
 
 	if (quit == true)
-		return UPDATE_STOP;
+		return UpdateStatus::Stop;
 
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // Called before quitting
-bool ModuleInput::CleanUp()
+void ModuleInput::CleanUp()
 {
 	LOG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
-	return true;
 }
 
 std::string ModuleInput::DroppedFileFormat()

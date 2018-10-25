@@ -10,96 +10,68 @@ struct ViewPort;
 
 class Module
 {
-private :
-	bool enabled;
-
-protected:
-	std::string moduleName;
-
 public:
-	Application* App;
-
-	Module(Application* parent, bool start_enabled = true) : App(parent)
-	{
-		enabled = start_enabled;
-	}
+	Module(Application* app, bool start_enabled = true)
+		: App(app)
+		, m_enabled(start_enabled)
+	{}
 
 	virtual ~Module()
 	{}
 
 	bool IsEnabled() const
-	{
-		return enabled;
-	}
+	{ return m_enabled; }
 
 	void Enable()
 	{
-		if (enabled == false)
+		if (m_enabled == false)
 		{
-			enabled = true;
+			m_enabled = true;
 			Start();
 		}
 	}
 
-	bool Disable()
+	void Disable()
 	{
-		bool ret = true;
-		if (enabled == true)
+		if (m_enabled == true)
 		{
-			enabled = false;
-			ret = CleanUp();
+			m_enabled = false;
+			CleanUp();
 		}
-		return ret;
 	}
 
 	virtual bool Init() 
-	{
-		return true; 
-	}
+	{ return true; }
 
-	virtual bool Start()
-	{
-		return true;
-	}
+	virtual void Start()
+	{ }
 
 	virtual UpdateStatus PreUpdate()
-	{
-		return UPDATE_CONTINUE;
-	}
+	{ return UpdateStatus::Continue; }
 
 	virtual UpdateStatus Update()
-	{
-		return UPDATE_CONTINUE;
-	}
+	{ return UpdateStatus::Continue; }
 
 	virtual void Render(const ViewPort& port)
-	{
-
-	}
+	{}
 
 	virtual UpdateStatus PostUpdate()
-	{
-		return UPDATE_CONTINUE;
-	}
+	{ return UpdateStatus::Continue; }
 
-	virtual bool CleanUp() 
-	{ 
-		enabled = false;
-		return true; 
-	}
+	virtual void CleanUp()
+	{ }
 
 	virtual void OnPlay() {}
 	virtual void OnStop() {}
-
-	std::string GetName()
-	{
-		return moduleName;
-	}
 
 	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 	{}
 
 	virtual void OnScreenResize(int width, int heigth) {  };
+
+	Application* App;
+private:
+	bool m_enabled;
 };
 
 #endif

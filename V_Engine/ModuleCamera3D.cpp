@@ -10,17 +10,15 @@
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModuleCamera3D";
 }
 
 ModuleCamera3D::~ModuleCamera3D()
 {}
 
 // -----------------------------------------------------------------
-bool ModuleCamera3D::Start()
+void ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
-	bool ret = true;
 	camSpeed = 200.f;
 	camSprintMultiplier = 10.f;
 
@@ -37,17 +35,8 @@ bool ModuleCamera3D::Start()
 	topView->GetComponent<Camera>().front()->SwitchViewType();
     topView->GetComponent<Camera>().front()->SetHorizontalFOV(50000);
 	topView->HideFromOutliner();
-
-	return ret;
 }
 
-// -----------------------------------------------------------------
-bool ModuleCamera3D::CleanUp()
-{
-	LOG("Cleaning camera");
-
-	return true;
-}
 
 // -----------------------------------------------------------------
 UpdateStatus ModuleCamera3D::Update()
@@ -82,7 +71,7 @@ UpdateStatus ModuleCamera3D::Update()
         topView->GetTransform()->SetGlobalPos(pos.x, topView->GetTransform()->GetGlobalPos().y, pos.z);
     }
 
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 

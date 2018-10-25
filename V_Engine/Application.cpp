@@ -87,33 +87,28 @@ Application::~Application()
 
 bool Application::Init()
 {
-	bool ret = true;
-	// Call Init() in all modules
-	std::vector<Module*>::iterator item = m_modules.begin();
-
-	while(item != m_modules.end() && ret == true)
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
 	{
-		ret = (*item)->Init();
-		item++;
-	}
+		if (m->Init() == false)
+		{
+			return false;
+		}
+	});
 
 	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
-	item = m_modules.begin();
-
 	//Variable used to determine if LOG's can be shown on console
 	m_gameRunning = true;
-
-	while(item != m_modules.end() && ret == true)
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
 	{
-		if ((*item)->IsEnabled())
+		if (m->IsEnabled())
 		{
-			ret = (*item)->Start();
+			m->Start();
 		}
-		item++;
-	}
+	});
 	m_maxFps = 0;
-
 	m_msTimer.Start();
 	m_fpsTimer.Start();
 	m_totalTime.Start();
@@ -124,7 +119,7 @@ bool Application::Init()
 	TIMER_CREATE_PERF("Timer Test");
 	TIMER_CREATE_PERF("TimerPerf Test");
 
-	return ret;
+	return true;
 }
 
 // ---------------------------------------------
@@ -189,42 +184,50 @@ void Application::FinishUpdate()
 // Call PreUpdate, Update and PostUpdate on all modules
 UpdateStatus Application::Update()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
+	UpdateStatus ret = UpdateStatus::Continue;
 	PrepareUpdate();
 	
-	std::vector<Module*>::iterator item = m_modules.begin();
-	
-	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
 	{
-		if ((*item)->IsEnabled())
+		if (m->IsEnabled())
 		{
-			ret = (*item)->PreUpdate();
+			UpdateStatus ret = m->PreUpdate();
+			if (ret != UpdateStatus::Continue)
+			{
+				return ret;
+			}
 		}
-		item++;
-	}
+	});
+
 	TIMER_READ_MS("App PreUpdate");
 	TIMER_START_PERF("App Update");
-	item = m_modules.begin();
-
-	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
 	{
-		if ((*item)->IsEnabled())
+		if (m->IsEnabled())
 		{
-			ret = (*item)->Update();
+			UpdateStatus ret = m->Update();
+			if (ret != UpdateStatus::Continue)
+			{
+				return ret;
+			}
 		}
-		item++;
-	}
+	});
 	TIMER_READ_MS("App Update");
-	item = m_modules.begin();
 	TIMER_START_PERF("App PostUpdate");
-	while(item != m_modules.end() && ret == UPDATE_CONTINUE)
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
 	{
-		if ((*item)->IsEnabled())
+		if (m->IsEnabled())
 		{
-			ret = (*item)->PostUpdate();
+			UpdateStatus ret = m->PostUpdate();
+			if (ret != UpdateStatus::Continue)
+			{
+				return ret;
+			}
 		}
-		item++;
-	}
+	});
 	TIMER_READ_MS("App PostUpdate");
 	FinishUpdate();
 
@@ -237,46 +240,37 @@ UpdateStatus Application::Update()
 	return ret;
 }
 
-bool Application::CleanUp()
+void Application::CleanUp()
 {
 	m_gameRunning = false;
-
-	bool ret = true;
 	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
-
-	while(item != m_modules.rend() && ret == true)
-	{
-		ret = (*item)->CleanUp();
-		item++;
-	}
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[](Module* m)
+	{ m->CleanUp();	});
 	RELEASE(m_timers);
-
-	return ret;
 }
 
-void Application::Render(const ViewPort& port)
+void Application::Render(const ViewPort& port) const
 {
-	std::vector<Module*>::iterator item = m_modules.begin();
-
-	while (item != m_modules.end())
+	std::for_each(m_modules.begin(), m_modules.end(),
+		[& port](Module* m)
 	{
-		if ((*item)->IsEnabled())
+		if (m->IsEnabled())
 		{
-			(*item)->Render(port);
+			m->Render(port);
 		}
-		item++;
-	}
+	});
 }
 
 
-bool Application::OpenBrowser(const char* link)
+bool Application::OpenBrowser(const char* link) const
 {
 	ShellExecuteA(0, 0, "chrome.exe", link, 0, SW_SHOWMAXIMIZED);
 
 	return true;
 }
 
-const char* Application::GetTitle()
+const char* Application::GetTitle() const
 {
 	return m_title.data();
 }

@@ -17,8 +17,6 @@
 
 ModulePhysics3D::ModulePhysics3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	moduleName = "ModulePhysics";
-
 	debug = false;
 
 	collision_conf = new btDefaultCollisionConfiguration();
@@ -48,26 +46,13 @@ bool ModulePhysics3D::Init()
 }
 
 // ---------------------------------------------------------
-bool ModulePhysics3D::Start()
+void ModulePhysics3D::Start()
 {
 	LOG("Creating Physics environment");
 
 	world = new btDiscreteDynamicsWorld(dispatcher, broad_phase, solver, collision_conf);
 	world->setDebugDrawer(debug_draw);
 	world->setGravity(GRAVITY);
-
-	// Big plane as ground
-	/*{
-		btCollisionShape* colShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
-
-		btDefaultMotionState* myMotionState = new btDefaultMotionState();
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(0.0f, myMotionState, colShape);
-
-		ground = new btRigidBody(rbInfo);
-		world->addRigidBody(ground);
-	}*/
-	
-	return true;
 }
 
 // ---------------------------------------------------------
@@ -106,10 +91,7 @@ UpdateStatus ModulePhysics3D::PreUpdate()
 			}
 		}
 	}
-
-
-
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // ---------------------------------------------------------
@@ -123,18 +105,11 @@ UpdateStatus ModulePhysics3D::Update()
 		world->debugDrawWorld();
 	}
 
-	return UPDATE_CONTINUE;
-}
-
-
-// ---------------------------------------------------------
-UpdateStatus ModulePhysics3D::PostUpdate()
-{
-	return UPDATE_CONTINUE;
+	return UpdateStatus::Continue;
 }
 
 // Called before quitting 
-bool ModulePhysics3D::CleanUp()
+void ModulePhysics3D::CleanUp()
 {
 	LOG("Destroying 3D Physics simulation");
 	//world->removeRigidBody(ground);
@@ -172,8 +147,6 @@ bool ModulePhysics3D::CleanUp()
 	bodies.clear();
 
 	delete world;
-
-	return true;
 }
 
 // ---------------------------------------------------------

@@ -16,12 +16,12 @@ public:
 
 	void Push(float x, float y, float z);
 	void GetTransform(float* matrix) const;
-	void SetTransform(const float* matrix) const;
+	void SetTransform(const float* matrix);
 	void SetPos(float x, float y, float z);
-	void GetPos(float* x, float* y, float* z);
+	void GetPos(float* x, float* y, float* z) const;
 	void SetAsSensor(bool is_sensor);
 	bool IsSensor() const;
-	bool IsResting();
+	bool IsResting() const;
 	void SetInactive();
 
 public:
@@ -30,8 +30,6 @@ public:
 private:
 	btRigidBody* m_body = nullptr;
 	bool m_isSensor = false;
-
-
 };
 
 #endif // __PhysBody3D_H__

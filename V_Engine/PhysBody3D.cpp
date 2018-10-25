@@ -29,7 +29,7 @@ void PhysBody3D::GetTransform(float* matrix) const
 }
 
 // ---------------------------------------------------------
-void PhysBody3D::SetTransform(const float* matrix) const
+void PhysBody3D::SetTransform(const float* matrix)
 {
 	if(m_body != nullptr && matrix != NULL)
 	{
@@ -47,7 +47,7 @@ void PhysBody3D::SetPos(float x, float y, float z)
 	m_body->setWorldTransform(t);
 }
 
-void PhysBody3D::GetPos(float* x, float* y, float* z)
+void PhysBody3D::GetPos(float* x, float* y, float* z) const
 {
 	btTransform t = m_body->getWorldTransform();
 	btVector3 pos = t.getOrigin();
@@ -77,7 +77,7 @@ bool PhysBody3D::IsSensor() const
 	return m_isSensor;
 }
 
-bool PhysBody3D::IsResting()
+bool PhysBody3D::IsResting() const
 {
 	return !m_body->isActive();
 }
