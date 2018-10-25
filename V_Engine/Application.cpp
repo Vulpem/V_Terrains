@@ -188,49 +188,35 @@ UpdateStatus Application::Update()
 	PrepareUpdate();
 	
 	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
+		[& ret](Module* m)
 	{
-		if (m->IsEnabled())
+		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
-			UpdateStatus ret = m->PreUpdate();
-			if (ret != UpdateStatus::Continue)
-			{
-				return ret;
-			}
+			ret = m->PreUpdate();
 		}
 	});
-
 	TIMER_READ_MS("App PreUpdate");
 	TIMER_START_PERF("App Update");
 	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
+		[& ret](Module* m)
 	{
-		if (m->IsEnabled())
+		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
-			UpdateStatus ret = m->Update();
-			if (ret != UpdateStatus::Continue)
-			{
-				return ret;
-			}
+			ret = m->Update();
 		}
 	});
 	TIMER_READ_MS("App Update");
 	TIMER_START_PERF("App PostUpdate");
 	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
+		[& ret](Module* m)
 	{
-		if (m->IsEnabled())
+		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
-			UpdateStatus ret = m->PostUpdate();
-			if (ret != UpdateStatus::Continue)
-			{
-				return ret;
-			}
+			ret = m->PostUpdate();
 		}
 	});
 	TIMER_READ_MS("App PostUpdate");
 	FinishUpdate();
-
 	if (m_frameTime > 0.0001f)
 	{
 		while (m_msTimer.ReadMs() < m_frameTime)

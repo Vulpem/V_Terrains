@@ -95,8 +95,6 @@ UpdateStatus ModuleInput::PreUpdate()
 
 	mouse_x_motion = mouse_y_motion = 0;
 
-	bool quit = false;
-
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
@@ -138,8 +136,7 @@ UpdateStatus ModuleInput::PreUpdate()
 				}
 				case SDL_QUIT:
 				{
-					quit = true;
-					break;
+					return UpdateStatus::Stop;
 				}
 				case SDL_WINDOWEVENT:
 				{
@@ -160,10 +157,7 @@ UpdateStatus ModuleInput::PreUpdate()
 	else if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
 	{
 		captureMouse = false;
-	}*/
-
-	if (quit == true)
-		return UpdateStatus::Stop;
+	}*/		
 
 	return UpdateStatus::Continue;
 }
