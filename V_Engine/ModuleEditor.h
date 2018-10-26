@@ -18,19 +18,19 @@ public:
 	ModuleEditor(Application* app, bool start_enabled = true);
 	~ModuleEditor();
 
-	bool Init();
+	bool Init() override;
 
-	void Start();
-	UpdateStatus PreUpdate();
-	UpdateStatus Update();
-	UpdateStatus PostUpdate();
+	void Start() override;
+	UpdateStatus PreUpdate() override;
+	UpdateStatus Update() override;
+	UpdateStatus PostUpdate() override;
 
 	void OnPlay() override;
 	void OnStop() override;
 
-	void CleanUp();
+	void CleanUp() override;
 
-	void Render(const ViewPort& port);
+	void Render(const ViewPort& port) const override;
 
 	void OnScreenResize(int width, int heigth);
 
@@ -43,7 +43,7 @@ private:
 
 	void MenuBar();
 	void Editor();
-    void ViewPortUI(const ViewPort & port);
+    void ViewPortUI(const ViewPort & port) const;
 	void AttributeWindow();
 	void Outliner();
 

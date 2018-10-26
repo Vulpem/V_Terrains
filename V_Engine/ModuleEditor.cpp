@@ -137,7 +137,7 @@ void ModuleEditor::CleanUp()
 
 
 // ---- Each ViewPort UI -------------------------------------------------------------------
-void ModuleEditor::Render(const ViewPort & port)
+void ModuleEditor::Render(const ViewPort & port) const
 {
 	if (Time.PlayMode != Play::Play)
 	{
@@ -327,7 +327,7 @@ void ModuleEditor::UnselectGameObject(GameObject * go)
 	}
 }
 
-void ModuleEditor::ViewPortUI(const ViewPort& port)
+void ModuleEditor::ViewPortUI(const ViewPort& port) const
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
 

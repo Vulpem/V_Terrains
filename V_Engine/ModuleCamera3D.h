@@ -12,8 +12,8 @@ public:
 	ModuleCamera3D(Application* app, bool start_enabled = true);
 	~ModuleCamera3D();
 
-	void Start();
-	UpdateStatus Update();
+	void Start() override;
+	UpdateStatus Update() override;
 
 	void LookAt(const float3 &Spot);
 	void Move(const float3 &Movement);

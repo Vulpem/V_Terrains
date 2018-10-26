@@ -52,7 +52,7 @@ public:
 	virtual UpdateStatus Update()
 	{ return UpdateStatus::Continue; }
 
-	virtual void Render(const ViewPort& port)
+	virtual void Render(const ViewPort& port) const
 	{}
 
 	virtual UpdateStatus PostUpdate()
