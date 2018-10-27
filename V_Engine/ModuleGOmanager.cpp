@@ -573,7 +573,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 		ret.m_meshColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	if (ret.m_shader.program == -1)
+	if (ret.m_shader.m_program == -1)
 	{
 		ret.m_shader = App->m_resourceManager->GetDefaultShader();
 	}

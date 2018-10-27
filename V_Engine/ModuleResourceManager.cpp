@@ -25,7 +25,7 @@ ModuleResourceManager::~ModuleResourceManager()
 // Called before render is available
 void ModuleResourceManager::Start()
 {
-	defaultVertexBuf = std::string(
+	m_defaultVertexBuf = std::string(
 		"#version 330 core\n"
 		"\n"
 		"layout (location = 0) in vec3 position;\n"
@@ -66,7 +66,7 @@ void ModuleResourceManager::Start()
 		"}\n"
 	);
 
-	defaultFragmentBuf = std::string(
+	m_defaultFragmentBuf = std::string(
 		"#version 330 core\n"
 		"\n"
 		"in vec4 ourColor;\n"
@@ -110,12 +110,12 @@ void ModuleResourceManager::Start()
 // Called every draw update
 UpdateStatus ModuleResourceManager::Update()
 {
-	if (autoRefresh)
+	if (m_autoRefresh)
 	{
-		refreshTimer += Time.dt;
-		if (refreshTimer > refreshDelay)
+		m_refreshTimer += Time.dt;
+		if (m_refreshTimer > m_refreshInterval)
 		{
-			refreshTimer = 0.0f;
+			m_refreshTimer = 0.0f;
 			Refresh();
 		}
 	}
@@ -133,13 +133,13 @@ UpdateStatus ModuleResourceManager::PostUpdate()
 void ModuleResourceManager::CleanUp()
 {
 	SaveMetaData();
-	std::for_each(resources.begin(), resources.end(),
+	std::for_each(m_resources.begin(), m_resources.end(),
 		[](std::pair<uint64_t, Resource*> resource)
 	{
 		RELEASE(resource.second);
 	});
-	resources.clear();
-	uidLib.clear();
+	m_resources.clear();
+	m_uidLib.clear();
 }
 
 Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component::Type type)
@@ -166,6 +166,7 @@ Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component
 	return nullptr;
 }
 
+//Create the Library folders
 void ModuleResourceManager::CreateLibraryDirs()
 {
 	App->m_fileSystem->CreateDir("Library");
@@ -178,26 +179,27 @@ void ModuleResourceManager::CreateLibraryDirs()
 	App->m_fileSystem->CreateDir("Assets/Scenes");
 }
 
+//Brute-Force reimport all assets. Existing files won't keep their previous UID
 void ModuleResourceManager::ReimportAll()
 {
 	TIMER_START("Res Reimport All");
 	ClearLibrary();
 
-	metaData.clear();
-	meta_lastMod.clear();
+	m_metaData.clear();
+	m_metaLastModificationDate.clear();
 
 	std::queue<R_Folder> pendant;
 	pendant.push(ReadFolder("Assets"));
 	while (pendant.empty() == false)
 	{
-		for (std::vector<std::string>::iterator it = pendant.front().subFoldersPath.begin(); it != pendant.front().subFoldersPath.end(); it++)
+		for (std::vector<std::string>::iterator it = pendant.front().m_subFoldersPath.begin(); it != pendant.front().m_subFoldersPath.end(); it++)
 		{
 			pendant.push(ReadFolder(it->data()));
 		}
 
-		for (std::vector<std::string>::iterator it = pendant.front().files.begin(); it != pendant.front().files.end(); it++)
+		for (std::vector<std::string>::iterator it = pendant.front().m_files.begin(); it != pendant.front().m_files.end(); it++)
 		{
-			std::string path(pendant.front().path);
+			std::string path(pendant.front().m_path);
 			path += "/";
 			path += it->data();
 
@@ -209,9 +211,9 @@ void ModuleResourceManager::ReimportAll()
 				{
 					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
 				}
-				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
+				m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
 
-				meta_lastMod.insert(std::pair<std::string, Date>(path, App->m_fileSystem->ReadFileDate(path.data())));
+				m_metaLastModificationDate.insert(std::pair<std::string, Date>(path, App->m_fileSystem->ReadFileDate(path.data())));
 			}
 		}
 
@@ -222,24 +224,27 @@ void ModuleResourceManager::ReimportAll()
 	TIMER_READ_MS("Res Reimport All");
 }
 
+//Dump all the library files
 void ModuleResourceManager::ClearLibrary()
 {
 	App->m_fileSystem->DeleteDir("Library");
 	CreateLibraryDirs();
 }
 
+//Save metadata for all files
 void ModuleResourceManager::SaveMetaData()
 {
 	App->m_fileSystem->DeleteDir("Library/Meta");
 	App->m_fileSystem->CreateDir("Library/Meta");
 
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
-	for (; fileIt != metaData.end(); fileIt++)
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = m_metaData.begin();
+	for (; fileIt != m_metaData.end(); fileIt++)
 	{
 		SaveMetaData(fileIt);
 	}
 }
 
+//Save a specific metadata file
 void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave)
 {
 	pugi::xml_document data;
@@ -259,7 +264,7 @@ void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Com
 	pugi::xml_node fileData = root_node.append_child("FileData");
 	fileData.append_attribute("name") = fileToSave->first.data();
 
-	std::map<std::string, Date>::iterator date = meta_lastMod.find(fileToSave->first);
+	std::map<std::string, Date>::iterator date = m_metaLastModificationDate.find(fileToSave->first);
 
 	fileData.append_attribute("year") = date->second.year;
 	fileData.append_attribute("month") = date->second.month;
@@ -291,8 +296,8 @@ void ModuleResourceManager::LoadMetaData()
 {
 	LOG("Reloading Metadata from library");
 
-	metaData.clear();
-	meta_lastMod.clear();
+	m_metaData.clear();
+	m_metaLastModificationDate.clear();
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
@@ -330,7 +335,7 @@ void ModuleResourceManager::LoadMetaData()
 					date.min = fileMeta.attribute("min").as_uint();
 					date.sec = fileMeta.attribute("sec").as_uint();
 
-					meta_lastMod.insert(std::pair<std::string, Date>(name, date));
+					m_metaLastModificationDate.insert(std::pair<std::string, Date>(name, date));
 
 					std::multimap<Component::Type, MetaInf> inf;
 
@@ -347,7 +352,7 @@ void ModuleResourceManager::LoadMetaData()
 						link = link.next_sibling("link");
 					}
 
-					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(name, inf));
+					m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(name, inf));
 				}
 			}
 		}
@@ -358,6 +363,7 @@ void ModuleResourceManager::LoadMetaData()
 	}
 }
 
+//Check for new or modified files in the Assets folder, and import them. Existing files will keep their UID
 void ModuleResourceManager::Refresh()
 {
 	TIMER_START("Res Refresh");
@@ -371,14 +377,14 @@ void ModuleResourceManager::Refresh()
 	pendantFolders.push(ReadFolder("Assets"));
 	while (pendantFolders.empty() == false)
 	{
-		for (std::vector<std::string>::iterator it = pendantFolders.front().subFoldersPath.begin(); it != pendantFolders.front().subFoldersPath.end(); it++)
+		for (std::vector<std::string>::iterator it = pendantFolders.front().m_subFoldersPath.begin(); it != pendantFolders.front().m_subFoldersPath.end(); it++)
 		{
 			pendantFolders.push(ReadFolder(it->data()));
 		}
 
-		for (std::vector<std::string>::iterator it = pendantFolders.front().files.begin(); it != pendantFolders.front().files.end(); it++)
+		for (std::vector<std::string>::iterator it = pendantFolders.front().m_files.begin(); it != pendantFolders.front().m_files.end(); it++)
 		{
-			std::string path(pendantFolders.front().path);
+			std::string path(pendantFolders.front().m_path);
 			path += "/";
 			path += it->data();
 			filesToCheck.push(path.data());			
@@ -396,8 +402,8 @@ void ModuleResourceManager::Refresh()
 			totalFiles++;
 			bool wantToImport = false;
 			bool overwrite = false;
-			std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
-			if (it != meta_lastMod.end())
+			std::map<std::string, Date>::iterator it = m_metaLastModificationDate.find(filesToCheck.front());
+			if (it != m_metaLastModificationDate.end())
 			{
 				//The file exists in meta
 				if (it->second != App->m_fileSystem->ReadFileDate(filesToCheck.front().data()))
@@ -423,26 +429,26 @@ void ModuleResourceManager::Refresh()
 					for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
 					{
 						tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
-						toReload.push_back(m->uid);
+						m_toReload.push_back(m->uid);
 					}
 
 					metaToSave.push_back(filesToCheck.front());
 
 
 					//Erasing the old data, so we can insert the new one
-					std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = metaData.find(filesToCheck.front());
-					if (toPop != metaData.end())
+					std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = m_metaData.find(filesToCheck.front());
+					if (toPop != m_metaData.end())
 					{
-						metaData.erase(toPop);
+						m_metaData.erase(toPop);
 					}
-					std::map<std::string, Date>::iterator toPop2 = meta_lastMod.find(filesToCheck.front());
-					if (toPop2 != meta_lastMod.end())
+					std::map<std::string, Date>::iterator toPop2 = m_metaLastModificationDate.find(filesToCheck.front());
+					if (toPop2 != m_metaLastModificationDate.end())
 					{
-						meta_lastMod.erase(toPop2);
+						m_metaLastModificationDate.erase(toPop2);
 					}
 
-					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
-					meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->m_fileSystem->ReadFileDate(filesToCheck.front().data())));
+					m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
+					m_metaLastModificationDate.insert(std::pair<std::string, Date>(filesToCheck.front(), App->m_fileSystem->ReadFileDate(filesToCheck.front().data())));
 
 					if (overwrite)
 					{
@@ -470,7 +476,7 @@ void ModuleResourceManager::Refresh()
 
 	while(metaToSave.size() > 0)
 	{
-		SaveMetaData(metaData.find(metaToSave.back()));
+		SaveMetaData(m_metaData.find(metaToSave.back()));
 		metaToSave.pop_back();
 	}
 	TIMER_READ_MS("Res Refresh");
@@ -478,8 +484,8 @@ void ModuleResourceManager::Refresh()
 
 const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.find(file);
-	if (f != metaData.end())
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.find(file);
+	if (f != m_metaData.end())
 	{
 		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
@@ -496,8 +502,8 @@ const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::
 
 const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const uint64_t componentUID)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.find(file);
-	if (f != metaData.end())
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.find(file);
+	if (f != m_metaData.end())
 	{
 		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
@@ -512,12 +518,12 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component:
 	return nullptr;
 }
 
-//TODO 
-//Fix this, it's way too ineficient
+//TODO
+//Improve this function, since it's slooooow to find stuff and iterates too much
 const MetaInf * ModuleResourceManager::GetMetaData(Component::Type type, const char * component)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.begin();
-	while (f != metaData.end())
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.begin();
+	while (f != m_metaData.end())
 	{
 		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
@@ -567,11 +573,11 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 		std::string _path(path);
 		_path += "/";
 		_path += it->data();
-		ret.subFoldersPath.push_back(_path);
+		ret.m_subFoldersPath.push_back(_path);
 	}
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
 	{
-		ret.files.push_back(it->data());
+		ret.m_files.push_back(it->data());
 	}
 
 	return ret;
@@ -654,8 +660,8 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 
 Resource * ModuleResourceManager::Peek(uint64_t uid) const
 {
-	std::map<uint64_t, Resource*>::const_iterator it = resources.find(uid);
-	if (it != resources.end())
+	std::map<uint64_t, Resource*>::const_iterator it = m_resources.find(uid);
+	if (it != m_resources.end())
 	{
 		return it->second;
 	}
@@ -665,11 +671,11 @@ Resource * ModuleResourceManager::Peek(uint64_t uid) const
 Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 {
 	Resource* ret = nullptr;
-	std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-	if (it != resources.end())
+	std::map<uint64_t, Resource*>::iterator it = m_resources.find(uid);
+	if (it != m_resources.end())
 	{
 		ret = it->second;
-		ret->nReferences++;
+		ret->m_numReferences++;
 	}
 	return ret;
 }
@@ -677,12 +683,12 @@ Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Type type)
 {
 	Resource* ret = nullptr;
-	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
+	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
 	//If previosuly there hasn't been loaded any resource with the same type as the requested one, we'll create the new map for this type of components
-	if (tmpMap == uidLib.end())
+	if (tmpMap == m_uidLib.end())
 	{
-		uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
-		tmpMap = uidLib.find(type);
+		m_uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
+		tmpMap = m_uidLib.find(type);
 	}
 	//We try to find the resource, to see if it's already loaded
 	std::map<std::string, uint64_t> ::iterator it = tmpMap->second.find(resName);
@@ -699,15 +705,15 @@ uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Typ
 		ret = LoadNewResource(resName, type);
 		if (ret != nullptr)
 		{
-			resources.insert(std::pair<uint64_t, Resource*>(ret->uid, ret));
-			tmpMap->second.insert(std::pair<std::string, uint64_t>(ret->name, ret->uid));
-			ret->nReferences++;
+			m_resources.insert(std::pair<uint64_t, Resource*>(ret->m_uid, ret));
+			tmpMap->second.insert(std::pair<std::string, uint64_t>(ret->m_name, ret->m_uid));
+			ret->m_numReferences++;
 		}
 	}
 
 	if (ret != nullptr)
 	{
-		return ret->uid;
+		return ret->m_uid;
 	}
 	return 0;
 }
@@ -716,27 +722,27 @@ void ModuleResourceManager::UnlinkResource(Resource * res)
 {
 	if (res != nullptr)
 	{
-		UnlinkResource(res->uid);
+		UnlinkResource(res->m_uid);
 	}
 }
 
 void ModuleResourceManager::UnlinkResource(uint64_t uid)
 {
-	std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-	if (it != resources.end() && it->second != nullptr)
+	std::map<uint64_t, Resource*>::iterator it = m_resources.find(uid);
+	if (it != m_resources.end() && it->second != nullptr)
 	{
-		it->second->nReferences--;
-		if (it->second->nReferences <= 0)
+		it->second->m_numReferences--;
+		if (it->second->m_numReferences <= 0)
 		{
-			toDelete.push_back(it->first);
+			m_toDelete.push_back(it->first);
 		}
 	}
 }
 
 void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type type)
 {
-	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
-	if (tmpMap != uidLib.end())
+	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
+	if (tmpMap != m_uidLib.end())
 	{
 		std::map<std::string, uint64_t>::iterator it = tmpMap->second.find(fileName);
 		if (it != tmpMap->second.end())
@@ -748,22 +754,22 @@ void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type
 
 void ModuleResourceManager::DeleteNow()
 {
-	if (toDelete.empty() == false)
+	if (m_toDelete.empty() == false)
 	{
-		std::vector<uint64_t> tmp = toDelete;
-		toDelete.clear();
+		std::vector<uint64_t> tmp = m_toDelete;
+		m_toDelete.clear();
 		while (tmp.empty() == false)
 		{
 			uint64_t uid = tmp.back();
 
 			//Erasing the resource itself
-			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-			if (it != resources.end())
+			std::map<uint64_t, Resource*>::iterator it = m_resources.find(uid);
+			if (it != m_resources.end())
 			{
-				if (it->second->nReferences <= 0)
+				if (it->second->m_numReferences <= 0)
 				{
 					RELEASE(it->second);
-					resources.erase(it);
+					m_resources.erase(it);
 				}
 			}
 
@@ -774,26 +780,26 @@ void ModuleResourceManager::DeleteNow()
 
 void ModuleResourceManager::ReloadNow()
 {
-	if (toReload.empty() == false)
+	if (m_toReload.empty() == false)
 	{
-		std::vector<uint64_t> tmp = toReload;
-		toReload.clear();
+		std::vector<uint64_t> tmp = m_toReload;
+		m_toReload.clear();
 
 		while (tmp.empty() == false)
 		{
 			uint64_t uid = tmp.back();
 
 			//Erasing the resource itself
-			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-			if (it != resources.end())
+			std::map<uint64_t, Resource*>::iterator it = m_resources.find(uid);
+			if (it != m_resources.end())
 			{
-				std::string name = it->second->name;
+				std::string name = it->second->m_name;
 				Component::Type type = it->second->GetType();
-				uint nRefs = it->second->nReferences;
+				uint nRefs = it->second->m_numReferences;
 
 				RELEASE(it->second);
 				it->second = LoadNewResource(name, type);
-				it->second->nReferences = nRefs;
+				it->second->m_numReferences = nRefs;
 			}
 
 			tmp.pop_back();
@@ -801,22 +807,23 @@ void ModuleResourceManager::ReloadNow()
 	}
 }
 
+//Returns all loaded resources. Pretty slow, for debugging use only
 const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 {
 	std::vector<Resource*> ret;
 
-	std::map<Component::Type, std::map<std::string, uint64_t>>::const_iterator tmpMap = uidLib.cbegin();
+	std::map<Component::Type, std::map<std::string, uint64_t>>::const_iterator tmpMap = m_uidLib.cbegin();
 	//Iterating all maps of components from uidLib. This maps allow us to find the UID of each component through it's type and name
 	//There's a different map for each type of component, so they're ordered
-	for (; tmpMap != uidLib.end(); tmpMap++)
+	for (; tmpMap != m_uidLib.end(); tmpMap++)
 	{
 		//Iterating inside each map
 		std::map<std::string, uint64_t>::const_iterator it = tmpMap->second.cbegin();
 		for (; it != tmpMap->second.end(); it++)
 		{
 			//Once we have the uid we want to push, we find the corresponding resource
-			std::map<uint64_t, Resource*>::const_iterator res = resources.find(it->second);
-			if (res != resources.cend())
+			std::map<uint64_t, Resource*>::const_iterator res = m_resources.find(it->second);
+			if (res != m_resources.cend())
 			{
 				ret.push_back(res->second);
 			}
@@ -826,12 +833,16 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 	return ret;
 }
 
+//Return explanation
+//Returns a vector of pairs:
+// -first is the file name
+// -Second is the vector of resources from that file
 std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceManager::GetAvaliableResources(Component::Type type)
 {
 	std::vector<std::pair<std::string, std::vector<std::string>>> ret;
 
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.begin();
-	for (;f != metaData.end();f++)
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.begin();
+	for (;f != m_metaData.end();f++)
 	{
 		std::vector<std::string> thisFile;
 		std::multimap<Component::Type, MetaInf> ::iterator it;
@@ -861,7 +872,7 @@ bool ModuleResourceManager::GenerateDefaultShader()
 	std::string ret;
 	bool error = false;
 
-	const char* src = defaultVertexBuf.c_str();
+	const char* src = m_defaultVertexBuf.c_str();
 	GLuint vertexShader;	
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &src, NULL);
@@ -879,7 +890,7 @@ bool ModuleResourceManager::GenerateDefaultShader()
 		LOG("Shader compilation error: %s", infoLog);
 	}
 
-	src = defaultFragmentBuf.c_str();
+	src = m_defaultFragmentBuf.c_str();
 	GLuint fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &src, NULL);
@@ -915,52 +926,52 @@ bool ModuleResourceManager::GenerateDefaultShader()
 
 	if (shaderProgram != 0 && error == false)
 	{
-		if (defaultShader.program != 0)
+		if (m_defaultShader.m_program != 0)
 		{
-			glDeleteProgram(defaultShader.program);
+			glDeleteProgram(m_defaultShader.m_program);
 		}
-		defaultShader.program = shaderProgram;
+		m_defaultShader.m_program = shaderProgram;
 	}	
 
-	defaultShader.modelMatrix = glGetUniformLocation(defaultShader.program,"model_matrix");
-	defaultShader.viewMatrix = glGetUniformLocation(defaultShader.program, "view_matrix");
-	defaultShader.projectionMatrix = glGetUniformLocation(defaultShader.program, "projection_matrix");
+	m_defaultShader.m_modelMatrix = glGetUniformLocation(m_defaultShader.m_program,"model_matrix");
+	m_defaultShader.m_viewMatrix = glGetUniformLocation(m_defaultShader.m_program, "view_matrix");
+	m_defaultShader.m_projectionMatrix = glGetUniformLocation(m_defaultShader.m_program, "projection_matrix");
 
-	defaultShader.materialColor = glGetUniformLocation(defaultShader.program, "material_color");
-	defaultShader.hasTexture = glGetUniformLocation(defaultShader.program, "has_texture");
-	defaultShader.useLight = glGetUniformLocation(defaultShader.program, "use_light");
-	defaultShader.time = glGetUniformLocation(defaultShader.program, "time");
-	defaultShader.ambientColor = glGetUniformLocation(defaultShader.program, "ambient_color");
-	defaultShader.globalLightDir = glGetUniformLocation(defaultShader.program, "global_light_direction");
-	defaultShader.fogDistance = glGetUniformLocation(defaultShader.program, "fog_distance");
-	defaultShader.fogColor = glGetUniformLocation(defaultShader.program, "fog_color");
-	defaultShader.maxHeight = glGetUniformLocation(defaultShader.program, "max_height");
+	m_defaultShader.m_materialColor = glGetUniformLocation(m_defaultShader.m_program, "material_color");
+	m_defaultShader.m_hasTexture = glGetUniformLocation(m_defaultShader.m_program, "has_texture");
+	m_defaultShader.m_useLight = glGetUniformLocation(m_defaultShader.m_program, "use_light");
+	m_defaultShader.m_time = glGetUniformLocation(m_defaultShader.m_program, "time");
+	m_defaultShader.m_ambientColor = glGetUniformLocation(m_defaultShader.m_program, "ambient_color");
+	m_defaultShader.m_globalLightDir = glGetUniformLocation(m_defaultShader.m_program, "global_light_direction");
+	m_defaultShader.m_fogDistance = glGetUniformLocation(m_defaultShader.m_program, "fog_distance");
+	m_defaultShader.m_fogColor = glGetUniformLocation(m_defaultShader.m_program, "fog_color");
+	m_defaultShader.m_maxHeight = glGetUniformLocation(m_defaultShader.m_program, "max_height");
 
 	glDetachShader(shaderProgram, vertexShader);
 	glDetachShader(shaderProgram, fragmentShader);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	shadersResult = ret;
+	m_shadersResult = ret;
 
 	return !error;
 }
 
-R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)
+R_Folder::R_Folder(const char* name, R_Folder* parent) : m_name(name)
 {
 	if (parent != nullptr)
 	{
-		std::string myPath(parent->path);
+		std::string myPath(parent->m_path);
 		myPath += "/";
 		myPath += name;
-		path = myPath;
+		m_path = myPath;
 	}
 	else
 	{
-		path = name;
+		m_path = name;
 	}
 }
 
-R_Folder::R_Folder(const char * name, const char * path) : name(name), path(path)
+R_Folder::R_Folder(const char * name, const char * path) : m_name(name), m_path(path)
 {
 }

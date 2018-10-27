@@ -12,12 +12,12 @@ public:
 
 	~R_Texture()
 	{
-		glDeleteBuffers(1, &bufferID);
+		glDeleteBuffers(1, &m_bufferID);
 	}
 
-	uint bufferID = 0;
-
 	Component::Type GetType() { return Component::Type::C_Texture; }
+
+	uint m_bufferID = 0;
 };
 
 #endif

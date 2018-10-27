@@ -32,7 +32,7 @@ void Material::EditorContent()
 		{
 			if (ImGui::MenuItem(fileIt->first.data()))
 			{
-				res->textures.push_back(App->m_resourceManager->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
+				res->m_textures.push_back(App->m_resourceManager->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
 				break;
 			}
 		}
@@ -45,8 +45,8 @@ void Material::EditorContent()
 	{
 		if (ImGui::MenuItem("Default shader"))
 		{
-			App->m_resourceManager->UnlinkResource(res->shader);
-			res->shader = 0;
+			App->m_resourceManager->UnlinkResource(res->m_shader);
+			res->m_shader = 0;
 		}
 		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Shader);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
@@ -61,10 +61,10 @@ void Material::EditorContent()
 		ImGui::EndPopup();
 	}
 #pragma endregion
-	uint64_t currentShader = res->shader;
+	uint64_t currentShader = res->m_shader;
 	if (currentShader != 0)
 	{
-		ImGui::Text("Current shader: %s", App->m_resourceManager->Peek(currentShader)->name.data());
+		ImGui::Text("Current shader: %s", App->m_resourceManager->Peek(currentShader)->m_name.data());
 	}
 	else
 	{
@@ -130,10 +130,10 @@ void Material::EditorContent()
 
 	ImGui::NewLine();
 	ImGui::Separator();
-	ImGui::ColorEdit4("Color", res->color);
-	if (res->textures.empty() == false)
+	ImGui::ColorEdit4("Color", res->m_color);
+	if (res->m_textures.empty() == false)
 	{
-		for (uint n = 0; n < res->textures.size(); n++)
+		for (uint n = 0; n < res->m_textures.size(); n++)
 		{
 			ImGui::Separator();
 			char tmp[524];
@@ -142,14 +142,14 @@ void Material::EditorContent()
 			{
 				texturesToRemove.push_back(n);
 			}
-			Resource* resText = App->m_resourceManager->Peek(res->textures.at(n));
+			Resource* resText = App->m_resourceManager->Peek(res->m_textures.at(n));
 			if (resText != nullptr)
 			{
 				ImGui::SameLine();
-				sprintf(tmp, "Id: %i    %s", n, resText->name.data());
+				sprintf(tmp, "Id: %i    %s", n, resText->m_name.data());
 				if (ImGui::TreeNode(tmp))
 				{
-					ImTextureID image = (void*)App->m_resourceManager->Peek(res->textures.at(n))->Read<R_Texture>()->bufferID;
+					ImTextureID image = (void*)App->m_resourceManager->Peek(res->m_textures.at(n))->Read<R_Texture>()->m_bufferID;
 					ImGui::Image(image, ImVec2(270, 270));
 
 					ImGui::TreePop();
@@ -162,12 +162,12 @@ void Material::EditorContent()
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
 	Resource* res = App->m_resourceManager->Peek(resource);
-	myNode.append_attribute("res") = res->name.data();
+	myNode.append_attribute("res") = res->m_name.data();
 	pugi::xml_node color_n = myNode.append_child("Color");
-	color_n.append_attribute("R") = ReadRes<R_Material>()->color[0];
-	color_n.append_attribute("G") = ReadRes<R_Material>()->color[1];
-	color_n.append_attribute("B") = ReadRes<R_Material>()->color[2];
-	color_n.append_attribute("A") = ReadRes<R_Material>()->color[3];
+	color_n.append_attribute("R") = ReadRes<R_Material>()->m_color[0];
+	color_n.append_attribute("G") = ReadRes<R_Material>()->m_color[1];
+	color_n.append_attribute("B") = ReadRes<R_Material>()->m_color[2];
+	color_n.append_attribute("A") = ReadRes<R_Material>()->m_color[3];
 }
 
 void Material::LoadSpecifics(pugi::xml_node & myNode)
@@ -180,31 +180,31 @@ void Material::LoadSpecifics(pugi::xml_node & myNode)
 	R_Material* res = ReadRes<R_Material>();
 	if (res)
 	{
-		res->color[0] = col.attribute("R").as_float();
-		res->color[1] = col.attribute("G").as_float();
-		res->color[2] = col.attribute("B").as_float();
-		res->color[3] = col.attribute("A").as_float();
+		res->m_color[0] = col.attribute("R").as_float();
+		res->m_color[1] = col.attribute("G").as_float();
+		res->m_color[2] = col.attribute("B").as_float();
+		res->m_color[3] = col.attribute("A").as_float();
 	}
 }
 
 uint Material::NofTextures()
 {
-	return ReadRes<R_Material>()->textures.size();
+	return ReadRes<R_Material>()->m_textures.size();
 }
 
 int Material::GetTexture(uint n)
 {
 	if (IsEnabled() && texturesToRemove.empty() == true)
 	{
-		if (n >= 0 && n < ReadRes<R_Material>()->textures.size())
+		if (n >= 0 && n < ReadRes<R_Material>()->m_textures.size())
 		{
 			R_Material* mat = ReadRes<R_Material>();
 			if (mat)
 			{
-				R_Texture* tex = App->m_resourceManager->Peek(mat->textures.at(n))->Read<R_Texture>();
+				R_Texture* tex = App->m_resourceManager->Peek(mat->m_textures.at(n))->Read<R_Texture>();
 				if (tex)
 				{
-					return tex->bufferID;
+					return tex->m_bufferID;
 				}
 			}
 		}
@@ -215,51 +215,51 @@ int Material::GetTexture(uint n)
 bool Material::AddTexture(std::string fileName)
 {
 	R_Material* res = ReadRes<R_Material>();
-	res->textures.push_back(App->m_resourceManager->LinkResource(fileName, Component::Type::C_Texture));
+	res->m_textures.push_back(App->m_resourceManager->LinkResource(fileName, Component::Type::C_Texture));
 	return true;
 }
 
 void Material::SetColor(float r, float g, float b, float a)
 {
-	ReadRes<R_Material>()->color[0] = r;
-	ReadRes<R_Material>()->color[1] = g;
-	ReadRes<R_Material>()->color[2] = b;
-	ReadRes<R_Material>()->color[3] = a;
+	ReadRes<R_Material>()->m_color[0] = r;
+	ReadRes<R_Material>()->m_color[1] = g;
+	ReadRes<R_Material>()->m_color[2] = b;
+	ReadRes<R_Material>()->m_color[3] = a;
 }
 
 math::float4 Material::GetColor()
 {
-	return math::float4(ReadRes<R_Material>()->color);
+	return math::float4(ReadRes<R_Material>()->m_color);
 }
 
 AlphaTestTypes Material::GetAlphaType()
 {
-	return ReadRes<R_Material>()->alphaType;
+	return ReadRes<R_Material>()->m_alphaType;
 }
 
 void Material::SetAlphaType(AlphaTestTypes type)
 {
-	ReadRes<R_Material>()->alphaType = type;
+	ReadRes<R_Material>()->m_alphaType = type;
 }
 
 float Material::GetAlphaTest()
 {
-	return ReadRes<R_Material>()->alphaTest;
+	return ReadRes<R_Material>()->m_alphaTest;
 }
 
 void Material::SetAlphaTest(float alphaTest)
 {
-	ReadRes<R_Material>()->alphaTest = alphaTest;
+	ReadRes<R_Material>()->m_alphaTest = alphaTest;
 }
 
 int Material::GetBlendType()
 {
-	return ReadRes<R_Material>()->blendType;
+	return ReadRes<R_Material>()->m_blendType;
 }
 
 void Material::SetBlendType(int blendType)
 {
-	ReadRes<R_Material>()->blendType = blendType;
+	ReadRes<R_Material>()->m_blendType = blendType;
 }
 
 Shader Material::GetShader()
@@ -276,13 +276,13 @@ void Material::RemoveTexturesNow()
 		{
 			for (int n = 0; n < texturesToRemove.size(); n++)
 			{
-				std::vector<uint64>::iterator it = matRes->textures.begin();
-				for (int m = 0; it != matRes->textures.end(); it++)
+				std::vector<uint64>::iterator it = matRes->m_textures.begin();
+				for (int m = 0; it != matRes->m_textures.end(); it++)
 				{
 					if (m == texturesToRemove[n])
 					{
-						App->m_resourceManager->UnlinkResource(matRes->textures[m]);
-						matRes->textures.erase(it);
+						App->m_resourceManager->UnlinkResource(matRes->m_textures[m]);
+						matRes->m_textures.erase(it);
 						break;
 					}
 					m++;

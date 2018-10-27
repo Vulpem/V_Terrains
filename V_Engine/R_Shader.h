@@ -13,15 +13,15 @@ public:
 
 	~R_Shader()
 	{
-		if (shaderProgram.program != 0)
+		if (m_shaderProgram.m_program != 0)
 		{
-			glDeleteProgram(shaderProgram.program);
+			glDeleteProgram(m_shaderProgram.m_program);
 		}
 	}
 
 	Component::Type GetType() { return Component::Type::C_Shader; }
 
-	Shader shaderProgram;
+	Shader m_shaderProgram;
 };
 
 #endif

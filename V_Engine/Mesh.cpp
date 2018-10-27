@@ -54,11 +54,11 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 
 		const R_Mesh* res = ReadRes<R_Mesh>();
 
-		ret.m_nIndices = res->m_nIndices;
-		ret.m_nVertices = res->m_nVertices;
+		ret.m_nIndices = res->m_numIndices;
+		ret.m_nVertices = res->m_numVertices;
 
-		ret.m_dataBuffer = res->id_data;
-		ret.m_indicesBuffer = res->id_indices;
+		ret.m_dataBuffer = res->m_idData;
+		ret.m_indicesBuffer = res->m_idIndices;
 
 		ret.m_origin = res;
 	}
@@ -72,32 +72,32 @@ const float3* mesh::GetVertices() const
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * m_nVertices, ret);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-	return ReadRes<R_Mesh>()->vertices;
+	return ReadRes<R_Mesh>()->m_vertices;
 }
 
 const uint mesh::GetNumVertices()
 {
-	return ReadRes<R_Mesh>()->m_nVertices;
+	return ReadRes<R_Mesh>()->m_numVertices;
 }
 
 const uint* mesh::GetIndices() const
 {
-	return ReadRes<R_Mesh>()->indices;
+	return ReadRes<R_Mesh>()->m_indices;
 }
 
 const uint mesh::GetNumIndices()
 {
-	return ReadRes<R_Mesh>()->m_nIndices;
+	return ReadRes<R_Mesh>()->m_numIndices;
 }
 
 const float3 * mesh::GetNormals() const
 {
-	return ReadRes<R_Mesh>()->normals;
+	return ReadRes<R_Mesh>()->m_normals;
 }
 
 AABB mesh::GetAABB()
 {
-	return ReadRes<R_Mesh>()->aabb;
+	return ReadRes<R_Mesh>()->m_aabb;
 }
 
 void mesh::EditorContent()
@@ -107,20 +107,20 @@ void mesh::EditorContent()
 	sprintf(tmp, "Wireframe##%llu", uid);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
-	ImGui::Text("Resource: %s", res->name.data());
+	ImGui::Text("Resource: %s", res->m_name.data());
 
-	ImGui::Text("Indices in memory: %i", res->indices);
+	ImGui::Text("Indices in memory: %i", res->m_indices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", res->id_indices);
+	ImGui::Text("Buffer: %i", res->m_idIndices);
 
-	ImGui::Text("Vertices in memory: %i", res->vertices);
+	ImGui::Text("Vertices in memory: %i", res->m_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
 	
-	if (res->hasNormals)
+	if (res->m_hasNormals)
 	{
 		ImGui::Text("Has normals");
 	}
-	if (res->hasUVs)
+	if (res->m_hasUVs)
 	{
 		ImGui::Text("Has UVs");
 	}
@@ -133,7 +133,7 @@ void mesh::EditorContent()
 void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
 	Resource* res = App->m_resourceManager->Peek(resource);
-	myNode.append_attribute("res") = res->name.data();
+	myNode.append_attribute("res") = res->m_name.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
 	myNode.append_attribute("Wired") = wires;
 }

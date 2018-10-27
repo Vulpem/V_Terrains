@@ -940,17 +940,17 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 				{
 					newMesh = new R_Mesh(inf->uid);
 
-					newMesh->name = resName;
+					newMesh->m_name = resName;
 
 					//Num vertices
 					bytes = sizeof(uint);
-					memcpy(&newMesh->m_nVertices, It, bytes);
+					memcpy(&newMesh->m_numVertices, It, bytes);
 					It += bytes;
 
 					//Actual vertices
-					newMesh->vertices = new float3[newMesh->m_nVertices];
-					bytes = sizeof(float3) * newMesh->m_nVertices;
-					memcpy(newMesh->vertices, It, bytes);
+					newMesh->m_vertices = new float3[newMesh->m_numVertices];
+					bytes = sizeof(float3) * newMesh->m_numVertices;
+					memcpy(newMesh->m_vertices, It, bytes);
 					It += bytes;	
 
 
@@ -963,11 +963,11 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 					if (numNormals > 0)
 					{
 						//Normals
-						newMesh->normals = new float3[numNormals];
+						newMesh->m_normals = new float3[numNormals];
 						bytes = sizeof(float3) * numNormals;
-						memcpy(newMesh->normals, It, bytes);
+						memcpy(newMesh->m_normals, It, bytes);
 						It += bytes;
-						newMesh->hasNormals = true;
+						newMesh->m_hasNormals = true;
 					}
 
 					//Num texture coords
@@ -984,26 +984,26 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 						bytes = sizeof(float2) * numTextureCoords;
 						memcpy(textureCoords, It, bytes);
 						It += bytes;
-						newMesh->hasUVs = true;
+						newMesh->m_hasUVs = true;
 					}
 
-					float* data = new float[(3 + 3 + 2) * newMesh->m_nVertices];
+					float* data = new float[(3 + 3 + 2) * newMesh->m_numVertices];
 					float* data_it = data;
-					for (uint n = 0; n < newMesh->m_nVertices; n++)
+					for (uint n = 0; n < newMesh->m_numVertices; n++)
 					{
-						memcpy(data_it, &newMesh->vertices[n], sizeof(float3));
+						memcpy(data_it, &newMesh->m_vertices[n], sizeof(float3));
 						data_it += 3;
 						
 						float3 normal = float3::zero;
-						if (newMesh->hasNormals)
+						if (newMesh->m_hasNormals)
 						{
-							normal = newMesh->normals[n];
+							normal = newMesh->m_normals[n];
 						}
 						memcpy(data_it, &normal, sizeof(float3));
 						data_it += 3;
 
 						float2 uv = float2::zero;
-						if (newMesh->hasUVs)
+						if (newMesh->m_hasUVs)
 						{
 							uv = textureCoords[n];
 						}
@@ -1012,9 +1012,9 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 					}
 
 					//Generating data buffer
-					glGenBuffers(1, (GLuint*) &(newMesh->id_data));
-					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_data);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->m_nVertices * (3 + 3 + 2), data, GL_STATIC_DRAW);
+					glGenBuffers(1, (GLuint*) &(newMesh->m_idData));
+					glBindBuffer(GL_ARRAY_BUFFER, newMesh->m_idData);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->m_numVertices * (3 + 3 + 2), data, GL_STATIC_DRAW);
 					//endof Generating vertices buffer
 
 					RELEASE_ARRAY(textureCoords);
@@ -1023,29 +1023,29 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 #pragma region Loading indices
 					//Num indices
 					bytes = sizeof(uint);
-					memcpy(&newMesh->m_nIndices, It, bytes);
+					memcpy(&newMesh->m_numIndices, It, bytes);
 					It += bytes;
 
 					//Actual indices
-					newMesh->indices = new uint[newMesh->m_nIndices];
-					bytes = sizeof(uint) * newMesh->m_nIndices;
-					memcpy(newMesh->indices, It, bytes);
+					newMesh->m_indices = new uint[newMesh->m_numIndices];
+					bytes = sizeof(uint) * newMesh->m_numIndices;
+					memcpy(newMesh->m_indices, It, bytes);
 					It += bytes;
 
 					//Generating indices buffer
-					glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->m_nIndices, newMesh->indices, GL_STATIC_DRAW);
+					glGenBuffers(1, (GLuint*) &(newMesh->m_idIndices));
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->m_idIndices);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->m_numIndices, newMesh->m_indices, GL_STATIC_DRAW);
 					//endOf generating indices buffer
 #pragma endregion
 
 					//AABB maxPoint
 					bytes = sizeof(float3);
-					memcpy(&newMesh->aabb.maxPoint, It, bytes);
+					memcpy(&newMesh->m_aabb.maxPoint, It, bytes);
 					It += bytes;
 
 					//AABB minPoint
-					memcpy(&newMesh->aabb.minPoint, It, bytes);
+					memcpy(&newMesh->m_aabb.minPoint, It, bytes);
 					It += bytes;
 				}
 			}
@@ -1081,7 +1081,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 				uint bytes = 0;
 				uint nTextures = 0;
 
-				mat->name = resName;
+				mat->m_name = resName;
 
 				//NumTextures
 				uint numTextures = 0;
@@ -1108,7 +1108,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 						uint64_t toAdd = App->m_resourceManager->LinkResource(path.data(), Component::C_Texture);
 						if (toAdd != 0)
 						{
-							mat->textures.push_back(toAdd);
+							mat->m_textures.push_back(toAdd);
 						}
 
 						delete[] textureName;
@@ -1122,10 +1122,10 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 					bytes = sizeof(float) * 3;
 					memcpy(color, It, bytes);
 					It += bytes;
-					mat->color[0] = color[0];
-					mat->color[1] = color[1];
-					mat->color[2] = color[2];
-					mat->color[4] = 1.0f;
+					mat->m_color[0] = color[0];
+					mat->m_color[1] = color[1];
+					mat->m_color[2] = color[2];
+					mat->m_color[4] = 1.0f;
 				}
 				RELEASE_ARRAY(file);
 			}
@@ -1156,8 +1156,8 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 		if (ID != 0)
 		{
 			ret = new R_Texture(inf->uid);
-			ret->name = inf->name;
-			ret->bufferID = ID;
+			ret->m_name = inf->name;
+			ret->m_bufferID = ID;
 			return ret;
 		}
 		else
@@ -1195,7 +1195,7 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 			if (file != nullptr && size > 0)
 			{
 				ret = new R_Shader(inf->uid);
-				ret->name = resName;
+				ret->m_name = resName;
 				
 				char* fileIt = file;
 
@@ -1207,26 +1207,26 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 				memcpy(&length, fileIt, sizeof(GLint));
 				fileIt += sizeof(GLint);
 
-				ret->shaderProgram.program = glCreateProgram();
-				Shader& shader = ret->shaderProgram;
-				int program = ret->shaderProgram.program;
+				ret->m_shaderProgram.m_program = glCreateProgram();
+				Shader& shader = ret->m_shaderProgram;
+				int program = ret->m_shaderProgram.m_program;
 
-				glProgramBinary(ret->shaderProgram.program, binaryFormat, fileIt, length);
+				glProgramBinary(ret->m_shaderProgram.m_program, binaryFormat, fileIt, length);
 				RELEASE_ARRAY(file);
 
-				shader.modelMatrix = glGetUniformLocation(shader.program, "model_matrix");
-				shader.viewMatrix = glGetUniformLocation(shader.program, "view_matrix");
-				shader.projectionMatrix = glGetUniformLocation(shader.program, "projection_matrix");
+				shader.m_modelMatrix = glGetUniformLocation(shader.m_program, "model_matrix");
+				shader.m_viewMatrix = glGetUniformLocation(shader.m_program, "view_matrix");
+				shader.m_projectionMatrix = glGetUniformLocation(shader.m_program, "projection_matrix");
 
-				shader.materialColor = glGetUniformLocation(shader.program, "material_color");
-				shader.hasTexture = glGetUniformLocation(shader.program, "has_texture");
-				shader.useLight = glGetUniformLocation(shader.program, "use_light");
-				shader.time = glGetUniformLocation(shader.program, "time");
-				shader.ambientColor = glGetUniformLocation(shader.program, "ambient_color");
-				shader.globalLightDir = glGetUniformLocation(shader.program, "global_light_direction");
-				shader.fogDistance = glGetUniformLocation(shader.program, "fog_distance");
-				shader.fogColor = glGetUniformLocation(shader.program, "fog_color");
-				shader.maxHeight = glGetUniformLocation(shader.program, "max_height");
+				shader.m_materialColor = glGetUniformLocation(shader.m_program, "material_color");
+				shader.m_hasTexture = glGetUniformLocation(shader.m_program, "has_texture");
+				shader.m_useLight = glGetUniformLocation(shader.m_program, "use_light");
+				shader.m_time = glGetUniformLocation(shader.m_program, "time");
+				shader.m_ambientColor = glGetUniformLocation(shader.m_program, "ambient_color");
+				shader.m_globalLightDir = glGetUniformLocation(shader.m_program, "global_light_direction");
+				shader.m_fogDistance = glGetUniformLocation(shader.m_program, "fog_distance");
+				shader.m_fogColor = glGetUniformLocation(shader.m_program, "fog_color");
+				shader.m_maxHeight = glGetUniformLocation(shader.m_program, "max_height");
 			}
 		}
 	}
@@ -1384,7 +1384,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (vertexBuf == nullptr)
 	{
 		ret += "- No vertex shader found. Using default vertex shader.\n";
-		vertexBuf = App->m_resourceManager->defaultVertexBuf.c_str();
+		vertexBuf = App->m_resourceManager->m_defaultVertexBuf.c_str();
 	}
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -1409,7 +1409,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (fragmentBuf == nullptr)
 	{
 		ret += "- No fragment shader found. Using default fragment shader.\n";
-		fragmentBuf = App->m_resourceManager->defaultFragmentBuf.c_str();
+		fragmentBuf = App->m_resourceManager->m_defaultFragmentBuf.c_str();
 	}
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

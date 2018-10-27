@@ -24,11 +24,11 @@ struct R_Folder
 	R_Folder(const char* name, R_Folder* parent);
 	R_Folder(const char* name, const char* path);
 
-	std::string name;
-	std::string path;
+	std::string m_name;
+	std::string m_path;
 
-	std::vector<std::string> subFoldersPath;
-	std::vector<std::string> files;
+	std::vector<std::string> m_subFoldersPath;
+	std::vector<std::string> m_files;
 };
 
 
@@ -44,73 +44,23 @@ public:
 	UpdateStatus PostUpdate();
 	void CleanUp();
 
-	//Chooses either we want the files to refresh automatically or not
-	bool autoRefresh = false;
-
-	//Number of seconds between file refreshes
-	int refreshDelay = 10;
-private:
-	//Very rudimentary timer to refresh the files automatically
-	float refreshTimer = 0.0f;
-
-	//Allows us to find any resource via its UID
-	std::map<uint64_t, Resource*> resources;
-
-	//Allows us to find any resource UID via its type and name
-	std::map<Component::Type, std::map<std::string, uint64_t>> uidLib;
-
-	//List of the resources we want to Unload
-	std::vector<uint64_t> toDelete;
-
-	//List of the resources we want to Reload
-	std::vector<uint64_t> toReload;
-
-	//metaData of all files
-	//The first map contains the name of the file the resource came from and a map of all the resources linked to that file
-	//The second map has all resources from the file ordered by type with its correspondant info
-	std::map<std::string, std::multimap<Component::Type,MetaInf>> metaData;
-
-	//Contains the Date each file was last modified
-	std::map<std::string, Date> meta_lastMod;
-
-	Resource* LoadNewResource(std::string fileName, Component::Type type);
-
-public:
-	//Check for new or modified files in the Assets folder, and import them. Existing files will keep their UID
 	void Refresh();
-
-	//Brute-Force reimport all assets. Existing files won't keep their previous UID
 	void ReimportAll();
-
-	//Dump all the library files
 	void ClearLibrary();
-
-	//Create the Library folders
 	void CreateLibraryDirs();
 
-	//Save metadata for all files
 	void SaveMetaData();
-	//Save a specific metadata file
 	void SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave);
-
-	//Read metadata files and load them into memory
 	void LoadMetaData();
-
 
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const uint64_t componentUID);
-
-	//TODO
-	//Improve this function, since it's slooooow to find stuff and iterates too much
 	const MetaInf* GetMetaData(Component::Type type, const char* component);
 
-private:
-	R_Folder ReadFolder(const char* path);
-public:
 	Resource* Peek(uint64_t uid) const;
 
 	//Link a resource to a new Resourced Component. Use only once per reference
-	Resource* LinkResource(uint64_t uid) ;
+	Resource* LinkResource(uint64_t uid);
 	uint64_t LinkResource(std::string resName, Component::Type type);
 
 	//Unlink a resource from a Resourced Component. Use only once per reference
@@ -118,34 +68,52 @@ public:
 	void UnlinkResource(uint64_t uid);
 	void UnlinkResource(std::string fileName, Component::Type type);
 
-	//Delte the components that need to be deleted
 	void DeleteNow();
-
-	//Reload the components that need to be reloaded
 	void ReloadNow();
 
-	//Returns all loaded resources. Pretty slow, for debugging use only
 	const std::vector<Resource*> ReadLoadedResources() const;
 
-	//Return explanation
-	//Returns a vector of pairs:
-	// -first is the file name
-	// -Second is the vector of resources from that file
 	std::vector<std::pair<std::string, std::vector<std::string>>> GetAvaliableResources(Component::Type type = Component::Type::C_None);
 
+	bool m_autoRefresh = false;
+	int m_refreshInterval = 10;
 
+private:
+	Resource* LoadNewResource(std::string fileName, Component::Type type);
+	R_Folder ReadFolder(const char* path);
+
+	float m_refreshTimer = 0.0f;
+
+	//Allows us to find any resource via its UID
+	std::map<uint64_t, Resource*> m_resources;
+
+	//Allows us to find any resource UID via its type and name
+	std::map<Component::Type, std::map<std::string, uint64_t>> m_uidLib;
+
+	std::vector<uint64_t> m_toDelete;
+	std::vector<uint64_t> m_toReload;
+
+	//metaData of all files
+	//The first map contains the name of the file the resource came from and a map of all the resources linked to that file
+	//The second map has all resources from the file ordered by type with its correspondant info
+	std::map<std::string, std::multimap<Component::Type,MetaInf>> m_metaData;
+
+	//Contains the Date each file was last modified
+	std::map<std::string, Date> m_metaLastModificationDate;
+
+public:
 	// --------------------------------- Shaders stuff ----------------------------------
 
 	bool GenerateDefaultShader();
-	std::string defaultVertexBuf;
-	std::string defaultFragmentBuf;
+	Shader GetDefaultShader() { return m_defaultShader; }
 
-	std::string shadersResult;
+	std::string m_defaultVertexBuf;
+	std::string m_defaultFragmentBuf;
 
-	Shader GetDefaultShader() { return defaultShader; }
+	std::string m_shadersResult;
 
 	private:	
-	Shader defaultShader;
+	Shader m_defaultShader;
 };
 
 #endif

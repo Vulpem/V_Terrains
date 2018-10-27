@@ -8,19 +8,19 @@
 class Resource
 {
 public:
-	Resource() { uid = GenerateUUID(); }
-	Resource(uint64_t UID) { this->uid = UID; }
+	Resource() { m_uid = GenerateUUID(); }
+	Resource(uint64_t UID) { this->m_uid = UID; }
 
 	virtual ~Resource() { }
 
 	//Number of references to this resource. Won't unload while it's over 0
-	uint nReferences = 0;
+	uint m_numReferences = 0;
 
 	//Unique ID for this resource
-	uint64_t uid = 0;
+	uint64_t m_uid = 0;
 
 	//Filename this resource extraced the data from
-	std::string name;
+	std::string m_name;
 
 	virtual Component::Type GetType() = 0;
 

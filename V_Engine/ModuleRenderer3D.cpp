@@ -363,23 +363,23 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	}
 	}
 
-	glUseProgram(meshInfo.m_shader.program);
+	glUseProgram(meshInfo.m_shader.m_program);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.m_indicesBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.m_dataBuffer);
 
 	// ------ Setting uniforms -------------------------
-	glUniformMatrix4fv(meshInfo.m_shader.modelMatrix, 1, GL_FALSE, meshInfo.m_transform.ptr());
-	glUniformMatrix4fv(meshInfo.m_shader.viewMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetViewMatrix().ptr());
-	glUniformMatrix4fv(meshInfo.m_shader.projectionMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetProjectionMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.m_modelMatrix, 1, GL_FALSE, meshInfo.m_transform.ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.m_viewMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetViewMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.m_projectionMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetProjectionMatrix().ptr());
 
-	glUniform1f(meshInfo.m_shader.time, (float)Time.AppRuntime);
+	glUniform1f(meshInfo.m_shader.m_time, (float)Time.AppRuntime);
 
-	glUniform4fv(meshInfo.m_shader.ambientColor, 1, m_ambientLight.ptr());
-	glUniform3fv(meshInfo.m_shader.globalLightDir, 1, m_sunDirection.ptr());
-	glUniform1i(meshInfo.m_shader.fogDistance, RPGT::config.fogDistance);
-	glUniform3fv(meshInfo.m_shader.fogColor, 1, RPGT::config.fogColor);
-	glUniform1f(meshInfo.m_shader.maxHeight, RPGT::config.maxHeight);
+	glUniform4fv(meshInfo.m_shader.m_ambientColor, 1, m_ambientLight.ptr());
+	glUniform3fv(meshInfo.m_shader.m_globalLightDir, 1, m_sunDirection.ptr());
+	glUniform1i(meshInfo.m_shader.m_fogDistance, RPGT::config.fogDistance);
+	glUniform3fv(meshInfo.m_shader.m_fogColor, 1, RPGT::config.fogColor);
+	glUniform1f(meshInfo.m_shader.m_maxHeight, RPGT::config.maxHeight);
 	
 	// ------ Setting data format -------------------------
 
@@ -394,19 +394,19 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.m_drawNormals)
 	{
-		glUniform4fv(meshInfo.m_shader.materialColor, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr());
+		glUniform4fv(meshInfo.m_shader.m_materialColor, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr());
 		RenderNormals(meshInfo);
 	}
 
 	if (meshInfo.m_drawWired)
 	{
-		glUniform4fv(meshInfo.m_shader.materialColor, 1, meshInfo.m_wiresColor.ptr());
+		glUniform4fv(meshInfo.m_shader.m_materialColor, 1, meshInfo.m_wiresColor.ptr());
 		RenderMeshWired(meshInfo);
 	}
 
-	glUniform1i(meshInfo.m_shader.useLight, m_currentViewPort->m_useLighting);
+	glUniform1i(meshInfo.m_shader.m_useLight, m_currentViewPort->m_useLighting);
 
-	glUniform1i(meshInfo.m_shader.hasTexture, (meshInfo.m_textureBuffer != 0));
+	glUniform1i(meshInfo.m_shader.m_hasTexture, (meshInfo.m_textureBuffer != 0));
 	if (meshInfo.m_textureBuffer > 0)
 	{
 		glBindTexture(GL_TEXTURE_2D, meshInfo.m_textureBuffer);
@@ -414,7 +414,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.m_drawFilled)
 	{
-		glUniform4fv(meshInfo.m_shader.materialColor, 1, meshInfo.m_meshColor.ptr());
+		glUniform4fv(meshInfo.m_shader.m_materialColor, 1, meshInfo.m_meshColor.ptr());
 		RenderMeshFilled(meshInfo);
 	}
 
@@ -554,13 +554,13 @@ void ModuleRenderer3D::RenderMeshFilled(const Mesh_RenderInfo& data)
 
 void ModuleRenderer3D::RenderNormals(const Mesh_RenderInfo & data)
 {
-	if (data.m_origin->hasNormals)
+	if (data.m_origin->m_hasNormals)
 	{
 		for (uint n = 0; n < data.m_nVertices; n++)
 		{
 			DrawLine(
-				float3(data.m_origin->vertices[n]),
-				float3(data.m_origin->vertices[n] + data.m_origin->normals[n]),
+				float3(data.m_origin->m_vertices[n]),
+				float3(data.m_origin->m_vertices[n] + data.m_origin->m_normals[n]),
 				float4(0.54f, 0.0f, 0.54f, 1.0f));
 		}
 	}
