@@ -19,7 +19,7 @@ GameObject::GameObject()
 	m_uid = GenerateUUID();
 	for (int n = 0; n < m_nComponentTypes; n++)
 	{
-		m_hasComponents[n] = false;
+		m_hasComponents[(ComponentType)n] = 0;
 	}
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
@@ -32,7 +32,7 @@ GameObject::GameObject(uint64_t Uid)
 	m_uid = Uid;
 	for (int n = 0; n < m_nComponentTypes; n++)
 	{
-		m_hasComponents[n] = false;
+		m_hasComponents[(ComponentType)n] = 0;
 	}
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
@@ -74,7 +74,7 @@ GameObject::~GameObject()
 	std::vector<Component*>::reverse_iterator comp = m_components.rbegin();
 	while (comp != m_components.rend())
 	{
-		std::multimap<Component::Type, Component*>::iterator it = App->m_goManager->components.find((*comp)->GetType());
+		std::multimap<ComponentType, Component*>::iterator it = App->m_goManager->components.find((*comp)->GetType());
 		for (; it->first == (*comp)->GetType(); it++)
 		{
 			if (it->second->GetUID() == (*comp)->GetUID())
@@ -110,7 +110,7 @@ void GameObject::DrawOnEditor()
 	{
 		if (ImGui::BeginMenu("Mesh##add"))
 		{
-			std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_mesh);
+			std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(ComponentType::mesh);
 			std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 			for (; fileIt != meshRes.end(); fileIt++)
 			{
@@ -121,7 +121,7 @@ void GameObject::DrawOnEditor()
 					{
 						if (ImGui::MenuItem(it->data()))
 						{
-							AddComponent(Component::Type::C_mesh, *it);
+							AddComponent(ComponentType::mesh, *it);
 							break;
 						}
 					}
@@ -132,13 +132,13 @@ void GameObject::DrawOnEditor()
 		}
 		if (ImGui::BeginMenu("Material##add"))
 		{
-			if (HasComponent(Component::Type::C_material))
+			if (HasComponent(ComponentType::material))
 			{
 				ImGui::Text("Already has a material!");
 			}
 			else
 			{
-				std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_material);
+				std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(ComponentType::material);
 				std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 				for (; fileIt != meshRes.end(); fileIt++)
 				{
@@ -149,7 +149,7 @@ void GameObject::DrawOnEditor()
 						{
 							if (ImGui::MenuItem(it->data()))
 							{
-								AddComponent(Component::Type::C_material, *it);
+								AddComponent(ComponentType::material, *it);
 								break;
 							}
 						}
@@ -161,13 +161,13 @@ void GameObject::DrawOnEditor()
 		}
 		if (ImGui::MenuItem("Camera##add"))
 		{
-			AddComponent(Component::Type::C_camera);
+			AddComponent(ComponentType::camera);
 		}
-		if (HasComponent(Component::Type::C_Billboard) == false)
+		if (HasComponent(ComponentType::billboard) == false)
 		{
 			if (ImGui::MenuItem("Billboard##add"))
 			{
-				AddComponent(Component::Type::C_Billboard);
+				AddComponent(ComponentType::billboard);
 			}
 		}
 		ImGui::EndPopup();
@@ -233,7 +233,7 @@ void GameObject::DrawLocator()
 		{
 			for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 			{
-				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
+				if ((*it)->HasComponent(ComponentType::transform) && !(*it)->HasComponent(ComponentType::mesh))
 				{
 					math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
 					App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
@@ -301,12 +301,12 @@ void GameObject::Unselect()
 
 void GameObject::SetOriginalAABB()
 {
-	if (HasComponent(Component::Type::C_mesh))
+	if (HasComponent(ComponentType::mesh))
 	{
 		m_originalAABB.SetNegativeInfinity();
-		std::vector<mesh*> meshes = GetComponent<mesh>();
+		std::vector<Mesh*> meshes = GetComponent<Mesh>();
 
-		for (std::vector<mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
+		for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
 		{
 			m_originalAABB.Enclose((*it)->GetAABB().maxPoint);
 			m_originalAABB.Enclose((*it)->GetAABB().minPoint);
@@ -335,7 +335,7 @@ void GameObject::UpdateAABB()
 
 void GameObject::UpdateTransformMatrix()
 {
-	if (HasComponent(Component::Type::C_transform))
+	if (HasComponent(ComponentType::transform))
 	{	
 		GetTransform()->UpdateGlobalTransform();
 	}
@@ -343,7 +343,7 @@ void GameObject::UpdateTransformMatrix()
 	UpdateAABB();
 
 	//Updating cameras position
-	if (HasComponent(Component::Type::C_camera))
+	if (HasComponent(ComponentType::camera))
 	{
 		std::vector<Camera*> cams = GetComponent<Camera>();
 		std::vector<Camera*>::iterator it = cams.begin();
@@ -413,44 +413,44 @@ const char * GameObject::GetName()
 	return m_name;
 }
 
-Component* GameObject::AddComponent(Component::Type type, std::string res, bool forceCreation)
+Component* GameObject::AddComponent(ComponentType type, std::string res, bool forceCreation)
 {
 	Component* toAdd = nullptr;
 	switch (type)
 	{
-	case Component::Type::C_transform:
+	case ComponentType::transform:
 	{
-		if (HasComponent(Component::C_transform) == false)
+		if (HasComponent(ComponentType::transform) == false)
 		{
 			toAdd = new Transform(this);
 			m_transform = (Transform*)toAdd;
 		}
 		break;
 	}
-	case Component::Type::C_mesh:
+	case ComponentType::mesh:
 	{
-		toAdd = new mesh(res, this);
+		toAdd = new Mesh(res, this);
 		break;
 	}
-	case Component::Type::C_material:
+	case ComponentType::material:
 	{
-		if (HasComponent(Component::C_material) == false)
+		if (HasComponent(ComponentType::material) == false)
 		{
 			toAdd = new Material(res, this);
 		}
 		break;
 	}
-	case Component::Type::C_camera:
+	case ComponentType::camera:
 	{
-		if (HasComponent(Component::Type::C_transform))
+		if (HasComponent(ComponentType::transform))
 		{
 			toAdd = new Camera(this);
 		}
 		break;
 	}
-	case Component::Type::C_Billboard:
+	case ComponentType::billboard:
 	{
-		if (HasComponent(Component::C_Billboard) == false)
+		if (HasComponent(ComponentType::billboard) == false)
 		{
 			toAdd = new Billboard(this);
 		}
@@ -464,8 +464,8 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 		{
 			m_hasComponents[toAdd->GetType()] += 1;
 			m_components.push_back(toAdd);
-			App->m_goManager->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
-			if (toAdd->GetType() == Component::Type::C_mesh)
+			App->m_goManager->components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));
+			if (toAdd->GetType() == ComponentType::mesh)
 			{
 				SetOriginalAABB();
 			}
@@ -480,12 +480,12 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 	return toAdd;
 }
 
-bool GameObject::HasComponent(Component::Type type)
+bool GameObject::HasComponent(ComponentType type)
 {
-	return (m_hasComponents[type] != 0);
+	return m_hasComponents[type] != 0;
 }
 
-uint GameObject::AmountOfComponent(Component::Type type)
+uint GameObject::AmountOfComponent(ComponentType type)
 {
 	return m_hasComponents[type];
 }
@@ -541,7 +541,7 @@ void GameObject::RemoveComponent(Component * comp)
 	{
 		if ((*it) == comp)
 		{
-			std::map<Component::Type, Component*>::iterator mapIt = App->m_goManager->components.find((*it)->GetType());
+			std::map<ComponentType, Component*>::iterator mapIt = App->m_goManager->components.find((*it)->GetType());
 			for (; mapIt != App->m_goManager->components.end() && mapIt->first == (*it)->GetType(); mapIt++)
 			{
 				if (mapIt->second == comp)

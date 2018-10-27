@@ -50,10 +50,10 @@ public:
 	void SetName(const char* newName);
 	const char* GetName();
 
-	Component* AddComponent(Component::Type type, std::string res = std::string(""), bool forceCreation = false);
+	Component* AddComponent(ComponentType type, std::string res = std::string(""), bool forceCreation = false);
 
-	bool HasComponent(Component::Type type);
-	uint AmountOfComponent(Component::Type type);
+	bool HasComponent(ComponentType type);
+	uint AmountOfComponent(ComponentType type);
 	Transform* GetTransform();
 
 	void Delete();
@@ -69,19 +69,16 @@ public:
 	std::vector<typeComp*> GetComponent()
 	{
 		std::vector<typeComp*> ret;
-		if (HasComponent(typeComp::GetType()))
+		std::for_each(m_components.begin(), m_components.end(),
+		[&ret](Component* comp)
 		{
-			std::vector<Component*>::iterator it = m_components.begin();
-			while (it != m_components.end())
+			typeComp* toReturn = dynamic_cast<typeComp*>(comp);
+			if (toReturn != nullptr)
 			{
-				//Remember to add a "static GetType()" function to all created components
-				if ((*it)->GetType() == typeComp::GetType())
-				{
-					ret.push_back((typeComp*)(*it));
-				}
-				it++;
+				ret.push_back(toReturn);
 			}
 		}
+		);
 		return ret;
 	}
 #pragma endregion
@@ -106,8 +103,8 @@ private:
 	bool m_hiddenOnOutliner = false;
 	bool m_static = false;
 
-	static const uint m_nComponentTypes = Component::Type::C_None;
-	int m_hasComponents[Component::Type::C_None];
+	static const uint m_nComponentTypes = (int)ComponentType::none;
+	std::map<ComponentType, int> m_hasComponents;
 
 	AABB m_originalAABB;
 
