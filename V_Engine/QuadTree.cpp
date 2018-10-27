@@ -84,15 +84,12 @@ bool QuadNode::Remove(GameObject * GO)
 	return false;
 }
 
-void QuadNode::Draw()
+void QuadNode::Draw() const
 {
 	float3 corners[8];
 	m_box.GetCornerPoints(corners);
 	App->m_renderer3D->DrawBox(corners);
-	for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
-	{
-		it->Draw();
-	}
+	std::for_each(m_childs.begin(), m_childs.end(), [](QuadNode child) { child.Draw(); });
 }
 
 void QuadNode::SetBox(int n, float3 breakPoint)
@@ -255,7 +252,7 @@ void Quad_Tree::Remove(GameObject * GO)
 }
 
 
-void Quad_Tree::Draw()
+void Quad_Tree::Draw() const
 {
 	m_root.Draw();
 }

@@ -45,10 +45,10 @@ public:
 
 	// Called before render is available
 	//bool Awake(pugi::xml_node&);
-	bool Init();
+	bool Init() override;
 
 	// Called before quitting
-	void CleanUp();
+	void CleanUp() override;
 
 	// Utility functions
 	bool AddPath(const char* path_or_zip, const char* mount_point = nullptr);

@@ -18,12 +18,12 @@ public:
 	ModuleRenderer3D(Application* app, bool start_enabled = true);
 	~ModuleRenderer3D();
 
-	bool Init();
-	UpdateStatus PreUpdate();
-	UpdateStatus PostUpdate();
-	void CleanUp();
+	bool Init() override;
+	UpdateStatus PreUpdate() override;
+	UpdateStatus PostUpdate() override;
+	void CleanUp() override;
 
-	void OnScreenResize(int width, int heigth);
+	void OnScreenResize(int width, int heigth) override;
 	void UpdateProjectionMatrix(Camera* cam);
 
 	void RenderBlendObjects();

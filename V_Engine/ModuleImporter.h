@@ -32,10 +32,10 @@ public:
 	ModuleImporter(Application* app, bool start_enabled = true);
 	~ModuleImporter();
 
-	bool Init();
+	bool Init() override;
 
-	void Start();
-	void CleanUp();
+	void Start() override;
+	void CleanUp() override;
 
 
 // ------------------------------- IMPORTING ------------------------------- 

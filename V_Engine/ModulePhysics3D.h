@@ -21,11 +21,11 @@ public:
 	ModulePhysics3D(Application* app, bool start_enabled = true);
 	~ModulePhysics3D();
 
-	bool Init();
-	void Start();
-	UpdateStatus PreUpdate();
-	UpdateStatus Update();
-	void CleanUp();
+	bool Init() override;
+	void Start() override;
+	UpdateStatus PreUpdate() override;
+	UpdateStatus Update() override;
+	void CleanUp() override;
 
 	PhysBody3D* AddBody(const P_Sphere& sphere, float mass = 1.0f);
 	PhysBody3D* AddBody(const P_Cube& cube, float mass = 1.0f);

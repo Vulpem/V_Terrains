@@ -263,10 +263,7 @@ const char* Application::GetTitle() const
 
 void Application::OnScreenResize(int width, int heigth)
 {
-	for (std::vector<Module*>::iterator it = m_modules.begin(); it != m_modules.end(); it++)
-	{
-		(*it)->OnScreenResize(width, heigth);
-	}
+	std::for_each(m_modules.begin(), m_modules.end(), [&width, &heigth](Module* m) {m->OnScreenResize(width, heigth); });
 }
 
 void Application::Play(bool debug)

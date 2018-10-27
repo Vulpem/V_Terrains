@@ -21,9 +21,9 @@ public:
 	ModuleInput(Application* app, bool start_enabled = true);
 	~ModuleInput();
 
-	bool Init();
-	UpdateStatus PreUpdate();
-	void CleanUp();
+	bool Init() override;
+	UpdateStatus PreUpdate() override;
+	void CleanUp() override;
 
 	std::string DroppedFileFormat();
 

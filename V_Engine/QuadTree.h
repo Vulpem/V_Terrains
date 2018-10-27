@@ -23,7 +23,7 @@ public:
 	template <typename C>
 	std::vector<GameObject*> FilterCollisions(C col);
 
-	void Draw();
+	void Draw() const;
 
 	AABB GetBox() { return m_box; }
 	void SetBox(int n, float3 breakPoint);
@@ -53,7 +53,7 @@ public:
 	template <typename c>
 	std::vector<GameObject*> FilterCollisions(c col);
 
-	void Draw();
+	void Draw() const;
 private:
 	QuadNode m_root;
 };

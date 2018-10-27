@@ -15,13 +15,13 @@ public:
 	// Destructor
 	virtual ~ModuleWindow();
 
-	bool Init();
-	void CleanUp();
+	bool Init() override;
+	void CleanUp() override;
 
 	void SetTitle(const char* title);
 
 	SDL_Window* GetWindow() { return window; }
-	void OnScreenResize(int width, int heigth);
+	void OnScreenResize(int width, int heigth) override;
 	float2 GetWindowSize();
 
 private:

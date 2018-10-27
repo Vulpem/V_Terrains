@@ -32,7 +32,7 @@ public:
 	void SetImage(int n, std::string textureFile);
 	void SetHeightmap(int n, std::string hmfile);
 
-	void Render(const ViewPort& port) override;
+	void Render(const ViewPort& port) const override;
 
 	void SetDefaultTextures();
 
@@ -88,10 +88,6 @@ private:
 	float m_chunkSize = 256.f;
 
 	std::string terrainToLoad;
-
-	bool m_calcCollisions = false;
-	float3 m_terrainPos[COL_N][COL_N];
-	float3 m_terrainNormal[COL_N][COL_N];
 
 	std::string textures[10];
 	std::string heightmaps[10];

@@ -32,7 +32,7 @@ public:
 
 	void Render(const ViewPort& port) const override;
 
-	void OnScreenResize(int width, int heigth);
+	void OnScreenResize(int width, int heigth) override;
 
 	void HandleInput(SDL_Event* event);
 

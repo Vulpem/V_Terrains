@@ -148,23 +148,6 @@ UpdateStatus ModuleTerrain::Update()
 	}
 	TIMER_READ_MS("0 Terrain Update");
 
-	if (m_calcCollisions)
-	{
-		float height;
-		float normal[3];
-		const int d = COL_N / 2;
-
-		for (int y = -d; y <= d; y++)
-		{
-			for (int x = -d; x <= d; x++)
-			{
-				RPGT::GetPoint(pos.x + x * COL_D, pos.z + y * COL_D, height, normal);
-				m_terrainPos[y + d][x + d] = float3(pos.x + x * COL_D, height, pos.z + y * COL_D);
-				m_terrainNormal[y + d][x + d] = float3(normal[0], normal[1], normal[2]);
-			}
-		}
-	}
-
 	if (m_wantRegen && m_regenTimer.Read() > 2000.0f)
 	{
 		m_regenTimer.Stop();
@@ -174,7 +157,6 @@ UpdateStatus ModuleTerrain::Update()
 		m_smoothRegen.Start();
 		m_variableFogDistance = m_fogDistance;
 	}
-	m_calcCollisions = false;
 
 	if (m_movingForward)
 	{
@@ -836,7 +818,7 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	}
 }
 
-void ModuleTerrain::Render(const ViewPort & port)
+void ModuleTerrain::Render(const ViewPort & port) const
 {
 	RPGT::config.debug.wiredRender = port.m_useOnlyWires;
 	RPGT::config.debug.renderLight = port.m_useLighting;
@@ -851,7 +833,23 @@ void ModuleTerrain::Render(const ViewPort & port)
 	}
 	if (port.m_renderTerrainCollisions)
 	{
-		m_calcCollisions = true;
+		float height;
+		float normal[3];
+		const int d = COL_N / 2;
+
+		float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
+		float3 m_terrainPos[COL_N][COL_N];
+		float3 m_terrainNormal[COL_N][COL_N];
+		for (int y = -d; y <= d; y++)
+		{
+			for (int x = -d; x <= d; x++)
+			{
+				RPGT::GetPoint(pos.x + x * COL_D, pos.z + y * COL_D, height, normal);
+				m_terrainPos[y + d][x + d] = float3(pos.x + x * COL_D, height, pos.z + y * COL_D);
+				m_terrainNormal[y + d][x + d] = float3(normal[0], normal[1], normal[2]);
+			}
+		}
+
 		for (int y = 0; y < COL_N - 1; y++)
 		{
 			for (int x = 0; x < COL_N - 1; x++)

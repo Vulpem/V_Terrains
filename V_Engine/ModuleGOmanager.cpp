@@ -172,7 +172,7 @@ UpdateStatus ModuleGoManager::PostUpdate()
 	return UpdateStatus::Continue;
 }
 
-void ModuleGoManager::Render(const ViewPort& port)
+void ModuleGoManager::Render(const ViewPort& port) const
 {
 	App->m_goManager->RenderGOs(port);
 	if (drawQuadTree)

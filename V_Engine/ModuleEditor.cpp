@@ -368,10 +368,10 @@ void ModuleEditor::ViewPortUI(const ViewPort& port) const
 				{
 					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera->SwitchViewType();
 				}
-				if (ImGui::Button("Select m_active m_camera"))
-				{
-					SelectGameObject(port.m_camera->object);
-				}
+				//if (ImGui::Button("Select m_active m_camera"))
+				//{
+				//	SelectGameObject(port.m_camera->object);
+				//}
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();

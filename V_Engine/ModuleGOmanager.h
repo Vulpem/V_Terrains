@@ -23,12 +23,12 @@ public:
 	ModuleGoManager(Application* app, bool start_enabled = true);
 	~ModuleGoManager();
 
-	bool Init();
-	UpdateStatus PreUpdate();
-	UpdateStatus Update();
-	UpdateStatus PostUpdate();
+	bool Init() override;
+	UpdateStatus PreUpdate() override;
+	UpdateStatus Update() override;
+	UpdateStatus PostUpdate() override;
 
-	void Render(const ViewPort& port);
+	void Render(const ViewPort& port) const override;
 
 	void CleanUp();
 
