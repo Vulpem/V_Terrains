@@ -22,7 +22,7 @@ public:
 	//Filename this resource extraced the data from
 	std::string m_name;
 
-	virtual Component::Type GetType() = 0;
+	virtual ComponentType GetType() const = 0;
 
 	template <typename T>
 	T* Read() { return (T*)this; }

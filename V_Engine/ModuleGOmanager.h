@@ -93,7 +93,7 @@ public:
 	void RenderGOs(const ViewPort& ViewPort, const std::vector<GameObject*>& exclusiveGOs = std::vector<GameObject*>());
 private:
 	//Get all the info necessary to render a mesh
-	Mesh_RenderInfo GetMeshData(mesh* getFrom);
+	Mesh_RenderInfo GetMeshData(Mesh* getFrom);
 
 	void AddGOtoRoot(GameObject* GO);
 	void CreateRootGameObject();
@@ -102,7 +102,7 @@ private:
 
 public:
 	//Map with all the components of all the GOs in the scene
-	std::multimap<Component::Type, Component*> components;
+	std::multimap<ComponentType, Component*> components;
 
 	// ----------------------- Collision filtering ------------------------------------------------------
 

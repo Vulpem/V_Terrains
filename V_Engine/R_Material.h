@@ -32,7 +32,7 @@ public:
 
 	bool AssignShader(std::string shaderName)
 	{
-		uint64_t res = App->m_resourceManager->LinkResource(shaderName, Component::Type::C_Shader);
+		uint64_t res = App->m_resourceManager->LinkResource(shaderName, ComponentType::shader);
 		if (res == 0) { return false; }
 		if (m_shader != 0)
 		{
@@ -51,7 +51,7 @@ public:
 	}
 	
 
-	Component::Type GetType() { return Component::Type::C_material; }
+	ComponentType GetType() const override { return ComponentType::material; }
 
 	float m_color[5] = { 1.0f, 1.0f, 1.0f,1.0f };
 	std::vector<uint64_t> m_textures;

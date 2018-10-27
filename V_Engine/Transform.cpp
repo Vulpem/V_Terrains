@@ -8,7 +8,7 @@
 #include "ViewPort.h"
 
 
-Transform::Transform(GameObject* linkedTo):Component(linkedTo, C_transform)
+Transform::Transform(GameObject* linkedTo):Component(linkedTo, ComponentType::transform)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Transform##%i", uid);
@@ -71,7 +71,7 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 void Transform::Draw(const ViewPort & port)
 {
-	if (!object->HasComponent(Component::Type::C_mesh))
+	if (!object->HasComponent(ComponentType::mesh))
 	{
 		object->DrawLocator();
 	}
@@ -162,7 +162,7 @@ math::float4x4 Transform::GetLocalTransformMatrix()
 
 void Transform::UpdateGlobalTransform()
 {
-	if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->m_parent != nullptr && object->m_parent->HasComponent(ComponentType::transform) == true)
 	{
 		Transform* m_parent = object->m_parent->GetTransform();
 		
@@ -195,7 +195,7 @@ void Transform::SetLocalPos(float x, float y, float z)
 
 		object->UpdateTransformMatrix();
 
-		if (object->HasComponent(Component::Type::C_camera))
+		if (object->HasComponent(ComponentType::camera))
 		{
 			std::vector<Camera*> cams = object->GetComponent<Camera>();
 			std::vector<Camera*>::iterator it = cams.begin();
@@ -222,7 +222,7 @@ void Transform::SetGlobalPos(float x, float y, float z)
 {
 	if (object->IsStatic() == false)
 	{
-		if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
+		if (object->m_parent != nullptr && object->m_parent->HasComponent(ComponentType::transform) == true)
 		{
 			//TODO
 			//Needs cleaning
@@ -317,7 +317,7 @@ void Transform::SetGlobalRot(float x, float y, float z)
 {
 	if (object->IsStatic() == false && allowRotation)
 	{
-		if (object->m_parent != nullptr && object->m_parent->HasComponent(Component::Type::C_transform) == true)
+		if (object->m_parent != nullptr && object->m_parent->HasComponent(ComponentType::transform) == true)
 		{
 			x *= DEGTORAD;
 			y *= DEGTORAD;

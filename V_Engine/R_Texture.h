@@ -15,8 +15,8 @@ public:
 		glDeleteBuffers(1, &m_bufferID);
 	}
 
-	Component::Type GetType() { return Component::Type::C_Texture; }
-
+	ComponentType GetType() const override { return ComponentType::texture; }
+	 
 	uint m_bufferID = 0;
 };
 

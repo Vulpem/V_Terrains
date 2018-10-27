@@ -16,7 +16,7 @@ struct MetaInf
 {
 	std::string name;
 	uint64_t uid;
-	Component::Type type;
+	ComponentType type;
 };
 
 struct R_Folder
@@ -50,36 +50,36 @@ public:
 	void CreateLibraryDirs();
 
 	void SaveMetaData();
-	void SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave);
+	void SaveMetaData(std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator fileToSave);
 	void LoadMetaData();
 
-	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
-	const MetaInf* GetMetaData(const char* file, Component::Type type, const uint64_t componentUID);
-	const MetaInf* GetMetaData(Component::Type type, const char* component);
+	const MetaInf* GetMetaData(const char* file, ComponentType type, const char* component);
+	const MetaInf* GetMetaData(const char* file, ComponentType type, const uint64_t componentUID);
+	const MetaInf* GetMetaData(ComponentType type, const char* component);
 
 	Resource* Peek(uint64_t uid) const;
 
 	//Link a resource to a new Resourced Component. Use only once per reference
 	Resource* LinkResource(uint64_t uid);
-	uint64_t LinkResource(std::string resName, Component::Type type);
+	uint64_t LinkResource(std::string resName, ComponentType type);
 
 	//Unlink a resource from a Resourced Component. Use only once per reference
 	void UnlinkResource(Resource* res);
 	void UnlinkResource(uint64_t uid);
-	void UnlinkResource(std::string fileName, Component::Type type);
+	void UnlinkResource(std::string fileName, ComponentType type);
 
 	void DeleteNow();
 	void ReloadNow();
 
 	const std::vector<Resource*> ReadLoadedResources() const;
 
-	std::vector<std::pair<std::string, std::vector<std::string>>> GetAvaliableResources(Component::Type type = Component::Type::C_None);
+	std::vector<std::pair<std::string, std::vector<std::string>>> GetAvaliableResources(ComponentType type = ComponentType::none);
 
 	bool m_autoRefresh = false;
 	int m_refreshInterval = 10;
 
 private:
-	Resource* LoadNewResource(std::string fileName, Component::Type type);
+	Resource* LoadNewResource(std::string fileName, ComponentType type);
 	R_Folder ReadFolder(const char* path);
 
 	float m_refreshTimer = 0.0f;
@@ -88,7 +88,7 @@ private:
 	std::map<uint64_t, Resource*> m_resources;
 
 	//Allows us to find any resource UID via its type and name
-	std::map<Component::Type, std::map<std::string, uint64_t>> m_uidLib;
+	std::map<ComponentType, std::map<std::string, uint64_t>> m_uidLib;
 
 	std::vector<uint64_t> m_toDelete;
 	std::vector<uint64_t> m_toReload;
@@ -96,7 +96,7 @@ private:
 	//metaData of all files
 	//The first map contains the name of the file the resource came from and a map of all the resources linked to that file
 	//The second map has all resources from the file ordered by type with its correspondant info
-	std::map<std::string, std::multimap<Component::Type,MetaInf>> m_metaData;
+	std::map<std::string, std::multimap<ComponentType,MetaInf>> m_metaData;
 
 	//Contains the Date each file was last modified
 	std::map<std::string, Date> m_metaLastModificationDate;

@@ -11,16 +11,16 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-mesh::mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, C_mesh)
+Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, ComponentType::mesh)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Mesh##%i", uid);
 	name = tmp;
 
-	texMaterialIndex = object->AmountOfComponent(Component::Type::C_mesh);
+	texMaterialIndex = object->AmountOfComponent(ComponentType::mesh);
 }
 
-Mesh_RenderInfo mesh::GetMeshInfo()
+Mesh_RenderInfo Mesh::GetMeshInfo()
 {
 	Mesh_RenderInfo ret;
 	if (object->IsActive())
@@ -65,7 +65,7 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 	return ret;
 }
 
-const float3* mesh::GetVertices() const
+const float3* Mesh::GetVertices() const
 {
 	/*//Obtaining the vertices data from the buffer
 	float3* ret = new float3[m_nVertices];
@@ -75,32 +75,32 @@ const float3* mesh::GetVertices() const
 	return ReadRes<R_Mesh>()->m_vertices;
 }
 
-const uint mesh::GetNumVertices()
+const uint Mesh::GetNumVertices()
 {
 	return ReadRes<R_Mesh>()->m_numVertices;
 }
 
-const uint* mesh::GetIndices() const
+const uint* Mesh::GetIndices() const
 {
 	return ReadRes<R_Mesh>()->m_indices;
 }
 
-const uint mesh::GetNumIndices()
+const uint Mesh::GetNumIndices()
 {
 	return ReadRes<R_Mesh>()->m_numIndices;
 }
 
-const float3 * mesh::GetNormals() const
+const float3 * Mesh::GetNormals() const
 {
 	return ReadRes<R_Mesh>()->m_normals;
 }
 
-AABB mesh::GetAABB()
+AABB Mesh::GetAABB()
 {
 	return ReadRes<R_Mesh>()->m_aabb;
 }
 
-void mesh::EditorContent()
+void Mesh::EditorContent()
 {
 	const R_Mesh* res = ReadRes<R_Mesh>();
 	char tmp[48];
@@ -130,7 +130,7 @@ void mesh::EditorContent()
 	ImGui::InputInt(tmp, &texMaterialIndex);
 }
 
-void mesh::SaveSpecifics(pugi::xml_node& myNode)
+void Mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
 	Resource* res = App->m_resourceManager->Peek(resource);
 	myNode.append_attribute("res") = res->m_name.data();
@@ -138,7 +138,7 @@ void mesh::SaveSpecifics(pugi::xml_node& myNode)
 	myNode.append_attribute("Wired") = wires;
 }
 
-void mesh::LoadSpecifics(pugi::xml_node & myNode)
+void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 {
 	std::string resName = myNode.attribute("res").as_string();
 	resource = App->m_resourceManager->LinkResource(resName.data(), GetType());

@@ -7,7 +7,7 @@
 
 #include "imGUI\imgui.h"
 
-Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(res, linkedTo, C_material)
+Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(res, linkedTo, ComponentType::material)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Material##%i", uid);
@@ -26,13 +26,13 @@ void Material::EditorContent()
 #pragma region AddTexturePopup
 	if (ImGui::BeginPopup("Add New Texture"))
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->m_resourceManager->GetAvaliableResources(ComponentType::texture);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
 		for (; fileIt != meshRes.end(); fileIt++)
 		{
 			if (ImGui::MenuItem(fileIt->first.data()))
 			{
-				res->m_textures.push_back(App->m_resourceManager->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
+				res->m_textures.push_back(App->m_resourceManager->LinkResource(fileIt->second.front(), ComponentType::texture));
 				break;
 			}
 		}
@@ -48,7 +48,7 @@ void Material::EditorContent()
 			App->m_resourceManager->UnlinkResource(res->m_shader);
 			res->m_shader = 0;
 		}
-		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Shader);
+		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->m_resourceManager->GetAvaliableResources(ComponentType::shader);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
 		for (; fileIt != shadersRes.end(); fileIt++)
 		{
@@ -215,7 +215,7 @@ int Material::GetTexture(uint n)
 bool Material::AddTexture(std::string fileName)
 {
 	R_Material* res = ReadRes<R_Material>();
-	res->m_textures.push_back(App->m_resourceManager->LinkResource(fileName, Component::Type::C_Texture));
+	res->m_textures.push_back(App->m_resourceManager->LinkResource(fileName, ComponentType::texture));
 	return true;
 }
 

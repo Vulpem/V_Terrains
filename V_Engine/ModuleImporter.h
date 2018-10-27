@@ -15,7 +15,7 @@ struct aiMesh;
 struct aiNode;
 class GameObject;
 class Material;
-class mesh;
+class Mesh;
 class R_Mesh;
 class R_Material;
 class R_Texture;

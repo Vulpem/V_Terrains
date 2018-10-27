@@ -142,23 +142,23 @@ void ModuleResourceManager::CleanUp()
 	m_uidLib.clear();
 }
 
-Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component::Type type)
+Resource * ModuleResourceManager::LoadNewResource(std::string resName, ComponentType type)
 {
 	switch (type)
 	{
-	case (Component::C_mesh):
+	case (ComponentType::mesh):
 		{
 			return (Resource*)App->m_importer->LoadMesh(resName.data());
 		}
-	case (Component::C_material):
+	case (ComponentType::material):
 		{
 			return (Resource*)App->m_importer->LoadMaterial(resName.data());
 		}
-	case (Component::C_Texture):
+	case (ComponentType::texture):
 		{
 			return (Resource*)App->m_importer->LoadTexture(resName.data());
 		}
-	case (Component::C_Shader):
+	case (ComponentType::shader):
 	{
 		return (Resource*)App->m_importer->LoadShader(resName.data());
 	}
@@ -206,12 +206,12 @@ void ModuleResourceManager::ReimportAll()
 			std::vector<MetaInf> toAdd = App->m_importer->Import(path.data());
 			if (toAdd.empty() == false)
 			{
-				std::multimap<Component::Type, MetaInf> tmp;
+				std::multimap<ComponentType, MetaInf> tmp;
 				for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
 				{
-					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+					tmp.insert(std::pair<ComponentType, MetaInf>(m->type, *m));
 				}
-				m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
+				m_metaData.insert(std::pair<std::string, std::multimap<ComponentType, MetaInf>>(path, tmp));
 
 				m_metaLastModificationDate.insert(std::pair<std::string, Date>(path, App->m_fileSystem->ReadFileDate(path.data())));
 			}
@@ -237,7 +237,7 @@ void ModuleResourceManager::SaveMetaData()
 	App->m_fileSystem->DeleteDir("Library/Meta");
 	App->m_fileSystem->CreateDir("Library/Meta");
 
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = m_metaData.begin();
+	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator fileIt = m_metaData.begin();
 	for (; fileIt != m_metaData.end(); fileIt++)
 	{
 		SaveMetaData(fileIt);
@@ -245,7 +245,7 @@ void ModuleResourceManager::SaveMetaData()
 }
 
 //Save a specific metadata file
-void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave)
+void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator fileToSave)
 {
 	pugi::xml_document data;
 	pugi::xml_node root_node;
@@ -273,12 +273,12 @@ void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Com
 	fileData.append_attribute("min") = date->second.min;
 	fileData.append_attribute("sec") = date->second.sec;
 
-	std::multimap<Component::Type, MetaInf>::iterator it = fileToSave->second.begin();
+	std::multimap<ComponentType, MetaInf>::iterator it = fileToSave->second.begin();
 	for (; it != fileToSave->second.end(); it++)
 	{
 		pugi::xml_node link = root_node.append_child("link");
 		link.append_attribute("name") = it->second.name.data();
-		link.append_attribute("type") = it->second.type;
+		link.append_attribute("type") = static_cast<int>(it->second.type);
 		link.append_attribute("uid") = it->second.uid;
 	}
 
@@ -337,22 +337,22 @@ void ModuleResourceManager::LoadMetaData()
 
 					m_metaLastModificationDate.insert(std::pair<std::string, Date>(name, date));
 
-					std::multimap<Component::Type, MetaInf> inf;
+					std::multimap<ComponentType, MetaInf> inf;
 
 					pugi::xml_node link = root.child("link");
 					while (link != nullptr)
 					{
 						MetaInf toAdd;
 						toAdd.name = link.attribute("name").as_string();
-						toAdd.type = (Component::Type)link.attribute("type").as_uint();
+						toAdd.type = (ComponentType)link.attribute("type").as_uint();
 						toAdd.uid = link.attribute("uid").as_ullong();
 
-						inf.insert(std::pair<Component::Type, MetaInf>(toAdd.type, toAdd));
+						inf.insert(std::pair<ComponentType, MetaInf>(toAdd.type, toAdd));
 
 						link = link.next_sibling("link");
 					}
 
-					m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(name, inf));
+					m_metaData.insert(std::pair<std::string, std::multimap<ComponentType, MetaInf>>(name, inf));
 				}
 			}
 		}
@@ -425,10 +425,10 @@ void ModuleResourceManager::Refresh()
 				std::vector<MetaInf> toAdd = App->m_importer->Import(filesToCheck.front().data(), overwrite);
 				if (toAdd.empty() == false)
 				{
-					std::multimap<Component::Type, MetaInf> tmp;
+					std::multimap<ComponentType, MetaInf> tmp;
 					for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
 					{
-						tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+						tmp.insert(std::pair<ComponentType, MetaInf>(m->type, *m));
 						m_toReload.push_back(m->uid);
 					}
 
@@ -436,7 +436,7 @@ void ModuleResourceManager::Refresh()
 
 
 					//Erasing the old data, so we can insert the new one
-					std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = m_metaData.find(filesToCheck.front());
+					std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator toPop = m_metaData.find(filesToCheck.front());
 					if (toPop != m_metaData.end())
 					{
 						m_metaData.erase(toPop);
@@ -447,7 +447,7 @@ void ModuleResourceManager::Refresh()
 						m_metaLastModificationDate.erase(toPop2);
 					}
 
-					m_metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
+					m_metaData.insert(std::pair<std::string, std::multimap<ComponentType, MetaInf>>(filesToCheck.front(), tmp));
 					m_metaLastModificationDate.insert(std::pair<std::string, Date>(filesToCheck.front(), App->m_fileSystem->ReadFileDate(filesToCheck.front().data())));
 
 					if (overwrite)
@@ -482,12 +482,12 @@ void ModuleResourceManager::Refresh()
 	TIMER_READ_MS("Res Refresh");
 }
 
-const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)
+const MetaInf* ModuleResourceManager::GetMetaData(const char * file, ComponentType type, const char * component)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.find(file);
+	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.find(file);
 	if (f != m_metaData.end())
 	{
-		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		std::multimap<ComponentType, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
 		{
 			if (it->second.name.compare(component) == 0)
@@ -500,12 +500,12 @@ const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::
 	return nullptr;
 }
 
-const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const uint64_t componentUID)
+const MetaInf * ModuleResourceManager::GetMetaData(const char * file, ComponentType type, const uint64_t componentUID)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.find(file);
+	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.find(file);
 	if (f != m_metaData.end())
 	{
-		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		std::multimap<ComponentType, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
 		{
 			if (it->second.uid == componentUID)
@@ -520,12 +520,12 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component:
 
 //TODO
 //Improve this function, since it's slooooow to find stuff and iterates too much
-const MetaInf * ModuleResourceManager::GetMetaData(Component::Type type, const char * component)
+const MetaInf * ModuleResourceManager::GetMetaData(ComponentType type, const char * component)
 {
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.begin();
+	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.begin();
 	while (f != m_metaData.end())
 	{
-		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		std::multimap<ComponentType, MetaInf> ::iterator it = f->second.find(type);
 		while (it != f->second.end() && it->first == type)
 		{
 			if (it->second.name.compare(component) == 0)
@@ -680,14 +680,14 @@ Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 	return ret;
 }
 
-uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Type type)
+uint64_t ModuleResourceManager::LinkResource(std::string resName, ComponentType type)
 {
 	Resource* ret = nullptr;
-	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
+	std::map<ComponentType, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
 	//If previosuly there hasn't been loaded any resource with the same type as the requested one, we'll create the new map for this type of components
 	if (tmpMap == m_uidLib.end())
 	{
-		m_uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
+		m_uidLib.insert(std::pair<ComponentType, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
 		tmpMap = m_uidLib.find(type);
 	}
 	//We try to find the resource, to see if it's already loaded
@@ -739,9 +739,9 @@ void ModuleResourceManager::UnlinkResource(uint64_t uid)
 	}
 }
 
-void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type type)
+void ModuleResourceManager::UnlinkResource(std::string fileName, ComponentType type)
 {
-	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
+	std::map<ComponentType, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
 	if (tmpMap != m_uidLib.end())
 	{
 		std::map<std::string, uint64_t>::iterator it = tmpMap->second.find(fileName);
@@ -794,7 +794,7 @@ void ModuleResourceManager::ReloadNow()
 			if (it != m_resources.end())
 			{
 				std::string name = it->second->m_name;
-				Component::Type type = it->second->GetType();
+				ComponentType type = it->second->GetType();
 				uint nRefs = it->second->m_numReferences;
 
 				RELEASE(it->second);
@@ -812,7 +812,7 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 {
 	std::vector<Resource*> ret;
 
-	std::map<Component::Type, std::map<std::string, uint64_t>>::const_iterator tmpMap = m_uidLib.cbegin();
+	std::map<ComponentType, std::map<std::string, uint64_t>>::const_iterator tmpMap = m_uidLib.cbegin();
 	//Iterating all maps of components from uidLib. This maps allow us to find the UID of each component through it's type and name
 	//There's a different map for each type of component, so they're ordered
 	for (; tmpMap != m_uidLib.end(); tmpMap++)
@@ -837,16 +837,16 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 //Returns a vector of pairs:
 // -first is the file name
 // -Second is the vector of resources from that file
-std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceManager::GetAvaliableResources(Component::Type type)
+std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceManager::GetAvaliableResources(ComponentType type)
 {
 	std::vector<std::pair<std::string, std::vector<std::string>>> ret;
 
-	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = m_metaData.begin();
+	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.begin();
 	for (;f != m_metaData.end();f++)
 	{
 		std::vector<std::string> thisFile;
-		std::multimap<Component::Type, MetaInf> ::iterator it;
-		if (type != Component::Type::C_None)
+		std::multimap<ComponentType, MetaInf> ::iterator it;
+		if (type != ComponentType::none)
 		{
 			it = f->second.find(type);
 		}
@@ -855,7 +855,7 @@ std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceMana
 			it = f->second.begin();
 		}
 
-		for (;it != f->second.end() && (it->first == type || type == Component::Type::C_None); it++)
+		for (;it != f->second.end() && (it->first == type || type == ComponentType::none); it++)
 		{
 			thisFile.push_back(it->second.name);
 		}

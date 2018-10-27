@@ -19,7 +19,7 @@ public:
 		}
 	}
 
-	Component::Type GetType() { return Component::Type::C_Shader; }
+	ComponentType GetType() const override { return ComponentType::shader; }
 
 	Shader m_shaderProgram;
 };

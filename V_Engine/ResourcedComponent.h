@@ -8,7 +8,7 @@
 class ResourcedComponent : public Component
 {
 public:
-	ResourcedComponent(std::string resource, GameObject* linkedTo, Component::Type type) : Component(linkedTo, type)
+	ResourcedComponent(std::string resource, GameObject* linkedTo, ComponentType type) : Component(linkedTo, type)
 	{
 		LinkResource(resource);
 	}

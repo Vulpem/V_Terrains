@@ -128,7 +128,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 			uint64_t uid = 0;
 			if (overWritting == true)
 			{
-				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_GO, "RootNode");
+				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, ComponentType::GO, "RootNode");
 				if (inf) { uid = inf->uid; }
 			}
 			ret = ImportGameObject(filePath, scene->mRootNode, scene, uid, overWritting);
@@ -192,7 +192,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 					uint64_t uid = 0;
 					if (overWritting)
 					{
-						const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Texture, IsolateFileName(filePath).data());
+						const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, ComponentType::texture, IsolateFileName(filePath).data());
 						if (inf)
 						{
 							uid = inf->uid;
@@ -211,7 +211,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 
 					MetaInf tmp;
 					tmp.name = IsolateFileName(filePath);
-					tmp.type = Component::C_Texture;
+					tmp.type = ComponentType::texture;
 					tmp.uid = uid;
 					ret.push_back(tmp);
 
@@ -261,7 +261,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 	if (overWritting == false)
 	{
 		//If already exists a shader with this name, this won't be imported
-		const MetaInf* existingShader = App->m_resourceManager->GetMetaData(Component::Type::C_Shader, shaderName.data());
+		const MetaInf* existingShader = App->m_resourceManager->GetMetaData(ComponentType::shader, shaderName.data());
 		if (existingShader != nullptr)
 		{
 			ret.push_back(*existingShader);
@@ -309,7 +309,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 			uint64_t uid = 0;
 			if (overWritting)
 			{
-				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Shader, IsolateFileName(filePath).data());
+				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, ComponentType::shader, IsolateFileName(filePath).data());
 				if (inf)
 				{
 					uid = inf->uid;
@@ -328,7 +328,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 
 			MetaInf tmp;
 			tmp.name = shaderName;
-			tmp.type = Component::C_Shader;
+			tmp.type = ComponentType::shader;
 			tmp.uid = uid;
 			ret.push_back(tmp);
 
@@ -404,7 +404,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		uint64_t meshUid = 0;
 		if (overWritting)
 		{
-			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_mesh, meshName);
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, ComponentType::mesh, meshName);
 			if (inf)
 			{
 				meshUid = inf->uid;
@@ -414,7 +414,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		MetaInf meshMeta;
 		meshMeta.name = meshName;
 		meshMeta.uid = meshUID;
-		meshMeta.type = Component::C_mesh;
+		meshMeta.type = ComponentType::mesh;
 		ret.push_back(meshMeta);
 
 		meshes.push_back(meshUID);
@@ -426,7 +426,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		uint64_t matUid = 0;
 		if (overWritting)
 		{
-			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_mesh, vGoName.data());
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, ComponentType::mesh, vGoName.data());
 			if (inf)
 			{
 				matUid = inf->uid;
@@ -436,7 +436,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		MetaInf matMeta;
 		matMeta.uid = ImportMaterial(scene, materials, vGoName.data(), matUid);
 		matMeta.name = vGoName;
-		matMeta.type = Component::C_material;
+		matMeta.type = ComponentType::material;
 		ret.push_back(matMeta);
 		hasMaterial = 1;
 	}
@@ -458,7 +458,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		childs[n] = 0;
 		if (overWritting == true)
 		{
-			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, Component::C_GO, NodetoLoad->mChildren[n]->mName.data);
+			const MetaInf* inf = App->m_resourceManager->GetMetaData(path, ComponentType::GO, NodetoLoad->mChildren[n]->mName.data);
 			if (inf != nullptr)
 			{
 				childs[n] = inf->uid;
@@ -522,7 +522,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	MetaInf GoMeta;
 	GoMeta.name = vGoName;
 	GoMeta.uid = uid;
-	GoMeta.type = Component::C_GO;
+	GoMeta.type = ComponentType::GO;
 	ret.push_back(GoMeta);
 
 	//Importing also all the childs
@@ -778,7 +778,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 //The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
 {
-	const MetaInf* meta = App->m_resourceManager->GetMetaData(fileName, Component::C_GO, vGoName);
+	const MetaInf* meta = App->m_resourceManager->GetMetaData(fileName, ComponentType::GO, vGoName);
 	if (meta != nullptr)
 	{
 		char path[1024];
@@ -802,7 +802,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 
 				//Creating basic components for a GameObject
 				GameObject* ret = new GameObject;
-				Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
+				Transform* trans = (Transform*)ret->AddComponent(ComponentType::transform);
 
 				//Setting name
 				ret->SetName(meta->name.data());
@@ -840,8 +840,8 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					bytes = sizeof(uint64_t);
 					memcpy(&meshUID, It, bytes);
 					It += bytes;
-					std::string meshName = App->m_resourceManager->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
-					ret->AddComponent(Component::Type::C_mesh, meshName);
+					std::string meshName = App->m_resourceManager->GetMetaData(fileName,ComponentType::mesh, meshUID)->name;
+					ret->AddComponent(ComponentType::mesh, meshName);
 					ret->SetOriginalAABB();
 				}
 
@@ -851,7 +851,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					bytes = sizeof(char) * 256;
 					memcpy(&materialName, It, bytes);
 					It += bytes;
-					ret->AddComponent(Component::Type::C_material, materialName);
+					ret->AddComponent(ComponentType::material, materialName);
 				}
 
 				//Num childs
@@ -877,7 +877,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					std::vector<uint64_t>::iterator childsUID = childs.begin();
 					while (childsUID != childs.end())
 					{
-						const MetaInf* inf = App->m_resourceManager->GetMetaData(fileName, Component::C_GO, *childsUID);
+						const MetaInf* inf = App->m_resourceManager->GetMetaData(fileName, ComponentType::GO, *childsUID);
 						if (inf != nullptr)
 						{
 							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
@@ -915,7 +915,7 @@ R_Mesh* ModuleImporter::LoadMesh(const char * resName)
 {
 	char* file = nullptr;
 	R_Mesh* newMesh = nullptr;
-	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_mesh, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(ComponentType::mesh, resName);
 	if (inf != nullptr)
 	{
 		char filePath[526];
@@ -1059,7 +1059,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 {
 	char* file = nullptr;
 	
-	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_material, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(ComponentType::material, resName);
 
 	R_Material* mat = nullptr;
 
@@ -1105,7 +1105,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 						memcpy(textureName, It, bytes);
 						It += bytes;
 						std::string path(textureName);
-						uint64_t toAdd = App->m_resourceManager->LinkResource(path.data(), Component::C_Texture);
+						uint64_t toAdd = App->m_resourceManager->LinkResource(path.data(), ComponentType::texture);
 						if (toAdd != 0)
 						{
 							mat->m_textures.push_back(toAdd);
@@ -1142,7 +1142,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 		return ret;
 	}
 
-	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_Texture, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(ComponentType::texture, resName);
 	if (inf != nullptr)
 	{
 		glActiveTexture(0);
@@ -1183,7 +1183,7 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 	char* file = nullptr;
 	R_Shader* ret = nullptr;
 
-	const MetaInf* inf = App->m_resourceManager->GetMetaData(Component::C_Shader, resName);
+	const MetaInf* inf = App->m_resourceManager->GetMetaData(ComponentType::shader, resName);
 	LOG("Loading shader %s", inf->name.data());
 	if (inf != nullptr)
 	{

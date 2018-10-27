@@ -45,10 +45,10 @@ bool ModuleGoManager::Init()
 UpdateStatus ModuleGoManager::PreUpdate()
 {
 	TIMER_START("Components PreUpdate");
-	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		std::multimap<Component::Type, Component*>::iterator nextIt = comp;
+		std::multimap<ComponentType, Component*>::iterator nextIt = comp;
 		nextIt--;
 		if (comp->second->TryDeleteNow())
 		{
@@ -74,7 +74,7 @@ UpdateStatus ModuleGoManager::Update()
 	}
 
 	TIMER_START("Components Update");
-	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
 		if (comp->second->object->IsActive())
@@ -127,7 +127,7 @@ UpdateStatus ModuleGoManager::Update()
 UpdateStatus ModuleGoManager::PostUpdate()
 {
 	TIMER_START("Components PostUpdate");
-	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
 		if (comp->second->object->IsActive())
@@ -199,7 +199,7 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
 
-	empty->AddComponent(Component::Type::C_transform);
+	empty->AddComponent(ComponentType::transform);
 	
 	if (name != NULL && name != "")
 	{
@@ -214,7 +214,7 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 GameObject* ModuleGoManager::CreateCamera(const char* name)
 {
 	GameObject* m_camera = CreateEmpty(name);
-	m_camera->AddComponent(Component::Type::C_camera);
+	m_camera->AddComponent(ComponentType::camera);
 	return m_camera;
 }
 
@@ -295,7 +295,7 @@ void ModuleGoManager::SaveSceneNow()
 	Components_node = root_node.append_child("Components");
 
 	//Saving components
-	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
 		if (comp->second->object->HiddenFromOutliner() == false)
@@ -374,7 +374,7 @@ void ModuleGoManager::LoadSceneNow()
 					pugi::xml_node general = comp.child("General");
 					std::string name = general.attribute("name").as_string();
 					uint64_t UID = general.attribute("UID").as_ullong();
-					Component::Type type = (Component::Type)general.attribute("type").as_int();
+					ComponentType type = (ComponentType)general.attribute("type").as_int();
 					int id = general.attribute("id").as_int();
 
 					uint64_t GO = general.attribute("GO").as_ullong();
@@ -493,10 +493,10 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	{
 		float collisionDistance = floatMax;
 		//One object may have more than a single mesh, so we'll check them one by one
-		if (check->second->HasComponent(Component::Type::C_mesh))
+		if (check->second->HasComponent(ComponentType::mesh))
 		{
-			std::vector<mesh*> meshes = check->second->GetComponent<mesh>();
-			for (std::vector<mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
+			std::vector<Mesh*> meshes = check->second->GetComponent<Mesh>();
+			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
 				LineSegment transformedRay = ray;
 				transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
@@ -549,13 +549,13 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 }
 
 
-Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
+Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
 	ret.m_transform = getFrom->object->GetTransform()->GetGlobalTransform();
 
-	if (getFrom->object->HasComponent(Component::Type::C_material))
+	if (getFrom->object->HasComponent(ComponentType::material))
 	{
 		Material* mat = getFrom->object->GetComponent<Material>().front();
 		if (mat->toDelete == false)
@@ -588,13 +588,13 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	if (exclusiveGOs.empty() == true)
 	{
 		//Call the Draw function of all the components, so they do what they need to
-		std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+		std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 		for (; comp != components.end(); comp++)
 		{
 			if (comp->second->object->IsActive())
 			{
 				comp->second->Draw(port);
-				if (comp->second->object->HasComponent(Component::Type::C_Billboard))
+				if (comp->second->object->HasComponent(ComponentType::billboard))
 				{
 					Transform* camTransform = port.m_camera->object->GetTransform();
 					comp->second->object->GetComponent<Billboard>().front()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
@@ -604,8 +604,8 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 		TIMER_START("Cam culling longest");
 		bool aCamHadCulling = false;
 		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
-		std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
-		for (; it != components.end() && it->first == Component::Type::C_camera; it++)
+		std::multimap<ComponentType, Component*>::iterator it = components.find(ComponentType::camera);
+		for (; it != components.end() && it->first == ComponentType::camera; it++)
 		{
 			if (((Camera*)(it->second))->HasCulling())
 			{
@@ -652,12 +652,12 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	std::for_each(toRender.begin(), toRender.end(),
 		[&](GameObject* go)
 	{
-		if (go->HasComponent(Component::Type::C_mesh))
+		if (go->HasComponent(ComponentType::mesh))
 		{
-			std::vector<mesh*> meshes = go->GetComponent<mesh>();
+			std::vector<Mesh*> meshes = go->GetComponent<Mesh>();
 			if (meshes.empty() == false)
 			{
-				for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
+				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 				{
 					if ((*mesh)->IsEnabled() && (*mesh)->toDelete == false)
 					{

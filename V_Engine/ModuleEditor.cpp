@@ -375,8 +375,8 @@ void ModuleEditor::ViewPortUI(const ViewPort& port) const
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
-			std::multimap<Component::Type, Component*>::iterator comp = App->m_goManager->components.find(Component::Type::C_camera);
-			for (; comp != App->m_goManager->components.end() && comp->first == Component::Type::C_camera; comp++)
+			std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->components.find(ComponentType::camera);
+			for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
 			{
 				Camera* cam = (Camera*)&*comp->second;
 				if (ImGui::MenuItem(cam->object->m_name))
@@ -406,7 +406,7 @@ void ModuleEditor::AttributeWindow()
 	{
 		m_selectedGameObject->DrawOnEditor();
 		ImGui::Separator();
-		if (m_selectedGameObject->HasComponent(Component::Type::C_transform))
+		if (m_selectedGameObject->HasComponent(ComponentType::transform))
 		{
 			if (ImGui::Button("Look at"))
 			{

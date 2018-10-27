@@ -83,7 +83,7 @@ public:
 
 	void Draw(const ViewPort & port);
 
-	static Type GetType() { return Type::C_transform; }
+	ComponentType GetType() const override { return ComponentType::transform; }
 
 };
 

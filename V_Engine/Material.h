@@ -23,7 +23,7 @@ public:
 	void SetColor(float r, float g, float b, float a = 1.0f);
 	math::float4 GetColor();
 
-	static Type GetType() { return Type::C_material; }
+	ComponentType GetType() const override { return ComponentType::material; }
 
 	AlphaTestTypes GetAlphaType();
 	void SetAlphaType(AlphaTestTypes type);

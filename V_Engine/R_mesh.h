@@ -27,7 +27,7 @@ public:
 		RELEASE_ARRAY(m_normals);
 	}
 
-	Component::Type GetType() { return Component::Type::C_mesh; }
+	ComponentType GetType() const override { return ComponentType::mesh; }
 
 	uint* m_indices = nullptr;
 	uint m_idIndices = 0;

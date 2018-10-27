@@ -5,10 +5,10 @@
 
 struct Mesh_RenderInfo;
 
-class mesh : public  ResourcedComponent
+class Mesh : public  ResourcedComponent
 {
 public:
-	mesh(std::string resource, GameObject* linkedTo);
+	Mesh(std::string resource, GameObject* linkedTo);
 
 public:
 	int texMaterialIndex = -1;
@@ -31,7 +31,7 @@ public:
 
 	void LoadSpecifics(pugi::xml_node & myNode);
 
-	static Type GetType() { return Type::C_mesh; }
+	ComponentType GetType() const override { return ComponentType::mesh; }
 };
 
 #endif

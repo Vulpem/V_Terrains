@@ -9,25 +9,24 @@
 class GameObject;
 class ViewPort;
 
+enum class ComponentType
+{
+	GO = 1,
+	transform,
+	mesh,
+	material,
+	texture,
+	camera,
+	billboard,
+	shader,
+	//Keep this "C_None" always last
+	none
+};
+
 class Component
 {
 public:
-	static const enum Type
-	{
-		C_GO = 1,
-		C_transform,
-		C_mesh,
-		C_material,
-		C_Texture,
-		C_camera,
-		C_Billboard,
-		C_Shader,
-
-		//Keep this "C_None" always last
-		C_None
-	};
-
-	Component(GameObject* linkedTo, Component::Type type);
+	Component(GameObject* linkedTo, ComponentType type);
 	virtual ~Component();
 	
 	virtual void Enable();
@@ -39,25 +38,14 @@ public:
 	virtual void Draw(const ViewPort & port) {};
 	virtual void DrawOnEditor();
 
-	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS
-	Type GetType() { return type; }
+	virtual ComponentType GetType() const = 0;
 	bool IsEnabled() { return enabled; }
 	virtual bool MissingComponent() { return false; }
 
 	void Save(pugi::xml_node& myNode);
-protected:
-	virtual void SaveSpecifics(pugi::xml_node& myNode) {}
-public:
+
 	virtual void LoadSpecifics(pugi::xml_node& myNode) {}
 
-protected:
-	virtual void OnEnable() {}
-	virtual void OnDisable() {}
-
-	virtual void EditorContent() {};
-
-	Type type;
-public:
 	const uint64_t GetUID() { return uid; }
 
 	void Delete();
@@ -70,7 +58,17 @@ public:
 	bool toDelete = false;
 
 	GameObject* object;
+
 protected:
+	virtual void SaveSpecifics(pugi::xml_node& myNode) {}
+
+	virtual void OnEnable() {}
+	virtual void OnDisable() {}
+
+	virtual void EditorContent() {};
+
+	ComponentType type;
+
 	uint64_t uid;
 private:
 	bool enabled = true;

@@ -6,7 +6,7 @@
 
 #include "ImGui\imgui.h"
 
-Component::Component(GameObject* linkedTo, Component::Type type): name("Empty component"), type(type)
+Component::Component(GameObject* linkedTo, ComponentType type): name("Empty component"), type(type)
 {
 	object = linkedTo;
 	uid = GenerateUUID();
@@ -37,7 +37,7 @@ void Component::Disable()
 
 void Component::DrawOnEditor()
 {
-	if (GetType() != Component::C_transform)
+	if (GetType() != ComponentType::transform)
 	{
 		bool active = enabled;
 		char _id[256];
@@ -99,7 +99,7 @@ void Component::Save(pugi::xml_node& myNode)
 
 	node.append_attribute("name") = tmpName;
 	node.append_attribute("UID") = uid;
-	node.append_attribute("type") = type;
+	node.append_attribute("type") = static_cast<int>(type);
 	node.append_attribute("GO") = object->GetUID();
 	node.append_attribute("enabled") = IsEnabled();
 

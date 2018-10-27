@@ -769,11 +769,11 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
 	if (textureFile.length() > 2)
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(ComponentType::texture);
 		auto res = std::find_if(texRes.begin(), texRes.end(), [textureFile](auto res) { return (textureFile.compare(res.first) == 0); });
 		if (res != texRes.end())
 		{
-			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), Component::Type::C_Texture);
+			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), ComponentType::texture);
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
@@ -796,11 +796,11 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	RPGT::ConditionalTexture t = RPGT::GetTexture(n);
 	if (hmfile.length() > 2)
 	{
-		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>> texRes = App->m_resourceManager->GetAvaliableResources(ComponentType::texture);
 		auto res = std::find_if(texRes.begin(), texRes.end(), [hmfile](auto res) { return (hmfile.compare(res.first) == 0); });
 		if (res != texRes.end())
 		{
-			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), Component::Type::C_Texture);
+			uint64_t UID = App->m_resourceManager->LinkResource(res->second.front(), ComponentType::texture);
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
