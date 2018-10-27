@@ -14,27 +14,27 @@ Timer::Timer()
 // ---------------------------------------------
 void Timer::Start()
 {
-	running = true;
-	started_at = SDL_GetTicks();
+	m_running = true;
+	m_startedAt = SDL_GetTicks();
 }
 
 // ---------------------------------------------
 void Timer::Stop()
 {
-	running = false;
-	stopped_at = SDL_GetTicks();
+	m_running = false;
+	m_stoppedAt = SDL_GetTicks();
 }
 
 // ---------------------------------------------
 Uint32 Timer::Read()
 {
-	if(running == true)
+	if(m_running == true)
 	{
-		return SDL_GetTicks() - started_at;
+		return SDL_GetTicks() - m_startedAt;
 	}
 	else
 	{
-		return stopped_at - started_at;
+		return m_stoppedAt - m_startedAt;
 	}
 }
 
