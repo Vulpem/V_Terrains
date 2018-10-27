@@ -608,11 +608,11 @@ void ModuleTerrain::DrawUI()
 				App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
-			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->multipleViews))
+			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_multipleViewports))
 			{
 				App->m_editor->SwitchViewPorts();
 			}
-			if (App->m_editor->multipleViews)
+			if (App->m_editor->m_multipleViewports)
 			{
 				ImGui::Spacing();
 				ImGui::Checkbox("Auto follow top cam", &App->m_camera->m_followCamera);

@@ -32,22 +32,23 @@ public:
 
 	Camera* GetMovingCamera();
 	void SetMovingCamera(Camera* cam = nullptr);
+
+public:
+	float m_camSpeed = 30.0f;
+	float m_camSprintMultiplier = 3.0f;
+	bool m_followCamera = true;
+
 private:
 	void MoveWithKeys();
 
-public:
-	float camSpeed = 30.0f;
-	float camSprintMultiplier = 3.0f;
-    bool m_followCamera = true;
-
 private:
-	Camera* movingCamera = nullptr;
-	GameObject* defaultCameraGO = nullptr;
-	Camera* defaultCamera = nullptr;
+	Camera* m_movingCamera = nullptr;
+	GameObject* m_defaultCameraGO = nullptr;
+	Camera* m_defaultCamera = nullptr;
 
-	GameObject* topView = nullptr;
-	GameObject* rightView = nullptr;
-	GameObject* frontView = nullptr;
+	GameObject* m_topView = nullptr;
+	GameObject* m_rightView = nullptr;
+	GameObject* m_frontView = nullptr;
 public:
 };
 

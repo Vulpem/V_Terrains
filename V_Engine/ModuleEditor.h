@@ -24,26 +24,30 @@ public:
 	UpdateStatus PreUpdate() override;
 	UpdateStatus Update() override;
 	UpdateStatus PostUpdate() override;
+	void CleanUp() override;
+	void Render(const ViewPort& port) const override;
 
 	void OnPlay() override;
 	void OnStop() override;
-
-	void CleanUp() override;
-
-	void Render(const ViewPort& port) const override;
-
 	void OnScreenResize(int width, int heigth) override;
 
 	void HandleInput(SDL_Event* event);
-
     void SwitchViewPorts();
-
 	void UnselectGameObject(GameObject* go);
-private:
 
+public:
+	bool m_multipleViewports = false;
+
+	bool m_isTestWindowOpen = false;
+
+	bool m_show0Plane = true;
+	bool m_renderNormals = false;
+    std::string m_shaderResult;
+
+private:
 	void MenuBar();
 	void Editor();
-    void ViewPortUI(const ViewPort & port) const;
+	void ViewPortUI(const ViewPort & port) const;
 	void AttributeWindow();
 	void Outliner();
 
@@ -51,34 +55,25 @@ private:
 
 	void SelectByViewPort();
 	void SelectGameObject(GameObject* node);
-public:
-	bool multipleViews = false;
-
-	bool IsOpenTestWindow = false;
-
-	bool showPlane = true;
-	bool renderNormals = false;
-    std::string m_shaderResult;
 
 private:
-	int screenW = 0;
-	int screenH = 0;
+	int m_screenW = 0;
+	int m_screenH = 0;
 
-	float2 viewPortMin;
-	float2 viewPortMax;
-	uint singleViewPort = 0;
-	uint multipleViewPorts[2] = { 0,0 };
-	uint fullScreenViewPort = 0;
+	float2 m_viewPortMin;
+	float2 m_viewPortMax;
+	uint m_singleViewportIndex = 0;
+	uint m_multipleViewportsIndex[2] = { 0,0 };
+	uint m_fullScreenViewportIndex = 0;
 
-	GameObject* selectedGameObject = nullptr;
-	float selectedPos[3] = { 0,0,0 };
-	float selectedScale[3] = { 1,1,1 };
-	float selectedEuler[3] = { 0,0,0 };
+	GameObject* m_selectedGameObject = nullptr;
+	float m_selectedGoPos[3] = { 0,0,0 };
+	float m_selectedGoScale[3] = { 1,1,1 };
+	float m_selectedGoEuler[3] = { 0,0,0 };
 
-	LineSegment selectRay;
-	float3 out_normal;
-	float3 out_pos;
-public:
+	LineSegment m_selectionRay;
+	float3 m_selectRayNormal;
+	float3 m_selectedRayPos;
 };
 
 #endif

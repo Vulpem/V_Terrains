@@ -19,22 +19,22 @@ ModuleCamera3D::~ModuleCamera3D()
 void ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
-	camSpeed = 200.f;
-	camSprintMultiplier = 10.f;
+	m_camSpeed = 200.f;
+	m_camSprintMultiplier = 10.f;
 
-	defaultCameraGO = App->m_goManager->CreateCamera("DefaultEditorCamera");
-	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
-	defaultCamera->SetFarPlane(50000.0);
-	defaultCameraGO->HideFromOutliner();
+	m_defaultCameraGO = App->m_goManager->CreateCamera("DefaultEditorCamera");
+	m_defaultCamera = m_defaultCameraGO->GetComponent<Camera>().front();
+	m_defaultCamera->SetFarPlane(50000.0);
+	m_defaultCameraGO->HideFromOutliner();
 
-	topView = App->m_goManager->CreateCamera("TopView");
-	topView->GetTransform()->SetLocalPos(0, 1000, 0);
-	topView->GetTransform()->SetLocalRot(90, 0, 0);
-	topView->GetTransform()->allowRotation = false;
-	topView->GetComponent<Camera>().front()->SetFarPlane(50000.000);
-	topView->GetComponent<Camera>().front()->SwitchViewType();
-    topView->GetComponent<Camera>().front()->SetHorizontalFOV(50000);
-	topView->HideFromOutliner();
+	m_topView = App->m_goManager->CreateCamera("m_topView");
+	m_topView->GetTransform()->SetLocalPos(0, 1000, 0);
+	m_topView->GetTransform()->SetLocalRot(90, 0, 0);
+	m_topView->GetTransform()->allowRotation = false;
+	m_topView->GetComponent<Camera>().front()->SetFarPlane(50000.000);
+	m_topView->GetComponent<Camera>().front()->SwitchViewType();
+    m_topView->GetComponent<Camera>().front()->SetHorizontalFOV(50000);
+	m_topView->HideFromOutliner();
 }
 
 
@@ -67,8 +67,8 @@ UpdateStatus ModuleCamera3D::Update()
 	}
     if (m_followCamera)
     {
-        math::float3 pos = defaultCameraGO->GetTransform()->GetGlobalPos();
-        topView->GetTransform()->SetGlobalPos(pos.x, topView->GetTransform()->GetGlobalPos().y, pos.z);
+        math::float3 pos = m_defaultCameraGO->GetTransform()->GetGlobalPos();
+        m_topView->GetTransform()->SetGlobalPos(pos.x, m_topView->GetTransform()->GetGlobalPos().y, pos.z);
     }
 
 	return UpdateStatus::Continue;
@@ -97,42 +97,42 @@ void ModuleCamera3D::SetPos(const float3 &Pos)
 
 Camera * ModuleCamera3D::GetDefaultCam()
 {
-	return defaultCamera;
+	return m_defaultCamera;
 }
 
 Camera * ModuleCamera3D::GetTopCam()
 {
-	return topView->GetComponent<Camera>().front();
+	return m_topView->GetComponent<Camera>().front();
 }
 
 Camera * ModuleCamera3D::GetRightCam()
 {
-	return rightView->GetComponent<Camera>().front();
+	return m_rightView->GetComponent<Camera>().front();
 }
 
 Camera * ModuleCamera3D::GetFrontCam()
 {
-	return frontView->GetComponent<Camera>().front();
+	return m_frontView->GetComponent<Camera>().front();
 }
 
 void ModuleCamera3D::SetCameraToDefault(Camera* toSet)
 {
-	SetCameraToCamera(defaultCameraGO, toSet);
+	SetCameraToCamera(m_defaultCameraGO, toSet);
 }
 
 void ModuleCamera3D::SetCameraToTop(Camera* toSet)
 {
-	SetCameraToCamera(topView, toSet);
+	SetCameraToCamera(m_topView, toSet);
 }
 
 void ModuleCamera3D::SetCameraToRight(Camera* toSet)
 {
-	SetCameraToCamera(rightView, toSet);
+	SetCameraToCamera(m_rightView, toSet);
 }
 
 void ModuleCamera3D::SetCameraToFront(Camera* toSet)
 {
-	SetCameraToCamera(frontView, toSet);
+	SetCameraToCamera(m_frontView, toSet);
 }
 
 void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
@@ -151,7 +151,7 @@ void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
 
 Camera * ModuleCamera3D::GetMovingCamera()
 {
-	Camera* cam = movingCamera;
+	Camera* cam = m_movingCamera;
 	if (cam == nullptr)
 	{
 		cam = GetDefaultCam();
@@ -161,19 +161,19 @@ Camera * ModuleCamera3D::GetMovingCamera()
 
 void ModuleCamera3D::SetMovingCamera(Camera * cam)
 {
-	movingCamera = cam;
+	m_movingCamera = cam;
 }
 
 void ModuleCamera3D::MoveWithKeys()
 {
 	Camera* cam = GetMovingCamera();
 
-	float speed = camSpeed;
+	float speed = m_camSpeed;
 	float3 lastCamPos = cam->object->GetTransform()->GetGlobalPos();
 	float3 camPos = lastCamPos;
 	if (App->m_input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
-		speed *= camSprintMultiplier;
+		speed *= m_camSprintMultiplier;
 	}
 
 	int mouseWheel = App->m_input->GetMouseZ();
