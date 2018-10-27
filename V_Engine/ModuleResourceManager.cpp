@@ -224,13 +224,13 @@ void ModuleResourceManager::ReimportAll()
 
 void ModuleResourceManager::ClearLibrary()
 {
-	App->m_fileSystem->DelDir("Library");
+	App->m_fileSystem->DeleteDir("Library");
 	CreateLibraryDirs();
 }
 
 void ModuleResourceManager::SaveMetaData()
 {
-	App->m_fileSystem->DelDir("Library/Meta");
+	App->m_fileSystem->DeleteDir("Library/Meta");
 	App->m_fileSystem->CreateDir("Library/Meta");
 
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
@@ -247,10 +247,10 @@ void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Com
 
 	uint n = 0;
 	char fileName[524];
-	sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
+	sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->IsolateFileName(fileToSave->first.data()).data(), n, META_FORMAT);
 	while (App->m_fileSystem->Exists(fileName) == true)
 	{
-		sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
+		sprintf(fileName, "Library/Meta/%s%u%s", App->m_importer->IsolateFileName(fileToSave->first.data()).data(), n, META_FORMAT);
 		n++;
 	}
 
@@ -296,7 +296,7 @@ void ModuleResourceManager::LoadMetaData()
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
-	App->m_fileSystem->GetFilesIn("Library/Meta", &folders, &files);
+	App->m_fileSystem->GetFilesIn("Library/Meta", folders, files);
 
 	for (std::vector<std::string>::iterator fileIt = files.begin(); fileIt != files.end(); fileIt++)
 	{
@@ -390,7 +390,7 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
-		std::string tmp("." + App->m_importer->FileFormat(filesToCheck.front().data()));
+		std::string tmp("." + App->m_importer->IsolateFileFormat(filesToCheck.front().data()));
 		if (tmp != SCENE_FORMAT && tmp != ".txt")
 		{
 			totalFiles++;
@@ -556,11 +556,11 @@ void ModuleResourceManager::RefreshFolder(const char * path)
 */
 R_Folder ModuleResourceManager::ReadFolder(const char * path)
 {
-	R_Folder ret(App->m_importer->FileName(path).data(), path);
+	R_Folder ret(App->m_importer->IsolateFileName(path).data(), path);
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
-	App->m_fileSystem->GetFilesIn(path, &folders, &files);
+	App->m_fileSystem->GetFilesIn(path, folders, files);
 
 	for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
 	{

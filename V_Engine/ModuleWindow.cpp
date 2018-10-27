@@ -5,11 +5,10 @@
 
 ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	window = nullptr;
-	screen_surface = nullptr;
+	m_window = nullptr;
+	m_screenSurface = nullptr;
 }
 
-// Destructor
 ModuleWindow::~ModuleWindow()
 {
 }
@@ -61,9 +60,9 @@ bool ModuleWindow::Init()
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 
-		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+		m_window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
-		if(window == nullptr)
+		if(m_window == nullptr)
 		{
 			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
@@ -71,9 +70,9 @@ bool ModuleWindow::Init()
 		else
 		{
 			//Get window surface
-			screen_surface = SDL_GetWindowSurface(window);
+			m_screenSurface = SDL_GetWindowSurface(m_window);
 			int w, h;
-			SDL_GetWindowSize(window, &w, &h);
+			SDL_GetWindowSize(m_window, &w, &h);
 			OnScreenResize(w,h);
 		}
 	}
@@ -87,9 +86,9 @@ void ModuleWindow::CleanUp()
 	LOG("Destroying SDL window and quitting all SDL systems");
 
 	//Destroy window
-	if(window != nullptr)
+	if(m_window != nullptr)
 	{
-		SDL_DestroyWindow(window);
+		SDL_DestroyWindow(m_window);
 	}
 
 	//Quit SDL subsystems
@@ -98,16 +97,16 @@ void ModuleWindow::CleanUp()
 
 void ModuleWindow::SetTitle(const char* title)
 {
-	SDL_SetWindowTitle(window, title);
+	SDL_SetWindowTitle(m_window, title);
 }
 
 void ModuleWindow::OnScreenResize(int width, int heigth)
 {
-	windowWidth = width;
-	windowHeigth = heigth;
+	m_windowWidth = width;
+	m_windowHeigth = heigth;
 }
 
 float2 ModuleWindow::GetWindowSize()
 {
-	return float2(windowWidth, windowHeigth);
+	return float2(m_windowWidth, m_windowHeigth);
 }

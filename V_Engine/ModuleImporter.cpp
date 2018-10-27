@@ -79,7 +79,8 @@ void ModuleImporter::CleanUp()
 
 // ------------------------------- IMPORTING ------------------------------- 
 
-
+//Import a file, without specificating which type of file it is.
+//The "overWritting" bool will check the resource manager metadata overwrite existing objects instead of creating new ones
 std::vector<MetaInf> ModuleImporter::Import(const char * path, bool overWritting)
 {
 	std::vector<MetaInf> ret;
@@ -96,11 +97,12 @@ std::vector<MetaInf> ModuleImporter::Import(const char * path, bool overWritting
 	return ret;
 }
 
+//Import a specific 3D model and decompose it
 std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 	//Making sure the file recieved is supported by the assimp library
-	std::string fmt = FileFormat(filePath);
+	std::string fmt = IsolateFileFormat(filePath);
 	std::string supportedFormats;
 	supportedFormats += " FBX";
 	for (uint n = 0; n < aiGetImportFormatCount(); n++)
@@ -147,7 +149,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 }
 
 
-
+//Import any image to dds
 std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
@@ -156,7 +158,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 	//http://openil.sourceforge.net/features.php
 	std::string supportedFormats("bmp dcx dds hdr icns ico cur iff gif jpg jpe jpeg jp2 lbm png raw tif tga");
 
-	if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
+	if (supportedFormats.find(IsolateFileFormat(filePath)) == std::string::npos)
 	{
 		return ret;
 	}
@@ -190,7 +192,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 					uint64_t uid = 0;
 					if (overWritting)
 					{
-						const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Texture, FileName(filePath).data());
+						const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Texture, IsolateFileName(filePath).data());
 						if (inf)
 						{
 							uid = inf->uid;
@@ -208,7 +210,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 					App->m_fileSystem->Save(toCreate, (const char*)data, newSize);
 
 					MetaInf tmp;
-					tmp.name = FileName(filePath);
+					tmp.name = IsolateFileName(filePath);
 					tmp.type = Component::C_Texture;
 					tmp.uid = uid;
 					ret.push_back(tmp);
@@ -238,6 +240,8 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 
 
 //https://www.opengl.org/wiki/Shader_Compilation#Shader_object_compilation
+
+//Compile any amount of shaders and store the resulting program in a binary precompiled file
 std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
@@ -245,14 +249,14 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
 	supportedFormats += " ";
 	supportedFormats += std::string(SHADER_VERTEX_FORMAT).substr(1);
-	if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
+	if (supportedFormats.find(IsolateFileFormat(filePath)) == std::string::npos)
 	{
 		return ret;
 	}
 
 	LOG("\nStarted importing shader %s", filePath);
 
-	std::string shaderName = FileName(filePath);
+	std::string shaderName = IsolateFileName(filePath);
 
 	if (overWritting == false)
 	{
@@ -305,7 +309,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 			uint64_t uid = 0;
 			if (overWritting)
 			{
-				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Shader, FileName(filePath).data());
+				const MetaInf* inf = App->m_resourceManager->GetMetaData(filePath, Component::C_Shader, IsolateFileName(filePath).data());
 				if (inf)
 				{
 					uid = inf->uid;
@@ -337,7 +341,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 		sprintf(toCreate, "%s%s", App->m_importer->RemoveFormat(filePath).data(), "_result.txt");
 		App->m_fileSystem->Save(toCreate, resultLog, compilationResult.length() + 1);
 
-		sprintf(toCreate, "%s%s%s", "Library/Shaders/", App->m_importer->FileName(filePath).data(), "_result.txt");
+		sprintf(toCreate, "%s%s%s", "Library/Shaders/", App->m_importer->IsolateFileName(filePath).data(), "_result.txt");
 		App->m_fileSystem->Save(toCreate, resultLog, compilationResult.length() + 1);
 		RELEASE_ARRAY(resultLog);
 	}
@@ -345,8 +349,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 	return ret;
 }
 
-
-
+//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
 std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, uint64_t uid, bool overWritting)
 {
 	std::vector<MetaInf> ret;
@@ -539,6 +542,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	return ret;
 }
 
+//Create a vmesh from a certain mesh. COntains all mesh info
 uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName,uint& materialID, uint64_t uid)
 {
 	//Importing vertex
@@ -693,6 +697,7 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	return uid;
 }
 
+//Create a vmat from a material, with colors & texture names
 uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid)
 {
 	if (matsIndex.empty() == false)
@@ -715,7 +720,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 			char tmp[1024];
 			strcpy(tmp, texturePath.data);			
 
-			std::string textureName = FileName(tmp);
+			std::string textureName = IsolateFileName(tmp);
 			uint textureNameLen = textureName.length() + 1;
 
 			//Importing color for this mesh
@@ -770,7 +775,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 
 // ------------------------------- LOADING ------------------------------- 
 
-
+//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
 {
 	const MetaInf* meta = App->m_resourceManager->GetMetaData(fileName, Component::C_GO, vGoName);
@@ -1232,7 +1237,8 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 
 // ------------------------------- UTILITY ------------------------------- 
 
-std::string ModuleImporter::FileFormat(const char * file)
+//This function will return only the file format, without the dot.
+std::string ModuleImporter::IsolateFileFormat(const char * file)
 {
 	char name[1024];
 	strcpy(name, file);
@@ -1253,7 +1259,8 @@ std::string ModuleImporter::FileFormat(const char * file)
 		return std::string(tmp);
 }
 
-std::string ModuleImporter::FileName(const char * file)
+//This function will remove everything from the path except the file's actual name. No format, no path
+std::string ModuleImporter::IsolateFileName(const char * file)
 {
 	char name[1024];
 	strcpy(name, file);
@@ -1284,7 +1291,8 @@ std::string ModuleImporter::FileName(const char * file)
 	return std::string(start);
 }
 
-std::string ModuleImporter::File(const char * file)
+//Returns the file name + format
+std::string ModuleImporter::IsolateFile(const char * file)
 {
 	const char* start = file;
 
@@ -1304,6 +1312,7 @@ std::string ModuleImporter::File(const char * file)
 	return std::string(start);
 }
 
+//Will change any "\\" into a "/" && will set the start of the path at "Assets", if found
 std::string ModuleImporter::NormalizePath(const char * path)
 {
 	char tmp[MAXLEN];
@@ -1338,6 +1347,7 @@ std::string ModuleImporter::NormalizePath(const char * path)
 	return std::string(tmp);
 }
 
+//Remove the file format from any string, if there's one
 std::string ModuleImporter::RemoveFormat(const char * file)
 {
 	char name[1024];

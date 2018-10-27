@@ -106,27 +106,27 @@ bool ModuleFileSystem::CreateDir(const char * dir)
 	return false;
 }
 
-bool ModuleFileSystem::DelDir(const char * dir)
+bool ModuleFileSystem::DeleteDir(const char * dir)
 {
 	if (IsDirectory(dir) == true)
 	{
 		std::vector<std::string> folders;
 		std::vector<std::string> files;
-		GetFilesIn(dir, &folders, &files);
+		GetFilesIn(dir, folders, files);
 
 		for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
 		{
 			std::string filePath(dir);
 			filePath += "/";
 			filePath += *it;
-			DelFile(filePath.data());
+			EraseFile(filePath.data());
 		}
 		for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
 		{
 			std::string dirPath(dir);
 			dirPath += "/";
 			dirPath += *it;
-			DelDir(dirPath.data());
+			DeleteDir(dirPath.data());
 		}
 		if (PHYSFS_delete(dir) == 0)
 		{
@@ -140,7 +140,7 @@ bool ModuleFileSystem::DelDir(const char * dir)
 	return false;
 }
 
-bool ModuleFileSystem::DelFile(const char * file)
+bool ModuleFileSystem::EraseFile(const char * file)
 {
 	if (Exists(file) == true)
 	{
@@ -168,7 +168,7 @@ std::string ModuleFileSystem::GetWrittingDirectory()
 	return std::string(PHYSFS_getWriteDir());
 }
 
-void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files)
+void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::string>& folders, std::vector<std::string>& files)
 {
 	char** f = PHYSFS_enumerateFiles(directory);
 	char** it;
@@ -178,11 +178,11 @@ void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::strin
 		std::string toPush(*it);
 		if (GetFileFormat(*it).length() > 0)
 		{
-			files->push_back(toPush);
+			files.push_back(toPush);
 		}
 		else
 		{
-			folders->push_back(toPush);
+			folders.push_back(toPush);
 		}
 	}
 
@@ -207,23 +207,6 @@ Date ModuleFileSystem::ReadFileDate(const char * path)
 
 	return date;
 }
-
-
-bool ModuleFileSystem::EraseFile(const char* file)
-{
-	if (true || Exists(file))
-	{
-		if (PHYSFS_delete(file) != 0)
-		{
-			return true;
-		}
-		LOG("Tried to erase %s, error: %s", file, PHYSFS_getLastError());
-		return false;
-	}
-	LOG("Tried to erase %s, which could not be found", file);
-	return false;
-}
-
 
 unsigned int ModuleFileSystem::Load(const char* path, const char* file, char** buffer) const
 {

@@ -43,30 +43,28 @@ public:
 	bool DeleteViewPort(uint ID);
 
 	void SetViewPort(ViewPort& port);
+public:
+	std::vector<ViewPort> m_viewPorts;
+	Light m_lights[MAX_LIGHTS];
+
+	float4 m_ambientLight = float4(0.3f, 0.3f, 0.3f, 1.0f);
+	float3 m_sunDirection = float3(1.0f, 1.0f, 1.0f);
+	float3 m_clearColor = float3(0.78f, 0.81f, 0.84f);
+
 private:
 	void RenderMeshWired(const Mesh_RenderInfo& data);
 	void RenderMeshFilled(const Mesh_RenderInfo& data);
 	void RenderNormals(const Mesh_RenderInfo& data);
-public:
-	std::vector<ViewPort> viewPorts;
-	Light lights[MAX_LIGHTS];
-
-	float4 ambientLight = float4(0.3f, 0.3f, 0.3f, 1.0f);
-	float3 sunDirection = float3(1.0f, 1.0f, 1.0f);
-	float3 clearColor = float3(0.78f, 0.81f, 0.84f);
 
 private:
-	std::multimap<float, Mesh_RenderInfo> alphaObjects;
-	ViewPort* currentViewPort = nullptr;
+	std::multimap<float, Mesh_RenderInfo> m_alphaObjects;
+	ViewPort* m_currentViewPort = nullptr;
 
-	SDL_GLContext context;
+	SDL_GLContext m_GLcontext;
 
-	//Only for read access
-	bool usingLights = true;
-	//Only for read access
-	bool usingSingleSidedFaces = true;
-	//Only for read access
-	bool usingTextures = true;
+	bool m_usingLights = true;
+	bool m_usingSingleSidedFaces = true;
+	bool m_usingTextures = true;
 };
 
 #endif

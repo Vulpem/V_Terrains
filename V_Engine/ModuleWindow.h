@@ -11,28 +11,26 @@ class ModuleWindow : public Module
 public:
 
 	ModuleWindow(Application* app, bool start_enabled = true);
-
-	// Destructor
-	virtual ~ModuleWindow();
+	~ModuleWindow();
 
 	bool Init() override;
 	void CleanUp() override;
 
 	void SetTitle(const char* title);
 
-	SDL_Window* GetWindow() { return window; }
+	SDL_Window* GetWindow() { return m_window; }
 	void OnScreenResize(int width, int heigth) override;
 	float2 GetWindowSize();
 
 private:
 	//The window we'll be rendering to
-	SDL_Window* window;
+	SDL_Window* m_window;
 
 	//The surface contained by the window
-	SDL_Surface* screen_surface;
+	SDL_Surface* m_screenSurface;
 
-	int windowWidth = 100;
-	int windowHeigth = 100;
+	int m_windowWidth = 100;
+	int m_windowHeigth = 100;
 };
 
 #endif // __ModuleWindow_H__

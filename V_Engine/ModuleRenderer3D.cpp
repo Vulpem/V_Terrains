@@ -39,8 +39,8 @@ bool ModuleRenderer3D::Init()
 	bool ret = true;
 
 	//Create context
-	context = SDL_GL_CreateContext(App->m_window->GetWindow());
-	if (context == nullptr)
+	m_GLcontext = SDL_GL_CreateContext(App->m_window->GetWindow());
+	if (m_GLcontext == nullptr)
 	{
 		LOG("OpenGL context could not be created! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
@@ -93,7 +93,7 @@ bool ModuleRenderer3D::Init()
 		glClearDepth(10.0f);
 
 		//Initialize clear color
-		glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.f);
+		glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.f);
 
 		//Check for error
 		error = glGetError();
@@ -111,20 +111,20 @@ bool ModuleRenderer3D::Init()
 		GLfloat LightModelAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LightModelAmbient);
 
-		lights[0].m_ref = GL_LIGHT0;
-		lights[1].m_ref = GL_LIGHT1;
-		lights[2].m_ref = GL_LIGHT2;
-		lights[3].m_ref = GL_LIGHT3;
-		lights[4].m_ref = GL_LIGHT4;
-		lights[5].m_ref = GL_LIGHT5;
-		lights[6].m_ref = GL_LIGHT6;
-		lights[7].m_ref = GL_LIGHT7;
+		m_lights[0].m_ref = GL_LIGHT0;
+		m_lights[1].m_ref = GL_LIGHT1;
+		m_lights[2].m_ref = GL_LIGHT2;
+		m_lights[3].m_ref = GL_LIGHT3;
+		m_lights[4].m_ref = GL_LIGHT4;
+		m_lights[5].m_ref = GL_LIGHT5;
+		m_lights[6].m_ref = GL_LIGHT6;
+		m_lights[7].m_ref = GL_LIGHT7;
 		for (int n = 0; n < MAX_LIGHTS; n++)
 		{
-			lights[n].m_ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
-			lights[n].m_diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
-			lights[n].SetPos(n * 5, 10, 0);
-			lights[n].Init();
+			m_lights[n].m_ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
+			m_lights[n].m_diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
+			m_lights[n].SetPos(n * 5, 10, 0);
+			m_lights[n].Init();
 		}
 
 		GLfloat MaterialAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -139,13 +139,13 @@ bool ModuleRenderer3D::Init()
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_TEXTURE_2D);
 
-		lights[0].Active(true);
+		m_lights[0].Active(true);
 
 		glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
 
 		glLineWidth(1.0f);
 
-		viewPorts.push_back(ViewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->m_camera->GetDefaultCam(), viewPorts.size()));
+		m_viewPorts.push_back(ViewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->m_camera->GetDefaultCam(), m_viewPorts.size()));
 
 	}
 
@@ -171,7 +171,7 @@ bool ModuleRenderer3D::Init()
 // PreUpdate: clear buffer
 UpdateStatus ModuleRenderer3D::PreUpdate()
 {
-	glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.f);
+	glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
@@ -183,15 +183,15 @@ UpdateStatus ModuleRenderer3D::PostUpdate()
 {
 	for (uint i = 0; i < MAX_LIGHTS; ++i)
 	{
-		lights[i].Render();
+		m_lights[i].Render();
 	}
 
-	viewPorts.front().m_camera = App->m_camera->GetDefaultCam();
+	m_viewPorts.front().m_camera = App->m_camera->GetDefaultCam();
 	TIMER_START("ViewPorts render");
-	if (viewPorts.empty() == false)
+	if (m_viewPorts.empty() == false)
 	{
 		TIMER_RESET_STORED("ViewPorts slowest");
-		for (std::vector<ViewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
+		for (std::vector<ViewPort>::iterator port = m_viewPorts.begin(); port != m_viewPorts.end(); port++)
 		{
 			TIMER_START_PERF("ViewPorts slowest");
 			if (port->m_active && port->m_autoRender)
@@ -221,13 +221,13 @@ UpdateStatus ModuleRenderer3D::PostUpdate()
 void ModuleRenderer3D::CleanUp()
 {
 	LOG("Destroying 3D Renderer");
-	SDL_GL_DeleteContext(context);
+	SDL_GL_DeleteContext(m_GLcontext);
 }
 
 
 void ModuleRenderer3D::OnScreenResize(int width, int heigth)
 {
-	viewPorts.front().m_size = float2(width, heigth);
+	m_viewPorts.front().m_size = float2(width, heigth);
 }
 
 void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
@@ -240,17 +240,17 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 
 void ModuleRenderer3D::RenderBlendObjects()
 {
-	std::multimap<float, Mesh_RenderInfo>::reverse_iterator it = alphaObjects.rbegin();
-	for (; it != alphaObjects.rend(); it++)
+	std::multimap<float, Mesh_RenderInfo>::reverse_iterator it = m_alphaObjects.rbegin();
+	for (; it != m_alphaObjects.rend(); it++)
 	{
 		DrawMesh(it->second, true);
 	}
-	alphaObjects.clear();
+	m_alphaObjects.clear();
 }
 
 void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 {
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glDisable(GL_LIGHTING);
 	}
@@ -262,7 +262,7 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 
 	glEnd();
 
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -270,7 +270,7 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 
 void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 {
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glDisable(GL_LIGHTING);
 	}
@@ -293,7 +293,7 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 
 	glEnd();
 
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -301,7 +301,7 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 
 void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 {
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glDisable(GL_LIGHTING);
 	}
@@ -321,7 +321,7 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 
 	glEnd();
 
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -341,9 +341,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		//TMP / TODO
 		//This is pretty inaccurate and probably not optimized. But, hey, it works. Sometimes. Maybe.
 		float3 objectPos = meshInfo.m_transform.Transposed().TranslatePart();
-		float distanceToObject = currentViewPort->m_camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
+		float distanceToObject = m_currentViewPort->m_camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
 
-		alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
+		m_alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
 		return;
 	}
 
@@ -370,13 +370,13 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	// ------ Setting uniforms -------------------------
 	glUniformMatrix4fv(meshInfo.m_shader.modelMatrix, 1, GL_FALSE, meshInfo.m_transform.ptr());
-	glUniformMatrix4fv(meshInfo.m_shader.viewMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetViewMatrix().ptr());
-	glUniformMatrix4fv(meshInfo.m_shader.projectionMatrix, 1, GL_FALSE, currentViewPort->m_camera->GetProjectionMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.viewMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetViewMatrix().ptr());
+	glUniformMatrix4fv(meshInfo.m_shader.projectionMatrix, 1, GL_FALSE, m_currentViewPort->m_camera->GetProjectionMatrix().ptr());
 
 	glUniform1f(meshInfo.m_shader.time, (float)Time.AppRuntime);
 
-	glUniform4fv(meshInfo.m_shader.ambientColor, 1, ambientLight.ptr());
-	glUniform3fv(meshInfo.m_shader.globalLightDir, 1, sunDirection.ptr());
+	glUniform4fv(meshInfo.m_shader.ambientColor, 1, m_ambientLight.ptr());
+	glUniform3fv(meshInfo.m_shader.globalLightDir, 1, m_sunDirection.ptr());
 	glUniform1i(meshInfo.m_shader.fogDistance, RPGT::config.fogDistance);
 	glUniform3fv(meshInfo.m_shader.fogColor, 1, RPGT::config.fogColor);
 	glUniform1f(meshInfo.m_shader.maxHeight, RPGT::config.maxHeight);
@@ -404,7 +404,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		RenderMeshWired(meshInfo);
 	}
 
-	glUniform1i(meshInfo.m_shader.useLight, currentViewPort->m_useLighting);
+	glUniform1i(meshInfo.m_shader.useLight, m_currentViewPort->m_useLighting);
 
 	glUniform1i(meshInfo.m_shader.hasTexture, (meshInfo.m_textureBuffer != 0));
 	if (meshInfo.m_textureBuffer > 0)
@@ -431,7 +431,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 ViewPort* ModuleRenderer3D::HoveringViewPort()
 {
-	for (std::vector<ViewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
+	for (std::vector<ViewPort>::reverse_iterator it = m_viewPorts.rbegin(); it != m_viewPorts.rend(); it++)
 	{
 		if (it->m_active)
 		{
@@ -467,13 +467,13 @@ float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, ViewPort
 
 uint ModuleRenderer3D::AddViewPort(float2 m_pos, float2 m_size, Camera * cam)
 {
-	viewPorts.push_back(ViewPort(m_pos, m_size, cam, viewPorts.size()));
-	return viewPorts.back().m_ID;
+	m_viewPorts.push_back(ViewPort(m_pos, m_size, cam, m_viewPorts.size()));
+	return m_viewPorts.back().m_ID;
 }
 
 ViewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
 {
-	for (std::vector<ViewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	for (std::vector<ViewPort>::iterator it = m_viewPorts.begin(); it != m_viewPorts.end(); it++)
 	{
 		if (it->m_ID == m_ID)
 		{
@@ -485,11 +485,11 @@ ViewPort * ModuleRenderer3D::FindViewPort(uint m_ID)
 
 bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 {
-	for (std::vector<ViewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	for (std::vector<ViewPort>::iterator it = m_viewPorts.begin(); it != m_viewPorts.end(); it++)
 	{
 		if (it->m_ID == m_ID)
 		{
-			viewPorts.erase(it);
+			m_viewPorts.erase(it);
 			return true;
 		}
 	}
@@ -498,7 +498,7 @@ bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 
 void ModuleRenderer3D::SetViewPort(ViewPort& port)
 {
-	currentViewPort = &port;
+	m_currentViewPort = &port;
 	port.SetCameraMatrix();
 	glViewport(port.m_pos.x, App->m_window->GetWindowSize().y - (port.m_size.y + port.m_pos.y), port.m_size.x, port.m_size.y);
 	UpdateProjectionMatrix(port.m_camera);
@@ -506,23 +506,23 @@ void ModuleRenderer3D::SetViewPort(ViewPort& port)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(port.m_camera->GetViewMatrix().ptr());
 
-	if (port.m_useSingleSidedFaces) { glEnable(GL_CULL_FACE); usingSingleSidedFaces = true; }
-	else { glDisable(GL_CULL_FACE); usingSingleSidedFaces = false; }
+	if (port.m_useSingleSidedFaces) { glEnable(GL_CULL_FACE); m_usingSingleSidedFaces = true; }
+	else { glDisable(GL_CULL_FACE); m_usingSingleSidedFaces = false; }
 
-	if (port.m_useLighting) { glEnable(GL_LIGHTING); usingLights = true; }
-	else { glDisable(GL_LIGHTING); usingLights = false;}
+	if (port.m_useLighting) { glEnable(GL_LIGHTING); m_usingLights = true; }
+	else { glDisable(GL_LIGHTING); m_usingLights = false;}
 
-	if (!port.m_renderHeightMap) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
-	else { glDisable(GL_TEXTURE_2D); usingTextures = false;}
+	if (!port.m_renderHeightMap) { glEnable(GL_TEXTURE_2D); m_usingTextures = true; }
+	else { glDisable(GL_TEXTURE_2D); m_usingTextures = false;}
 }
 
 void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 {
-	if (usingSingleSidedFaces)
+	if (m_usingSingleSidedFaces)
 	{
 		glDisable(GL_CULL_FACE);
 	}
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glDisable(GL_LIGHTING);
 	}
@@ -534,11 +534,11 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	if (usingSingleSidedFaces)
+	if (m_usingSingleSidedFaces)
 	{
 		glEnable(GL_CULL_FACE);
 	}
-	if (usingLights)
+	if (m_usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}

@@ -66,7 +66,7 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	RPGT::config.globalLight[0] = tmp.x;
 	RPGT::config.globalLight[1] = tmp.y;
 	RPGT::config.globalLight[2] = tmp.z;
-	App->m_renderer3D->sunDirection = tmp;
+	App->m_renderer3D->m_sunDirection = tmp;
 }
 
 // Destructor
@@ -94,9 +94,9 @@ void ModuleTerrain::Start()
 
 UpdateStatus ModuleTerrain::Update()
 {
-	RPGT::config.fogColor[0] = App->m_renderer3D->clearColor.x;
-	RPGT::config.fogColor[1] = App->m_renderer3D->clearColor.y;
-	RPGT::config.fogColor[2] = App->m_renderer3D->clearColor.z;
+	RPGT::config.fogColor[0] = App->m_renderer3D->m_clearColor.x;
+	RPGT::config.fogColor[1] = App->m_renderer3D->m_clearColor.y;
+	RPGT::config.fogColor[2] = App->m_renderer3D->m_clearColor.z;
 
 	if (m_regening)
 	{
@@ -120,7 +120,7 @@ UpdateStatus ModuleTerrain::Update()
 				m_generatedMap = true;
 			}
 			float3 currentFogColor = Lerp(previousFogColor, wantedFogColor, (ms - 750.f) / 1000.f);
-			App->m_renderer3D->clearColor = currentFogColor;
+			App->m_renderer3D->m_clearColor = currentFogColor;
 		}
 		else if (ms < 2500)
 		{
@@ -129,7 +129,7 @@ UpdateStatus ModuleTerrain::Update()
 		else
 		{
 			RPGT::config.fogDistance = m_fogDistance;
-			App->m_renderer3D->clearColor = wantedFogColor;
+			App->m_renderer3D->m_clearColor = wantedFogColor;
 			m_regening = false;
 		}
 	}
@@ -425,7 +425,7 @@ void ModuleTerrain::DrawUI()
 		if (ImGui::BeginMenu("Load Terrain"))
 		{
 			std::vector<std::string> folders, files;
-			App->m_fileSystem->GetFilesIn("Assets/Terrains", &folders, &files);
+			App->m_fileSystem->GetFilesIn("Assets/Terrains", folders, files);
 			for (int n = 0; n < files.size(); n++)
 			{
 				if (ImGui::MenuItem(files[n].data()))
@@ -446,7 +446,7 @@ void ModuleTerrain::DrawUI()
 			ImGui::SliderFloat("FogDistance", &RPGT::config.fogDistance, 0.0f, 100000.f, "%.3f", 4.f);
 			ImGui::SliderFloat("WaterHeight", &RPGT::config.waterHeight, 0.0f, 1.f);
 			ImGui::SliderFloat("Tesselation Triangle Size", &RPGT::config.tesselationTriangleSize, 0.1f, 200.f, "%.2f", 4.f);
-			ImGui::ColorPicker3("Background Color", App->m_renderer3D->clearColor.ptr());
+			ImGui::ColorPicker3("Background Color", App->m_renderer3D->m_clearColor.ptr());
 			ImGui::NewLine();
 			ImGui::Text("Global light:");
 			bool lightDirChanged = false;
@@ -461,7 +461,7 @@ void ModuleTerrain::DrawUI()
 				RPGT::config.globalLight[0] = tmp.x;
 				RPGT::config.globalLight[1] = tmp.y;
 				RPGT::config.globalLight[2] = tmp.z;
-				App->m_renderer3D->sunDirection = tmp;
+				App->m_renderer3D->m_sunDirection = tmp;
 			}
 
 			ImGui::DragFloat3("Light vector", RPGT::config.globalLight);
@@ -994,7 +994,7 @@ void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
 	m_regenTimer.Start();
-	previousFogColor = wantedFogColor = App->m_renderer3D->clearColor;
+	previousFogColor = wantedFogColor = App->m_renderer3D->m_clearColor;
 }
 
 void ModuleTerrain::ShaderEditor()

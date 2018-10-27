@@ -12,15 +12,15 @@
 
 ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	keyboard = new KEY_STATE[MAX_KEYS + 1];
-	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
-	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
+	m_keyboardStates = new KEY_STATE[MAX_KEYS + 1];
+	memset(m_keyboardStates, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
+	memset(m_mouseButtons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
 }
 
 // Destructor
 ModuleInput::~ModuleInput()
 {
-	delete[] keyboard;
+	delete[] m_keyboardStates;
 }
 
 // Called before render is available
@@ -38,8 +38,8 @@ bool ModuleInput::Init()
 		ret = false;
 	}
 
-	dropped_file[0] = '\0';
-	file_was_dropped = false;
+	m_lastDroppedFile[0] = '\0';
+	m_fileWasDropped = false;
 
 	return ret;
 }
@@ -49,67 +49,67 @@ UpdateStatus ModuleInput::PreUpdate()
 {
 	SDL_PumpEvents();
 
-	file_was_dropped = false;
+	m_fileWasDropped = false;
 	
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	
 	for(int i = 0; i < MAX_KEYS; ++i)
 	{
-		if(keys[i] == 1 && ignoreKeyboard == false)
+		if(keys[i] == 1 && m_ignoreKeyboard == false)
 		{
-			if(keyboard[i] == KEY_IDLE)
-				keyboard[i] = KEY_DOWN;
+			if(m_keyboardStates[i] == KEY_IDLE)
+				m_keyboardStates[i] = KEY_DOWN;
 			else
-				keyboard[i] = KEY_REPEAT;
+				m_keyboardStates[i] = KEY_REPEAT;
 		}
 		else
 		{
-			if(keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN)
-				keyboard[i] = KEY_UP;
+			if(m_keyboardStates[i] == KEY_REPEAT || m_keyboardStates[i] == KEY_DOWN)
+				m_keyboardStates[i] = KEY_UP;
 			else
-				keyboard[i] = KEY_IDLE;
+				m_keyboardStates[i] = KEY_IDLE;
 		}
 	}
 
-	Uint32 buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+	Uint32 buttons = SDL_GetMouseState(&m_mouseX, &m_mouseY);
 
-	mouse_z = 0;
+	m_mouseZ = 0;
 
 	for(int i = 0; i < 5; ++i)
 	{
-		if(buttons & SDL_BUTTON(i) && ignoreMouse == false)
+		if(buttons & SDL_BUTTON(i) && m_ignoreMouse == false)
 		{
-			if(mouse_buttons[i] == KEY_IDLE)
-				mouse_buttons[i] = KEY_DOWN;
+			if(m_mouseButtons[i] == KEY_IDLE)
+				m_mouseButtons[i] = KEY_DOWN;
 			else
-				mouse_buttons[i] = KEY_REPEAT;
+				m_mouseButtons[i] = KEY_REPEAT;
 		}
 		else
 		{
-			if(mouse_buttons[i] == KEY_REPEAT || mouse_buttons[i] == KEY_DOWN)
-				mouse_buttons[i] = KEY_UP;
+			if(m_mouseButtons[i] == KEY_REPEAT || m_mouseButtons[i] == KEY_DOWN)
+				m_mouseButtons[i] = KEY_UP;
 			else
-				mouse_buttons[i] = KEY_IDLE;
+				m_mouseButtons[i] = KEY_IDLE;
 		}
 	}
 
-	mouse_x_motion = mouse_y_motion = 0;
+	m_mouseMotionX = m_mouseMotionY = 0;
 
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
-		if (ignoreMouse == false)
+		if (m_ignoreMouse == false)
 		{
 			switch (e.type)
 			{
 				case SDL_EventType::SDL_MOUSEWHEEL:
 				{
-					mouse_z = e.wheel.y;
+					m_mouseZ = e.wheel.y;
 					break;
 				}
 				case SDL_EventType::SDL_MOUSEMOTION:
 				{
-					if (captureMouse)
+					if (m_captureMouse)
 					{
 						if (CaptureMouse(e))
 						{
@@ -117,21 +117,20 @@ UpdateStatus ModuleInput::PreUpdate()
 							ImGui::GetIO().MousePosPrev = ImVec2(-1, -1);
 						}
 					}
-					mouse_x = e.motion.x;
-					mouse_y = e.motion.y;
+					m_mouseX = e.motion.x;
+					m_mouseY = e.motion.y;
 
-					mouse_x_motion = e.motion.xrel;
-					mouse_y_motion = e.motion.yrel;
+					m_mouseMotionX = e.motion.xrel;
+					m_mouseMotionY = e.motion.yrel;
 					break;
 				}
 
 				case SDL_EventType::SDL_DROPFILE:
 				{
-					strcpy_s(dropped_file, e.drop.file);
+					strcpy_s(m_lastDroppedFile, e.drop.file);
 					SDL_free(e.drop.file);
-					file_was_dropped = true;
-					LOG("Dropped %s", dropped_file);
-					LOG("File was detected as a %s", DroppedFileFormat().data());
+					m_fileWasDropped = true;
+					LOG("Dropped %s", m_lastDroppedFile);
 					break;
 				}
 				case SDL_EventType::SDL_QUIT:
@@ -169,50 +168,30 @@ void ModuleInput::CleanUp()
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 }
 
-std::string ModuleInput::DroppedFileFormat()
-{
-	if (file_was_dropped)
-	{
-		char* tmp = dropped_file;
-		while (*tmp != '\0')
-		{
-			tmp++;
-		}
-		while (*tmp != '.')
-		{
-			tmp--;
-		}
-		tmp++;
-		return std::string(tmp);
-
-	}
-	return std::string("Error_Reading_format");
-}
-
 bool ModuleInput::CaptureMouse(SDL_Event& e)
 {
 	bool ret = false;
 	float2 windowSize = App->m_window->GetWindowSize();
-	if (mouse_x + e.motion.xrel >= windowSize.x)
+	if (m_mouseX + e.motion.xrel >= windowSize.x)
 	{
 		SDL_WarpMouseInWindow(App->m_window->GetWindow(), 1, e.motion.y);
 		e.motion.xrel = 0;
 		ret = true;
 	}
-	else if (mouse_x + e.motion.xrel <= 0)
+	else if (m_mouseX + e.motion.xrel <= 0)
 	{
 		SDL_WarpMouseInWindow(App->m_window->GetWindow(), windowSize.x - 1, e.motion.y);
 		e.motion.xrel = 0;
 		ret = true;
 	}
 
-	if (mouse_y + e.motion.yrel >= windowSize.y)
+	if (m_mouseY + e.motion.yrel >= windowSize.y)
 	{
 		SDL_WarpMouseInWindow(App->m_window->GetWindow(), e.motion.x, 1);
 		e.motion.yrel = 0;
 		ret = true;
 	}
-	else if (mouse_y + e.motion.yrel <= 0)
+	else if (m_mouseY + e.motion.yrel <= 0)
 	{
 		SDL_WarpMouseInWindow(App->m_window->GetWindow(), e.motion.x, windowSize.y - 1);
 		e.motion.yrel = 0;

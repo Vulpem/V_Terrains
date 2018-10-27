@@ -4,16 +4,32 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Primitive.h"
-
 #include "Math.h"
 
 #include "Bullet\include\btBulletDynamicsCommon.h"
 
-// Recommended scale is 1.0f == 1 meter, no less than 0.2 objects
 #define GRAVITY btVector3(0.0f, -10.0f, 0.0f) 
 
-class DebugDrawer;
 struct PhysBody3D;
+
+class DebugDrawer : public btIDebugDraw
+{
+public:
+	DebugDrawer()
+	: m_line(0, 0, 0)
+	{}
+
+	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+	void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
+	void reportErrorWarning(const char* warningString);
+	void draw3dText(const btVector3& location, const char* textString);
+	void setDebugMode(int debugMode);
+	int	 getDebugMode() const;
+
+	DebugDrawModes m_drawMode;
+	P_Line m_line;
+	Primitive m_primitivePoint;
+};
 
 class ModulePhysics3D : public Module
 {
@@ -31,14 +47,12 @@ public:
 	PhysBody3D* AddBody(const P_Cube& cube, float mass = 1.0f);
 	PhysBody3D* AddBody(const P_Cylinder& cylinder, float mass = 1.0f);
 
-
 	void AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB);
 	void AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB, const math::float3& axisS, const math::float3& axisB, bool disable_collision = false);
 	void DeleteBody(PhysBody3D* body);
 
 private:
-
-	bool debug = false;
+	bool m_debugDisplay = false;
 
 	btDefaultCollisionConfiguration*	collision_conf;
 	btCollisionDispatcher*				dispatcher;
@@ -47,30 +61,12 @@ private:
 	btDiscreteDynamicsWorld*			world;
 	DebugDrawer*						debug_draw;
 
-	std::list<btCollisionShape*> shapes;
-	std::list<PhysBody3D*> bodies;
-	std::list<btDefaultMotionState*> motions;
-	std::list<btTypedConstraint*> constraints;
+	std::list<btCollisionShape*> m_shapes;
+	std::list<PhysBody3D*> m_bodies;
+	std::list<btDefaultMotionState*> m_motions;
+	std::list<btTypedConstraint*> m_constraints;
 
-	btRigidBody* ground = nullptr;
-};
-
-class DebugDrawer : public btIDebugDraw
-{
-public:
-	DebugDrawer() : line(0,0,0)
-	{}
-
-	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
-	void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
-	void reportErrorWarning(const char* warningString);
-	void draw3dText(const btVector3& location, const char* textString);
-	void setDebugMode(int debugMode);
-	int	 getDebugMode() const;
-
-	DebugDrawModes mode;
-	P_Line line;
-	Primitive point;
+	btRigidBody* m_ground = nullptr;
 };
 
 #endif

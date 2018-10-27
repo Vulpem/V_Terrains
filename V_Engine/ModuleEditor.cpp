@@ -64,13 +64,13 @@ UpdateStatus ModuleEditor::PreUpdate()
 	{
 
 		ImGuiIO IO = ImGui::GetIO();
-		App->m_input->ignoreMouse = IO.WantCaptureMouse;
-		App->m_input->ignoreKeyboard = (IO.WantCaptureKeyboard || IO.WantTextInput);
+		App->m_input->m_ignoreMouse = IO.WantCaptureMouse;
+		App->m_input->m_ignoreKeyboard = (IO.WantCaptureKeyboard || IO.WantTextInput);
 	}
 	else
 	{
-		App->m_input->ignoreKeyboard = false;
-		App->m_input->ignoreMouse = false;
+		App->m_input->m_ignoreKeyboard = false;
+		App->m_input->m_ignoreMouse = false;
 	}
 	return UpdateStatus::Continue;
 }

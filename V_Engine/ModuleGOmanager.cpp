@@ -65,10 +65,10 @@ UpdateStatus ModuleGoManager::PreUpdate()
 
 UpdateStatus ModuleGoManager::Update()
 {
-	if (App->m_input->file_was_dropped)
+	if (App->m_input->m_fileWasDropped)
 	{
 		char droppedFile[1024];
-		strcpy(droppedFile, App->m_input->dropped_file);
+		strcpy(droppedFile, App->m_input->m_lastDroppedFile);
 		std::string file = App->m_importer->NormalizePath(droppedFile);
 		LoadGO(file.data());
 	}
