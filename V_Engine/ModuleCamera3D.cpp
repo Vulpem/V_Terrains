@@ -137,7 +137,7 @@ void ModuleCamera3D::SetCameraToFront(Camera* toSet)
 
 void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
 {
-	if (setTo->HasComponent(ComponentType::camera) && setTo->GetTransform() != nullptr)
+	if (setTo->HasComponent<Camera>() && setTo->GetTransform() != nullptr)
 	{
 		toSet->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
 		toSet->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());

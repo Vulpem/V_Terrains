@@ -493,7 +493,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	{
 		float collisionDistance = floatMax;
 		//One object may have more than a single mesh, so we'll check them one by one
-		if (check->second->HasComponent(ComponentType::mesh))
+		if (check->second->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes = check->second->GetComponent<Mesh>();
 			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
@@ -555,7 +555,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 
 	ret.m_transform = getFrom->object->GetTransform()->GetGlobalTransform();
 
-	if (getFrom->object->HasComponent(ComponentType::material))
+	if (getFrom->object->HasComponent<Material>())
 	{
 		Material* mat = getFrom->object->GetComponent<Material>().front();
 		if (mat->toDelete == false)
@@ -594,7 +594,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 			if (comp->second->object->IsActive())
 			{
 				comp->second->Draw(port);
-				if (comp->second->object->HasComponent(ComponentType::billboard))
+				if (comp->second->object->HasComponent<Billboard>())
 				{
 					Transform* camTransform = port.m_camera->object->GetTransform();
 					comp->second->object->GetComponent<Billboard>().front()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
@@ -649,10 +649,9 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	TIMER_START("GO render longest");
 	//And now, we render them
 	TIMER_RESET_STORED("Mesh slowest");
-	std::for_each(toRender.begin(), toRender.end(),
-		[&](GameObject* go)
+	for(GameObject* go : toRender)
 	{
-		if (go->HasComponent(ComponentType::mesh))
+		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes = go->GetComponent<Mesh>();
 			if (meshes.empty() == false)
@@ -675,7 +674,6 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 			}
 		}
 	}
-	);
 	TIMER_READ_MS_MAX("GO render longest");
 }
 

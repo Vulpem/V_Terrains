@@ -89,7 +89,10 @@ void QuadNode::Draw() const
 	float3 corners[8];
 	m_box.GetCornerPoints(corners);
 	App->m_renderer3D->DrawBox(corners);
-	std::for_each(m_childs.begin(), m_childs.end(), [](QuadNode child) { child.Draw(); });
+	for (QuadNode child : m_childs)
+	{
+		child.Draw();
+	}
 }
 
 void QuadNode::SetBox(int n, float3 breakPoint)

@@ -132,7 +132,7 @@ void GameObject::DrawOnEditor()
 		}
 		if (ImGui::BeginMenu("Material##add"))
 		{
-			if (HasComponent(ComponentType::material))
+			if (HasComponent<Material>())
 			{
 				ImGui::Text("Already has a material!");
 			}
@@ -163,7 +163,7 @@ void GameObject::DrawOnEditor()
 		{
 			AddComponent(ComponentType::camera);
 		}
-		if (HasComponent(ComponentType::billboard) == false)
+		if (HasComponent<Billboard>() == false)
 		{
 			if (ImGui::MenuItem("Billboard##add"))
 			{
@@ -233,7 +233,7 @@ void GameObject::DrawLocator()
 		{
 			for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 			{
-				if ((*it)->HasComponent(ComponentType::transform) && !(*it)->HasComponent(ComponentType::mesh))
+				if ((*it)->HasComponent<Transform>() && !(*it)->HasComponent<Mesh>())
 				{
 					math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
 					App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
@@ -301,7 +301,7 @@ void GameObject::Unselect()
 
 void GameObject::SetOriginalAABB()
 {
-	if (HasComponent(ComponentType::mesh))
+	if (HasComponent<Mesh>())
 	{
 		m_originalAABB.SetNegativeInfinity();
 		std::vector<Mesh*> meshes = GetComponent<Mesh>();
@@ -335,7 +335,7 @@ void GameObject::UpdateAABB()
 
 void GameObject::UpdateTransformMatrix()
 {
-	if (HasComponent(ComponentType::transform))
+	if (HasComponent<Transform>())
 	{	
 		GetTransform()->UpdateGlobalTransform();
 	}
@@ -343,7 +343,7 @@ void GameObject::UpdateTransformMatrix()
 	UpdateAABB();
 
 	//Updating cameras position
-	if (HasComponent(ComponentType::camera))
+	if (HasComponent<Camera>())
 	{
 		std::vector<Camera*> cams = GetComponent<Camera>();
 		std::vector<Camera*>::iterator it = cams.begin();
@@ -420,7 +420,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	{
 	case ComponentType::transform:
 	{
-		if (HasComponent(ComponentType::transform) == false)
+		if (HasComponent<Transform>() == false)
 		{
 			toAdd = new Transform(this);
 			m_transform = (Transform*)toAdd;
@@ -434,7 +434,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	}
 	case ComponentType::material:
 	{
-		if (HasComponent(ComponentType::material) == false)
+		if (HasComponent<Material>() == false)
 		{
 			toAdd = new Material(res, this);
 		}
@@ -442,7 +442,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	}
 	case ComponentType::camera:
 	{
-		if (HasComponent(ComponentType::transform))
+		if (HasComponent<Transform>())
 		{
 			toAdd = new Camera(this);
 		}
@@ -450,7 +450,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	}
 	case ComponentType::billboard:
 	{
-		if (HasComponent(ComponentType::billboard) == false)
+		if (HasComponent<Billboard>() == false)
 		{
 			toAdd = new Billboard(this);
 		}
@@ -478,11 +478,6 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	}
 
 	return toAdd;
-}
-
-bool GameObject::HasComponent(ComponentType type)
-{
-	return m_hasComponents[type] != 0;
 }
 
 uint GameObject::AmountOfComponent(ComponentType type)

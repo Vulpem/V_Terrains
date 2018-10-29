@@ -87,27 +87,25 @@ Application::~Application()
 
 bool Application::Init()
 {
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
+	for(Module* m : m_modules)
 	{
 		if (m->Init() == false)
 		{
 			return false;
 		}
-	});
+	};
 
 	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
 	//Variable used to determine if LOG's can be shown on console
 	m_gameRunning = true;
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
+	for (Module* m : m_modules)
 	{
 		if (m->IsEnabled())
 		{
 			m->Start();
 		}
-	});
+	};
 	m_maxFps = 0;
 	m_msTimer.Start();
 	m_fpsTimer.Start();
@@ -187,34 +185,31 @@ UpdateStatus Application::Update()
 	UpdateStatus ret = UpdateStatus::Continue;
 	PrepareUpdate();
 	
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[& ret](Module* m)
+	for (Module* m : m_modules)
 	{
 		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
 			ret = m->PreUpdate();
 		}
-	});
+	};
 	TIMER_READ_MS("App PreUpdate");
 	TIMER_START_PERF("App Update");
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[& ret](Module* m)
+	for (Module* m : m_modules)
 	{
 		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
 			ret = m->Update();
 		}
-	});
+	};
 	TIMER_READ_MS("App Update");
 	TIMER_START_PERF("App PostUpdate");
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[& ret](Module* m)
+	for (Module* m : m_modules)
 	{
 		if (m->IsEnabled() && ret == UpdateStatus::Continue)
 		{
 			ret = m->PostUpdate();
 		}
-	});
+	};
 	TIMER_READ_MS("App PostUpdate");
 	FinishUpdate();
 	if (m_frameTime > 0.0001f)
@@ -230,22 +225,22 @@ void Application::CleanUp()
 {
 	m_gameRunning = false;
 	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m)
-	{ m->CleanUp();	});
+	for (Module* m : m_modules)
+	{
+		m->CleanUp();
+	};
 	RELEASE(m_timers);
 }
 
 void Application::Render(const ViewPort& port) const
 {
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[& port](Module* m)
+	for (Module* m : m_modules)
 	{
 		if (m->IsEnabled())
 		{
 			m->Render(port);
 		}
-	});
+	};
 }
 
 
@@ -263,7 +258,7 @@ const char* Application::GetTitle() const
 
 void Application::OnScreenResize(int width, int heigth)
 {
-	std::for_each(m_modules.begin(), m_modules.end(), [&width, &heigth](Module* m) {m->OnScreenResize(width, heigth); });
+	for (Module* m : m_modules) {m->OnScreenResize(width, heigth); };
 }
 
 void Application::Play(bool debug)
@@ -276,15 +271,13 @@ void Application::Play(bool debug)
 	{
 		Time.PlayMode = Play::DebugPlay;
 	}
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m) {m->OnPlay(); });
+	for (Module* m : m_modules) {m->OnPlay(); };
 }
 
 void Application::Stop()
 {
 	Time.PlayMode = Play::Stop;
-	std::for_each(m_modules.begin(), m_modules.end(),
-		[](Module* m) {m->OnStop(); });
+	for (Module* m : m_modules) {m->OnStop(); };
 }
 
 void Application::AddModule(Module* mod)

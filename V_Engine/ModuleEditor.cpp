@@ -406,7 +406,7 @@ void ModuleEditor::AttributeWindow()
 	{
 		m_selectedGameObject->DrawOnEditor();
 		ImGui::Separator();
-		if (m_selectedGameObject->HasComponent(ComponentType::transform))
+		if (m_selectedGameObject->HasComponent<Transform>())
 		{
 			if (ImGui::Button("Look at"))
 			{

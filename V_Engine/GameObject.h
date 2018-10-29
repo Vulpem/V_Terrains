@@ -52,7 +52,8 @@ public:
 
 	Component* AddComponent(ComponentType type, std::string res = std::string(""), bool forceCreation = false);
 
-	bool HasComponent(ComponentType type);
+	template <typename typeComp>
+	bool HasComponent();
 	uint AmountOfComponent(ComponentType type);
 	Transform* GetTransform();
 
@@ -63,25 +64,8 @@ public:
 	//For system use, do not call
 	void RemoveComponent(Component* comp);
 
-#pragma region GetComponents
-	//GetComponent function
 	template <typename typeComp>
-	std::vector<typeComp*> GetComponent()
-	{
-		std::vector<typeComp*> ret;
-		std::for_each(m_components.begin(), m_components.end(),
-		[&ret](Component* comp)
-		{
-			typeComp* toReturn = dynamic_cast<typeComp*>(comp);
-			if (toReturn != nullptr)
-			{
-				ret.push_back(toReturn);
-			}
-		}
-		);
-		return ret;
-	}
-#pragma endregion
+	std::vector<typeComp*> GetComponent();
 
 public:
 	char m_name[NAME_MAX_LEN];
@@ -109,7 +93,33 @@ private:
 	AABB m_originalAABB;
 
 	Transform* m_transform = nullptr;
-
 };
 
+template <typename typeComp>
+std::vector<typeComp*> GameObject::GetComponent()
+{
+	std::vector<typeComp*> ret;
+	for (Component* component : m_components)
+	{
+		typeComp* toReturn = dynamic_cast<typeComp*>(component);
+		if (toReturn != nullptr)
+		{
+			ret.push_back(toReturn);
+		}
+	}
+	return ret;
+}
+
+template <typename typeComp>
+bool GameObject::HasComponent()
+{
+	for (Component* component : m_components)
+	{
+		if (dynamic_cast<typeComp*>(component) != nullptr)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 #endif

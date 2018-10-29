@@ -133,11 +133,10 @@ UpdateStatus ModuleResourceManager::PostUpdate()
 void ModuleResourceManager::CleanUp()
 {
 	SaveMetaData();
-	std::for_each(m_resources.begin(), m_resources.end(),
-		[](std::pair<uint64_t, Resource*> resource)
+	for(auto resource : m_resources)
 	{
 		RELEASE(resource.second);
-	});
+	};
 	m_resources.clear();
 	m_uidLib.clear();
 }
