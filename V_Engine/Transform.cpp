@@ -197,11 +197,10 @@ void Transform::SetLocalPos(float x, float y, float z)
 
 		if (object->HasComponent<Camera>())
 		{
-			std::vector<Camera*> cams = object->GetComponent<Camera>();
-			std::vector<Camera*>::iterator it = cams.begin();
-			while (it != cams.end())
+			std::vector<Camera*> cams = object->GetComponents<Camera>();
+			for (auto it : cams)
 			{
-				(*it)->UpdatePos();
+				it->UpdatePos();
 				it++;
 			}
 		}

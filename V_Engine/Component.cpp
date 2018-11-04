@@ -76,7 +76,7 @@ void Component::DrawOnEditor()
 		else
 		{
 			ImGui::Text("Something went terribly wrong.");
-			ImGui::Text("¡This component is missing its resource!");			
+			ImGui::Text("¡This component is missing its resource!");
 		}
 	}
 }

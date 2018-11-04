@@ -495,7 +495,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		//One object may have more than a single mesh, so we'll check them one by one
 		if (check->second->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = check->second->GetComponent<Mesh>();
+			std::vector<Mesh*> meshes = check->second->GetComponents<Mesh>();
 			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
 				LineSegment transformedRay = ray;
@@ -557,7 +557,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 
 	if (getFrom->object->HasComponent<Material>())
 	{
-		Material* mat = getFrom->object->GetComponent<Material>().front();
+		Material* mat = getFrom->object->GetComponent<Material>();
 		if (mat->toDelete == false)
 		{
 			ret.m_meshColor = mat->GetColor();
@@ -597,7 +597,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 				if (comp->second->object->HasComponent<Billboard>())
 				{
 					Transform* camTransform = port.m_camera->object->GetTransform();
-					comp->second->object->GetComponent<Billboard>().front()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+					comp->second->object->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 				}
 			}
 		}
@@ -653,7 +653,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	{
 		if (go->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = go->GetComponent<Mesh>();
+			std::vector<Mesh*> meshes = go->GetComponents<Mesh>();
 			if (meshes.empty() == false)
 			{
 				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)

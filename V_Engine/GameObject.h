@@ -61,11 +61,13 @@ public:
 
 	void Save(pugi::xml_node& node);
 
-	//For system use, do not call
 	void RemoveComponent(Component* comp);
 
 	template <typename typeComp>
-	std::vector<typeComp*> GetComponent();
+	std::vector<typeComp*> GetComponents();
+
+	template <typename typeComp>
+	typeComp* GetComponent();
 
 public:
 	char m_name[NAME_MAX_LEN];
@@ -96,7 +98,7 @@ private:
 };
 
 template <typename typeComp>
-std::vector<typeComp*> GameObject::GetComponent()
+std::vector<typeComp*> GameObject::GetComponents()
 {
 	std::vector<typeComp*> ret;
 	for (Component* component : m_components)
@@ -108,6 +110,20 @@ std::vector<typeComp*> GameObject::GetComponent()
 		}
 	}
 	return ret;
+}
+
+template <typename typeComp>
+typeComp* GameObject::GetComponent()
+{
+	for (Component* component : m_components)
+	{
+		typeComp* toReturn = dynamic_cast<typeComp*>(component);
+		if (toReturn != nullptr)
+		{
+			return toReturn;
+		}
+	}
+	return nullptr;
 }
 
 template <typename typeComp>

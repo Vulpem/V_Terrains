@@ -23,7 +23,7 @@ void ModuleCamera3D::Start()
 	m_camSprintMultiplier = 10.f;
 
 	m_defaultCameraGO = App->m_goManager->CreateCamera("DefaultEditorCamera");
-	m_defaultCamera = m_defaultCameraGO->GetComponent<Camera>().front();
+	m_defaultCamera = m_defaultCameraGO->GetComponent<Camera>();
 	m_defaultCamera->SetFarPlane(50000.0);
 	m_defaultCameraGO->HideFromOutliner();
 
@@ -31,9 +31,9 @@ void ModuleCamera3D::Start()
 	m_topView->GetTransform()->SetLocalPos(0, 1000, 0);
 	m_topView->GetTransform()->SetLocalRot(90, 0, 0);
 	m_topView->GetTransform()->allowRotation = false;
-	m_topView->GetComponent<Camera>().front()->SetFarPlane(50000.000);
-	m_topView->GetComponent<Camera>().front()->SwitchViewType();
-    m_topView->GetComponent<Camera>().front()->SetHorizontalFOV(50000);
+	m_topView->GetComponent<Camera>()->SetFarPlane(50000.000);
+	m_topView->GetComponent<Camera>()->SwitchViewType();
+    m_topView->GetComponent<Camera>()->SetHorizontalFOV(50000);
 	m_topView->HideFromOutliner();
 }
 
@@ -102,17 +102,17 @@ Camera * ModuleCamera3D::GetDefaultCam()
 
 Camera * ModuleCamera3D::GetTopCam()
 {
-	return m_topView->GetComponent<Camera>().front();
+	return m_topView->GetComponent<Camera>();
 }
 
 Camera * ModuleCamera3D::GetRightCam()
 {
-	return m_rightView->GetComponent<Camera>().front();
+	return m_rightView->GetComponent<Camera>();
 }
 
 Camera * ModuleCamera3D::GetFrontCam()
 {
-	return m_frontView->GetComponent<Camera>().front();
+	return m_frontView->GetComponent<Camera>();
 }
 
 void ModuleCamera3D::SetCameraToDefault(Camera* toSet)
@@ -141,7 +141,7 @@ void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
 	{
 		toSet->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
 		toSet->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
-		if (toSet->GetFrustum()->type != setTo->GetComponent<Camera>().front()->GetFrustum()->type)
+		if (toSet->GetFrustum()->type != setTo->GetComponent<Camera>()->GetFrustum()->type)
 		{
 			toSet->SwitchViewType();
 		}
