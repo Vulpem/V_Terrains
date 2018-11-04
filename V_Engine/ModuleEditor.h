@@ -35,6 +35,9 @@ public:
     void SwitchViewPorts();
 	void UnselectGameObject(GameObject* go);
 
+	void Log(const char* input);
+	void ClearConsole();
+
 public:
 	bool m_multipleViewports = false;
 
@@ -45,17 +48,19 @@ public:
     std::string m_shaderResult;
 
 private:
-	void MenuBar();
+	UpdateStatus MenuBar();
 	void Editor();
+	void PlayButtons();
 	void ViewPortUI(const ViewPort & port) const;
+	void Console();
 	void AttributeWindow();
 	void Outliner();
+	bool SaveLoadPopups();
 
 	void SceneTreeGameObject(GameObject* node);
 
 	void SelectByViewPort();
 	void SelectGameObject(GameObject* node);
-
 private:
 	int m_screenW = 0;
 	int m_screenH = 0;
