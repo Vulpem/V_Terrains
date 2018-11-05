@@ -632,7 +632,14 @@ void ModuleEditor::AttributeWindow()
 	ImGui::End();
 }
 
-
+void ModuleEditor::UnselectGameObject(GameObject * go)
+{
+	if (m_selectedGameObject == go)
+	{
+		go->Unselect();
+		m_selectedGameObject = nullptr;
+	}
+}
 
 
 void ModuleEditor::SwitchViewPorts()
