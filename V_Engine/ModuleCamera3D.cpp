@@ -35,6 +35,22 @@ void ModuleCamera3D::Start()
 	m_topView->GetComponent<Camera>()->SwitchViewType();
     m_topView->GetComponent<Camera>()->SetHorizontalFOV(50000);
 	m_topView->HideFromOutliner();
+
+	m_frontView = App->m_goManager->CreateCamera("FrontView");
+	m_frontView->GetTransform()->SetLocalPos(0, 0, -1000);
+	m_frontView->GetTransform()->SetLocalRot(0, 0, 0);
+	m_frontView->GetTransform()->allowRotation = false;
+	m_frontView->GetComponent<Camera>()->SetFarPlane(2000);
+	m_frontView->GetComponent<Camera>()->SwitchViewType();
+	m_frontView->HideFromOutliner();
+
+	m_rightView = App->m_goManager->CreateCamera("RightView");
+	m_rightView->GetTransform()->SetLocalPos(-1000, 0, 0);
+	m_rightView->GetTransform()->SetLocalRot(0, 90, 0);
+	m_rightView->GetTransform()->allowRotation = false;
+	m_rightView->GetComponent<Camera>()->SetFarPlane(2000);
+	m_rightView->GetComponent<Camera>()->SwitchViewType();
+	m_rightView->HideFromOutliner();
 }
 
 

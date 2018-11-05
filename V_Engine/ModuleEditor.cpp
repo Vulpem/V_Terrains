@@ -128,6 +128,15 @@ void ModuleEditor::CleanUp()
 	ImGui_ImplSdlGL3_Shutdown();
 }
 
+void ModuleEditor::OnPlay()
+{
+	SwitchViewPorts();
+}
+
+void ModuleEditor::OnStop()
+{
+	SwitchViewPorts();
+}
 
 // ---- Each ViewPort UI -------------------------------------------------------------------
 void ModuleEditor::Render(const ViewPort & port) const
