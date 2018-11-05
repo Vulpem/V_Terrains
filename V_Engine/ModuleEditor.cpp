@@ -40,7 +40,7 @@ bool ModuleEditor::Init()
 
 void ModuleEditor::Start()
 {
-	ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
+	//ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
 	//Initializing the strings used to test the editor
 	strcpy(m_toImport, "");
@@ -576,9 +576,7 @@ void ModuleEditor::Console()
 
 	ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f, flags);
 
-	ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
-	//TODO
-	//ImGui::PushStyleColor(0, col);
+	ImGui::PushStyleColor(ImGuiCol(0), ImVec4(0.6f, 0.6f, 1.0f, 1.0f));
 
 	ImGui::TextUnformatted(m_buffer.begin());
 	ImGui::PopStyleColor();
