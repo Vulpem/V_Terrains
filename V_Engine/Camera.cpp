@@ -16,15 +16,15 @@
 Camera::Camera(GameObject* linkedTo):Component(linkedTo, ComponentType::camera)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Camera##%i", uid);
-	name = tmp;
+	sprintf(tmp, "Camera##%i", m_uid);
+	m_name = tmp;
 
 	positionOffset = float3::zero;
-	if (object)
+	if (m_gameObject)
 	{
-		if (object->m_aabb.IsFinite())
+		if (m_gameObject->m_aabb.IsFinite())
 		{
-			positionOffset = object->m_aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+			positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 		}
 	}
 	frustum.nearPlaneDistance = 4;
@@ -53,12 +53,12 @@ void Camera::PreUpdate()
 
 float3 Camera::GetPosition()
 {
-    return object->GetTransform()->GetGlobalPos();
+    return m_gameObject->GetTransform()->GetGlobalPos();
 }
 
 void Camera::Draw(const ViewPort & port)
 {
-	if (object->HiddenFromOutliner() == false)
+	if (m_gameObject->HiddenFromOutliner() == false)
 	{
 		DrawFrustum();
 	}
@@ -66,9 +66,9 @@ void Camera::Draw(const ViewPort & port)
 
 void Camera::UpdateCamMatrix()
 {
-	if (object->m_aabb.IsFinite())
+	if (m_gameObject->m_aabb.IsFinite())
 	{
-		positionOffset = object->m_aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+		positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 	}
 	UpdateOrientation();
 	UpdatePos();
@@ -76,16 +76,16 @@ void Camera::UpdateCamMatrix()
 
 void Camera::UpdatePos()
 {
-	frustum.pos = object->GetTransform()->GetGlobalPos() + positionOffset;
+	frustum.pos = m_gameObject->GetTransform()->GetGlobalPos() + positionOffset;
 }
 
 void Camera::UpdateOrientation()
 {
-	float3 rotation = object->GetTransform()->GetGlobalRot();
+	float3 rotation = m_gameObject->GetTransform()->GetGlobalRot();
 	rotation *= DEGTORAD;
 	float4x4 toSend = float4x4::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
 	frustum.SetWorldMatrix(toSend.Float3x4Part());
-	frustum.front = object->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
+	frustum.front = m_gameObject->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
 }
 
 FrustumCollision Camera::Collides(AABB boundingBox)
@@ -244,7 +244,7 @@ void Camera::LoadSpecifics(pugi::xml_node & myNode)
 
 void Camera::DrawFrustum()
 {
-	if (object->m_selected)
+	if (m_gameObject->m_selected)
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);

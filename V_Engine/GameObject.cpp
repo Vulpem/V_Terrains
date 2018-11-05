@@ -472,7 +472,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 		}
 		else
 		{
-			LOG("Error loading a component from %s", toAdd->name.data());
+			LOG("Error loading a component from %s", toAdd->m_name.data());
 			RELEASE(toAdd);
 		}
 	}

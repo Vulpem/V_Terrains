@@ -688,7 +688,7 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			if (ImGui::BeginMenu("Current Camera"))
 			{
 				ImGui::Text("Name:");
-				ImGui::Text(port.m_camera->object->m_name);
+				ImGui::Text(port.m_camera->GetOwner()->m_name);
 				ImGui::Separator();
 				ImGui::NewLine();
 				if (ImGui::MenuItem("Switch view type"))
@@ -702,7 +702,7 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
 			{
 				Camera* cam = (Camera*)&*comp->second;
-				if (ImGui::MenuItem(cam->object->m_name))
+				if (ImGui::MenuItem(cam->GetOwner()->m_name))
 				{
 					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
 					int a = 0;

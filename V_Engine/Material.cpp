@@ -10,8 +10,8 @@
 Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(res, linkedTo, ComponentType::material)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Material##%i", uid);
-	name = tmp;
+	sprintf(tmp, "Material##%i", m_uid);
+	m_name = tmp;
 }
 
 void Material::PreUpdate()

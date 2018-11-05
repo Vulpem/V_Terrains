@@ -14,18 +14,18 @@
 Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, ComponentType::mesh)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Mesh##%i", uid);
-	name = tmp;
+	sprintf(tmp, "Mesh##%i", m_uid);
+	m_name = tmp;
 
-	texMaterialIndex = object->AmountOfComponent(ComponentType::mesh);
+	texMaterialIndex = m_gameObject->AmountOfComponent(ComponentType::mesh);
 }
 
 Mesh_RenderInfo Mesh::GetMeshInfo()
 {
 	Mesh_RenderInfo ret;
-	if (object->IsActive())
+	if (m_gameObject->IsActive())
 	{
-		if (wires == true || object->m_selected)
+		if (wires == true || m_gameObject->m_selected)
 		{
 			ret.m_drawWired = true;
 			if (wires == true)
@@ -33,9 +33,9 @@ Mesh_RenderInfo Mesh::GetMeshInfo()
 				ret.m_drawDoubleSidedFaces = true;
 				ret.m_wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
 			}
-			if (object->m_selected)
+			if (m_gameObject->m_selected)
 			{
-				if (object->m_parent && object->m_parent->m_selected)
+				if (m_gameObject->m_parent && m_gameObject->m_parent->m_selected)
 				{
 					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}
@@ -50,7 +50,7 @@ Mesh_RenderInfo Mesh::GetMeshInfo()
 			ret.m_drawFilled = true;
 		}
 
-		ret.m_drawNormals = object->m_drawNormals;
+		ret.m_drawNormals = m_gameObject->m_drawNormals;
 
 		const R_Mesh* res = ReadRes<R_Mesh>();
 
@@ -104,7 +104,7 @@ void Mesh::EditorContent()
 {
 	const R_Mesh* res = ReadRes<R_Mesh>();
 	char tmp[48];
-	sprintf(tmp, "Wireframe##%llu", uid);
+	sprintf(tmp, "Wireframe##%llu", m_uid);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
 	ImGui::Text("Resource: %s", res->m_name.data());
@@ -126,7 +126,7 @@ void Mesh::EditorContent()
 	}
 	ImGui::Separator();
 	ImGui::Text("Texture index material:");
-	sprintf(tmp, "##MaterialID%llu", uid);
+	sprintf(tmp, "##MaterialID%llu", m_uid);
 	ImGui::InputInt(tmp, &texMaterialIndex);
 }
 
@@ -145,5 +145,5 @@ void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 
 	wires = myNode.attribute("Wired").as_bool();
 	texMaterialIndex = myNode.attribute("TextureIndex").as_int();
-	object->SetOriginalAABB();
+	m_gameObject->SetOriginalAABB();
 }

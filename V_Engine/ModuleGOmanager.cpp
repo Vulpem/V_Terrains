@@ -54,7 +54,7 @@ UpdateStatus ModuleGoManager::PreUpdate()
 		{
 			comp = nextIt;
 		}
-		else if (comp->second->object->IsActive())
+		else if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->PreUpdate();
 		}
@@ -77,7 +77,7 @@ UpdateStatus ModuleGoManager::Update()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->IsActive())
+		if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->Update();
 		}
@@ -130,7 +130,7 @@ UpdateStatus ModuleGoManager::PostUpdate()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->IsActive())
+		if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->PostUpdate();
 		}
@@ -298,7 +298,7 @@ void ModuleGoManager::SaveSceneNow()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->HiddenFromOutliner() == false)
+		if (comp->second->GetOwner()->HiddenFromOutliner() == false)
 		{
 			comp->second->Save(Components_node.append_child("Component"));
 		}
@@ -553,12 +553,12 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
-	ret.m_transform = getFrom->object->GetTransform()->GetGlobalTransform();
+	ret.m_transform = getFrom->GetOwner()->GetTransform()->GetGlobalTransform();
 
-	if (getFrom->object->HasComponent<Material>())
+	if (getFrom->GetOwner()->HasComponent<Material>())
 	{
-		Material* mat = getFrom->object->GetComponent<Material>();
-		if (mat->toDelete == false)
+		Material* mat = getFrom->GetOwner()->GetComponent<Material>();
+		if (mat->MarkedForDeletion() == false)
 		{
 			ret.m_meshColor = mat->GetColor();
 			ret.m_textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
@@ -591,13 +591,13 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 		std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 		for (; comp != components.end(); comp++)
 		{
-			if (comp->second->object->IsActive())
+			if (comp->second->GetOwner()->IsActive())
 			{
 				comp->second->Draw(port);
-				if (comp->second->object->HasComponent<Billboard>())
+				if (comp->second->GetOwner()->HasComponent<Billboard>())
 				{
-					Transform* camTransform = port.m_camera->object->GetTransform();
-					comp->second->object->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+					Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
+					comp->second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 				}
 			}
 		}
@@ -658,7 +658,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 			{
 				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 				{
-					if ((*mesh)->IsEnabled() && (*mesh)->toDelete == false)
+					if ((*mesh)->IsEnabled() && (*mesh)->MarkedForDeletion() == false)
 					{
 						TIMER_START("Mesh slowest");
 						Mesh_RenderInfo info = GetMeshData(*mesh);

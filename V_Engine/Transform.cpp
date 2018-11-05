@@ -11,8 +11,8 @@
 Transform::Transform(GameObject* linkedTo):Component(linkedTo, ComponentType::transform)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Transform##%i", uid);
-	name = tmp;
+	sprintf(tmp, "Transform##%i", m_uid);
+	m_name = tmp;
 
 	localPosition.Set(0, 0, 0);
 	localScale.Set(1, 1, 1);
@@ -71,16 +71,16 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 void Transform::Draw(const ViewPort & port)
 {
-	if (!object->HasComponent<Mesh>())
+	if (!m_gameObject->HasComponent<Mesh>())
 	{
-		object->DrawLocator();
+		m_gameObject->DrawLocator();
 	}
 	//Drawing AABB independantly of object transform
 	//REMOVED
 	if (port.m_renderBoundingBoxes)
 	{
-		object->DrawAABB();
-		object->DrawOBB();
+		m_gameObject->DrawAABB();
+		m_gameObject->DrawOBB();
 	}
 }
 
@@ -162,9 +162,9 @@ math::float4x4 Transform::GetLocalTransformMatrix()
 
 void Transform::UpdateGlobalTransform()
 {
-	if (object->m_parent != nullptr && object->m_parent->HasComponent<Transform>() == true)
+	if (m_gameObject->m_parent != nullptr && m_gameObject->m_parent->HasComponent<Transform>() == true)
 	{
-		Transform* m_parent = object->m_parent->GetTransform();
+		Transform* m_parent = m_gameObject->m_parent->GetTransform();
 		
 		globalTransform = GetLocalTransformMatrix() * m_parent->GetGlobalTransform();
 	}
@@ -187,17 +187,17 @@ void Transform::UpdateEditorValues()
 
 void Transform::SetLocalPos(float x, float y, float z)
 {
-	if (object->IsStatic() == false)
+	if (m_gameObject->IsStatic() == false)
 	{
 		localPosition.x = x;
 		localPosition.y = y;
 		localPosition.z = z;
 
-		object->UpdateTransformMatrix();
+		m_gameObject->UpdateTransformMatrix();
 
-		if (object->HasComponent<Camera>())
+		if (m_gameObject->HasComponent<Camera>())
 		{
-			std::vector<Camera*> cams = object->GetComponents<Camera>();
+			std::vector<Camera*> cams = m_gameObject->GetComponents<Camera>();
 			for (auto it : cams)
 			{
 				it->UpdatePos();
@@ -219,13 +219,13 @@ math::float3 Transform::GetLocalPos()
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	if (object->IsStatic() == false)
+	if (m_gameObject->IsStatic() == false)
 	{
-		if (object->m_parent != nullptr && object->m_parent->HasComponent<Transform>() == true)
+		if (m_gameObject->m_parent != nullptr && m_gameObject->m_parent->HasComponent<Transform>() == true)
 		{
 			//TODO
 			//Needs cleaning
-			Transform* parentTrans = object->m_parent->GetTransform();
+			Transform* parentTrans = m_gameObject->m_parent->GetTransform();
 
 			float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
 			float4x4 parentGlobal = parentTrans->GetGlobalTransform();
@@ -265,7 +265,7 @@ void Transform::Translate(float3 m)
 
 void Transform::SetLocalRot(float x, float y, float z)
 {
-	if (object->IsStatic() == false && allowRotation)
+	if (m_gameObject->IsStatic() == false && allowRotation)
 	{
 		while (x < 0) { x += 360; }
 		while (y < 0) { y += 360; }
@@ -277,7 +277,7 @@ void Transform::SetLocalRot(float x, float y, float z)
 
 		localRotation = math::Quat::FromEulerXYZ(x, y, z);
 
-		object->UpdateTransformMatrix();
+		m_gameObject->UpdateTransformMatrix();
 		UpdateEditorValues();
 	}
 }
@@ -289,11 +289,11 @@ void Transform::SetLocalRot(float3 rot)
 
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	if (object->IsStatic() == false && allowRotation)
+	if (m_gameObject->IsStatic() == false && allowRotation)
 	{
 		localRotation.Set(x, y, z, w);
 
-		object->UpdateTransformMatrix();
+		m_gameObject->UpdateTransformMatrix();
 	}
 }
 
@@ -314,9 +314,9 @@ Quat Transform::GetLocalRotQuat()
 
 void Transform::SetGlobalRot(float x, float y, float z)
 {
-	if (object->IsStatic() == false && allowRotation)
+	if (m_gameObject->IsStatic() == false && allowRotation)
 	{
-		if (object->m_parent != nullptr && object->m_parent->HasComponent<Transform>() == true)
+		if (m_gameObject->m_parent != nullptr && m_gameObject->m_parent->HasComponent<Transform>() == true)
 		{
 			x *= DEGTORAD;
 			y *= DEGTORAD;
@@ -324,7 +324,7 @@ void Transform::SetGlobalRot(float x, float y, float z)
 
 			//Quat::from
 
-			Transform* parentTrans = object->m_parent->GetTransform();
+			Transform* parentTrans = m_gameObject->m_parent->GetTransform();
 			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans->GetGlobalRotQuat().Conjugated();
 			SetLocalRot(local.x, local.y, local.z, local.w);
 		}
@@ -345,7 +345,7 @@ void Transform::RotateLocal(float3 rotation)
 	if(rotation.x != 0.f || rotation.y != 0.f || rotation.z != 0.f)
 	{
 		localRotation = localRotation * Quat::FromEulerXYZ(rotation.x * DEGTORAD, rotation.y* DEGTORAD, rotation.z* DEGTORAD);
-		object->UpdateTransformMatrix();
+		m_gameObject->UpdateTransformMatrix();
 		UpdateEditorValues();
 	}
 }
@@ -370,13 +370,13 @@ math::float3 Transform::GetGlobalRot()
 
 void Transform::SetLocalScale(float x, float y, float z)
 {
-	if (object->IsStatic() == false)
+	if (m_gameObject->IsStatic() == false)
 	{
 		if (x != 0 && y != 0 && z != 0)
 		{
 			localScale.Set(x, y, z);
 
-			object->UpdateTransformMatrix();
+			m_gameObject->UpdateTransformMatrix();
 		}
 	}
 }
@@ -393,7 +393,7 @@ math::float3 Transform::GetGlobalScale()
 
 void Transform::LookAt(const float3 & Spot, float3 worldUp)
 {
-	if (object->IsStatic() == false)
+	if (m_gameObject->IsStatic() == false)
 	{
 		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0,0,1), float3(0,1,0), worldUp);
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
