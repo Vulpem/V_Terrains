@@ -31,12 +31,11 @@ ModuleEditor::~ModuleEditor()
 // Called before render is available
 bool ModuleEditor::Init()
 {
-	bool ret = true;
 	LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
 	//Linking ImGUI and the m_window
 	ImGui_ImplSdlGL3_Init(App->m_window->GetWindow());
 
-	return ret;
+	return true;
 }
 
 void ModuleEditor::Start()
@@ -50,11 +49,11 @@ void ModuleEditor::Start()
 
 	App->m_renderer3D->FindViewPort(0)->m_active = false;
 
-	m_singleViewport = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
-	m_multipleViewports[0] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
-	m_multipleViewports[1] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetTopCam());
-	m_multipleViewports[2] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetRightCam());
-	m_multipleViewports[3] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetFrontCam());
+	m_singleViewportID = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
+	m_multipleViewportsIDs[0] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetDefaultCam());
+	m_multipleViewportsIDs[1] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetTopCam());
+	m_multipleViewportsIDs[2] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetRightCam());
+	m_multipleViewportsIDs[3] = App->m_renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->m_camera->GetFrontCam());
 
 	OnScreenResize(App->m_window->GetWindowSize().x, App->m_window->GetWindowSize().y);
 	SwitchViewPorts();
@@ -65,35 +64,31 @@ void ModuleEditor::Start()
 // Called every draw update
 UpdateStatus ModuleEditor::PreUpdate()
 {
-	UpdateStatus ret = UpdateStatus::Continue;
-
 	ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
 	ImGuiIO IO = ImGui::GetIO();
-	App->m_input->ignoreMouse = IO.WantCaptureMouse;
+	App->m_input->m_ignoreMouse = IO.WantCaptureMouse;
 
 	if (IO.WantCaptureKeyboard || IO.WantTextInput)
 	{
-		App->m_input->ignoreKeyboard = true;
+		App->m_input->m_ignoreKeyboard = true;
 	}
 	else
 	{
-		App->m_input->ignoreKeyboard = false;
+		App->m_input->m_ignoreKeyboard = false;
 	}
 
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleEditor::Update()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
-
 	if (App->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->m_input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 		ViewPort* port = App->m_renderer3D->HoveringViewPort();
 		if (port != nullptr)
 		{
-			App->m_camera->SetMovingCamera(port->camera);
+			App->m_camera->SetMovingCamera(port->m_camera);
 		}
 	}
 
@@ -101,23 +96,21 @@ UpdateStatus ModuleEditor::Update()
 
 	if (App->m_input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
-		m_multipleViews = !m_multipleViews;
+		m_displayMultipleViews = !m_displayMultipleViews;
 		SwitchViewPorts();
 	}
 
-	return ret;
+	return UpdateStatus::Continue;
 }
 
 UpdateStatus ModuleEditor::PostUpdate()
 {
-	UpdateStatus ret = UPDATE_CONTINUE;
-
 	if (m_isTestWindowOpen)
 	{
-		ImGui::ShowTestWindow(&m_isTestWindowOpen);
+		ImGui::ShowTestWindow();
 	}
 
-	ret = MenuBar();
+	UpdateStatus ret = MenuBar();
 	Editor();
 	Console();
 	PlayButtons();
@@ -132,30 +125,27 @@ UpdateStatus ModuleEditor::PostUpdate()
 void ModuleEditor::CleanUp()
 {
 	ClearConsole();
-
 	ImGui_ImplSdlGL3_Shutdown();
-
-	return true;
 }
 
 
 // ---- Each ViewPort UI -------------------------------------------------------------------
 void ModuleEditor::Render(const ViewPort & port) const
 {
-	if (port.withUI)
+	if (port.m_withUI)
 	{
 		//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
 		ViewPortUI(port);
 
-		App->m_renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
+		App->m_renderer3D->DrawLine(m_selectionRay.a, m_selectionRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
+		
+		App->m_renderer3D->DrawLocator(m_selectedRayPos, float4(0.75f, 0.75f, 0.75f, 1));
+		App->m_renderer3D->DrawLine(m_selectedRayPos, m_selectedRayPos + m_selectRayNormal * 2, float4(1, 1, 0, 1));
 
-		App->m_renderer3D->DrawLocator(m_out_pos, float4(0.75f, 0.75f, 0.75f, 1));
-		App->m_renderer3D->DrawLine(m_out_pos, m_out_pos + m_out_normal * 2, float4(1, 1, 0, 1));
-
-		if (m_showPlane)
+		if (m_show0Plane)
 		{
 			P_Plane p(0, 0, 0, 1);
-			p.axis = true;
+			p.m_axis = true;
 			p.Render();
 		}
 	}
@@ -165,37 +155,37 @@ void ModuleEditor::Render(const ViewPort & port) const
 
 void ModuleEditor::OnScreenResize(int width, int heigth)
 {
-	screenW = width;
-	screenH = heigth;
-	viewPortMax.x = screenW - 330;
-	viewPortMax.y = screenH - 200;
-	viewPortMin.x = 300;
-	viewPortMin.y = 20;
+	m_screenW = width;
+	m_screenH = heigth;
+	m_viewPortMax.x = m_screenW - 330;
+	m_viewPortMax.y = m_screenH - 200;
+	m_viewPortMin.x = 300;
+	m_viewPortMin.y = 20;
 
 	//Setting the single ViewPort data
-	ViewPort* port = App->m_renderer3D->FindViewPort(m_singleViewport);
-	port->m_pos = viewPortMin;
-	port->m_size.x = viewPortMax.x - viewPortMin.x;
-	port->m_size.y = viewPortMax.y - viewPortMin.y;
+	ViewPort* port = App->m_renderer3D->FindViewPort(m_singleViewportID);
+	port->m_pos = m_viewPortMin;
+	port->m_size.x = m_viewPortMax.x - m_viewPortMin.x;
+	port->m_size.y = m_viewPortMax.y - m_viewPortMin.y;
 
 	//Setting the multiple ViewPort data
-	float2 m_size((viewPortMax.x - viewPortMin.x) / 2, (viewPortMax.y - viewPortMin.y) / 2);
-	port = App->m_renderer3D->FindViewPort(m_multipleViewports[0]);
-	port->m_pos = viewPortMin;
+	float2 m_size((m_viewPortMax.x - m_viewPortMin.x) / 2, (m_viewPortMax.y - m_viewPortMin.y) / 2);
+	port = App->m_renderer3D->FindViewPort(m_multipleViewportsIDs[0]);
+	port->m_pos = m_viewPortMin;
 	port->m_size = m_size;
 
-	port = App->m_renderer3D->FindViewPort(m_multipleViewports[1]);
-	port->m_pos = viewPortMin;
+	port = App->m_renderer3D->FindViewPort(m_multipleViewportsIDs[1]);
+	port->m_pos = m_viewPortMin;
 	port->m_pos.x += m_size.x;
 	port->m_size = m_size;
 
-	port = App->m_renderer3D->FindViewPort(m_multipleViewports[2]);
-	port->m_pos = viewPortMin;
+	port = App->m_renderer3D->FindViewPort(m_multipleViewportsIDs[2]);
+	port->m_pos = m_viewPortMin;
 	port->m_pos.y += m_size.y;
 	port->m_size = m_size;
 
-	port = App->m_renderer3D->FindViewPort(m_multipleViewports[3]);
-	port->m_pos = viewPortMin;
+	port = App->m_renderer3D->FindViewPort(m_multipleViewportsIDs[3]);
+	port->m_pos = m_viewPortMin;
 	port->m_pos.x += m_size.x;
 	port->m_pos.y += m_size.y;
 	port->m_size = m_size;
@@ -208,7 +198,7 @@ void ModuleEditor::HandleInput(SDL_Event* event)
 
 void ModuleEditor::Log(const char* m_input)
 {
-	m_buffer.append(m_input);
+	m_buffer.appendf(m_input);
 	m_scrollToBottom = true;
 }
 
@@ -279,15 +269,15 @@ UpdateStatus ModuleEditor::MenuBar()
 		{
 			if (ImGui::MenuItem("New Scene##NewMenuBar"))
 			{
-				m_wantNew = true;
+				m_wantNewScene = true;
 			}
 			if (ImGui::MenuItem("Save Scene##SaveMenuBar"))
 			{
-				m_wantToSave = true;
+				m_wantToSaveScene = true;
 			}
 			if (ImGui::MenuItem("Load Scene##LoadMenuBar"))
 			{
-				m_wantToLoad = true;
+				m_wantToLoadScene = true;
 			}
 			if (ImGui::MenuItem("ClearConsole"))
 			{
@@ -305,7 +295,7 @@ UpdateStatus ModuleEditor::MenuBar()
 			if (App->m_resourceManager->m_autoRefresh)
 			{
 				ImGui::Text("Auto Refresh delay(seconds):");
-				ImGui::DragInt("##autoRefreshDelay", &App->m_resourceManager->m_refreshDelay, 1.0f, 1, 600);
+				ImGui::DragInt("##autoRefreshDelay", &App->m_resourceManager->m_refreshInterval, 1.0f, 1, 600);
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Refresh Assets"))
@@ -327,13 +317,13 @@ UpdateStatus ModuleEditor::MenuBar()
 
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::Checkbox("Multiple Views", &m_multipleViews))
+			if (ImGui::Checkbox("Multiple Views", &m_displayMultipleViews))
 			{
 				SwitchViewPorts();
 			}
-			ImGui::Checkbox("Edit default shaders", &m_openShaderEditor);
+			//ImGui::Checkbox("Edit default shaders", &m_openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &m_isTestWindowOpen);
-			ImGui::Checkbox("InGame Plane", &m_showPlane);
+			ImGui::Checkbox("InGame Plane", &m_show0Plane);
 			ImGui::Checkbox("QuadTree", &App->m_goManager->drawQuadTree);
 			if (ImGui::Checkbox("Render Normals", &m_renderNormals))
 			{
@@ -389,11 +379,11 @@ void ModuleEditor::PlayButtons()
 
 	ImGui::Begin("PlayButtons", 0, ImVec2(500, 300), 0.8f, flags);
 
-	if (Time.PlayMode == false)
+	if (Time.PlayMode == PlayMode::Stop)
 	{
 		if (ImGui::Button("Play##PlayButton"))
 		{
-			Time.PlayMode = true;
+			Time.PlayMode = PlayMode::DebugPlay;
 			Time.GameRuntime = 0.0f;
 			App->m_goManager->SaveScene("temp");
 		}
@@ -407,7 +397,7 @@ void ModuleEditor::PlayButtons()
 		ImGui::SameLine();
 		if (ImGui::Button("Stop##StopButton"))
 		{
-			Time.PlayMode = false;
+			Time.PlayMode = PlayMode::Stop;
 			Time.Pause = false;
 			Time.gdt = 0.0f;
 			App->m_goManager->LoadScene("temp");
@@ -418,8 +408,8 @@ void ModuleEditor::PlayButtons()
 
 void ModuleEditor::Editor()
 {
-	ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20) / 2));
-	ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 2));
+	ImGui::SetNextWindowPos(ImVec2(m_screenW - 330, 20 + (m_screenH - 20) / 2));
+	ImGui::SetNextWindowSize(ImVec2(330, (m_screenH - 20) / 2));
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -430,14 +420,14 @@ void ModuleEditor::Editor()
 		ImGui::Text("Time since startup: %f", Time.AppRuntime);
 		ImGui::Text("Game Time: %f", Time.GameRuntime);
 
-		ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+		ImGui::InputInt("Max Framerate:", &App->m_maxFps, 15);
 		char tmp[256];
-		sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
-		ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+		sprintf(tmp, "Framerate: %i", int(App->m_framerate[EDITOR_FRAME_SAMPLES - 1]));
+		ImGui::PlotHistogram("##Framerate:", App->m_framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
 		char tmp2[256];
-		sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-		ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+		sprintf(tmp2, "Ms: %i", int(App->m_msFrame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+		ImGui::PlotHistogram("##ms", App->m_msFrame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
 	}
 
 	if (ImGui::CollapsingHeader("Input"))
@@ -450,19 +440,19 @@ void ModuleEditor::Editor()
 	{
 		ImGui::Text("Position");
 		ImGui::Text("Camera speed");
-		ImGui::DragFloat("##camSpeed", &App->m_camera->camSpeed, 0.1f);
+		ImGui::DragFloat("##camSpeed", &App->m_camera->m_camSpeed, 0.1f);
 		ImGui::Text("Sprint speed multiplier");
-		ImGui::DragFloat("##camsprint", &App->m_camera->camSprintMultiplier, 0.1f);
+		ImGui::DragFloat("##camsprint", &App->m_camera->m_camSprintMultiplier, 0.1f);
 
 	}
 
 	if (ImGui::CollapsingHeader("Render"))
 	{
 		ImGui::Text("Global light direction");
-		ImGui::DragFloat3("##GlobalLightDirection", App->m_renderer3D->sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
+		ImGui::DragFloat3("##GlobalLightDirection", App->m_renderer3D->m_sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
 
 		ImGui::Text("Ambient light intensity");
-		ImGui::DragFloat("##GlobalLightDirection", &App->m_renderer3D->ambientLight.x, 0.1f, -1.0f, 1.0f);
+		ImGui::DragFloat("##GlobalLightDirection", &App->m_renderer3D->m_ambientLight.x, 0.1f, -1.0f, 1.0f);
 
 		if (ImGui::TreeNode("Lights"))
 		{
@@ -470,14 +460,14 @@ void ModuleEditor::Editor()
 			{
 				char lightName[46];
 				sprintf(lightName, "Light %i", nLight);
-				bool on = App->m_renderer3D->lights[nLight].on;
+				bool on = App->m_renderer3D->m_lights[nLight].m_on;
 				ImGui::Checkbox(lightName, &on);
 
-				if (on != App->m_renderer3D->lights[nLight].on)
+				if (on != App->m_renderer3D->m_lights[nLight].m_on)
 				{
-					App->m_renderer3D->lights[nLight].Active(on);
+					App->m_renderer3D->m_lights[nLight].Active(on);
 				}
-				if (App->m_renderer3D->lights[nLight].on == true)
+				if (App->m_renderer3D->m_lights[nLight].m_on == true)
 				{
 
 					sprintf(lightName, "Expand##Light_%i", nLight);
@@ -486,11 +476,11 @@ void ModuleEditor::Editor()
 					{
 						char tmp[46];
 						sprintf(tmp, "X##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->lights[nLight].position.x, 1.0f);
+						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.x, 1.0f);
 						sprintf(tmp, "Y##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->lights[nLight].position.y, 1.0f);
+						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.y, 1.0f);
 						sprintf(tmp, "Z##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->lights[nLight].position.z, 1.0f);
+						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.z, 1.0f);
 						ImGui::TreePop();
 					}
 				}
@@ -503,10 +493,10 @@ void ModuleEditor::Editor()
 	{
 		ImGui::Text("Loaded resources:");
 		const std::vector<Resource*> res = App->m_resourceManager->ReadLoadedResources();
-		if (res.m_size() > 0)
+		if (res.size() > 0)
 		{
 			std::vector<Resource*>::const_iterator it = res.begin();
-			Component::Type lastType = Component::Type::C_None;
+			ComponentType lastType = ComponentType::none;
 			char name[256];
 			for (; it != res.end(); it++)
 			{
@@ -516,28 +506,28 @@ void ModuleEditor::Editor()
 					ImGui::Separator();
 					switch (lastType)
 					{
-					case (Component::C_GO):
+					case (ComponentType::GO):
 					{
 						ImGui::Text("GameObjects:"); break;
 					}
-					case (Component::C_material):
+					case (ComponentType::material):
 					{
 						ImGui::Text("Materials:"); break;
 					}
-					case (Component::C_mesh):
+					case (ComponentType::mesh):
 					{
 						ImGui::Text("Meshes:"); break;
 					}
-					case (Component::C_Texture):
+					case (ComponentType::texture):
 					{
 						ImGui::Text("Textures:"); break;
 					}
 					}
 				}
-				sprintf(name, "%s", (*it)->name.data());
+				sprintf(name, "%s", (*it)->m_name.data());
 				if (ImGui::TreeNode(name))
 				{
-					ImGui::Text("N references: %u", (*it)->nReferences);
+					ImGui::Text("N references: %u", (*it)->m_numReferences);
 					ImGui::TreePop();
 				}
 			}
@@ -546,7 +536,7 @@ void ModuleEditor::Editor()
 
 	if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
 	{
-		std::vector<std::pair<std::string, float>> timers = App->timers->GetLastReads();
+		std::vector<std::pair<std::string, float>> timers = App->m_timers->GetLastReads();
 		if (timers.empty() == false)
 		{
 			char lastLetter = '0';
@@ -565,30 +555,21 @@ void ModuleEditor::Editor()
 			ImGui::Text("No timers initialized");
 		}
 	}
-
-	if (ImGui::CollapsingHeader("Tests"))
-	{
-		ImGui::InputText("##consoleTest", testConsoleInput, 60);
-		ImGui::SameLine();
-		if (ImGui::Button("TestConsole"))
-		{
-			LOG(testConsoleInput);
-		}
-	}
 	ImGui::End();
 }
 
 void ModuleEditor::Console()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
-	ImGui::SetNextWindowSize(ImVec2(screenW - 330.0f, 200.0f));
+	ImGui::SetNextWindowPos(ImVec2(0.0f, m_screenH - 200.0f));
+	ImGui::SetNextWindowSize(ImVec2(m_screenW - 330.0f, 200.0f));
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
 	ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f, flags);
 
 	ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
-	ImGui::PushStyleColor(0, col);
+	//TODO
+	//ImGui::PushStyleColor(0, col);
 
 	ImGui::TextUnformatted(m_buffer.begin());
 	ImGui::PopStyleColor();
@@ -604,7 +585,7 @@ void ModuleEditor::Console()
 void ModuleEditor::Outliner()
 {
 	ImGui::SetNextWindowPos(ImVec2(0.0f, 50.0f));
-	ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 250.0f));
+	ImGui::SetNextWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -622,8 +603,8 @@ void ModuleEditor::Outliner()
 
 void ModuleEditor::AttributeWindow()
 {
-	ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 2));
+	ImGui::SetNextWindowPos(ImVec2(m_screenW - 330, 20.0f));
+	ImGui::SetNextWindowSize(ImVec2(330, (m_screenH - 20) / 2));
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
@@ -632,7 +613,7 @@ void ModuleEditor::AttributeWindow()
 	{
 		m_selectedGameObject->DrawOnEditor();
 		ImGui::Separator();
-		if (m_selectedGameObject->HasComponent(Component::Type::C_transform))
+		if (m_selectedGameObject->HasComponent<Transform>())
 		{
 			if (ImGui::Button("Look at"))
 			{
@@ -656,10 +637,10 @@ void ModuleEditor::AttributeWindow()
 
 void ModuleEditor::SwitchViewPorts()
 {
-	App->m_renderer3D->FindViewPort(m_singleViewport)->m_active = !m_multipleViews;
+	App->m_renderer3D->FindViewPort(m_singleViewportID)->m_active = !m_displayMultipleViews;
 	for (int n = 0; n < 4; n++)
 	{
-		App->m_renderer3D->FindViewPort(m_multipleViewports[n])->m_active = m_multipleViews;
+		App->m_renderer3D->FindViewPort(m_multipleViewportsIDs[n])->m_active = m_displayMultipleViews;
 	}
 }
 
@@ -680,10 +661,11 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 		if (ImGui::BeginMenu(tmp))
 		{
 			ViewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
-			ImGui::Checkbox("Wired", &editPort->useOnlyWires);
-			ImGui::Checkbox("Lightning", &editPort->useLighting);
-			ImGui::Checkbox("Textured", &editPort->useMaterials);
-			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
+			ImGui::Checkbox("Wired", &editPort->m_useOnlyWires);
+			ImGui::Checkbox("Lightning", &editPort->m_useLighting);
+			//TODO
+			//ImGui::Checkbox("Textured", &editPort->m_useMaterials);
+			ImGui::Checkbox("Single sided faces", &editPort->m_useSingleSidedFaces);
 			ImGui::EndMenu();
 		}
 		sprintf(tmp, "Camera##ViewPort%i", port.m_ID);
@@ -692,23 +674,23 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			if (ImGui::BeginMenu("Current Camera"))
 			{
 				ImGui::Text("Name:");
-				ImGui::Text(port.camera->object->name);
+				ImGui::Text(port.m_camera->object->m_name);
 				ImGui::Separator();
 				ImGui::NewLine();
 				if (ImGui::MenuItem("Switch view type"))
 				{
-					App->m_renderer3D->FindViewPort(port.m_ID)->camera->SwitchViewType();
+					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera->SwitchViewType();
 				}
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
-			std::multimap<Component::Type, Component*>::iterator comp = App->m_goManager->components.find(Component::Type::C_camera);
-			for (; comp != App->m_goManager->components.end() && comp->first == Component::Type::C_camera; comp++)
+			std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->components.find(ComponentType::camera);
+			for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
 			{
 				Camera* cam = (Camera*)&*comp->second;
-				if (ImGui::MenuItem(cam->object->name))
+				if (ImGui::MenuItem(cam->object->m_name))
 				{
-					App->m_renderer3D->FindViewPort(port.m_ID)->camera = cam;
+					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
 					int a = 0;
 				}
 			}
@@ -731,8 +713,8 @@ bool ModuleEditor::SaveLoadPopups()
 		ImGui::Text("Save current scene?");
 		if (ImGui::Button("Yes##saveCurrentButton"))
 		{
-			m_wantToSave = true;
-			clearAfterSave = true;
+			m_wantToSaveScene = true;
+			m_clearAfterSave = true;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("No##NotSaveCurrentButton"))
@@ -754,12 +736,12 @@ bool ModuleEditor::SaveLoadPopups()
 	{
 		bool close = false;
 		ImGui::Text("Scene name:");
-		ImGui::InputText("##saveSceneInputText", sceneName, 256);
-		if (ImGui::Button("Save##saveButton") && sceneName[0] != '\0')
+		ImGui::InputText("##saveSceneInputText", m_sceneName, 256);
+		if (ImGui::Button("Save##saveButton") && m_sceneName[0] != '\0')
 		{
-			App->m_goManager->SaveScene(sceneName);
+			App->m_goManager->SaveScene(m_sceneName);
 			close = true;
-			if (clearAfterSave)
+			if (m_clearAfterSave)
 			{
 				App->m_goManager->ClearScene();
 			}
@@ -767,8 +749,8 @@ bool ModuleEditor::SaveLoadPopups()
 		ImGui::SameLine();
 		if (close || ImGui::Button("Cancel##cancelSaveScene"))
 		{
-			strcpy(sceneName, "");
-			clearAfterSave = false;
+			strcpy(m_sceneName, "");
+			m_clearAfterSave = false;
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
@@ -779,36 +761,36 @@ bool ModuleEditor::SaveLoadPopups()
 	{
 		m_selectedGameObject = nullptr;
 		ImGui::Text("Scene name:");
-		ImGui::InputText("##saveSceneInputText", sceneName, 256);
+		ImGui::InputText("##saveSceneInputText", m_sceneName, 256);
 		bool close = false;
-		if (ImGui::Button("Load##loadButton") && sceneName[0] != '\0')
+		if (ImGui::Button("Load##loadButton") && m_sceneName[0] != '\0')
 		{
-			App->m_goManager->LoadScene(sceneName);
+			App->m_goManager->LoadScene(m_sceneName);
 			close = true;
 		}
 		ImGui::SameLine();
 		if (close || ImGui::Button("Cancel##cancelLoadScene"))
 		{
-			strcpy(sceneName, "");
+			strcpy(m_sceneName, "");
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
 	}
 
-	if (m_wantNew)
+	if (m_wantNewScene)
 	{
 		ImGui::OpenPopup("New scene");
-		m_wantNew = false;
+		m_wantNewScene = false;
 	}
-	if (m_wantToSave)
+	if (m_wantToSaveScene)
 	{
 		ImGui::OpenPopup("Save scene");
-		m_wantToSave = false;
+		m_wantToSaveScene = false;
 	}
-	if (m_wantToLoad)
+	if (m_wantToLoadScene)
 	{
 		ImGui::OpenPopup("Load Scene");
-		m_wantToLoad = false;
+		m_wantToLoadScene = false;
 	}
 
 	return false;
@@ -827,11 +809,11 @@ void ModuleEditor::SelectByViewPort()
 			portPos.x = portPos.x / (port->m_size.x / 2) - 1;
 			portPos.y = portPos.y / (port->m_size.y / 2) - 1;
 			//Generating the LineSegment we'll check for collisions
-			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+			m_selectionRay = port->m_camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
 
 			GameObject* out_go = NULL;
-
-			if (App->m_goManager->RayCast(selectRay, &out_go, &m_out_pos, &m_out_normal, false))
+			
+			if (App->m_goManager->RayCast(m_selectionRay, &out_go, &m_selectedRayPos, &m_selectRayNormal, false))
 			{
 				SelectGameObject(out_go);
 			}

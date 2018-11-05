@@ -39,14 +39,15 @@ public:
 	void ClearConsole();
 
 public:
-	bool m_multipleViewports = false;
-
 	bool m_isTestWindowOpen = false;
 
 	bool m_show0Plane = true;
 	bool m_renderNormals = false;
     std::string m_shaderResult;
 
+	uint m_singleViewportID = 0;
+	uint m_multipleViewportsIDs[4] = { 0,0,0,0 };
+	bool m_displayMultipleViews = false;
 private:
 	UpdateStatus MenuBar();
 	void Editor();
@@ -75,6 +76,16 @@ private:
 	float m_selectedGoPos[3] = { 0,0,0 };
 	float m_selectedGoScale[3] = { 1,1,1 };
 	float m_selectedGoEuler[3] = { 0,0,0 };
+
+	bool m_wantNewScene = false;
+	bool m_wantToSaveScene = false;
+	bool m_wantToLoadScene = false;
+	bool m_clearAfterSave = false;
+
+	char m_toImport[256];
+	char m_sceneName[256];
+	ImGuiTextBuffer m_buffer;
+	bool m_scrollToBottom;
 
 	LineSegment m_selectionRay;
 	float3 m_selectRayNormal;

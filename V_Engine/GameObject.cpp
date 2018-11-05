@@ -214,7 +214,7 @@ void GameObject::DrawOnEditor()
 
 void GameObject::DrawLocator()
 {
-	if (Time.PlayMode != Play::Play)
+	if (Time.PlayMode != PlayMode::Play)
 	{
 		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
 		if (m_selected)
@@ -245,7 +245,7 @@ void GameObject::DrawLocator()
 
 void GameObject::DrawAABB()
 {
-	if (Time.PlayMode != Play::Play)
+	if (Time.PlayMode != PlayMode::Play)
 	{
 		if (m_aabb.IsFinite())
 		{
@@ -258,7 +258,7 @@ void GameObject::DrawAABB()
 
 void GameObject::DrawOBB()
 {
-	if (Time.PlayMode != Play::Play)
+	if (Time.PlayMode != PlayMode::Play)
 	{
 		if (m_obb.IsFinite())
 		{

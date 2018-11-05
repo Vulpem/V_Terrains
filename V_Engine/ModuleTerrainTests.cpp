@@ -188,7 +188,7 @@ UpdateStatus ModuleTerrain::Update()
 // PostUpdate present buffer to screen
 UpdateStatus ModuleTerrain::PostUpdate()
 {
-	if (Time.PlayMode != Play::Play)
+	if (Time.PlayMode != PlayMode::Play)
 	{
 		DrawUI();
 	}
@@ -383,13 +383,13 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 
 void ModuleTerrain::DrawUI()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
+	//ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
 
-	ImGui::SetNextWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
+	//ImGui::SetNextWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 
-	if (ImGui::Begin("TerrainTests", 0, flags))
+	if (ImGui::Begin("TerrainTests", 0/*, flags*/))
 	{
 		ImGui::Text(
 			"Use WASD to move the camera around.\n"
@@ -608,11 +608,11 @@ void ModuleTerrain::DrawUI()
 				App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
-			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_multipleViewports))
+			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_displayMultipleViews))
 			{
 				App->m_editor->SwitchViewPorts();
 			}
-			if (App->m_editor->m_multipleViewports)
+			if (App->m_editor->m_multipleViewportsIDs)
 			{
 				ImGui::Spacing();
 				ImGui::Checkbox("Auto follow top cam", &App->m_camera->m_followCamera);

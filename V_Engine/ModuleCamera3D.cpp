@@ -41,7 +41,7 @@ void ModuleCamera3D::Start()
 // -----------------------------------------------------------------
 UpdateStatus ModuleCamera3D::Update()
 {
-	if (Time.PlayMode == Play::Stop)
+	if (Time.PlayMode == PlayMode::Stop)
 	{
 		MoveWithKeys();
 		// Mouse motion ----------------
