@@ -30,6 +30,7 @@ public:
 	void DrawOBB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
+	//TODO 
 	void HideFromOutliner() { m_hiddenOnOutliner = true; }
 	bool HiddenFromOutliner() { return m_hiddenOnOutliner; }
 
@@ -73,7 +74,7 @@ public:
 	char m_name[NAME_MAX_LEN];
 	AABB m_aabb;
 	OBB m_obb;
-
+//TODO move everything that can be in a component in there, clean GameObject
 	std::vector<GameObject*> m_childs;
 	GameObject* m_parent = nullptr;
 
@@ -98,6 +99,8 @@ private:
 };
 
 template <typename typeComp>
+//TODO
+//Pass by reference vector
 std::vector<typeComp*> GameObject::GetComponents()
 {
 	std::vector<typeComp*> ret;
@@ -117,6 +120,7 @@ typeComp* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
+		//TODO look into typeID(typeComp)
 		typeComp* toReturn = dynamic_cast<typeComp*>(component);
 		if (toReturn != nullptr)
 		{
