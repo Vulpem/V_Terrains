@@ -383,14 +383,14 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 
 void ModuleTerrain::DrawUI()
 {
-	//ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
-
-	//ImGui::SetNextWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 
 	if (ImGui::Begin("TerrainTests", 0/*, flags*/))
 	{
+		ImGui::SetWindowPos(ImVec2(0.f, 20.f));
+		ImGui::SetWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
+
 		ImGui::Text(
 			"Use WASD to move the camera around.\n"
 			"Q and E to move up and down.\n"

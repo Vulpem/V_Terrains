@@ -381,262 +381,264 @@ UpdateStatus ModuleEditor::MenuBar()
 
 void ModuleEditor::PlayButtons()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(300.0f, 30.0f));
-
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
 
-	ImGui::Begin("PlayButtons", 0, ImVec2(500, 300), 0.8f, flags);
-
-	if (Time.PlayMode == PlayMode::Stop)
+	if (ImGui::Begin("PlayButtons", 0, ImVec2(500, 300), 0.8f, flags))
 	{
-		if (ImGui::Button("Play##PlayButton"))
+		ImGui::SetWindowPos(ImVec2(0.0f, 20.0f));
+		ImGui::SetWindowSize(ImVec2(300.0f, 30.0f));
+		if (Time.PlayMode == PlayMode::Stop)
 		{
-			Time.PlayMode = PlayMode::DebugPlay;
-			Time.GameRuntime = 0.0f;
-			App->m_goManager->SaveScene("temp");
-		}
-	}
-	else
-	{
-		if (ImGui::Button("Pause##PauseButton"))
-		{
-			Time.Pause = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Stop##StopButton"))
-		{
-			Time.PlayMode = PlayMode::Stop;
-			Time.Pause = false;
-			Time.gdt = 0.0f;
-			App->m_goManager->LoadScene("temp");
-		}
-	}
-	ImGui::End();
-}
-
-void ModuleEditor::Editor()
-{
-	ImGui::SetNextWindowPos(ImVec2(m_screenW - 330, 20 + (m_screenH - 20) / 2));
-	ImGui::SetNextWindowSize(ImVec2(330, (m_screenH - 20) / 2));
-
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-
-	ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f, flags);
-
-	if (ImGui::CollapsingHeader("Application"))
-	{
-		ImGui::Text("Time since startup: %f", Time.AppRuntime);
-		ImGui::Text("Game Time: %f", Time.GameRuntime);
-
-		ImGui::InputInt("Max Framerate:", &App->m_maxFps, 15);
-		char tmp[256];
-		sprintf(tmp, "Framerate: %i", int(App->m_framerate[EDITOR_FRAME_SAMPLES - 1]));
-		ImGui::PlotHistogram("##Framerate:", App->m_framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
-
-		char tmp2[256];
-		sprintf(tmp2, "Ms: %i", int(App->m_msFrame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-		ImGui::PlotHistogram("##ms", App->m_msFrame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
-	}
-
-	if (ImGui::CollapsingHeader("Input"))
-	{
-		ImGui::LabelText("label", "MouseX: %i", App->m_input->GetMouseX());
-		ImGui::LabelText("label", "MouseY: %i", App->m_input->GetMouseY());
-	}
-
-	if (ImGui::CollapsingHeader("Camera##CameraModule"))
-	{
-		ImGui::Text("Position");
-		ImGui::Text("Camera speed");
-		ImGui::DragFloat("##camSpeed", &App->m_camera->m_camSpeed, 0.1f);
-		ImGui::Text("Sprint speed multiplier");
-		ImGui::DragFloat("##camsprint", &App->m_camera->m_camSprintMultiplier, 0.1f);
-
-	}
-
-	if (ImGui::CollapsingHeader("Render"))
-	{
-		ImGui::Text("Global light direction");
-		ImGui::DragFloat3("##GlobalLightDirection", App->m_renderer3D->m_sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
-
-		ImGui::Text("Ambient light intensity");
-		ImGui::DragFloat("##GlobalLightDirection", &App->m_renderer3D->m_ambientLight.x, 0.1f, -1.0f, 1.0f);
-
-		if (ImGui::TreeNode("Lights"))
-		{
-			for (int nLight = 0; nLight < MAX_LIGHTS; nLight++)
+			if (ImGui::Button("Play##PlayButton"))
 			{
-				char lightName[46];
-				sprintf(lightName, "Light %i", nLight);
-				bool on = App->m_renderer3D->m_lights[nLight].m_on;
-				ImGui::Checkbox(lightName, &on);
-
-				if (on != App->m_renderer3D->m_lights[nLight].m_on)
-				{
-					App->m_renderer3D->m_lights[nLight].Active(on);
-				}
-				if (App->m_renderer3D->m_lights[nLight].m_on == true)
-				{
-
-					sprintf(lightName, "Expand##Light_%i", nLight);
-					ImGui::SameLine();
-					if (ImGui::TreeNode(lightName))
-					{
-						char tmp[46];
-						sprintf(tmp, "X##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.x, 1.0f);
-						sprintf(tmp, "Y##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.y, 1.0f);
-						sprintf(tmp, "Z##light_%i", nLight);
-						ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.z, 1.0f);
-						ImGui::TreePop();
-					}
-				}
-			}
-			ImGui::TreePop();
-		}
-	}
-
-	if (ImGui::CollapsingHeader("Resource Manager"))
-	{
-		ImGui::Text("Loaded resources:");
-		const std::vector<Resource*> res = App->m_resourceManager->ReadLoadedResources();
-		if (res.size() > 0)
-		{
-			std::vector<Resource*>::const_iterator it = res.begin();
-			ComponentType lastType = ComponentType::none;
-			char name[256];
-			for (; it != res.end(); it++)
-			{
-				if (lastType != (*it)->GetType())
-				{
-					lastType = (*it)->GetType();
-					ImGui::Separator();
-					switch (lastType)
-					{
-					case (ComponentType::GO):
-					{
-						ImGui::Text("GameObjects:"); break;
-					}
-					case (ComponentType::material):
-					{
-						ImGui::Text("Materials:"); break;
-					}
-					case (ComponentType::mesh):
-					{
-						ImGui::Text("Meshes:"); break;
-					}
-					case (ComponentType::texture):
-					{
-						ImGui::Text("Textures:"); break;
-					}
-					}
-				}
-				sprintf(name, "%s", (*it)->m_name.data());
-				if (ImGui::TreeNode(name))
-				{
-					ImGui::Text("N references: %u", (*it)->m_numReferences);
-					ImGui::TreePop();
-				}
-			}
-		}
-	}
-
-	if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
-	{
-		std::vector<std::pair<std::string, float>> timers = App->m_timers->GetLastReads();
-		if (timers.empty() == false)
-		{
-			char lastLetter = '0';
-			for (std::vector<std::pair<std::string, float>>::iterator it = timers.begin(); it != timers.end(); it++)
-			{
-				if (it->first.data()[0] != lastLetter)
-				{
-					lastLetter = it->first.data()[0];
-					ImGui::Separator();
-				}
-				ImGui::Text("%*s: %*0.3f ms", 25, it->first.data(), 5, it->second);
+				Time.PlayMode = PlayMode::DebugPlay;
+				Time.GameRuntime = 0.0f;
+				App->m_goManager->SaveScene("temp");
 			}
 		}
 		else
 		{
-			ImGui::Text("No timers initialized");
+			if (ImGui::Button("Pause##PauseButton"))
+			{
+				Time.Pause = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Stop##StopButton"))
+			{
+				Time.PlayMode = PlayMode::Stop;
+				Time.Pause = false;
+				Time.gdt = 0.0f;
+				App->m_goManager->LoadScene("temp");
+			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
+}
+
+void ModuleEditor::Editor()
+{
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+	if (ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f, flags))
+	{
+		ImGui::SetWindowPos(ImVec2(m_screenW - 330, 20 + (m_screenH - 20) / 2));
+		ImGui::SetWindowSize(ImVec2(330, (m_screenH - 20) / 2));
+
+		if (ImGui::CollapsingHeader("Application"))
+		{
+			ImGui::Text("Time since startup: %f", Time.AppRuntime);
+			ImGui::Text("Game Time: %f", Time.GameRuntime);
+
+			ImGui::InputInt("Max Framerate:", &App->m_maxFps, 15);
+			char tmp[256];
+			sprintf(tmp, "Framerate: %i", int(App->m_framerate[EDITOR_FRAME_SAMPLES - 1]));
+			ImGui::PlotHistogram("##Framerate:", App->m_framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+
+			char tmp2[256];
+			sprintf(tmp2, "Ms: %i", int(App->m_msFrame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+			ImGui::PlotHistogram("##ms", App->m_msFrame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+		}
+
+		if (ImGui::CollapsingHeader("Input"))
+		{
+			ImGui::LabelText("label", "MouseX: %i", App->m_input->GetMouseX());
+			ImGui::LabelText("label", "MouseY: %i", App->m_input->GetMouseY());
+		}
+
+		if (ImGui::CollapsingHeader("Camera##CameraModule"))
+		{
+			ImGui::Text("Position");
+			ImGui::Text("Camera speed");
+			ImGui::DragFloat("##camSpeed", &App->m_camera->m_camSpeed, 0.1f);
+			ImGui::Text("Sprint speed multiplier");
+			ImGui::DragFloat("##camsprint", &App->m_camera->m_camSprintMultiplier, 0.1f);
+
+		}
+
+		if (ImGui::CollapsingHeader("Render"))
+		{
+			ImGui::Text("Global light direction");
+			ImGui::DragFloat3("##GlobalLightDirection", App->m_renderer3D->m_sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
+
+			ImGui::Text("Ambient light intensity");
+			ImGui::DragFloat("##GlobalLightDirection", &App->m_renderer3D->m_ambientLight.x, 0.1f, -1.0f, 1.0f);
+
+			if (ImGui::TreeNode("Lights"))
+			{
+				for (int nLight = 0; nLight < MAX_LIGHTS; nLight++)
+				{
+					char lightName[46];
+					sprintf(lightName, "Light %i", nLight);
+					bool on = App->m_renderer3D->m_lights[nLight].m_on;
+					ImGui::Checkbox(lightName, &on);
+
+					if (on != App->m_renderer3D->m_lights[nLight].m_on)
+					{
+						App->m_renderer3D->m_lights[nLight].Active(on);
+					}
+					if (App->m_renderer3D->m_lights[nLight].m_on == true)
+					{
+
+						sprintf(lightName, "Expand##Light_%i", nLight);
+						ImGui::SameLine();
+						if (ImGui::TreeNode(lightName))
+						{
+							char tmp[46];
+							sprintf(tmp, "X##light_%i", nLight);
+							ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.x, 1.0f);
+							sprintf(tmp, "Y##light_%i", nLight);
+							ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.y, 1.0f);
+							sprintf(tmp, "Z##light_%i", nLight);
+							ImGui::DragFloat(tmp, &App->m_renderer3D->m_lights[nLight].m_position.z, 1.0f);
+							ImGui::TreePop();
+						}
+					}
+				}
+				ImGui::TreePop();
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Resource Manager"))
+		{
+			ImGui::Text("Loaded resources:");
+			const std::vector<Resource*> res = App->m_resourceManager->ReadLoadedResources();
+			if (res.size() > 0)
+			{
+				std::vector<Resource*>::const_iterator it = res.begin();
+				ComponentType lastType = ComponentType::none;
+				char name[256];
+				for (; it != res.end(); it++)
+				{
+					if (lastType != (*it)->GetType())
+					{
+						lastType = (*it)->GetType();
+						ImGui::Separator();
+						switch (lastType)
+						{
+						case (ComponentType::GO):
+						{
+							ImGui::Text("GameObjects:"); break;
+						}
+						case (ComponentType::material):
+						{
+							ImGui::Text("Materials:"); break;
+						}
+						case (ComponentType::mesh):
+						{
+							ImGui::Text("Meshes:"); break;
+						}
+						case (ComponentType::texture):
+						{
+							ImGui::Text("Textures:"); break;
+						}
+						}
+					}
+					sprintf(name, "%s", (*it)->m_name.data());
+					if (ImGui::TreeNode(name))
+					{
+						ImGui::Text("N references: %u", (*it)->m_numReferences);
+						ImGui::TreePop();
+					}
+				}
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
+		{
+			std::vector<std::pair<std::string, float>> timers = App->m_timers->GetLastReads();
+			if (timers.empty() == false)
+			{
+				char lastLetter = '0';
+				for (std::vector<std::pair<std::string, float>>::iterator it = timers.begin(); it != timers.end(); it++)
+				{
+					if (it->first.data()[0] != lastLetter)
+					{
+						lastLetter = it->first.data()[0];
+						ImGui::Separator();
+					}
+					ImGui::Text("%*s: %*0.3f ms", 25, it->first.data(), 5, it->second);
+				}
+			}
+			else
+			{
+				ImGui::Text("No timers initialized");
+			}
+		}
+		ImGui::End();
+	}
 }
 
 void ModuleEditor::Console()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.0f, m_screenH - 200.0f));
-	ImGui::SetNextWindowSize(ImVec2(m_screenW - 330.0f, 200.0f));
-
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
-	ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f, flags);
+	if (ImGui::Begin("Console", 0, ImVec2(m_screenW - 330.0f, 200.0f), 0.8f, flags))
+	{
+		ImGui::SetWindowPos(ImVec2(0.0f, m_screenH - 200.0f));
+		ImGui::SetWindowSize(ImVec2(m_screenW - 330.0f, 200.0f));
+		ImGui::PushStyleColor(ImGuiCol(0), ImVec4(0.6f, 0.6f, 1.0f, 1.0f));
 
-	ImGui::PushStyleColor(ImGuiCol(0), ImVec4(0.6f, 0.6f, 1.0f, 1.0f));
+		ImGui::TextUnformatted(m_buffer.begin());
+		ImGui::PopStyleColor();
 
-	ImGui::TextUnformatted(m_buffer.begin());
-	ImGui::PopStyleColor();
+		if (m_scrollToBottom)
+			ImGui::SetScrollHere(1.0f);
 
-	if (m_scrollToBottom)
-		ImGui::SetScrollHere(1.0f);
+		m_scrollToBottom = false;
 
-	m_scrollToBottom = false;
-
-	ImGui::End();
+		ImGui::End();
+	}
 }
 
 void ModuleEditor::Outliner()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 50.0f));
-	ImGui::SetNextWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
-
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
-	ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f, flags);
-
-	std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->m_childs.begin();
-	while (node != App->m_goManager->GetRoot()->m_childs.end())
+	if (ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f, flags))
 	{
-		SceneTreeGameObject((*node));
-		node++;
-	}
+		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
+		ImGui::SetWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
 
-	ImGui::End();
+		std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->m_childs.begin();
+		while (node != App->m_goManager->GetRoot()->m_childs.end())
+		{
+			SceneTreeGameObject((*node));
+			node++;
+		}
+		ImGui::End();
+	}
 }
 
 void ModuleEditor::AttributeWindow()
 {
-	ImGui::SetNextWindowPos(ImVec2(m_screenW - 330, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(330, (m_screenH - 20) / 2));
-
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
-	ImGui::Begin("Attribute Editor", 0, flags);
-	if (m_selectedGameObject)
+	if (ImGui::Begin("Attribute Editor", 0, flags))
 	{
-		m_selectedGameObject->DrawOnEditor();
-		ImGui::Separator();
-		if (m_selectedGameObject->HasComponent<Transform>())
+		ImGui::SetWindowPos(ImVec2(m_screenW - 330, 20.0f));
+		ImGui::SetWindowSize(ImVec2(330, (m_screenH - 20) / 2));
+		if (m_selectedGameObject)
 		{
-			if (ImGui::Button("Look at"))
+			m_selectedGameObject->DrawOnEditor();
+			ImGui::Separator();
+			if (m_selectedGameObject->HasComponent<Transform>())
 			{
-				float3 toLook = m_selectedGameObject->GetTransform()->GetGlobalPos();
-				App->m_camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
-			}
-			ImGui::NewLine();
-			ImGui::Text("Danger Zone:");
-			if (ImGui::Button("Delete##DeleteGO"))
-			{
-				App->m_goManager->DeleteGameObject(m_selectedGameObject);
-				m_selectedGameObject = nullptr;
+				if (ImGui::Button("Look at"))
+				{
+					float3 toLook = m_selectedGameObject->GetTransform()->GetGlobalPos();
+					App->m_camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
+				}
+				ImGui::NewLine();
+				ImGui::Text("Danger Zone:");
+				if (ImGui::Button("Delete##DeleteGO"))
+				{
+					App->m_goManager->DeleteGameObject(m_selectedGameObject);
+					m_selectedGameObject = nullptr;
+				}
 			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
 void ModuleEditor::UnselectGameObject(GameObject * go)
@@ -662,15 +664,14 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
 
-	ImGui::SetNextWindowPos(ImVec2(port.m_pos.x, port.m_pos.y));
-	ImGui::SetNextWindowSize(ImVec2(port.m_size.x, 0));
-
 	char tmp[256];
 	sprintf(tmp, "ViewPortMenu##%i", port.m_ID);
 
 	ImGui::Begin(tmp, 0, flags);
 	if (ImGui::BeginMenuBar())
 	{
+		ImGui::SetWindowPos(ImVec2(port.m_pos.x, port.m_pos.y));
+		ImGui::SetWindowSize(ImVec2(port.m_size.x, 0));
 		sprintf(tmp, "Display##ViewPort%i", port.m_ID);
 		if (ImGui::BeginMenu(tmp))
 		{
@@ -719,7 +720,7 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 
 bool ModuleEditor::SaveLoadPopups()
 {
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	ImGui::SetWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("New scene"))
 	{
 		m_selectedGameObject = nullptr;
@@ -745,7 +746,7 @@ bool ModuleEditor::SaveLoadPopups()
 	}
 
 
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	ImGui::SetWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("Save scene"))
 	{
 		bool close = false;
@@ -770,7 +771,7 @@ bool ModuleEditor::SaveLoadPopups()
 		ImGui::EndPopup();
 	}
 
-	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	ImGui::SetWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("Load Scene"))
 	{
 		m_selectedGameObject = nullptr;
