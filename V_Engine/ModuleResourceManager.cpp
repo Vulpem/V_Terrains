@@ -107,6 +107,12 @@ void ModuleResourceManager::Start()
 	GenerateDefaultShader();
 }
 
+UpdateStatus ModuleResourceManager::PreUpdate()
+{
+	DeleteNow();
+	return UpdateStatus::Continue;
+}
+
 // Called every draw update
 UpdateStatus ModuleResourceManager::Update()
 {
@@ -125,7 +131,6 @@ UpdateStatus ModuleResourceManager::Update()
 UpdateStatus ModuleResourceManager::PostUpdate()
 {
 	ReloadNow();
-	DeleteNow();
 	return UpdateStatus::Continue;
 }
 
@@ -740,6 +745,7 @@ void ModuleResourceManager::UnlinkResource(uint64_t uid)
 
 void ModuleResourceManager::UnlinkResource(std::string fileName, ComponentType type)
 {
+	fileName = App->m_importer->IsolateFileName(fileName.data());
 	std::map<ComponentType, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
 	if (tmpMap != m_uidLib.end())
 	{

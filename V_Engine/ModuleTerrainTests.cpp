@@ -777,6 +777,10 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
+				if (textures[n].length() > 0)
+				{
+					App->m_resourceManager->UnlinkResource(textures[n], ComponentType::texture);
+				}
 				t.buf_diffuse = resource->Read<R_Texture>()->m_bufferID;
 				textures[n] = textureFile;
 				RPGT::SetTexture(n, t);
@@ -785,6 +789,7 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 	}
 	else
 	{
+		App->m_resourceManager->UnlinkResource(textures[n], ComponentType::texture);
 		t.buf_diffuse = 0;
 		textures[n] = "";
 		RPGT::SetTexture(n, t);
@@ -804,6 +809,10 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
+				if (heightmaps[n].length() > 0)
+				{
+					App->m_resourceManager->UnlinkResource(heightmaps[n], ComponentType::texture);
+				}
 				t.buf_heightmap = resource->Read<R_Texture>()->m_bufferID;
 				heightmaps[n] = hmfile;
 				RPGT::SetTexture(n, t);
@@ -812,6 +821,7 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	}
 	else
 	{
+		App->m_resourceManager->UnlinkResource(heightmaps[n], ComponentType::texture);
 		t.buf_heightmap = 0;
 		heightmaps[n] = "";
 		RPGT::SetTexture(n, t);

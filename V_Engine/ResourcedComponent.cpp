@@ -6,7 +6,7 @@
 void ResourcedComponent::LinkResource(std::string resName)
 {
 	UnLinkResource();
-	resource = App->m_resourceManager->LinkResource(resName, this->GetType());
+	resource = App->m_resourceManager->LinkResource(resName, GetType());
 }
 
 void ResourcedComponent::UnLinkResource()
