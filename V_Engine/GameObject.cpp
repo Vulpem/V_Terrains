@@ -304,7 +304,9 @@ void GameObject::SetOriginalAABB()
 	if (HasComponent<Mesh>())
 	{
 		m_originalAABB.SetNegativeInfinity();
-		std::vector<Mesh*> meshes = GetComponents<Mesh>();
+		std::vector<Mesh*> meshes;
+		meshes.reserve(2);
+		GetComponents<Mesh>(meshes);
 
 		for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
 		{
@@ -345,7 +347,8 @@ void GameObject::UpdateTransformMatrix()
 	//Updating cameras position
 	if (HasComponent<Camera>())
 	{
-		std::vector<Camera*> cams = GetComponents<Camera>();
+		std::vector<Camera*> cams;
+		GetComponents<Camera>(cams);
 		std::vector<Camera*>::iterator it = cams.begin();
 		while (it != cams.end())
 		{

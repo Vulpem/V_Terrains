@@ -64,7 +64,7 @@ public:
 	void RemoveComponent(Component* comp);
 
 	template <typename typeComp>
-	std::vector<typeComp*> GetComponents();
+	void GetComponents(std::vector<typeComp*>& out);
 
 	template <typename typeComp>
 	typeComp* GetComponent();
@@ -98,19 +98,16 @@ private:
 };
 
 template <typename typeComp>
-//TODO: Pass by reference vector
-std::vector<typeComp*> GameObject::GetComponents()
+void GameObject::GetComponents(std::vector<typeComp*>& out)
 {
-	std::vector<typeComp*> ret;
 	for (Component* component : m_components)
 	{
 		typeComp* toReturn = dynamic_cast<typeComp*>(component);
 		if (toReturn != nullptr)
 		{
-			ret.push_back(toReturn);
+			out.push_back(toReturn);
 		}
 	}
-	return ret;
 }
 
 template <typename typeComp>

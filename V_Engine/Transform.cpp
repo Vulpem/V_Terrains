@@ -197,7 +197,8 @@ void Transform::SetLocalPos(float x, float y, float z)
 
 		if (m_gameObject->HasComponent<Camera>())
 		{
-			std::vector<Camera*> cams = m_gameObject->GetComponents<Camera>();
+			std::vector<Camera*> cams;
+			m_gameObject->GetComponents<Camera>(cams);
 			for (auto it : cams)
 			{
 				it->UpdatePos();

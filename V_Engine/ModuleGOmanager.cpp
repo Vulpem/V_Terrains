@@ -495,7 +495,9 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		//One object may have more than a single mesh, so we'll check them one by one
 		if (check->second->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = check->second->GetComponents<Mesh>();
+			std::vector<Mesh*> meshes;
+			meshes.reserve(3);
+			check->second->GetComponents<Mesh>(meshes);
 			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
 				LineSegment transformedRay = ray;
@@ -653,7 +655,9 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	{
 		if (go->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = go->GetComponents<Mesh>();
+			std::vector<Mesh*> meshes;
+			meshes.reserve(3);
+			go->GetComponents<Mesh>(meshes);
 			if (meshes.empty() == false)
 			{
 				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
