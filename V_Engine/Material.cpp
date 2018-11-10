@@ -162,13 +162,16 @@ void Material::EditorContent()
 
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->m_resourceManager->Peek(m_resource);
-	myNode.append_attribute("res") = res->m_name.data();
-	pugi::xml_node color_n = myNode.append_child("Color");
-	color_n.append_attribute("R") = ReadRes<R_Material>()->m_color[0];
-	color_n.append_attribute("G") = ReadRes<R_Material>()->m_color[1];
-	color_n.append_attribute("B") = ReadRes<R_Material>()->m_color[2];
-	color_n.append_attribute("A") = ReadRes<R_Material>()->m_color[3];
+	if (m_resource)
+	{
+		Resource* res = App->m_resourceManager->Peek(m_resource);
+		myNode.append_attribute("res") = res->m_name.data();
+		pugi::xml_node color_n = myNode.append_child("Color");
+		color_n.append_attribute("R") = ReadRes<R_Material>()->m_color[0];
+		color_n.append_attribute("G") = ReadRes<R_Material>()->m_color[1];
+		color_n.append_attribute("B") = ReadRes<R_Material>()->m_color[2];
+		color_n.append_attribute("A") = ReadRes<R_Material>()->m_color[3];
+	}
 }
 
 void Material::LoadSpecifics(pugi::xml_node & myNode)

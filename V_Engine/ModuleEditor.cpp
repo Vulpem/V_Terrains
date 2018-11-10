@@ -219,7 +219,7 @@ void ModuleEditor::ClearConsole()
 
 void ModuleEditor::SceneTreeGameObject(GameObject* node)
 {
-	if (node->HiddenFromOutliner() == false)
+	if (node->HiddenFromOutliner() == false || m_displayHiddenOutlinerGameobjects == true)
 	{
 		ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 		if (m_selectedGameObject == node)
@@ -598,7 +598,7 @@ void ModuleEditor::Outliner()
 	{
 		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
 		ImGui::SetWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
-
+		ImGui::Checkbox("Show hidden objects", &m_displayHiddenOutlinerGameobjects);
 		std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->m_childs.begin();
 		while (node != App->m_goManager->GetRoot()->m_childs.end())
 		{
@@ -678,8 +678,7 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			ViewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
 			ImGui::Checkbox("Wired", &editPort->m_useOnlyWires);
 			ImGui::Checkbox("Lightning", &editPort->m_useLighting);
-			//TODO
-			//ImGui::Checkbox("Textured", &editPort->m_useMaterials);
+			//TODO ImGui::Checkbox("Textured", &editPort->m_useMaterials);
 			ImGui::Checkbox("Single sided faces", &editPort->m_useSingleSidedFaces);
 			ImGui::EndMenu();
 		}

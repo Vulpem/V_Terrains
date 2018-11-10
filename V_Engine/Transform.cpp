@@ -223,8 +223,7 @@ void Transform::SetGlobalPos(float x, float y, float z)
 	{
 		if (m_gameObject->m_parent != nullptr && m_gameObject->m_parent->HasComponent<Transform>() == true)
 		{
-			//TODO
-			//Needs cleaning
+			//TODO: clean transform SetGlobalPos
 			Transform* parentTrans = m_gameObject->m_parent->GetTransform();
 
 			float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));

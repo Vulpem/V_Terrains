@@ -40,6 +40,7 @@ public:
 
 public:
 	bool m_isTestWindowOpen = false;
+	bool m_displayHiddenOutlinerGameobjects = false;
 
 	bool m_show0Plane = true;
 	bool m_renderNormals = false;

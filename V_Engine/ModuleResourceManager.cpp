@@ -522,8 +522,8 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, ComponentT
 	return nullptr;
 }
 
-//TODO
-//Improve this function, since it's slooooow to find stuff and iterates too much
+//TODO Improve "GetMetaData function"
+//Improve this function, since it iterates too much
 const MetaInf * ModuleResourceManager::GetMetaData(ComponentType type, const char * component)
 {
 	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.begin();

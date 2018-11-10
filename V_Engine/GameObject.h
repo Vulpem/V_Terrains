@@ -30,7 +30,6 @@ public:
 	void DrawOBB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
-	//TODO 
 	void HideFromOutliner() { m_hiddenOnOutliner = true; }
 	bool HiddenFromOutliner() { return m_hiddenOnOutliner; }
 
@@ -99,8 +98,7 @@ private:
 };
 
 template <typename typeComp>
-//TODO
-//Pass by reference vector
+//TODO: Pass by reference vector
 std::vector<typeComp*> GameObject::GetComponents()
 {
 	std::vector<typeComp*> ret;

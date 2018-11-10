@@ -27,7 +27,7 @@ void ModuleCamera3D::Start()
 	m_defaultCamera->SetFarPlane(50000.0);
 	m_defaultCameraGO->HideFromOutliner();
 
-	m_topView = App->m_goManager->CreateCamera("m_topView");
+	m_topView = App->m_goManager->CreateCamera("TopViewCamera");
 	m_topView->GetTransform()->SetLocalPos(0, 1000, 0);
 	m_topView->GetTransform()->SetLocalRot(90, 0, 0);
 	m_topView->GetTransform()->allowRotation = false;
@@ -36,7 +36,7 @@ void ModuleCamera3D::Start()
     m_topView->GetComponent<Camera>()->SetHorizontalFOV(50000);
 	m_topView->HideFromOutliner();
 
-	m_frontView = App->m_goManager->CreateCamera("FrontView");
+	m_frontView = App->m_goManager->CreateCamera("FrontViewCamera");
 	m_frontView->GetTransform()->SetLocalPos(0, 0, -1000);
 	m_frontView->GetTransform()->SetLocalRot(0, 0, 0);
 	m_frontView->GetTransform()->allowRotation = false;
@@ -44,7 +44,7 @@ void ModuleCamera3D::Start()
 	m_frontView->GetComponent<Camera>()->SwitchViewType();
 	m_frontView->HideFromOutliner();
 
-	m_rightView = App->m_goManager->CreateCamera("RightView");
+	m_rightView = App->m_goManager->CreateCamera("RightViewCamera");
 	m_rightView->GetTransform()->SetLocalPos(-1000, 0, 0);
 	m_rightView->GetTransform()->SetLocalRot(0, 90, 0);
 	m_rightView->GetTransform()->allowRotation = false;
