@@ -10,6 +10,7 @@
 #include "ModulePhysics3D.h"
 #include "ModuleGOmanager.h"
 #include "ModuleResourceManager.h"
+#include "ModuleTerrainTests.h"
 #include "Timers.h"
 
 #include "AllComponents.h"
@@ -111,12 +112,18 @@ UpdateStatus ModuleEditor::PostUpdate()
 	}
 
 	UpdateStatus ret = MenuBar();
-	Editor();
+	switch (m_multiWindowDisplay)
+	{
+	default: { Outliner(); break; }
+	case 1: { App->m_terrain->DrawUI(); break; }
+	case 2: { Editor(); break; }
+	}
 	Console();
 	PlayButtons();
-	Outliner();
 	AttributeWindow();
 	SaveLoadPopups();
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
 	return ret;
 }
@@ -411,6 +418,15 @@ void ModuleEditor::PlayButtons()
 				App->m_goManager->LoadScene("temp");
 			}
 		}
+		ImGui::SameLine();
+		if (ImGui::BeginMenu("Window displayed:"))
+		{
+			if (ImGui::MenuItem("Outliner")) { m_multiWindowDisplay = 0; }
+			if (ImGui::MenuItem("Terrain configuration")) { m_multiWindowDisplay = 1; }
+			if (ImGui::MenuItem("Editor configuration")) { m_multiWindowDisplay = 2; }
+			ImGui::EndMenu();
+		}
+
 		ImGui::End();
 	}
 }
@@ -421,8 +437,8 @@ void ModuleEditor::Editor()
 
 	if (ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f, flags))
 	{
-		ImGui::SetWindowPos(ImVec2(m_screenW - 330, 20 + (m_screenH - 20) / 2));
-		ImGui::SetWindowSize(ImVec2(330, (m_screenH - 20) / 2));
+		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
+		ImGui::SetWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
 
 		if (ImGui::CollapsingHeader("Application"))
 		{
@@ -616,7 +632,7 @@ void ModuleEditor::AttributeWindow()
 	if (ImGui::Begin("Attribute Editor", 0, flags))
 	{
 		ImGui::SetWindowPos(ImVec2(m_screenW - 330, 20.0f));
-		ImGui::SetWindowSize(ImVec2(330, (m_screenH - 20) / 2));
+		ImGui::SetWindowSize(ImVec2(330, m_screenH - 20));
 		if (m_selectedGameObject)
 		{
 			m_selectedGameObject->DrawOnEditor();
@@ -697,16 +713,19 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::Separator();
-			std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->components.find(ComponentType::camera);
-			for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
+			if (ImGui::BeginMenu("Link new camera"))
 			{
-				Camera* cam = (Camera*)&*comp->second;
-				if (ImGui::MenuItem(cam->GetOwner()->m_name))
+				std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->components.find(ComponentType::camera);
+				for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
 				{
-					App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
-					int a = 0;
+					Camera* cam = (Camera*)&*comp->second;
+					if (ImGui::MenuItem(cam->GetOwner()->m_name))
+					{
+						App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
+						int a = 0;
+					}
 				}
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}

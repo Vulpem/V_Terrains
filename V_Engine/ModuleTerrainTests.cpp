@@ -185,16 +185,6 @@ UpdateStatus ModuleTerrain::Update()
     return UpdateStatus::Continue;
 }
 
-// PostUpdate present buffer to screen
-UpdateStatus ModuleTerrain::PostUpdate()
-{
-	if (Time.PlayMode != PlayMode::Play)
-	{
-		DrawUI();
-	}
-	return UpdateStatus::Continue;
-}
-
 void ModuleTerrain::SaveTerrainConfig(std::string configName)
 {
 	TCHAR pwd[MAX_PATH];
@@ -386,10 +376,10 @@ void ModuleTerrain::DrawUI()
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 
-	if (ImGui::Begin("TerrainTests", 0/*, flags*/))
+	if (ImGui::Begin("TerrainTests", 0, flags))
 	{
-		//ImGui::SetWindowPos(ImVec2(0.f, 20.f));
-		//ImGui::SetWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
+		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
+		ImGui::SetWindowSize(ImVec2(300.0f, App->m_window->GetWindowSize().y - 250.0f));
 
 		ImGui::Text(
 			"Use WASD to move the camera around.\n"

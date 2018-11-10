@@ -88,6 +88,8 @@ private:
 	ImGuiTextBuffer m_buffer;
 	bool m_scrollToBottom;
 
+	int m_multiWindowDisplay = 0;
+
 	LineSegment m_selectionRay;
 	float3 m_selectRayNormal;
 	float3 m_selectedRayPos;
