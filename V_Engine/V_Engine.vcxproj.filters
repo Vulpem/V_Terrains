@@ -64,9 +64,6 @@
     <Filter Include="Terrains">
       <UniqueIdentifier>{f1893366-4ee5-4852-b09e-30723e890294}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Terrains\Terrain">
-      <UniqueIdentifier>{89f9796c-5414-4f13-8fa7-b2b7f163ff2c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -429,11 +426,11 @@
     <ClInclude Include="R_Shader.h">
       <Filter>Sources\ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleTerrainTests.h">
-      <Filter>Terrains\Terrain</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTerrainTests.h">
+      <Filter>Terrains</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -645,7 +642,7 @@
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
     <ClCompile Include="ModuleTerrainTests.cpp">
-      <Filter>Terrains\Terrain</Filter>
+      <Filter>Terrains</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

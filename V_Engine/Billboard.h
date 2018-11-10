@@ -1,7 +1,7 @@
 #ifndef __BILLBOARD__
 #define __BILLBOARD__
 
-#include "ResourcedComponent.h"
+#include "Component.h"
 
 class Billboard :public Component
 {

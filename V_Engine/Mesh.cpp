@@ -11,12 +11,12 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, ComponentType::mesh)
+Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(linkedTo, ComponentType::mesh)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Mesh##%i", m_uid);
 	m_name = tmp;
-
+	LoadResource(resource);
 	texMaterialIndex = m_gameObject->AmountOfComponent(ComponentType::mesh);
 }
 
@@ -132,7 +132,7 @@ void Mesh::EditorContent()
 
 void Mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->m_resourceManager->Peek(resource);
+	Resource* res = App->m_resourceManager->Peek(m_resource);
 	myNode.append_attribute("res") = res->m_name.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
 	myNode.append_attribute("Wired") = wires;
@@ -141,7 +141,7 @@ void Mesh::SaveSpecifics(pugi::xml_node& myNode)
 void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 {
 	std::string resName = myNode.attribute("res").as_string();
-	resource = App->m_resourceManager->LinkResource(resName.data(), GetType());
+	m_resource = App->m_resourceManager->LinkResource(resName.data(), GetType());
 
 	wires = myNode.attribute("Wired").as_bool();
 	texMaterialIndex = myNode.attribute("TextureIndex").as_int();

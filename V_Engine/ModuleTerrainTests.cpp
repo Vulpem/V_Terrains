@@ -388,8 +388,8 @@ void ModuleTerrain::DrawUI()
 
 	if (ImGui::Begin("TerrainTests", 0/*, flags*/))
 	{
-		ImGui::SetWindowPos(ImVec2(0.f, 20.f));
-		ImGui::SetWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
+		//ImGui::SetWindowPos(ImVec2(0.f, 20.f));
+		//ImGui::SetWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
 
 		ImGui::Text(
 			"Use WASD to move the camera around.\n"

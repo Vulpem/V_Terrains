@@ -7,11 +7,12 @@
 
 #include "imGUI\imgui.h"
 
-Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(res, linkedTo, ComponentType::material)
+Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(linkedTo, ComponentType::material)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Material##%i", m_uid);
 	m_name = tmp;
+	LoadResource(res);
 }
 
 void Material::PreUpdate()
@@ -161,7 +162,7 @@ void Material::EditorContent()
 
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->m_resourceManager->Peek(resource);
+	Resource* res = App->m_resourceManager->Peek(m_resource);
 	myNode.append_attribute("res") = res->m_name.data();
 	pugi::xml_node color_n = myNode.append_child("Color");
 	color_n.append_attribute("R") = ReadRes<R_Material>()->m_color[0];
@@ -173,7 +174,7 @@ void Material::SaveSpecifics(pugi::xml_node& myNode)
 void Material::LoadSpecifics(pugi::xml_node & myNode)
 {
 	std::string resName = myNode.attribute("res").as_string();
-	resource = App->m_resourceManager->LinkResource(resName.data(),GetType());
+	m_resource = App->m_resourceManager->LinkResource(resName.data(),GetType());
 
 	pugi::xml_node col = myNode.child("Color");
 
