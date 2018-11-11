@@ -40,6 +40,7 @@ public:
 	~ModuleResourceManager();
 
 	void Start();
+	UpdateStatus PreUpdate() override;
 	UpdateStatus Update();
 	UpdateStatus PostUpdate();
 	void CleanUp();

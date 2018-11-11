@@ -11,21 +11,23 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, ComponentType::mesh)
+Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(linkedTo, ComponentType::mesh)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Mesh##%i", uid);
-	name = tmp;
-
-	texMaterialIndex = object->AmountOfComponent(ComponentType::mesh);
+	sprintf(tmp, "Mesh##%i", m_uid);
+	m_name = tmp;
+	LoadResource(resource);
+	std::vector<Mesh*> existingMeshes;
+	m_gameObject->GetComponents<Mesh>(existingMeshes);
+	texMaterialIndex = existingMeshes.size();
 }
 
 Mesh_RenderInfo Mesh::GetMeshInfo()
 {
 	Mesh_RenderInfo ret;
-	if (object->IsActive())
+	if (m_gameObject->IsActive())
 	{
-		if (wires == true || object->m_selected)
+		if (wires == true || m_gameObject->m_selected)
 		{
 			ret.m_drawWired = true;
 			if (wires == true)
@@ -33,9 +35,9 @@ Mesh_RenderInfo Mesh::GetMeshInfo()
 				ret.m_drawDoubleSidedFaces = true;
 				ret.m_wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
 			}
-			if (object->m_selected)
+			if (m_gameObject->m_selected)
 			{
-				if (object->m_parent && object->m_parent->m_selected)
+				if (m_gameObject->GetTransform()->GetParent() != nullptr && m_gameObject->GetTransform()->GetParent()->GetGameobject()->m_selected)
 				{
 					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}
@@ -50,7 +52,7 @@ Mesh_RenderInfo Mesh::GetMeshInfo()
 			ret.m_drawFilled = true;
 		}
 
-		ret.m_drawNormals = object->m_drawNormals;
+		ret.m_drawNormals = m_gameObject->m_drawNormals;
 
 		const R_Mesh* res = ReadRes<R_Mesh>();
 
@@ -104,7 +106,7 @@ void Mesh::EditorContent()
 {
 	const R_Mesh* res = ReadRes<R_Mesh>();
 	char tmp[48];
-	sprintf(tmp, "Wireframe##%llu", uid);
+	sprintf(tmp, "Wireframe##%llu", m_uid);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
 	ImGui::Text("Resource: %s", res->m_name.data());
@@ -126,24 +128,29 @@ void Mesh::EditorContent()
 	}
 	ImGui::Separator();
 	ImGui::Text("Texture index material:");
-	sprintf(tmp, "##MaterialID%llu", uid);
+	sprintf(tmp, "##MaterialID%llu", m_uid);
 	ImGui::InputInt(tmp, &texMaterialIndex);
 }
 
 void Mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
-	Resource* res = App->m_resourceManager->Peek(resource);
-	myNode.append_attribute("res") = res->m_name.data();
-	myNode.append_attribute("TextureIndex") = texMaterialIndex;
-	myNode.append_attribute("Wired") = wires;
+	if (m_resource)
+	{
+		Resource* res = App->m_resourceManager->Peek(m_resource);
+		myNode.append_attribute("res") = res->m_name.data();
+		myNode.append_attribute("TextureIndex") = texMaterialIndex;
+		myNode.append_attribute("Wired") = wires;
+	}
 }
 
 void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 {
-	std::string resName = myNode.attribute("res").as_string();
-	resource = App->m_resourceManager->LinkResource(resName.data(), GetType());
+	{
+		std::string resName = myNode.attribute("res").as_string();
+		m_resource = App->m_resourceManager->LinkResource(resName.data(), GetType());
 
-	wires = myNode.attribute("Wired").as_bool();
-	texMaterialIndex = myNode.attribute("TextureIndex").as_int();
-	object->SetOriginalAABB();
+		wires = myNode.attribute("Wired").as_bool();
+		texMaterialIndex = myNode.attribute("TextureIndex").as_int();
+		m_gameObject->SetOriginalAABB();
+	}
 }

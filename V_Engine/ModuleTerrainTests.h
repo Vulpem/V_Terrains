@@ -22,7 +22,6 @@ public:
 	bool Init();
 	void Start();
     UpdateStatus Update() override;
-	UpdateStatus PostUpdate() override;
 
 	void SaveTerrainConfig(std::string configName);
 	void LoadTerrainConfig(std::string configName);

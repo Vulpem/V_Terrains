@@ -27,21 +27,37 @@ void ModuleCamera3D::Start()
 	m_defaultCamera->SetFarPlane(50000.0);
 	m_defaultCameraGO->HideFromOutliner();
 
-	m_topView = App->m_goManager->CreateCamera("m_topView");
+	m_topView = App->m_goManager->CreateCamera("TopViewCamera");
 	m_topView->GetTransform()->SetLocalPos(0, 1000, 0);
 	m_topView->GetTransform()->SetLocalRot(90, 0, 0);
-	m_topView->GetTransform()->allowRotation = false;
+	m_topView->GetTransform()->m_allowRotation = false;
 	m_topView->GetComponent<Camera>()->SetFarPlane(50000.000);
 	m_topView->GetComponent<Camera>()->SwitchViewType();
     m_topView->GetComponent<Camera>()->SetHorizontalFOV(50000);
 	m_topView->HideFromOutliner();
+
+	m_frontView = App->m_goManager->CreateCamera("FrontViewCamera");
+	m_frontView->GetTransform()->SetLocalPos(0, 0, -1000);
+	m_frontView->GetTransform()->SetLocalRot(0, 0, 0);
+	m_frontView->GetTransform()->m_allowRotation = false;
+	m_frontView->GetComponent<Camera>()->SetFarPlane(2000);
+	m_frontView->GetComponent<Camera>()->SwitchViewType();
+	m_frontView->HideFromOutliner();
+
+	m_rightView = App->m_goManager->CreateCamera("RightViewCamera");
+	m_rightView->GetTransform()->SetLocalPos(-1000, 0, 0);
+	m_rightView->GetTransform()->SetLocalRot(0, 90, 0);
+	m_rightView->GetTransform()->m_allowRotation = false;
+	m_rightView->GetComponent<Camera>()->SetFarPlane(2000);
+	m_rightView->GetComponent<Camera>()->SwitchViewType();
+	m_rightView->HideFromOutliner();
 }
 
 
 // -----------------------------------------------------------------
 UpdateStatus ModuleCamera3D::Update()
 {
-	if (Time.PlayMode == Play::Stop)
+	if (Time.PlayMode == PlayMode::Stop)
 	{
 		MoveWithKeys();
 		// Mouse motion ----------------
@@ -52,7 +68,7 @@ UpdateStatus ModuleCamera3D::Update()
 			if (dx != 0 || dy != 0)
 			{
 				float Sensitivity = 0.04;
-				Transform* cam = GetMovingCamera()->object->GetTransform();
+				Transform* cam = GetMovingCamera()->GetOwner()->GetTransform();
 
 				float3 toLook = cam->GetGlobalPos();
 				toLook += cam->Forward() * 10;
@@ -78,19 +94,19 @@ UpdateStatus ModuleCamera3D::Update()
 // -----------------------------------------------------------------
 void ModuleCamera3D::LookAt( const float3 &Spot)
 {
-	GetMovingCamera()->object->GetTransform()->LookAt(Spot);
+	GetMovingCamera()->GetOwner()->GetTransform()->LookAt(Spot);
 }
 
 
 // -----------------------------------------------------------------
 void ModuleCamera3D::Move(const float3 &Movement)
 {
-	GetMovingCamera()->object->GetTransform()->SetGlobalPos(GetMovingCamera()->object->GetTransform()->GetGlobalPos() + Movement);
+	GetMovingCamera()->GetOwner()->GetTransform()->SetGlobalPos(GetMovingCamera()->GetOwner()->GetTransform()->GetGlobalPos() + Movement);
 }
 
 void ModuleCamera3D::SetPos(const float3 &Pos)
 {
-	GetMovingCamera()->object->GetTransform()->SetGlobalPos(Pos);
+	GetMovingCamera()->GetOwner()->GetTransform()->SetGlobalPos(Pos);
 }
 
 // -----------------------------------------------------------------
@@ -137,10 +153,10 @@ void ModuleCamera3D::SetCameraToFront(Camera* toSet)
 
 void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
 {
-	if (setTo->HasComponent<Camera>() && setTo->GetTransform() != nullptr)
+	if (setTo->HasComponent<Camera>())
 	{
-		toSet->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
-		toSet->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
+		toSet->GetOwner()->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
+		toSet->GetOwner()->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
 		if (toSet->GetFrustum()->type != setTo->GetComponent<Camera>()->GetFrustum()->type)
 		{
 			toSet->SwitchViewType();
@@ -169,7 +185,7 @@ void ModuleCamera3D::MoveWithKeys()
 	Camera* cam = GetMovingCamera();
 
 	float speed = m_camSpeed;
-	float3 lastCamPos = cam->object->GetTransform()->GetGlobalPos();
+	float3 lastCamPos = cam->GetOwner()->GetTransform()->GetGlobalPos();
 	float3 camPos = lastCamPos;
 	if (App->m_input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
@@ -181,7 +197,7 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel * 30 * Time.dt;
+			lastCamPos += cam->GetOwner()->GetTransform()->Forward() * speed * mouseWheel * 30 * Time.dt;
 		}
 		else
 		{
@@ -191,8 +207,8 @@ void ModuleCamera3D::MoveWithKeys()
 
 	if (App->m_input->GetMouseButton(2))
 	{
-		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt * App->m_input->GetMouseXMotion();
-		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt * App->m_input->GetMouseYMotion();
+		lastCamPos += cam->GetOwner()->GetTransform()->Left() * speed* Time.dt * App->m_input->GetMouseXMotion();
+		lastCamPos += cam->GetOwner()->GetTransform()->Up() * speed* Time.dt * App->m_input->GetMouseYMotion();
 	}
 
 	//Forward Backward
@@ -201,7 +217,7 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Forward() * speed* Time.dt;
+			lastCamPos += cam->GetOwner()->GetTransform()->Forward() * speed* Time.dt;
 		}
 		else
 		{
@@ -212,7 +228,7 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Backward() * speed* Time.dt;
+			lastCamPos += cam->GetOwner()->GetTransform()->Backward() * speed* Time.dt;
 		}
 		else
 		{
@@ -223,25 +239,25 @@ void ModuleCamera3D::MoveWithKeys()
 	//Right Left
 	if (App->m_input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt;
+		lastCamPos += cam->GetOwner()->GetTransform()->Left() * speed* Time.dt;
 	}
 	if (App->m_input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Right() * speed* Time.dt;
+		lastCamPos += cam->GetOwner()->GetTransform()->Right() * speed* Time.dt;
 	}
 
 	//Up Down
 	if (App->m_input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Down() * speed* Time.dt;
+		lastCamPos += cam->GetOwner()->GetTransform()->Down() * speed* Time.dt;
 	}
 	if (App->m_input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt;
+		lastCamPos += cam->GetOwner()->GetTransform()->Up() * speed* Time.dt;
 	}
 
 	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)
 	{
-		cam->object->GetTransform()->SetGlobalPos(lastCamPos);
+		cam->GetOwner()->GetTransform()->SetGlobalPos(lastCamPos);
 	}
 }

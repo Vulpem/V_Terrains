@@ -7,33 +7,19 @@
 class math::float3;
 class math::Quat;
 
-class Transform : public Component
+class Transform
 {
 public:
 	Transform(GameObject* linkedTo);
 	~Transform();
 
-	bool allowRotation = true;
-
 	void SaveSpecifics(pugi::xml_node& myNode);
 	void LoadSpecifics(pugi::xml_node& myNode);
-private:
-	math::Quat localRotation = math::Quat::identity;
-	math::float3 localPosition = math::float3::zero;
-	math::float3 localScale = math::float3::zero;
-	//TMP - Needed to fix the attribute editor display
-	math::float3 editorRot = math::float3::zero;
-	math::float3 editorGlobalRot = math::float3::zero;
 
-	math::float4x4 globalTransform = math::float4x4::identity;
-
-	void EditorContent();
-public:
 	math::float4x4 GetLocalTransformMatrix();
 
 	void UpdateGlobalTransform();
 	math::float4x4 GetGlobalTransform();
-
 
 	void UpdateEditorValues();
 
@@ -81,10 +67,33 @@ public:
 	static float3 WorldForward();
 	static float3 WorldBackward();
 
+	GameObject* GetGameobject();
+
+	void SetParent(Transform* parent);
+	Transform* GetParent();
+
+	void AddChild(Transform* newChild);
+	std::vector<Transform*> GetChilds();
+
 	void Draw(const ViewPort & port);
+	void EditorContent();
 
-	ComponentType GetType() const override { return ComponentType::transform; }
+	bool m_allowRotation = true;
+private:
 
+	math::Quat m_localRotation = math::Quat::identity;
+	math::float3 m_localPosition = math::float3::zero;
+	math::float3 m_localScale = math::float3::zero;
+	//TMP - Needed to fix the attribute editor display
+	math::float3 m_editorRot = math::float3::zero;
+	math::float3 m_editorGlobalRot = math::float3::zero;
+
+	math::float4x4 m_globalTransform = math::float4x4::identity;
+
+	GameObject* m_gameObject;
+
+	std::vector<Transform*> m_childs;
+	Transform* m_parent = nullptr;
 };
 
 #endif

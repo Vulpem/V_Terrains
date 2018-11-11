@@ -128,7 +128,7 @@ void Application::PrepareUpdate()
 
 	//Time managing
 	Time.dt = m_msTimer.ReadMs() / 1000.0f;
-	if (Time.PlayMode != Play::Stop && Time.Pause == false)
+	if (Time.PlayMode != PlayMode::Stop && Time.Pause == false)
 	{
 		Time.gdt = Time.dt / Time.gdtModifier;
 		Time.GameRuntime += Time.dt;
@@ -265,18 +265,18 @@ void Application::Play(bool debug)
 {
 	if (!debug)
 	{
-		Time.PlayMode = Play::Play;
+		Time.PlayMode = PlayMode::Play;
 	}
 	else
 	{
-		Time.PlayMode = Play::DebugPlay;
+		Time.PlayMode = PlayMode::DebugPlay;
 	}
 	for (Module* m : m_modules) {m->OnPlay(); };
 }
 
 void Application::Stop()
 {
-	Time.PlayMode = Play::Stop;
+	Time.PlayMode = PlayMode::Stop;
 	for (Module* m : m_modules) {m->OnStop(); };
 }
 

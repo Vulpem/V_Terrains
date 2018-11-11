@@ -32,7 +32,7 @@
 		 }\
 	 }
 
-enum class Play
+enum class PlayMode
 {
 	Stop,
 	Play,
@@ -57,7 +57,7 @@ struct GlobalTime
 	float gdtModifier = 1.0f;
 
 	//Is the game in "Play mode"?
-	Play PlayMode = Play::Stop;
+	PlayMode PlayMode = PlayMode::Stop;
 
 	bool debug = false;
 

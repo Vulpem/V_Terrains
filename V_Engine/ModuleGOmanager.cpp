@@ -8,6 +8,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
+#include "Mesh.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -54,7 +55,7 @@ UpdateStatus ModuleGoManager::PreUpdate()
 		{
 			comp = nextIt;
 		}
-		else if (comp->second->object->IsActive())
+		else if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->PreUpdate();
 		}
@@ -77,7 +78,7 @@ UpdateStatus ModuleGoManager::Update()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->IsActive())
+		if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->Update();
 		}
@@ -130,7 +131,7 @@ UpdateStatus ModuleGoManager::PostUpdate()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->IsActive())
+		if (comp->second->GetOwner()->IsActive())
 		{
 			comp->second->PostUpdate();
 		}
@@ -143,30 +144,30 @@ UpdateStatus ModuleGoManager::PostUpdate()
 
 	bool worked = false;
 
-	if (wantToSaveScene && worked == false)
+	if (m_wantToSaveScene && worked == false)
 	{
 		worked = true;
 		TIMER_START_PERF("Saving Scene");
 		SaveSceneNow();
-		wantToSaveScene = false;
+		m_wantToSaveScene = false;
 		TIMER_READ_MS("Saving Scene");
 	}
 
-	if (wantToClearScene && worked == false)
+	if (m_wantToClearScene && worked == false)
 	{
 		worked = true;
 		ClearSceneNow();
-		wantToClearScene = false;
+		m_wantToClearScene = false;
 	}
 
 	DeleteGOs();
 
-	if (wantToLoadScene&& worked == false)
+	if (m_wantToLoadScene&& worked == false)
 	{
 		worked = true;
 		TIMER_START_PERF("Loading Scene");
 		LoadSceneNow();
-		wantToLoadScene = false;
+		m_wantToLoadScene = false;
 		TIMER_READ_MS("Loading Scene");
 	}
 	return UpdateStatus::Continue;
@@ -186,9 +187,9 @@ void ModuleGoManager::Render(const ViewPort& port) const
 // Called before quitting
 void ModuleGoManager::CleanUp()
 {
-	if (root)
+	if (m_root)
 	{
-		delete root;
+		delete m_root;
 	}
 }
 
@@ -198,8 +199,6 @@ void ModuleGoManager::CleanUp()
 GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
-
-	empty->AddComponent(ComponentType::transform);
 	
 	if (name != NULL && name != "")
 	{
@@ -229,15 +228,15 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
 	GameObject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
 	std::vector<GameObject*> ret;
-	if (sceneRoot && sceneRoot->m_childs.empty() == false)
+	std::vector<Transform*> sceneRootChilds = sceneRoot->GetTransform()->GetChilds();
+	if (sceneRoot && sceneRootChilds.empty() == false)
 	{
-		for (std::vector<GameObject*>::iterator childs = sceneRoot->m_childs.begin(); childs != sceneRoot->m_childs.end(); childs++)
+		std::vector<Transform*> childs = sceneRoot->GetTransform()->GetChilds();
+		for (auto child : childs)
 		{
-			AddGOtoRoot(*childs);
-			ret.push_back((*childs));
+			AddGOtoRoot(child->GetGameobject());
+			ret.push_back(child->GetGameobject());
 		}
-		//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
-		sceneRoot->m_childs.clear();
 		delete sceneRoot;
 		LOG("Loaded %s", fileName);
 	}
@@ -264,17 +263,12 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 
 void ModuleGoManager::ClearSceneNow()
 {
-	if (root->m_childs.empty() == false)
+	for (auto child : m_root->GetTransform()->GetChilds())
 	{
-		std::vector<GameObject*>::iterator it = root->m_childs.begin();
-		for (; it != root->m_childs.end(); it++)
+		if (child->GetGameobject()->HiddenFromOutliner() == false)
 		{
-			if ((*it)->HiddenFromOutliner() == false)
-			{
-				toDelete.push(*it);
-			}
+			toDelete.push(child->GetGameobject());
 		}
-			LOG("Scene cleared");
 	}
 }
 
@@ -287,10 +281,10 @@ void ModuleGoManager::SaveSceneNow()
 
 	root_node = data.append_child("Scene");
 
-	root_node.append_attribute("SceneName") = sceneName.data();
+	root_node.append_attribute("SceneName") = m_sceneName.data();
 
 	//Saving GameObjects
-	root->Save(root_node.append_child("GameObjects"));
+	m_root->Save(root_node.append_child("GameObjects"));
 
 	Components_node = root_node.append_child("Components");
 
@@ -298,14 +292,14 @@ void ModuleGoManager::SaveSceneNow()
 	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->HiddenFromOutliner() == false)
+		if (comp->second->GetOwner()->HiddenFromOutliner() == false)
 		{
 			comp->second->Save(Components_node.append_child("Component"));
 		}
 	}
 
 	char path[524];
-	sprintf(path, "Assets/Scenes/%s%s", sceneName.data(), SCENE_FORMAT);
+	sprintf(path, "Assets/Scenes/%s%s", m_sceneName.data(), SCENE_FORMAT);
 
 	std::stringstream stream;
 	data.save(stream);
@@ -321,7 +315,7 @@ void ModuleGoManager::LoadSceneNow()
 	std::map<uint64_t, GameObject*> UIDlib;
 
 	char scenePath[526];
-	sprintf(scenePath, "Assets/Scenes/%s%s", sceneName.data(), SCENE_FORMAT);
+	sprintf(scenePath, "Assets/Scenes/%s%s", m_sceneName.data(), SCENE_FORMAT);
 
 
 	char* buffer;
@@ -356,11 +350,12 @@ void ModuleGoManager::LoadSceneNow()
 					bool isActive = GOs.attribute("Active").as_bool();
 					toAdd->SetActive(isActive);
 
+					toAdd->GetTransform()->LoadSpecifics(GOs.child("Transform"));
+
 					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
 					if (parent != UIDlib.end())
 					{
-						toAdd->m_parent = parent->second;
-						parent->second->m_childs.push_back(toAdd);
+						toAdd->GetTransform()->SetParent(parent->second->GetTransform());
 					}
 					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
 					if (UID != 0)
@@ -395,15 +390,14 @@ void ModuleGoManager::LoadSceneNow()
 				}
 
 				GameObject* sceneRoot = UIDlib.find(0)->second;
-				for (std::vector<GameObject*>::iterator it = sceneRoot->m_childs.begin(); it != sceneRoot->m_childs.end(); it++)
+				std::vector<Transform*> childs = sceneRoot->GetTransform()->GetChilds();
+				for (auto child : childs)
 				{
-					AddGOtoRoot((*it));
+					AddGOtoRoot(child->GetGameobject());
 				}
-				//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
-				sceneRoot->m_childs.clear();
 				RELEASE(sceneRoot);
 
-				LOG("Scene loaded: %s", sceneName.data());
+				LOG("Scene loaded: %s", m_sceneName.data());
 			}
 		}
 	}
@@ -419,9 +413,9 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 		GO->SetStatic(Static);
 		if (Static)
 		{
-			if (GO->m_parent != nullptr)
+			if (GO->GetTransform()->GetParent() != nullptr)
 			{
-				SetStatic(true, GO->m_parent);
+				SetStatic(true, GO->GetTransform()->GetParent()->GetGameobject());
 			}
 			App->m_goManager->quadTree.Add(GO);
 			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
@@ -435,12 +429,10 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 		}
 		else
 		{
-			if (GO->m_childs.empty() == false)
+			std::vector<Transform*> childs = GO->GetTransform()->GetChilds();
+			for (auto child : childs)
 			{
-				for (std::vector<GameObject*>::iterator it = GO->m_childs.begin(); it != GO->m_childs.end(); it++)
-				{
-					SetStatic(false, (*it));
-				}
+				SetStatic(false, child->GetGameobject());
 			}
 			quadTree.Remove(GO);
 			dynamicGO.push_back(GO);
@@ -453,12 +445,10 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 	SetStatic(Static, GO);
 	if (Static == true)
 	{
-		if (GO->m_childs.empty() == false)
+		std::vector<Transform*> childs = GO->GetTransform()->GetChilds();
+		for (auto child : childs)
 		{
-			for (std::vector<GameObject*>::iterator it = GO->m_childs.begin(); it != GO->m_childs.end(); it++)
-			{
-				SetChildsStatic(Static,(*it));
-			}
+			SetChildsStatic(Static, child->GetGameobject());
 		}
 	}
 }
@@ -495,7 +485,9 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		//One object may have more than a single mesh, so we'll check them one by one
 		if (check->second->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = check->second->GetComponents<Mesh>();
+			std::vector<Mesh*> meshes;
+			meshes.reserve(3);
+			check->second->GetComponents<Mesh>(meshes);
 			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
 				LineSegment transformedRay = ray;
@@ -553,12 +545,12 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
-	ret.m_transform = getFrom->object->GetTransform()->GetGlobalTransform();
+	ret.m_transform = getFrom->GetOwner()->GetTransform()->GetGlobalTransform();
 
-	if (getFrom->object->HasComponent<Material>())
+	if (getFrom->GetOwner()->HasComponent<Material>())
 	{
-		Material* mat = getFrom->object->GetComponent<Material>();
-		if (mat->toDelete == false)
+		Material* mat = getFrom->GetOwner()->GetComponent<Material>();
+		if (mat->MarkedForDeletion() == false)
 		{
 			ret.m_meshColor = mat->GetColor();
 			ret.m_textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
@@ -591,13 +583,13 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 		std::multimap<ComponentType, Component*>::iterator comp = components.begin();
 		for (; comp != components.end(); comp++)
 		{
-			if (comp->second->object->IsActive())
+			if (comp->second->GetOwner()->IsActive())
 			{
 				comp->second->Draw(port);
-				if (comp->second->object->HasComponent<Billboard>())
+				if (comp->second->GetOwner()->HasComponent<Billboard>())
 				{
-					Transform* camTransform = port.m_camera->object->GetTransform();
-					comp->second->object->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+					Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
+					comp->second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 				}
 			}
 		}
@@ -653,12 +645,14 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 	{
 		if (go->HasComponent<Mesh>())
 		{
-			std::vector<Mesh*> meshes = go->GetComponents<Mesh>();
+			std::vector<Mesh*> meshes;
+			meshes.reserve(3);
+			go->GetComponents<Mesh>(meshes);
 			if (meshes.empty() == false)
 			{
 				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 				{
-					if ((*mesh)->IsEnabled() && (*mesh)->toDelete == false)
+					if ((*mesh)->IsEnabled() && (*mesh)->MarkedForDeletion() == false)
 					{
 						TIMER_START("Mesh slowest");
 						Mesh_RenderInfo info = GetMeshData(*mesh);
@@ -679,13 +673,12 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 
 void ModuleGoManager::AddGOtoRoot(GameObject * GO)
 {
-	GO->m_parent = root;
-	root->m_childs.push_back(GO);
+	GO->GetTransform()->SetParent(m_root->GetTransform());
 }
 
 void ModuleGoManager::CreateRootGameObject()
 {
-	if (root == nullptr)
+	if (m_root == nullptr)
 	{
 		GameObject* ret = new GameObject();
 
@@ -694,12 +687,12 @@ void ModuleGoManager::CreateRootGameObject()
 		ret->SetName("Root");
 
 		//Setting parent
-		ret->m_parent = nullptr;
+		ret->GetTransform()->SetParent(nullptr);
 
 		//Setting transform
 		math::Quat rot = math::Quat::identity;
 
-		root = ret;
+		m_root = ret;
 	}
 	else
 	{

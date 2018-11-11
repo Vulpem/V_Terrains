@@ -107,6 +107,12 @@ void ModuleResourceManager::Start()
 	GenerateDefaultShader();
 }
 
+UpdateStatus ModuleResourceManager::PreUpdate()
+{
+	DeleteNow();
+	return UpdateStatus::Continue;
+}
+
 // Called every draw update
 UpdateStatus ModuleResourceManager::Update()
 {
@@ -125,7 +131,6 @@ UpdateStatus ModuleResourceManager::Update()
 UpdateStatus ModuleResourceManager::PostUpdate()
 {
 	ReloadNow();
-	DeleteNow();
 	return UpdateStatus::Continue;
 }
 
@@ -517,8 +522,8 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, ComponentT
 	return nullptr;
 }
 
-//TODO
-//Improve this function, since it's slooooow to find stuff and iterates too much
+//TODO Improve "GetMetaData function"
+//Improve this function, since it iterates too much
 const MetaInf * ModuleResourceManager::GetMetaData(ComponentType type, const char * component)
 {
 	std::map<std::string, std::multimap<ComponentType, MetaInf>>::iterator f = m_metaData.begin();
@@ -740,6 +745,7 @@ void ModuleResourceManager::UnlinkResource(uint64_t uid)
 
 void ModuleResourceManager::UnlinkResource(std::string fileName, ComponentType type)
 {
+	fileName = App->m_importer->IsolateFileName(fileName.data());
 	std::map<ComponentType, std::map<std::string, uint64_t>>::iterator tmpMap = m_uidLib.find(type);
 	if (tmpMap != m_uidLib.end())
 	{

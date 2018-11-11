@@ -11,6 +11,7 @@
 #include "QuadTree.h"
 
 #include "GameObject.h"
+#include "Mesh.h"
 
 struct ViewPort;
 
@@ -35,7 +36,7 @@ public:
 
 	// ----------------------- GO Management ------------------------------------------------------
 private:
-	GameObject* root = nullptr;
+	GameObject* m_root = nullptr;
 public:
 	//Create an empty GameObject
 	GameObject* CreateEmpty(const char* name = NULL);
@@ -58,15 +59,15 @@ public:
 
 	// ----------------------- Scene Management ------------------------------------------------------
 
-	void SaveScene(char* name) { wantToSaveScene = true; sceneName = name; }
-	void LoadScene(char* name) { wantToLoadScene = true; sceneName = name;	wantToClearScene = true; }
-	void ClearScene() { wantToClearScene = true; }
+	void SaveScene(char* name) { m_wantToSaveScene = true; m_sceneName = name; }
+	void LoadScene(char* name) { m_wantToLoadScene = true; m_sceneName = name;	m_wantToClearScene = true; }
+	void ClearScene() { m_wantToClearScene = true; }
 
 private:
-	std::string sceneName;
-	bool wantToSaveScene = false;
-	bool wantToLoadScene = false;
-	bool wantToClearScene = false;
+	std::string m_sceneName;
+	bool m_wantToSaveScene = false;
+	bool m_wantToLoadScene = false;
+	bool m_wantToClearScene = false;
 	void SaveSceneNow();
 	void LoadSceneNow();
 	void ClearSceneNow();
@@ -86,7 +87,7 @@ public:
 	bool RayCast(const LineSegment& ray, GameObject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL, bool onlyMeshes = true);
 
 	//Returns the root GO. Only read
-	const GameObject* GetRoot() { return root; }
+	GameObject* GetRoot() { return m_root; }
 
 	//Render all the GameObjects onto a viewport.
 	//If "exclusiveGOs" vector is empty, all visible GOs will be rendered. Otherwise, only the passed objects will be rendered

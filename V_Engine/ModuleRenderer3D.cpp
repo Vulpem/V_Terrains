@@ -338,10 +338,10 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glActiveTexture(0);
 	if (meshInfo.m_alphaType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
 	{
-		//TMP / TODO
+		//TMP / TODO Improve "DrawMesh" function alpha test ordering
 		//This is pretty inaccurate and probably not optimized. But, hey, it works. Sometimes. Maybe.
 		float3 objectPos = meshInfo.m_transform.Transposed().TranslatePart();
-		float distanceToObject = m_currentViewPort->m_camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
+		float distanceToObject = m_currentViewPort->m_camera->GetOwner()->GetTransform()->GetGlobalPos().Distance(objectPos);
 
 		m_alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
 		return;

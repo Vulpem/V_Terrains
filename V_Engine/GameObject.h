@@ -9,7 +9,7 @@
 #include "Math.h"
 
 #include "Component.h"
-#include "Mesh.h"
+#include "Transform.h"
 
 class Transform;
 
@@ -54,7 +54,6 @@ public:
 
 	template <typename typeComp>
 	bool HasComponent();
-	uint AmountOfComponent(ComponentType type);
 	Transform* GetTransform();
 
 	void Delete();
@@ -64,7 +63,7 @@ public:
 	void RemoveComponent(Component* comp);
 
 	template <typename typeComp>
-	std::vector<typeComp*> GetComponents();
+	void GetComponents(std::vector<typeComp*>& out);
 
 	template <typename typeComp>
 	typeComp* GetComponent();
@@ -73,9 +72,7 @@ public:
 	char m_name[NAME_MAX_LEN];
 	AABB m_aabb;
 	OBB m_obb;
-
-	std::vector<GameObject*> m_childs;
-	GameObject* m_parent = nullptr;
+//TODO move everything that can be in a component in there, clean GameObject
 
 	std::vector<Component*> m_components;
 	bool m_selected = false;
@@ -83,33 +80,27 @@ public:
 	bool m_beingRendered = false;
 private:
 	uint64_t m_uid;
+	Transform m_transform;
 
 	bool m_active = true;
 	bool m_publicActive = true;
 	bool m_hiddenOnOutliner = false;
 	bool m_static = false;
 
-	static const uint m_nComponentTypes = (int)ComponentType::none;
-	std::map<ComponentType, int> m_hasComponents;
-
 	AABB m_originalAABB;
-
-	Transform* m_transform = nullptr;
 };
 
 template <typename typeComp>
-std::vector<typeComp*> GameObject::GetComponents()
+void GameObject::GetComponents(std::vector<typeComp*>& out)
 {
-	std::vector<typeComp*> ret;
 	for (Component* component : m_components)
 	{
 		typeComp* toReturn = dynamic_cast<typeComp*>(component);
 		if (toReturn != nullptr)
 		{
-			ret.push_back(toReturn);
+			out.push_back(toReturn);
 		}
 	}
-	return ret;
 }
 
 template <typename typeComp>
@@ -117,6 +108,7 @@ typeComp* GameObject::GetComponent()
 {
 	for (Component* component : m_components)
 	{
+		//TODO look into typeID(typeComp)
 		typeComp* toReturn = dynamic_cast<typeComp*>(component);
 		if (toReturn != nullptr)
 		{

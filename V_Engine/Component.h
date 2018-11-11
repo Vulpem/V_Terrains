@@ -12,7 +12,6 @@ class ViewPort;
 enum class ComponentType
 {
 	GO = 1,
-	transform,
 	mesh,
 	material,
 	texture,
@@ -39,26 +38,22 @@ public:
 	virtual void DrawOnEditor();
 
 	virtual ComponentType GetType() const = 0;
-	bool IsEnabled() { return enabled; }
+	bool IsEnabled() { return m_enabled; }
 	virtual bool MissingComponent() { return false; }
 
 	void Save(pugi::xml_node& myNode);
+	GameObject* GetOwner() const;
+	bool MarkedForDeletion() const;
 
 	virtual void LoadSpecifics(pugi::xml_node& myNode) {}
 
-	const uint64_t GetUID() { return uid; }
-
+	const uint64_t GetUID() { return m_uid; }
 	void Delete();
 
 	//For system use, do not call
 	bool TryDeleteNow();
 
-	std::string name;
-
-	bool toDelete = false;
-
-	GameObject* object;
-
+	std::string m_name;
 protected:
 	virtual void SaveSpecifics(pugi::xml_node& myNode) {}
 
@@ -67,11 +62,12 @@ protected:
 
 	virtual void EditorContent() {};
 
-	ComponentType type;
-
-	uint64_t uid;
+	ComponentType m_type;
+	uint64_t m_uid;
+	bool m_toDelete = false;
+	GameObject* m_gameObject;
 private:
-	bool enabled = true;
+	bool m_enabled = true;
 };
 
 #endif

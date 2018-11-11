@@ -802,12 +802,18 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 
 				//Creating basic components for a GameObject
 				GameObject* ret = new GameObject;
-				Transform* trans = (Transform*)ret->AddComponent(ComponentType::transform);
 
 				//Setting name
 				ret->SetName(meta->name.data());
 				//Setting parent
-				ret->m_parent = parent;
+				if (parent != nullptr)
+				{
+					ret->GetTransform()->SetParent(parent->GetTransform());
+				}
+				else
+				{
+					ret->GetTransform()->SetParent(nullptr);
+				}
 
 				//Setting transform
 				float _transform[10];
@@ -815,11 +821,11 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 				memcpy(_transform, It, bytes);
 				It += bytes;
 
-				trans->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
-				trans->SetLocalScale(_transform[4], _transform[5], _transform[6]);
-				trans->SetLocalPos(_transform[7], _transform[8], _transform[9]);
+				ret->GetTransform()->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
+				ret->GetTransform()->SetLocalScale(_transform[4], _transform[5], _transform[6]);
+				ret->GetTransform()->SetLocalPos(_transform[7], _transform[8], _transform[9]);
 
-				trans->UpdateEditorValues();
+				ret->GetTransform()->UpdateEditorValues();
 
 				//Number of meshes
 				uint nMeshes = 0;
@@ -883,7 +889,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
 							if (child)
 							{
-								ret->m_childs.push_back(child);
+								ret->GetTransform()->AddChild(child->GetTransform());
 							}
 						}
 						else

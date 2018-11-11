@@ -84,7 +84,7 @@ bool ModuleTerrain::Init()
 void ModuleTerrain::Start()
 {
 	RPGT::Init();
-    App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
+    App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
 	App->m_fileSystem->CreateDir("Assets/Terrains");
 	SetDefaultTextures();
@@ -160,7 +160,7 @@ UpdateStatus ModuleTerrain::Update()
 
 	if (m_movingForward)
 	{
-		Transform* camTrans = App->m_camera->GetMovingCamera()->object->GetTransform();
+		Transform* camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
 		float3 p = camTrans->GetGlobalPos() + float3(0, 0, m_forwardSpeed * Time.dt);
 		camTrans->SetGlobalPos(p);
 	}
@@ -168,7 +168,7 @@ UpdateStatus ModuleTerrain::Update()
 	{
 		float height = 0;
 		const float heightSpeed = 200.f;
-		Transform* camTrans = App->m_camera->GetMovingCamera()->object->GetTransform();
+		Transform* camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
 		float3 p = camTrans->GetGlobalPos();
 
 		p.y += currentVSpeed * Time.dt;
@@ -183,16 +183,6 @@ UpdateStatus ModuleTerrain::Update()
 	}
 
     return UpdateStatus::Continue;
-}
-
-// PostUpdate present buffer to screen
-UpdateStatus ModuleTerrain::PostUpdate()
-{
-	if (Time.PlayMode != Play::Play)
-	{
-		DrawUI();
-	}
-	return UpdateStatus::Continue;
 }
 
 void ModuleTerrain::SaveTerrainConfig(std::string configName)
@@ -383,14 +373,14 @@ void ModuleTerrain::LoadTerrainNow(std::string configName)
 
 void ModuleTerrain::DrawUI()
 {
-	ImGui::SetNextWindowPos(ImVec2(0.f, 20.f));
-
-	ImGui::SetNextWindowSize(ImVec2(350, (App->m_window->GetWindowSize().y - 20) / 4 * 3 - 20));
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	float3 pos = App->m_camera->GetDefaultCam()->GetPosition();
 
 	if (ImGui::Begin("TerrainTests", 0, flags))
 	{
+		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
+		ImGui::SetWindowSize(ImVec2(300.0f, App->m_window->GetWindowSize().y - 250.0f));
+
 		ImGui::Text(
 			"Use WASD to move the camera around.\n"
 			"Q and E to move up and down.\n"
@@ -604,15 +594,15 @@ void ModuleTerrain::DrawUI()
 		{
 			if (ImGui::Button("Reset Camera Height"))
 			{
-				float3 pos = App->m_camera->GetDefaultCam()->object->GetTransform()->GetGlobalPos();
-				App->m_camera->GetDefaultCam()->object->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+				float3 pos = App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->GetGlobalPos();
+				App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
-			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_multipleViewports))
+			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_displayMultipleViews))
 			{
 				App->m_editor->SwitchViewPorts();
 			}
-			if (App->m_editor->m_multipleViewports)
+			if (App->m_editor->m_multipleViewportsIDs)
 			{
 				ImGui::Spacing();
 				ImGui::Checkbox("Auto follow top cam", &App->m_camera->m_followCamera);
@@ -777,6 +767,10 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
+				if (textures[n].length() > 0)
+				{
+					App->m_resourceManager->UnlinkResource(textures[n], ComponentType::texture);
+				}
 				t.buf_diffuse = resource->Read<R_Texture>()->m_bufferID;
 				textures[n] = textureFile;
 				RPGT::SetTexture(n, t);
@@ -785,6 +779,7 @@ void ModuleTerrain::SetImage(int n, std::string textureFile)
 	}
 	else
 	{
+		App->m_resourceManager->UnlinkResource(textures[n], ComponentType::texture);
 		t.buf_diffuse = 0;
 		textures[n] = "";
 		RPGT::SetTexture(n, t);
@@ -804,6 +799,10 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 			Resource* resource = App->m_resourceManager->Peek(UID);
 			if (resource != nullptr)
 			{
+				if (heightmaps[n].length() > 0)
+				{
+					App->m_resourceManager->UnlinkResource(heightmaps[n], ComponentType::texture);
+				}
 				t.buf_heightmap = resource->Read<R_Texture>()->m_bufferID;
 				heightmaps[n] = hmfile;
 				RPGT::SetTexture(n, t);
@@ -812,6 +811,7 @@ void ModuleTerrain::SetHeightmap(int n, std::string hmfile)
 	}
 	else
 	{
+		App->m_resourceManager->UnlinkResource(heightmaps[n], ComponentType::texture);
 		t.buf_heightmap = 0;
 		heightmaps[n] = "";
 		RPGT::SetTexture(n, t);
