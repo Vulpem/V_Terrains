@@ -24,7 +24,7 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, ComponentType::camera)
 	{
 		if (m_gameObject->m_aabb.IsFinite())
 		{
-			positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform().GetGlobalPos();
+			positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 		}
 	}
 	frustum.nearPlaneDistance = 4;
@@ -53,7 +53,7 @@ void Camera::PreUpdate()
 
 float3 Camera::GetPosition()
 {
-    return m_gameObject->GetTransform().GetGlobalPos();
+    return m_gameObject->GetTransform()->GetGlobalPos();
 }
 
 void Camera::Draw(const ViewPort & port)
@@ -68,7 +68,7 @@ void Camera::UpdateCamMatrix()
 {
 	if (m_gameObject->m_aabb.IsFinite())
 	{
-		positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform().GetGlobalPos();
+		positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 	}
 	UpdateOrientation();
 	UpdatePos();
@@ -76,16 +76,16 @@ void Camera::UpdateCamMatrix()
 
 void Camera::UpdatePos()
 {
-	frustum.pos = m_gameObject->GetTransform().GetGlobalPos() + positionOffset;
+	frustum.pos = m_gameObject->GetTransform()->GetGlobalPos() + positionOffset;
 }
 
 void Camera::UpdateOrientation()
 {
-	float3 rotation = m_gameObject->GetTransform().GetGlobalRot();
+	float3 rotation = m_gameObject->GetTransform()->GetGlobalRot();
 	rotation *= DEGTORAD;
 	float4x4 toSend = float4x4::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
 	frustum.SetWorldMatrix(toSend.Float3x4Part());
-	frustum.front = m_gameObject->GetTransform().GetGlobalTransform().Transposed().WorldZ().Normalized();
+	frustum.front = m_gameObject->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
 }
 
 FrustumCollision Camera::Collides(AABB boundingBox)

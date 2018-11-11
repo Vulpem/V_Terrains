@@ -54,7 +54,7 @@ public:
 
 	template <typename typeComp>
 	bool HasComponent();
-	Transform& GetTransform();
+	Transform* GetTransform();
 
 	void Delete();
 
@@ -73,8 +73,6 @@ public:
 	AABB m_aabb;
 	OBB m_obb;
 //TODO move everything that can be in a component in there, clean GameObject
-	std::vector<GameObject*> m_childs;
-	GameObject* m_parent = nullptr;
 
 	std::vector<Component*> m_components;
 	bool m_selected = false;

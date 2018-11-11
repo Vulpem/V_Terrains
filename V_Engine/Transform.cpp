@@ -154,11 +154,11 @@ math::float4x4 Transform::GetLocalTransformMatrix()
 
 void Transform::UpdateGlobalTransform()
 {
-	if (m_gameObject->m_parent != nullptr)
+	if (m_gameObject->GetTransform()->GetParent() != nullptr)
 	{
-		Transform& m_parent = m_gameObject->m_parent->GetTransform();
+		Transform* m_parent = m_gameObject->GetTransform()->GetParent();
 		
-		m_globalTransform = GetLocalTransformMatrix() * m_parent.GetGlobalTransform();
+		m_globalTransform = GetLocalTransformMatrix() * m_parent->GetGlobalTransform();
 	}
 	else
 	{
@@ -214,13 +214,13 @@ void Transform::SetGlobalPos(float x, float y, float z)
 {
 	if (m_gameObject->IsStatic() == false)
 	{
-		if (m_gameObject->m_parent != nullptr)
+		if (m_gameObject->GetTransform()->GetParent() != nullptr)
 		{
 			//TODO: clean transform SetGlobalPos
-			Transform& parentTrans = m_gameObject->m_parent->GetTransform();
+			Transform* parentTrans = m_gameObject->GetTransform()->GetParent();
 
 			float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
-			float4x4 parentGlobal = parentTrans.GetGlobalTransform();
+			float4x4 parentGlobal = parentTrans->GetGlobalTransform();
 
 			float4x4 localMat = myGlobal.Transposed() * parentGlobal.Inverted();
 			localMat.Transpose();
@@ -308,7 +308,7 @@ void Transform::SetGlobalRot(float x, float y, float z)
 {
 	if (m_gameObject->IsStatic() == false && m_allowRotation)
 	{
-		if (m_gameObject->m_parent != nullptr)
+		if (m_gameObject->GetTransform()->GetParent() != nullptr)
 		{
 			x *= DEGTORAD;
 			y *= DEGTORAD;
@@ -316,8 +316,8 @@ void Transform::SetGlobalRot(float x, float y, float z)
 
 			//Quat::from
 
-			Transform& parentTrans = m_gameObject->m_parent->GetTransform();
-			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans.GetGlobalRotQuat().Conjugated();
+			Transform* parentTrans = m_gameObject->GetTransform()->GetParent();
+			const Quat local = Quat::FromEulerXYZ(x, y, z) * parentTrans->GetGlobalRotQuat().Conjugated();
 			SetLocalRot(local.x, local.y, local.z, local.w);
 		}
 		else
@@ -453,4 +453,38 @@ float3 Transform::WorldForward()
 float3 Transform::WorldBackward()
 {
 	return float3(0, 0,-1);
+}
+
+GameObject * Transform::GetGameobject()
+{
+	return m_gameObject;
+}
+
+void Transform::SetParent(Transform * newParent)
+{
+	if (m_parent != nullptr)
+	{
+		m_parent->m_childs.erase(std::find(m_parent->m_childs.begin(), m_parent->m_childs.end(), this));
+		m_parent = nullptr;
+	}
+	if (newParent != nullptr)
+	{
+		newParent->m_childs.push_back(this);
+		m_parent = newParent;
+	}
+}
+
+Transform * Transform::GetParent()
+{
+	return m_parent;
+}
+
+void Transform::AddChild(Transform * newChild)
+{
+	newChild->SetParent(this);
+}
+
+std::vector<Transform*> Transform::GetChilds()
+{
+	return m_childs;
 }

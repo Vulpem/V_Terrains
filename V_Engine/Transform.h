@@ -67,6 +67,14 @@ public:
 	static float3 WorldForward();
 	static float3 WorldBackward();
 
+	GameObject* GetGameobject();
+
+	void SetParent(Transform* parent);
+	Transform* GetParent();
+
+	void AddChild(Transform* newChild);
+	std::vector<Transform*> GetChilds();
+
 	void Draw(const ViewPort & port);
 	void EditorContent();
 
@@ -83,6 +91,9 @@ private:
 	math::float4x4 m_globalTransform = math::float4x4::identity;
 
 	GameObject* m_gameObject;
+
+	std::vector<Transform*> m_childs;
+	Transform* m_parent = nullptr;
 };
 
 #endif

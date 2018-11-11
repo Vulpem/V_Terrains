@@ -55,15 +55,7 @@ GameObject::~GameObject()
 		App->m_goManager->quadTree.Remove(this);
 	}
 
-	if (m_parent != nullptr)
-	{
-		std::vector<GameObject*>::iterator it = m_parent->m_childs.begin();
-		while ((*it) != this)
-		{
-			it++;
-		}
-		m_parent->m_childs.erase(it);
-	}
+	GetTransform()->SetParent(nullptr);
 
 	std::vector<Component*>::reverse_iterator comp = m_components.rbegin();
 	while (comp != m_components.rend())
@@ -83,17 +75,13 @@ GameObject::~GameObject()
 	}
 	m_components.clear();
 
-	if (m_childs.empty() == false)
+	std::vector<Transform*> childs = GetTransform()->GetChilds();
+	if (childs.empty() == false)
 	{
-		std::vector<GameObject*>::iterator iterator = m_childs.begin();
-		while (m_childs.size() > 0 && iterator != m_childs.end())
+		std::vector<Transform*>::iterator iterator = childs.begin();
+		for (auto child : childs)
 		{
-			delete (*iterator);
-			//Erasing a Node will already remove it from the child list in its destructor, so we don't have to empty the list here, it will be done automatically
-			if (m_childs.size() > 0)
-			{
-				iterator = m_childs.begin();
-			}
+			delete child->GetGameobject();
 		}
 	}
 }
@@ -189,7 +177,7 @@ void GameObject::DrawOnEditor()
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
 	if (isStatic != m_static && App->m_goManager->setting == nullptr)
 	{
-		if (m_childs.empty() == true)
+		if (GetTransform()->GetChilds().empty() == true)
 		{
 			App->m_goManager->SetStatic(isStatic, this);
 		}
@@ -216,7 +204,7 @@ void GameObject::DrawLocator()
 		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
 		if (m_selected)
 		{
-			if (m_parent->m_selected)
+			if (GetTransform()->GetParent()->GetGameobject()->m_selected)
 			{
 				color = float4(0, 0.5f, 0.5f, 1);
 			}
@@ -224,17 +212,15 @@ void GameObject::DrawLocator()
 				color = float4(0, 0.8f, 0.8f, 1);
 			}
 		}
-		App->m_renderer3D->DrawLocator(GetTransform().GetGlobalTransform(), color);
+		App->m_renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
 
-		if (m_childs.empty() == false)
+		std::vector<Transform*> childs = GetTransform()->GetChilds();
+		for (auto child : childs)
 		{
-			for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
+			if (child->GetGameobject()->HasComponent<Mesh>() == false)
 			{
-				if (!(*it)->HasComponent<Mesh>())
-				{
-					math::float3 childPos((*it)->GetTransform().GetGlobalPos());
-					App->m_renderer3D->DrawLine(GetTransform().GetGlobalPos(), childPos, color);
-				}
+				math::float3 childPos(child->GetGlobalPos());
+				App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
 			}
 		}
 	}
@@ -271,13 +257,12 @@ void GameObject::Select(bool _renderNormals)
 	m_selected = true;
 	m_drawNormals = _renderNormals;
 
-	GetTransform().UpdateEditorValues();
+	GetTransform()->UpdateEditorValues();
 
-	std::vector<GameObject*>::iterator childIt = m_childs.begin();
-	while (childIt != m_childs.end())
+	std::vector<Transform*> childs = GetTransform()->GetChilds();
+	for (auto child : childs)
 	{
-		(*childIt)->Select();
-		childIt++;
+		child->GetGameobject()->Select();
 	}
 }
 
@@ -285,14 +270,10 @@ void GameObject::Unselect()
 {
 	m_selected = false;
 	m_drawNormals = false;
-	if (m_childs.empty() == false)
+	std::vector<Transform*> childs = GetTransform()->GetChilds();
+	for (auto child : childs)
 	{
-		std::vector<GameObject*>::iterator childIt = m_childs.begin();
-		while (childIt != m_childs.end())
-		{
-			(*childIt)->Unselect();
-			childIt++;
-		}
+		child->GetGameobject()->Unselect();
 	}
 }
 
@@ -327,14 +308,14 @@ void GameObject::UpdateAABB()
 	if (m_originalAABB.IsFinite())
 	{
 		m_obb = m_originalAABB;
-		m_obb.Transform(GetTransform().GetGlobalTransform().Transposed());
+		m_obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
 		m_aabb.Enclose(m_obb);
 	}
 }
 
 void GameObject::UpdateTransformMatrix()
 {
-	GetTransform().UpdateGlobalTransform();
+	GetTransform()->UpdateGlobalTransform();
 
 	UpdateAABB();
 
@@ -351,16 +332,10 @@ void GameObject::UpdateTransformMatrix()
 		}
 	}
 
-	if (m_childs.empty() == false)
+	for (auto child : GetTransform()->GetChilds())
 	{
-		std::vector<GameObject*>::iterator child = m_childs.begin();
-		while (child != m_childs.end())
-		{
-			(*child)->UpdateTransformMatrix();
-			child++;
-		}
+		child->GetGameobject()->UpdateTransformMatrix();
 	}
-
 }
 
 void GameObject::SetActive(bool state, bool justPublic)
@@ -371,11 +346,9 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 	m_publicActive = state;
 
-	std::vector<GameObject*>::iterator childIt = m_childs.begin();
-	while (childIt != m_childs.end())
+	for (auto child : GetTransform()->GetChilds())
 	{
-		(*childIt)->SetActive(state, true);
-		childIt++;
+		child->GetGameobject()->SetActive(state, true);
 	}
 
 	if (justPublic)
@@ -384,9 +357,9 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 	m_active = state;
 
-	if (state == true && m_parent)
+	if (state == true && GetTransform()->GetParent() != nullptr)
 	{
-		m_parent->SetActive(true);
+		GetTransform()->GetParent()->GetGameobject()->SetActive(true);
 	}
 }
 
@@ -464,9 +437,9 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	return toAdd;
 }
 
-Transform& GameObject::GetTransform()
+Transform* GameObject::GetTransform()
 {
-	return m_transform;
+	return &m_transform;
 }
 
 void GameObject::Delete()
@@ -483,12 +456,12 @@ void GameObject::Save(pugi::xml_node& node)
 		GO.append_attribute("Active") = m_active;
 		GO.append_attribute("m_static") = m_static;
 		GO.append_attribute("m_name") = m_name;
-		if (m_parent != nullptr)
+		if (GetTransform()->GetParent() != nullptr)
 		{
 			GO.append_attribute("UID") = m_uid;
-			if (m_parent->m_parent != nullptr)
+			if (GetTransform()->GetParent()->GetParent() != nullptr)
 			{
-				GO.append_attribute("m_parent") = m_parent->GetUID();
+				GO.append_attribute("m_parent") = GetTransform()->GetParent()->GetGameobject()->GetUID();
 			}
 			else
 			{
@@ -503,9 +476,9 @@ void GameObject::Save(pugi::xml_node& node)
 
 		m_transform.SaveSpecifics(GO.append_child("Transform"));
 
-		for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
+		for (auto child : GetTransform()->GetChilds())
 		{
-			(*it)->Save(node);
+			child->GetGameobject()->Save(node);
 		}
 	}
 }

@@ -37,7 +37,7 @@ Mesh_RenderInfo Mesh::GetMeshInfo()
 			}
 			if (m_gameObject->m_selected)
 			{
-				if (m_gameObject->m_parent && m_gameObject->m_parent->m_selected)
+				if (m_gameObject->GetTransform()->GetParent() != nullptr && m_gameObject->GetTransform()->GetParent()->GetGameobject()->m_selected)
 				{
 					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}

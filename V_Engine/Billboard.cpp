@@ -17,15 +17,15 @@ void Billboard::UpdateNow(const float3& point, const float3& _up)
 {
 	if (_up.IsZero() == false)
 	{
-		Transform& trans = m_gameObject->GetTransform();
-		float3 front = point - trans.GetGlobalPos();
+		Transform* trans = m_gameObject->GetTransform();
+		float3 front = point - trans->GetGlobalPos();
 
 		float4x4 tmp = float4x4::LookAt(m_localForward.Normalized(), front, m_localUp.Normalized(), _up);
-		trans.SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
+		trans->SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
 	}
 	else
 	{
-		m_gameObject->GetTransform().LookAt(point);
+		m_gameObject->GetTransform()->LookAt(point);
 	}
 }
 

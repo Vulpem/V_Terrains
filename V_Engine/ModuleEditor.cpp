@@ -233,7 +233,7 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 		{
 			node_flags += ImGuiTreeNodeFlags_Selected;
 		}
-		if (node->m_childs.empty())
+		if (node->GetTransform()->GetChilds().empty())
 		{
 			node_flags += ImGuiTreeNodeFlags_Leaf;
 		}
@@ -247,11 +247,10 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 				SelectGameObject(node);
 			}
 
-			std::vector<GameObject*>::iterator it = node->m_childs.begin();
-			while (it != node->m_childs.end())
+			std::vector<Transform*> childs = node->GetTransform()->GetChilds();
+			for (auto child : childs)
 			{
-				SceneTreeGameObject((*it));
-				it++;
+				SceneTreeGameObject(child->GetGameobject());
 			}
 			ImGui::TreePop();
 		}
@@ -615,11 +614,9 @@ void ModuleEditor::Outliner()
 		ImGui::SetWindowPos(ImVec2(0.0f, 50.0f));
 		ImGui::SetWindowSize(ImVec2(300.0f, m_screenH - 250.0f));
 		ImGui::Checkbox("Show hidden objects", &m_displayHiddenOutlinerGameobjects);
-		std::vector<GameObject*>::const_iterator node = App->m_goManager->GetRoot()->m_childs.begin();
-		while (node != App->m_goManager->GetRoot()->m_childs.end())
+		for (auto node : App->m_goManager->GetRoot()->GetTransform()->GetChilds())
 		{
-			SceneTreeGameObject((*node));
-			node++;
+			SceneTreeGameObject(node->GetGameobject());
 		}
 		ImGui::End();
 	}
@@ -639,7 +636,7 @@ void ModuleEditor::AttributeWindow()
 			ImGui::Separator();
 				if (ImGui::Button("Look at"))
 				{
-					float3 toLook = m_selectedGameObject->GetTransform().GetGlobalPos();
+					float3 toLook = m_selectedGameObject->GetTransform()->GetGlobalPos();
 					App->m_camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
 				}
 				ImGui::NewLine();
