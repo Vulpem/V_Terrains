@@ -688,8 +688,13 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			ViewPort* editPort = App->m_renderer3D->FindViewPort(port.m_ID);
 			ImGui::Checkbox("Wired", &editPort->m_useOnlyWires);
 			ImGui::Checkbox("Lightning", &editPort->m_useLighting);
-			//TODO ImGui::Checkbox("Textured", &editPort->m_useMaterials);
+			ImGui::Checkbox("Render Terrain Heightmap", &editPort->m_renderHeightMap);
 			ImGui::Checkbox("Single sided faces", &editPort->m_useSingleSidedFaces);
+			ImGui::Checkbox("Render Terrain", &editPort->m_renderTerrain);
+			ImGui::Checkbox("Render Terrain Collision", &editPort->m_renderTerrainCollisions);
+			ImGui::Checkbox("Render Chunk Borders", &editPort->m_renderChunkBorders);
+			ImGui::Checkbox("Render Bounding boxes", &editPort->m_renderBoundingBoxes);
+
 			ImGui::EndMenu();
 		}
 		sprintf(tmp, "Camera##ViewPort%i", port.m_ID);
