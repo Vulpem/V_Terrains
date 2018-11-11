@@ -11,6 +11,7 @@
 #include "QuadTree.h"
 
 #include "GameObject.h"
+#include "Mesh.h"
 
 struct ViewPort;
 

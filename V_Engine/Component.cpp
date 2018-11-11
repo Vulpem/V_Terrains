@@ -37,37 +37,35 @@ void Component::Disable()
 
 void Component::DrawOnEditor()
 {
-	if (GetType() != ComponentType::transform)
+	bool active = m_enabled;
+	char _id[256];
+	sprintf(_id, "##checkbox%llu", m_uid);
+	ImGui::Checkbox(_id, &active);
+
+	if (active != m_enabled)
 	{
-		bool active = m_enabled;
-		char _id[256];
-		sprintf(_id, "##checkbox%llu", m_uid);
-		ImGui::Checkbox(_id, &active);
-
-		if (active != m_enabled)
+		if (active)
 		{
-			if (active)
-			{
-				Enable();
-			}
-			else
-			{
-				Disable();
-			}
+			Enable();
 		}
-
-
-		ImGui::SameLine(ImGui::GetWindowWidth() - 50);
-		sprintf(_id, "X##RemoveComponent%llu", m_uid);
-		if (ImGui::Button(_id, ImVec2(25, 20)))
+		else
 		{
-			Delete();
+			Disable();
 		}
-		ImGui::SameLine(30);
 	}
+
+
+	ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+	sprintf(_id, "X##RemoveComponent%llu", m_uid);
+	if (ImGui::Button(_id, ImVec2(25, 20)))
+	{
+		Delete();
+	}
+	ImGui::SameLine(30);
+
 	bool open = ImGui::CollapsingHeader(m_name.data());
 
-	if(open && m_enabled)
+	if (open && m_enabled)
 	{
 		if (MissingComponent() == false)
 		{

@@ -9,7 +9,7 @@
 #include "Math.h"
 
 #include "Component.h"
-#include "Mesh.h"
+#include "Transform.h"
 
 class Transform;
 
@@ -54,8 +54,7 @@ public:
 
 	template <typename typeComp>
 	bool HasComponent();
-	uint AmountOfComponent(ComponentType type);
-	Transform* GetTransform();
+	Transform& GetTransform();
 
 	void Delete();
 
@@ -83,18 +82,14 @@ public:
 	bool m_beingRendered = false;
 private:
 	uint64_t m_uid;
+	Transform m_transform;
 
 	bool m_active = true;
 	bool m_publicActive = true;
 	bool m_hiddenOnOutliner = false;
 	bool m_static = false;
 
-	static const uint m_nComponentTypes = (int)ComponentType::none;
-	std::map<ComponentType, int> m_hasComponents;
-
 	AABB m_originalAABB;
-
-	Transform* m_transform = nullptr;
 };
 
 template <typename typeComp>

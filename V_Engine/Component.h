@@ -12,7 +12,6 @@ class ViewPort;
 enum class ComponentType
 {
 	GO = 1,
-	transform,
 	mesh,
 	material,
 	texture,

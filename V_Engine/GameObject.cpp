@@ -15,12 +15,9 @@
 
 
 GameObject::GameObject()
+	: m_transform(this)
 {
 	m_uid = GenerateUUID();
-	for (int n = 0; n < m_nComponentTypes; n++)
-	{
-		m_hasComponents[(ComponentType)n] = 0;
-	}
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
@@ -28,12 +25,9 @@ GameObject::GameObject()
 }
 
 GameObject::GameObject(uint64_t Uid)
+	: m_transform(this)
 {
 	m_uid = Uid;
-	for (int n = 0; n < m_nComponentTypes; n++)
-	{
-		m_hasComponents[(ComponentType)n] = 0;
-	}
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
@@ -205,7 +199,10 @@ void GameObject::DrawOnEditor()
 			App->m_goManager->settingStatic = isStatic;
 		}
 	}
-
+	if (ImGui::CollapsingHeader("Transform"))
+	{
+	m_transform.EditorContent();
+	}
 	for (std::vector<Component*>::iterator it = m_components.begin(); it != m_components.end(); it++)
 	{
 		(*it)->DrawOnEditor();
@@ -227,16 +224,16 @@ void GameObject::DrawLocator()
 				color = float4(0, 0.8f, 0.8f, 1);
 			}
 		}
-		App->m_renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
+		App->m_renderer3D->DrawLocator(GetTransform().GetGlobalTransform(), color);
 
 		if (m_childs.empty() == false)
 		{
 			for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 			{
-				if ((*it)->HasComponent<Transform>() && !(*it)->HasComponent<Mesh>())
+				if (!(*it)->HasComponent<Mesh>())
 				{
-					math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
-					App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
+					math::float3 childPos((*it)->GetTransform().GetGlobalPos());
+					App->m_renderer3D->DrawLine(GetTransform().GetGlobalPos(), childPos, color);
 				}
 			}
 		}
@@ -274,7 +271,7 @@ void GameObject::Select(bool _renderNormals)
 	m_selected = true;
 	m_drawNormals = _renderNormals;
 
-	GetTransform()->UpdateEditorValues();
+	GetTransform().UpdateEditorValues();
 
 	std::vector<GameObject*>::iterator childIt = m_childs.begin();
 	while (childIt != m_childs.end())
@@ -330,17 +327,14 @@ void GameObject::UpdateAABB()
 	if (m_originalAABB.IsFinite())
 	{
 		m_obb = m_originalAABB;
-		m_obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
+		m_obb.Transform(GetTransform().GetGlobalTransform().Transposed());
 		m_aabb.Enclose(m_obb);
 	}
 }
 
 void GameObject::UpdateTransformMatrix()
 {
-	if (HasComponent<Transform>())
-	{	
-		GetTransform()->UpdateGlobalTransform();
-	}
+	GetTransform().UpdateGlobalTransform();
 
 	UpdateAABB();
 
@@ -421,15 +415,6 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	Component* toAdd = nullptr;
 	switch (type)
 	{
-	case ComponentType::transform:
-	{
-		if (HasComponent<Transform>() == false)
-		{
-			toAdd = new Transform(this);
-			m_transform = (Transform*)toAdd;
-		}
-		break;
-	}
 	case ComponentType::mesh:
 	{
 		toAdd = new Mesh(res, this);
@@ -445,10 +430,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	}
 	case ComponentType::camera:
 	{
-		if (HasComponent<Transform>())
-		{
-			toAdd = new Camera(this);
-		}
+		toAdd = new Camera(this);
 		break;
 	}
 	case ComponentType::billboard:
@@ -465,7 +447,6 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	{
 		if (toAdd->MissingComponent() == false || forceCreation)
 		{
-			m_hasComponents[toAdd->GetType()] += 1;
 			m_components.push_back(toAdd);
 			App->m_goManager->components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));
 			if (toAdd->GetType() == ComponentType::mesh)
@@ -483,12 +464,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 	return toAdd;
 }
 
-uint GameObject::AmountOfComponent(ComponentType type)
-{
-	return m_hasComponents[type];
-}
-
-Transform * GameObject::GetTransform()
+Transform& GameObject::GetTransform()
 {
 	return m_transform;
 }
@@ -525,6 +501,8 @@ void GameObject::Save(pugi::xml_node& node)
 			GO.append_attribute("m_parent") = "0";
 		}
 
+		m_transform.SaveSpecifics(GO.append_child("Transform"));
+
 		for (std::vector<GameObject*>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 		{
 			(*it)->Save(node);
@@ -548,7 +526,6 @@ void GameObject::RemoveComponent(Component * comp)
 					break;
 				}
 			}
-			m_hasComponents[(*it)->GetType()] -= 1;
 			RELEASE(*it);
 			m_components.erase(it);
 			return;

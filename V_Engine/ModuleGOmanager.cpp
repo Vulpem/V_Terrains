@@ -8,6 +8,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
+#include "Mesh.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -198,8 +199,6 @@ void ModuleGoManager::CleanUp()
 GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
-
-	empty->AddComponent(ComponentType::transform);
 	
 	if (name != NULL && name != "")
 	{
@@ -356,6 +355,8 @@ void ModuleGoManager::LoadSceneNow()
 					bool isActive = GOs.attribute("Active").as_bool();
 					toAdd->SetActive(isActive);
 
+					toAdd->GetTransform().LoadSpecifics(GOs.child("Transform"));
+
 					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
 					if (parent != UIDlib.end())
 					{
@@ -501,7 +502,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 			for (std::vector<Mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
 				LineSegment transformedRay = ray;
-				transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
+				transformedRay.Transform(check->second->GetTransform().GetGlobalTransform().InverseTransposed());
 				//Generating the triangles the mes has, and checking them one by one
 				const float3* vertices = (*m)->GetVertices();
 				const uint* index = (*m)->GetIndices();
@@ -521,7 +522,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 							out_pos = intersectionPoint;
 							out_normal = tri.NormalCCW();
 							LineSegment tmp(out_pos, out_pos + out_normal);
-							tmp.Transform(check->second->GetTransform()->GetGlobalTransform().Transposed());
+							tmp.Transform(check->second->GetTransform().GetGlobalTransform().Transposed());
 							out_pos = tmp.a;
 							out_normal = tmp.b - tmp.a;
 						}
@@ -534,7 +535,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 			collided = true;
 			out_go = check->second;
 			out_normal = float3(0, 1, 0);
-			out_pos = check->second->GetTransform()->GetGlobalPos();
+			out_pos = check->second->GetTransform().GetGlobalPos();
 		}
 	}
 	*OUT_gameobject = out_go;
@@ -555,7 +556,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
-	ret.m_transform = getFrom->GetOwner()->GetTransform()->GetGlobalTransform();
+	ret.m_transform = getFrom->GetOwner()->GetTransform().GetGlobalTransform();
 
 	if (getFrom->GetOwner()->HasComponent<Material>())
 	{
@@ -598,8 +599,8 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 				comp->second->Draw(port);
 				if (comp->second->GetOwner()->HasComponent<Billboard>())
 				{
-					Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
-					comp->second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+					Transform& camTransform = port.m_camera->GetOwner()->GetTransform();
+					comp->second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform.GetGlobalPos(), camTransform.Up());
 				}
 			}
 		}

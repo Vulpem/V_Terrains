@@ -84,7 +84,7 @@ bool ModuleTerrain::Init()
 void ModuleTerrain::Start()
 {
 	RPGT::Init();
-    App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
+    App->m_camera->GetDefaultCam()->GetOwner()->GetTransform().SetGlobalPos(0.f, m_maxHeight, 0.f);
     GenMap();
 	App->m_fileSystem->CreateDir("Assets/Terrains");
 	SetDefaultTextures();
@@ -160,19 +160,19 @@ UpdateStatus ModuleTerrain::Update()
 
 	if (m_movingForward)
 	{
-		Transform* camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
-		float3 p = camTrans->GetGlobalPos() + float3(0, 0, m_forwardSpeed * Time.dt);
-		camTrans->SetGlobalPos(p);
+		Transform& camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
+		float3 p = camTrans.GetGlobalPos() + float3(0, 0, m_forwardSpeed * Time.dt);
+		camTrans.SetGlobalPos(p);
 	}
 	if (m_movingHeight)
 	{
 		float height = 0;
 		const float heightSpeed = 200.f;
-		Transform* camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
-		float3 p = camTrans->GetGlobalPos();
+		Transform& camTrans = App->m_camera->GetMovingCamera()->GetOwner()->GetTransform();
+		float3 p = camTrans.GetGlobalPos();
 
 		p.y += currentVSpeed * Time.dt;
-		camTrans->SetGlobalPos(p);
+		camTrans.SetGlobalPos(p);
 
 		RPGT::GetPoint(p.x, p.z + 300, height);
 		height += m_verticalOffset;
@@ -594,8 +594,8 @@ void ModuleTerrain::DrawUI()
 		{
 			if (ImGui::Button("Reset Camera Height"))
 			{
-				float3 pos = App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->GetGlobalPos();
-				App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->SetGlobalPos(pos.x, m_maxHeight, pos.y);
+				float3 pos = App->m_camera->GetDefaultCam()->GetOwner()->GetTransform().GetGlobalPos();
+				App->m_camera->GetDefaultCam()->GetOwner()->GetTransform().SetGlobalPos(pos.x, m_maxHeight, pos.y);
 			}
 			ImGui::Checkbox("Simulate player position to 0", &m_forcePositionTo0);
 			if (ImGui::Checkbox("Multiple viewports", &App->m_editor->m_displayMultipleViews))

@@ -17,7 +17,9 @@ Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(linke
 	sprintf(tmp, "Mesh##%i", m_uid);
 	m_name = tmp;
 	LoadResource(resource);
-	texMaterialIndex = m_gameObject->AmountOfComponent(ComponentType::mesh);
+	std::vector<Mesh*> existingMeshes;
+	m_gameObject->GetComponents<Mesh>(existingMeshes);
+	texMaterialIndex = existingMeshes.size();
 }
 
 Mesh_RenderInfo Mesh::GetMeshInfo()

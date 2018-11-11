@@ -637,11 +637,9 @@ void ModuleEditor::AttributeWindow()
 		{
 			m_selectedGameObject->DrawOnEditor();
 			ImGui::Separator();
-			if (m_selectedGameObject->HasComponent<Transform>())
-			{
 				if (ImGui::Button("Look at"))
 				{
-					float3 toLook = m_selectedGameObject->GetTransform()->GetGlobalPos();
+					float3 toLook = m_selectedGameObject->GetTransform().GetGlobalPos();
 					App->m_camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
 				}
 				ImGui::NewLine();
@@ -651,7 +649,6 @@ void ModuleEditor::AttributeWindow()
 					App->m_goManager->DeleteGameObject(m_selectedGameObject);
 					m_selectedGameObject = nullptr;
 				}
-			}
 		}
 		ImGui::End();
 	}
