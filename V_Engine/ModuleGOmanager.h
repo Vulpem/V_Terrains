@@ -91,7 +91,7 @@ public:
 
 	//Render all the GameObjects onto a viewport.
 	//If "exclusiveGOs" vector is empty, all visible GOs will be rendered. Otherwise, only the passed objects will be rendered
-	void RenderGOs(const ViewPort& ViewPort, const std::vector<GameObject*>& exclusiveGOs = std::vector<GameObject*>());
+	void RenderGOs(const ViewPort& ViewPort);
 private:
 	//Get all the info necessary to render a mesh
 	Mesh_RenderInfo GetMeshData(Mesh* getFrom);
@@ -99,24 +99,26 @@ private:
 	void AddGOtoRoot(GameObject* GO);
 	void CreateRootGameObject();
 	void DeleteGOs();
-	std::stack<GameObject*> toDelete;
+	// TODO make a vector
+	std::vector<GameObject*> m_toDelete;
 
 public:
 	//Map with all the components of all the GOs in the scene
-	std::multimap<ComponentType, Component*> components;
+	std::multimap<ComponentType, Component*> m_components;
 
 	// ----------------------- Collision filtering ------------------------------------------------------
 
-	Quad_Tree quadTree;
-	bool drawQuadTree = false;
-	std::vector<GameObject*> dynamicGO;
+	Quad_Tree m_quadTree;
+	bool m_drawQuadTree = false;
+	std::vector<GameObject*> m_dynamicGO;
 
 
 	// -------- UI TMP STUFF ------------
-	GameObject* setting = nullptr;
-	bool settingStatic = true;
+	//TODO: wth is this?
+	GameObject* m_setting = nullptr;
+	bool m_settingStatic = true;
 private:
-	bool StaticChildsPopUpIsOpen = false;
+	bool m_staticChildsPopUpIsOpen = false;
 };
 
 
@@ -124,9 +126,9 @@ template<typename C>
 inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 {
 	std::vector<GameObject*> ret;// = quadTree.FilterCollisions(col);
-	ret.reserve(dynamicGO.size());
+	ret.reserve(m_dynamicGO.size());
 
-	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_dynamicGO.begin(); it != m_dynamicGO.end(); it++)
 	{
 		if ((*it)->IsActive() && (*it)->m_aabb.IsFinite() && (*it)->m_aabb.Intersects(col) == true)
 		{

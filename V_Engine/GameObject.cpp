@@ -21,7 +21,7 @@ GameObject::GameObject()
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
-	App->m_goManager->dynamicGO.push_back(this);
+	App->m_goManager->m_dynamicGO.push_back(this);
 }
 
 GameObject::GameObject(uint64_t Uid)
@@ -31,20 +31,20 @@ GameObject::GameObject(uint64_t Uid)
 	m_aabb.SetNegativeInfinity();
 	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
-	App->m_goManager->dynamicGO.push_back(this);
+	App->m_goManager->m_dynamicGO.push_back(this);
 }
 
 GameObject::~GameObject()
 {
 	if (IsStatic() == false)
 	{
-		if (App->m_goManager->dynamicGO.empty() == false)
+		if (App->m_goManager->m_dynamicGO.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
+			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
 			{
 				if ((*it) == this)
 				{
-					App->m_goManager->dynamicGO.erase(it);
+					App->m_goManager->m_dynamicGO.erase(it);
 					break;
 				}
 			}
@@ -52,7 +52,7 @@ GameObject::~GameObject()
 	}
 	else
 	{
-		App->m_goManager->quadTree.Remove(this);
+		App->m_goManager->m_quadTree.Remove(this);
 	}
 
 	GetTransform()->SetParent(nullptr);
@@ -60,12 +60,12 @@ GameObject::~GameObject()
 	std::vector<Component*>::reverse_iterator comp = m_components.rbegin();
 	while (comp != m_components.rend())
 	{
-		std::multimap<ComponentType, Component*>::iterator it = App->m_goManager->components.find((*comp)->GetType());
+		std::multimap<ComponentType, Component*>::iterator it = App->m_goManager->m_components.find((*comp)->GetType());
 		for (; it->first == (*comp)->GetType(); it++)
 		{
 			if (it->second->GetUID() == (*comp)->GetUID())
 			{
-				App->m_goManager->components.erase(it);
+				App->m_goManager->m_components.erase(it);
 				break;
 			}
 		}
@@ -175,7 +175,7 @@ void GameObject::DrawOnEditor()
 	ImGui::SameLine();
 	bool isStatic = m_static;
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != m_static && App->m_goManager->setting == nullptr)
+	if (isStatic != m_static && App->m_goManager->m_setting == nullptr)
 	{
 		if (GetTransform()->GetChilds().empty() == true)
 		{
@@ -183,8 +183,8 @@ void GameObject::DrawOnEditor()
 		}
 		else
 		{
-			App->m_goManager->setting = this;
-			App->m_goManager->settingStatic = isStatic;
+			App->m_goManager->m_setting = this;
+			App->m_goManager->m_settingStatic = isStatic;
 		}
 	}
 	if (ImGui::CollapsingHeader("Transform"))
@@ -421,7 +421,7 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 		if (toAdd->MissingComponent() == false || forceCreation)
 		{
 			m_components.push_back(toAdd);
-			App->m_goManager->components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));
+			App->m_goManager->m_components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));
 			if (toAdd->GetType() == ComponentType::mesh)
 			{
 				SetOriginalAABB();
@@ -490,12 +490,12 @@ void GameObject::RemoveComponent(Component * comp)
 	{
 		if ((*it) == comp)
 		{
-			std::map<ComponentType, Component*>::iterator mapIt = App->m_goManager->components.find((*it)->GetType());
-			for (; mapIt != App->m_goManager->components.end() && mapIt->first == (*it)->GetType(); mapIt++)
+			std::map<ComponentType, Component*>::iterator mapIt = App->m_goManager->m_components.find((*it)->GetType());
+			for (; mapIt != App->m_goManager->m_components.end() && mapIt->first == (*it)->GetType(); mapIt++)
 			{
 				if (mapIt->second == comp)
 				{
-					App->m_goManager->components.erase(mapIt);
+					App->m_goManager->m_components.erase(mapIt);
 					break;
 				}
 			}

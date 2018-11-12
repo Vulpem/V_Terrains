@@ -93,14 +93,7 @@ void Transform::EditorContent()
 	tmp[2] = m_editorRot.z;
 	for (int n = 0; n < 3; n++)
 	{
-		while (tmp[n] >= 360)
-		{
-			tmp[n] -= 360;
-		}
-		while (tmp[n] < 0)
-		{
-			tmp[n] += 360;
-		}
+		tmp[n] = tmp[n] - FloorInt(tmp[n] / 360) * 360;
 	}
 	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
 	{
@@ -141,7 +134,7 @@ void Transform::EditorContent()
 	}
 
 	float3 scal = GetGlobalScale();
-	ImGui::Text("%.2f, %.2f, %.2f", scal.x, scal.y, scal.z);
+	ImGui::Text("%.2f, %.2f, %.2f  Global scale", scal.x, scal.y, scal.z);
 
 }
 
@@ -259,10 +252,9 @@ void Transform::SetLocalRot(float x, float y, float z)
 {
 	if (m_gameObject->IsStatic() == false && m_allowRotation)
 	{
-		while (x < 0) { x += 360; }
-		while (y < 0) { y += 360; }
-		while (z < 0) { z += 360; }
-
+		x = x - FloorInt(x / 360) * 360;
+		y = y - FloorInt(y / 360) * 360;
+		z = z - FloorInt(z / 360) * 360;
 		x *= DEGTORAD;
 		y *= DEGTORAD;
 		z *= DEGTORAD;

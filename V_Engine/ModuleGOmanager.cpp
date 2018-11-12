@@ -9,6 +9,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
 #include "Mesh.h"
+#include "Transform.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -23,7 +24,7 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
+ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), m_quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
 }
 
@@ -46,8 +47,8 @@ bool ModuleGoManager::Init()
 UpdateStatus ModuleGoManager::PreUpdate()
 {
 	TIMER_START("Components PreUpdate");
-	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
-	for (; comp != components.end(); comp++)
+	std::multimap<ComponentType, Component*>::iterator comp = m_components.begin();
+	for (; comp != m_components.end(); comp++)
 	{
 		std::multimap<ComponentType, Component*>::iterator nextIt = comp;
 		nextIt--;
@@ -75,8 +76,8 @@ UpdateStatus ModuleGoManager::Update()
 	}
 
 	TIMER_START("Components Update");
-	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
-	for (; comp != components.end(); comp++)
+	std::multimap<ComponentType, Component*>::iterator comp = m_components.begin();
+	for (; comp != m_components.end(); comp++)
 	{
 		if (comp->second->GetOwner()->IsActive())
 		{
@@ -84,11 +85,11 @@ UpdateStatus ModuleGoManager::Update()
 		}
 	}
 	TIMER_READ_MS("Components Update");
-	if (setting != nullptr)
+	if (m_setting != nullptr)
 	{
-		if (ImGui::BeginPopupModal("##SetStaticChilds", &StaticChildsPopUpIsOpen))
+		if (ImGui::BeginPopupModal("##SetStaticChilds", &m_staticChildsPopUpIsOpen))
 		{
-			if (settingStatic)
+			if (m_settingStatic)
 			{
 				ImGui::Text("Set childs to Static too?");
 			}
@@ -100,26 +101,26 @@ UpdateStatus ModuleGoManager::Update()
 			ImGui::SameLine(30);
 			if (ImGui::Button("Yes##yesSetStatic"))
 			{
-				SetChildsStatic(settingStatic, setting);
-				setting = nullptr;
+				SetChildsStatic(m_settingStatic, m_setting);
+				m_setting = nullptr;
 			}
 			ImGui::SameLine(150);
 			if (ImGui::Button("No##NoSetStatic"))
 			{
-				SetStatic(settingStatic, setting);
-				setting = nullptr;
+				SetStatic(m_settingStatic, m_setting);
+				m_setting = nullptr;
 			}
 			ImGui::EndPopup();
 		}
-		if (StaticChildsPopUpIsOpen == false)
+		if (m_staticChildsPopUpIsOpen == false)
 		{
 			ImGui::OpenPopup("##SetStaticChilds");
-			StaticChildsPopUpIsOpen = true;
+			m_staticChildsPopUpIsOpen = true;
 		}
 	}
 	else
 	{
-		StaticChildsPopUpIsOpen = false;
+		m_staticChildsPopUpIsOpen = false;
 	}
 
 	return UpdateStatus::Continue;
@@ -128,8 +129,8 @@ UpdateStatus ModuleGoManager::Update()
 UpdateStatus ModuleGoManager::PostUpdate()
 {
 	TIMER_START("Components PostUpdate");
-	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
-	for (; comp != components.end(); comp++)
+	std::multimap<ComponentType, Component*>::iterator comp = m_components.begin();
+	for (; comp != m_components.end(); comp++)
 	{
 		if (comp->second->GetOwner()->IsActive())
 		{
@@ -176,10 +177,10 @@ UpdateStatus ModuleGoManager::PostUpdate()
 void ModuleGoManager::Render(const ViewPort& port) const
 {
 	App->m_goManager->RenderGOs(port);
-	if (drawQuadTree)
+	if (m_drawQuadTree)
 	{
 		TIMER_START("QuadTree drawTime");
-		quadTree.Draw();
+		m_quadTree.Draw();
 		TIMER_READ_MS("QuadTree drawTime");
 	}
 }
@@ -251,7 +252,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
 	if (toErase)
 	{
-		toDelete.push(toErase);
+		m_toDelete.push_back(toErase);
 		return true;
 	}
 	return false;
@@ -267,7 +268,7 @@ void ModuleGoManager::ClearSceneNow()
 	{
 		if (child->GetGameobject()->HiddenFromOutliner() == false)
 		{
-			toDelete.push(child->GetGameobject());
+			m_toDelete.push_back(child->GetGameobject());
 		}
 	}
 }
@@ -289,8 +290,8 @@ void ModuleGoManager::SaveSceneNow()
 	Components_node = root_node.append_child("Components");
 
 	//Saving components
-	std::multimap<ComponentType, Component*>::iterator comp = components.begin();
-	for (; comp != components.end(); comp++)
+	std::multimap<ComponentType, Component*>::iterator comp = m_components.begin();
+	for (; comp != m_components.end(); comp++)
 	{
 		if (comp->second->GetOwner()->HiddenFromOutliner() == false)
 		{
@@ -360,7 +361,7 @@ void ModuleGoManager::LoadSceneNow()
 					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
 					if (UID != 0)
 					{
-						dynamicGO.push_back(toAdd);
+						m_dynamicGO.push_back(toAdd);
 					}
 				}
 
@@ -417,12 +418,12 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 			{
 				SetStatic(true, GO->GetTransform()->GetParent()->GetGameobject());
 			}
-			App->m_goManager->quadTree.Add(GO);
-			for (std::vector<GameObject*>::iterator it = App->m_goManager->dynamicGO.begin(); it != App->m_goManager->dynamicGO.end(); it++)
+			App->m_goManager->m_quadTree.Add(GO);
+			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
 			{
 				if ((*it) == GO)
 				{
-					dynamicGO.erase(it);
+					m_dynamicGO.erase(it);
 					break;
 				}
 			}
@@ -434,8 +435,8 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 			{
 				SetStatic(false, child->GetGameobject());
 			}
-			quadTree.Remove(GO);
-			dynamicGO.push_back(GO);
+			m_quadTree.Remove(GO);
+			m_dynamicGO.push_back(GO);
 		}
 	}
 }
@@ -572,32 +573,28 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObject*>& exclusiveGOs)
+void ModuleGoManager::RenderGOs(const ViewPort & port)
 {
-	std::vector<GameObject*> toRender;
-
-	//This vector will generally be empty. It is only used when we send certain GOs we want to render exclusively
-	if (exclusiveGOs.empty() == true)
-	{
 		//Call the Draw function of all the components, so they do what they need to
-		std::multimap<ComponentType, Component*>::iterator comp = components.begin();
-		for (; comp != components.end(); comp++)
+		for (auto component : m_components)
 		{
-			if (comp->second->GetOwner()->IsActive())
+			if (component.second->GetOwner()->IsActive())
 			{
-				comp->second->Draw(port);
-				if (comp->second->GetOwner()->HasComponent<Billboard>())
+				component.second->Draw(port);
+				if (component.second->GetOwner()->HasComponent<Billboard>())
 				{
 					Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
-					comp->second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+					component.second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 				}
 			}
 		}
 		TIMER_START("Cam culling longest");
+
+		std::vector<GameObject*> toRender;
 		bool aCamHadCulling = false;
 		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
-		std::multimap<ComponentType, Component*>::iterator it = components.find(ComponentType::camera);
-		for (; it != components.end() && it->first == ComponentType::camera; it++)
+		std::multimap<ComponentType, Component*>::iterator it = m_components.find(ComponentType::camera);
+		for (; it != m_components.end() && it->first == ComponentType::camera; it++)
 		{
 			if (((Camera*)(it->second))->HasCulling())
 			{
@@ -628,21 +625,13 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 			}
 		}
 		TIMER_READ_MS_MAX("Cam culling longest");
-	}
-	else
-	{
-		App->m_renderer3D->SetViewPort(*App->m_renderer3D->FindViewPort(port.m_ID));
-		for (std::vector<GameObject*>::const_iterator toInsert = exclusiveGOs.begin(); toInsert != exclusiveGOs.end(); toInsert++)
-		{
-			toRender.push_back(*toInsert);
-		}
-	}
 
 	TIMER_START("GO render longest");
-	//And now, we render them
 	TIMER_RESET_STORED("Mesh slowest");
 	for(GameObject* go : toRender)
 	{
+		//TODO fix linker issue of Transform Draw
+		//go->GetTransform()->Draw(port);
 		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes;
@@ -650,12 +639,12 @@ void ModuleGoManager::RenderGOs(const ViewPort & port, const std::vector<GameObj
 			go->GetComponents<Mesh>(meshes);
 			if (meshes.empty() == false)
 			{
-				for (std::vector<Mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
+				for(auto mesh : meshes)
 				{
-					if ((*mesh)->IsEnabled() && (*mesh)->MarkedForDeletion() == false)
+					if (mesh->IsEnabled() && mesh->MarkedForDeletion() == false)
 					{
 						TIMER_START("Mesh slowest");
-						Mesh_RenderInfo info = GetMeshData(*mesh);
+						Mesh_RenderInfo info = GetMeshData(mesh);
 						if (port.m_useOnlyWires)
 						{
 							info.m_drawFilled = false;
@@ -680,32 +669,23 @@ void ModuleGoManager::CreateRootGameObject()
 {
 	if (m_root == nullptr)
 	{
-		GameObject* ret = new GameObject();
-
 		LOG("Creating root node for scene");
-		//Setting Name
-		ret->SetName("Root");
-
-		//Setting parent
-		ret->GetTransform()->SetParent(nullptr);
-
-		//Setting transform
-		math::Quat rot = math::Quat::identity;
-
-		m_root = ret;
+		m_root = new GameObject();
+		m_root->SetName("Root");
+		m_root->GetTransform()->SetParent(nullptr);
 	}
 	else
 	{
-		LOG("Be careful! You almost created a second root node!");
+		LOG("Can't create a second root node.");
 	}
 }
 
 void ModuleGoManager::DeleteGOs()
 {
-	while (toDelete.empty() == false)
+	for (auto goToDelete : m_toDelete)
 	{
-		LOG("Erasing GO %s", toDelete.top()->GetName());			
-		delete toDelete.top();
-		toDelete.pop();
+		LOG("Erasing GO %s", goToDelete->GetName());
+		delete goToDelete;
 	}
+	m_toDelete.clear();
 }

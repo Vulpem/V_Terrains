@@ -339,7 +339,7 @@ UpdateStatus ModuleEditor::MenuBar()
 			//ImGui::Checkbox("Edit default shaders", &m_openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &m_isTestWindowOpen);
 			ImGui::Checkbox("InGame Plane", &m_show0Plane);
-			ImGui::Checkbox("QuadTree", &App->m_goManager->drawQuadTree);
+			ImGui::Checkbox("QuadTree", &App->m_goManager->m_drawQuadTree);
 			if (ImGui::Checkbox("Render Normals", &m_renderNormals))
 			{
 				SelectGameObject(m_selectedGameObject);
@@ -714,8 +714,8 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			}
 			if (ImGui::BeginMenu("Link new camera"))
 			{
-				std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->components.find(ComponentType::camera);
-				for (; comp != App->m_goManager->components.end() && comp->first == ComponentType::camera; comp++)
+				std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->m_components.find(ComponentType::camera);
+				for (; comp != App->m_goManager->m_components.end() && comp->first == ComponentType::camera; comp++)
 				{
 					Camera* cam = (Camera*)&*comp->second;
 					if (ImGui::MenuItem(cam->GetOwner()->m_name))

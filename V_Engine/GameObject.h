@@ -17,7 +17,6 @@ class GameObject
 {
 public:
 	GameObject();
-	//Force the gameobject to have a certain UID. For loading purposes
 	GameObject(uint64_t Uid);
 
 	~GameObject();
@@ -45,12 +44,12 @@ public:
 	bool IsActive();
 
 	void SetStatic(bool Stat) { m_static = Stat; }
-	bool IsStatic() { return m_static; }
+	bool IsStatic() const { return m_static; }
 
 	void SetName(const char* newName);
 	const char* GetName();
 
-	Component* AddComponent(ComponentType type, std::string res = std::string(""), bool forceCreation = false);
+	Component* AddComponent(ComponentType type, std::string resource = std::string(""), bool forceCreation = false);
 
 	template <typename typeComp>
 	bool HasComponent();
