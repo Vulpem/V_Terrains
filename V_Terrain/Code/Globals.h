@@ -18,7 +18,7 @@ typedef unsigned int uint;
 #include "utils/IncludeSTD.h"
 #include "Terrainconfig.h"
 #include "utils/Vec3.h"
-#include <windows.h> 
+#include <windows.h>
 
 #define SHOW_ERROR(...) RPGT::utils::ShowAlertPopup(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 #define ASSERT(expression, ...) if(!(expression)) { SHOW_ERROR(__VA_ARGS__); DebugBreak();}

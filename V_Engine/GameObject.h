@@ -11,8 +11,6 @@
 #include "Component.h"
 #include "Transform.h"
 
-class Transform;
-
 class GameObject
 {
 public:

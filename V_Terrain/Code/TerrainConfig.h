@@ -62,9 +62,9 @@ namespace RPGT
 
 		Config()
 			: m_heightCurve([](float a) {return a; })
-			, throwErrorFunc([](const char* c) {})
-			, chunkLoaded([](int x, int y) {})
-			, chunkUnloaded([](int x, int y) {})
+			, throwErrorFunc([](const char*) {})
+			, chunkLoaded([](int, int) {})
+			, chunkUnloaded([](int, int) {})
 		{}
     };
     extern Config config;

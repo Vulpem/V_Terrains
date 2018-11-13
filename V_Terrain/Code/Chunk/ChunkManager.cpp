@@ -117,7 +117,7 @@ namespace RPGT
         glUniform1i(m_shader.loc_render_light, config.debug.renderLight);
 
 		glUniform1f(m_shader.loc_triSize, config.tesselationTriangleSize);
-		glUniform2f(m_shader.loc_viewPortSize, config.screenWidth, config.screenHeight);
+		glUniform2f(m_shader.loc_viewPortSize, (float)config.screenWidth, (float)config.screenHeight);
 
         for (int n = 0; n < 10; n++)
         {
@@ -211,8 +211,8 @@ namespace RPGT
     {
         const int HMresolution = static_cast<int>(RPGT::config.chunkSize);
         Vec2<int> currentChunk(
-            floor((x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1),
-            floor((y - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)
+            static_cast<int>(floor((x - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1)),
+			static_cast<int>(floor((y - floor(HMresolution / 2.f) + (HMresolution % 2 != 0)) / HMresolution + 1))
         );
         auto chunk = std::find_if(m_chunks.begin(), m_chunks.end(),
             [currentChunk](const Chunk& c)

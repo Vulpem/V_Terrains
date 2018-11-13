@@ -9,7 +9,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
 #include "Mesh.h"
-#include "Transform.h"
+#include "GameObject.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -195,8 +195,7 @@ void ModuleGoManager::CleanUp()
 }
 
 
-//Creating/deleting GOs
-
+//Create an empty GameObject
 GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
@@ -211,6 +210,7 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 	return empty;
 }
 
+//Create a gameobject with just a Camera attached to it
 GameObject* ModuleGoManager::CreateCamera(const char* name)
 {
 	GameObject* m_camera = CreateEmpty(name);
@@ -218,13 +218,7 @@ GameObject* ModuleGoManager::CreateCamera(const char* name)
 	return m_camera;
 }
 
-GameObject * ModuleGoManager::DuplicateGO(GameObject * toCopy)
-{
-	GameObject* ret = new GameObject();
-
-	return nullptr;
-}
-
+//Load a vGO avaliable in the resources
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
 	GameObject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
@@ -406,7 +400,7 @@ void ModuleGoManager::LoadSceneNow()
 }
 
 
-
+//Set a single GO to the passed Static value
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 {
 	if (Static != GO->IsStatic())
@@ -441,6 +435,7 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 	}
 }
 
+//Set a GO and all his childs to the passed Static value
 void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 {
 	SetStatic(Static, GO);
@@ -455,7 +450,11 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 }
 
 
-
+/*Check if the ray collides with any GameObject
+-return bool: wether if the ray collided with something or not
+-OUT_Gameobject: gameobject the ray collided with. If there's none, nullptr is returned
+-OUT_position: the position where the ray collided. If it didn't, it will return (-1,-1).
+-OUT_normal: the direction of the normal of the surface where the ray collided. If it didn't, it will return (-1,-1).*/
 bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal, bool onlyMeshes)
 {
 	TIMER_RESET_STORED("Raycast");
@@ -468,14 +467,14 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	//Obtaining all the AABB collisions, and sorting them by distance of the AABB
 	std::vector<GameObject*> colls = App->m_goManager->FilterCollisions(ray);
 	std::map<float, GameObject*> candidates;
-	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end() && colls.empty() == false; GO++)
+	for (auto candidateGO : colls)
 	{
 		float distanceNear;
 		float distanceFar;
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
-		if ((*GO)->m_obb.Intersects(ray, distanceNear, distanceFar) == true)
+		if (candidateGO->m_obb.Intersects(ray, distanceNear, distanceFar) == true)
 		{
-			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), (*GO)));
+			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), candidateGO));
 		}
 	}
 
@@ -631,7 +630,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)
 	for(GameObject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
-		//go->GetTransform()->Draw(port);
+		go->GetTransform()->Draw(port);
 		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes;
