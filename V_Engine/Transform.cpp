@@ -19,7 +19,7 @@ Transform::~Transform()
 {
 }
 
-void Transform::SaveSpecifics(pugi::xml_node& myNode)
+void Transform::SaveSpecifics(pugi::xml_node& myNode) const
 {
 	myNode.append_attribute("AllowRotation") = m_allowRotation;
 	pugi::xml_node node = myNode.append_child("LocalRotation");
@@ -138,7 +138,7 @@ void Transform::EditorContent()
 
 }
 
-math::float4x4 Transform::GetLocalTransformMatrix()
+math::float4x4 Transform::GetLocalTransformMatrix() const
 {
 		math::float4x4 transform = math::float4x4::FromTRS(m_localPosition, m_localRotation.ToFloat3x3(), m_localScale);
 		transform.Transpose();
@@ -198,7 +198,7 @@ void Transform::SetLocalPos(float3 pos)
 	SetLocalPos(pos.x, pos.y, pos.z);
 }
 
-math::float3 Transform::GetLocalPos()
+math::float3 Transform::GetLocalPos() const
 {
 	return m_localPosition;
 }
@@ -281,7 +281,7 @@ void Transform::SetLocalRot(float x, float y, float z, float w)
 	}
 }
 
-math::float3 Transform::GetLocalRot()
+math::float3 Transform::GetLocalRot() const
 {
 	math::float3 ret = m_localRotation.ToEulerXYZ();
 	ret.x *= RADTODEG;
@@ -291,7 +291,7 @@ math::float3 Transform::GetLocalRot()
 	return ret;
 }
 
-Quat Transform::GetLocalRotQuat()
+Quat Transform::GetLocalRotQuat() const
 {
 	return m_localRotation;
 }
@@ -334,7 +334,7 @@ void Transform::RotateLocal(float3 rotation)
 	}
 }
 
-math::Quat Transform::GetGlobalRotQuat()
+math::Quat Transform::GetGlobalRotQuat() const
 {
 	float3 pos;
 	float3 scal;
@@ -343,7 +343,7 @@ math::Quat Transform::GetGlobalRotQuat()
 	return ret;
 }
 
-math::float3 Transform::GetGlobalRot()
+math::float3 Transform::GetGlobalRot() const
 {
 	math::float3 ret = m_globalTransform.Transposed().ToEulerXYZ();
 	ret.x *= RADTODEG;
@@ -365,12 +365,12 @@ void Transform::SetLocalScale(float x, float y, float z)
 	}
 }
 
-math::float3 Transform::GetLocalScale()
+math::float3 Transform::GetLocalScale() const
 {
 	return m_localScale;
 }
 
-math::float3 Transform::GetGlobalScale()
+math::float3 Transform::GetGlobalScale() const
 {
 	return m_globalTransform.ExtractScale();
 }
@@ -387,32 +387,32 @@ void Transform::LookAt(const float3 & Spot, float3 worldUp)
 
 
 
-float3 Transform::Up()
+float3 Transform::Up() const
 {
 	return m_globalTransform.Transposed().WorldY().Normalized();
 }
 
-float3 Transform::Down()
+float3 Transform::Down() const
 {
 	return -Up();
 }
 
-float3 Transform::Left()
+float3 Transform::Left() const
 {
 	return m_globalTransform.Transposed().WorldX().Normalized();
 }
 
-float3 Transform::Right()
+float3 Transform::Right() const
 {
 	return -Left();
 }
 
-float3 Transform::Forward()
+float3 Transform::Forward() const
 {
 	return m_globalTransform.Transposed().WorldZ().Normalized();
 }
 
-float3 Transform::Backward()
+float3 Transform::Backward() const
 {
 	return -Forward();
 }
@@ -447,7 +447,7 @@ float3 Transform::WorldBackward()
 	return float3(0, 0,-1);
 }
 
-GameObject * Transform::GetGameobject()
+GameObject * Transform::GetGameobject() const
 {
 	return m_gameObject;
 }
