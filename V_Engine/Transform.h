@@ -1,11 +1,12 @@
 #ifndef __TRANSFORM__
 #define __TRANSFORM__
 
-#include "Component.h"
+#include "Globals.h"
+#include "Math.h"
+#include "PugiXml\src\pugixml.hpp"
 
-
-class math::float3;
-class math::Quat;
+class GameObject;
+class ViewPort;
 
 class Transform
 {
