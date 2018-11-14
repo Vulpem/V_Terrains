@@ -15,18 +15,14 @@
 
 
 GameObject::GameObject()
-	: m_transform(this)
-{
-	m_uid = GenerateUUID();
-	strcpy(m_name, "Unnamed");
-	App->m_goManager->m_dynamicGO.push_back(this);
-}
+	: GameObject(GenerateUUID())
+{ }
 
-GameObject::GameObject(uint64_t Uid)
+GameObject::GameObject(uint64_t uid)
 	: m_transform(this)
+	, m_uid(uid)
+	, m_name("Unnamed")
 {
-	m_uid = Uid;
-	strcpy(m_name, "Unnamed");
 	App->m_goManager->m_dynamicGO.push_back(this);
 }
 
@@ -51,23 +47,9 @@ GameObject::~GameObject()
 		App->m_goManager->m_quadTree.Remove(this);
 	}
 
-	GetTransform()->SetParent(nullptr);
-
-	std::vector<Component*>::reverse_iterator comp = m_components.rbegin();
-	while (comp != m_components.rend())
+	for(auto component : m_components)
 	{
-		std::multimap<ComponentType, Component*>::iterator it = App->m_goManager->m_components.find((*comp)->GetType());
-		for (; it->first == (*comp)->GetType(); it++)
-		{
-			if (it->second->GetUID() == (*comp)->GetUID())
-			{
-				App->m_goManager->m_components.erase(it);
-				break;
-			}
-		}
-
-		delete *comp;
-		comp++;
+		App->m_goManager->DeleteComponent(component);
 	}
 	m_components.clear();
 
@@ -82,6 +64,7 @@ GameObject::~GameObject()
 	}
 }
 
+//TODO distribute this on every component
 void GameObject::DrawOnEditor()
 {
 	if (ImGui::BeginPopup("Add Component"))

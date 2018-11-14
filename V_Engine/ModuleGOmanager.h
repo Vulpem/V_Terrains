@@ -35,7 +35,8 @@ public:
 
 	GameObject* CreateEmpty(const char* name = NULL);
 	GameObject* CreateCamera(const char* name = NULL);
-	bool DeleteGameObject(GameObject* toErase);
+	void DeleteGameObject(GameObject* toErase);
+	void DeleteComponent(Component* toErase);
 
 	void SetStatic(bool Static, GameObject* GO);
 	void SetChildsStatic(bool Static, GameObject* GO);

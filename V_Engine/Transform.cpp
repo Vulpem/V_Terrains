@@ -17,6 +17,7 @@ Transform::Transform(GameObject* linkedTo)
 
 Transform::~Transform()
 {
+	SetParent(nullptr);
 }
 
 void Transform::SaveSpecifics(pugi::xml_node& myNode) const

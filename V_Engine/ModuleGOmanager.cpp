@@ -240,20 +240,29 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 	return ret;
 }
 
-bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
+void ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
-	if (toErase)
+	m_toDelete.push_back(toErase);
+}
+
+void ModuleGoManager::DeleteComponent(Component * toErase)
+{
+	//TODO finish
+	std::multimap<ComponentType, Component*>::iterator it = m_components.find(toErase->GetType());
+	for (; it->first == toErase->GetType(); it++)
 	{
-		m_toDelete.push_back(toErase);
-		return true;
+		if (it->second->GetUID() == toErase->GetUID())
+		{
+			App->m_goManager->m_components.erase(it);
+			break;
+		}
 	}
-	return false;
-	
+
+	delete toErase;
 }
 
 
 //Scene management
-
 void ModuleGoManager::ClearSceneNow()
 {
 	for (auto child : m_root->GetTransform()->GetChilds())
