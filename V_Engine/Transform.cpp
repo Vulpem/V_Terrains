@@ -65,7 +65,7 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 }
 
-void Transform::Draw(const ViewPort & port)
+void Transform::Draw(const ViewPort & port) const
 {
 	m_gameObject->DrawLocator();
 
@@ -159,7 +159,7 @@ void Transform::UpdateGlobalTransform()
 	}
 }
 
-math::float4x4 Transform::GetGlobalTransform()
+math::float4x4 Transform::GetGlobalTransform() const
 {
 	return m_globalTransform;
 }
@@ -232,7 +232,7 @@ void Transform::SetGlobalPos(float3 pos)
 	SetGlobalPos(pos.x, pos.y, pos.z);
 }
 
-math::float3 Transform::GetGlobalPos()
+math::float3 Transform::GetGlobalPos() const
 {
 	math::float4x4 p = m_globalTransform.Transposed();
 	return p.TranslatePart();
@@ -466,7 +466,7 @@ void Transform::SetParent(Transform * newParent)
 	}
 }
 
-Transform * Transform::GetParent()
+Transform * Transform::GetParent() const
 {
 	return m_parent;
 }
@@ -476,7 +476,7 @@ void Transform::AddChild(Transform * newChild)
 	newChild->SetParent(this);
 }
 
-std::vector<Transform*> Transform::GetChilds()
+std::vector<Transform*> Transform::GetChilds() const
 {
 	return m_childs;
 }

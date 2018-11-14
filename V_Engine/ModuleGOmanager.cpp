@@ -9,12 +9,10 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
 #include "Mesh.h"
-#include "GameObject.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
 #include "ViewPort.h"
-
 
 #include "AllComponents.h"
 
@@ -472,7 +470,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		float distanceNear;
 		float distanceFar;
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
-		if (candidateGO->m_obb.Intersects(ray, distanceNear, distanceFar) == true)
+		if (candidateGO->GetOBB().Intersects(ray, distanceNear, distanceFar) == true)
 		{
 			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), candidateGO));
 		}
@@ -630,7 +628,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)
 	for(GameObject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
-		go->GetTransform()->Draw(port);
+		//go->GetTransform()->Draw(port);
 		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes;

@@ -15,7 +15,7 @@ public:
 	~QuadNode();
 
 	/*Try to add a GO to this Node.
-	Won't be added and return false if the object's aabb doesn't collide with this node
+	Won't be added and return false if the object's m_aabb doesn't collide with this node
 	Will return true if it's added*/
 	bool Add(GameObject* GO);
 	bool Remove(GameObject* GO);
@@ -63,29 +63,27 @@ template<typename C>
 inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
 {
 	std::vector<GameObject*> ret;
-	if (box.Intersects(col))
+	if (m_box.Intersects(col))
 	{
-		if (GOs.empty() == false)
+		if (m_GOs.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+			for (auto go : m_GOs)
 			{
-				if ((*it)->IsActive() && (*it)->aabb.IsFinite() && col.Intersects((*it)->aabb) == true)
+				AABB goAABB = go->GetAABB();
+				if (go->IsActive() && goAABB.IsFinite() && col.Intersects(goAABB) == true)
 				{
-					ret.push_back(*it);
+					ret.push_back(go);
 				}
 			}
 		}
-		if (childs.empty() == false)
+		if (m_childs.empty() == false)
 		{
-			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			for (auto child : m_childs)
 			{
-				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
-				if (toAdd.empty() == false)
+				std::vector<GameObject*> toAdd = child.FilterCollisions(col);
+				for (auto goToAdd : toAdd)
 				{
-					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
-					{
-						ret.push_back(*it);
-					}
+					ret.push_back(goToAdd);
 				}
 			}
 		}
@@ -98,7 +96,7 @@ inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
 template<typename c>
 inline std::vector<GameObject*> Quad_Tree::FilterCollisions(c col)
 {
-	return root.FilterCollisions(col);
+	return m_root.FilterCollisions(col);
 }
 
 #endif // !__QUADTREE__

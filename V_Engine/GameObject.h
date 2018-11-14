@@ -22,7 +22,7 @@ public:
 	const uint64_t GetUID() { return m_uid; }
 
 	void DrawOnEditor();
-	void DrawLocator();
+	void DrawLocator() const;
 	void DrawAABB();
 	void DrawOBB();
 
@@ -32,9 +32,6 @@ public:
 
 	void Select(bool renderNormals = false);
 	void Unselect();
-
-	void SetOriginalAABB();
-	void UpdateAABB();
 
 	void UpdateTransformMatrix();
 
@@ -50,8 +47,9 @@ public:
 	Component* AddComponent(ComponentType type, std::string resource = std::string(""), bool forceCreation = false);
 
 	template <typename typeComp>
-	bool HasComponent();
+	bool HasComponent() const;
 	Transform* GetTransform();
+	const Transform* GetTransform() const;
 
 	void Delete();
 
@@ -60,15 +58,15 @@ public:
 	void RemoveComponent(Component* comp);
 
 	template <typename typeComp>
-	void GetComponents(std::vector<typeComp*>& out);
+	void GetComponents(std::vector<typeComp*>& out) const;
 
 	template <typename typeComp>
-	typeComp* GetComponent();
+	typeComp* GetComponent() const;
 
-public:
+	AABB GetObjectSpaceAABB() const;
+	AABB GetAABB() const;
+	OBB GetOBB() const;
 	char m_name[NAME_MAX_LEN];
-	AABB m_aabb;
-	OBB m_obb;
 //TODO move everything that can be in a component in there, clean GameObject
 
 	std::vector<Component*> m_components;
@@ -83,12 +81,10 @@ private:
 	bool m_publicActive = true;
 	bool m_hiddenOnOutliner = false;
 	bool m_static = false;
-
-	AABB m_originalAABB;
 };
 
 template <typename typeComp>
-void GameObject::GetComponents(std::vector<typeComp*>& out)
+void GameObject::GetComponents(std::vector<typeComp*>& out) const
 {
 	for (Component* component : m_components)
 	{
@@ -101,7 +97,7 @@ void GameObject::GetComponents(std::vector<typeComp*>& out)
 }
 
 template <typename typeComp>
-typeComp* GameObject::GetComponent()
+typeComp* GameObject::GetComponent() const
 {
 	for (Component* component : m_components)
 	{
@@ -116,7 +112,7 @@ typeComp* GameObject::GetComponent()
 }
 
 template <typename typeComp>
-bool GameObject::HasComponent()
+bool GameObject::HasComponent() const
 {
 	for (Component* component : m_components)
 	{

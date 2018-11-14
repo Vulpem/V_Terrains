@@ -91,19 +91,20 @@ template<typename C>
 //Returns a vector of all the GOs that collided with the shape passed
 inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 {
-	std::vector<GameObject*> ret;// = quadTree.FilterCollisions(col);
-	ret.reserve(m_dynamicGO.size());
+	std::vector<GameObject*> ret = m_quadTree.FilterCollisions(col);
+	ret.reserve(ret.size() + m_dynamicGO.size());
 
-	for (std::vector<GameObject*>::iterator it = m_dynamicGO.begin(); it != m_dynamicGO.end(); it++)
+	for (auto go : m_dynamicGO)
 	{
-		if ((*it)->IsActive() && (*it)->m_aabb.IsFinite() && (*it)->m_aabb.Intersects(col) == true)
+		AABB goAABB = go->GetAABB();
+		if (go->IsActive() && goAABB.IsFinite() && goAABB.Intersects(col) == true)
 		{
-			ret.push_back(*it);
-			(*it)->m_beingRendered = true;
+			ret.push_back(go);
+			go->m_beingRendered = true;
 		}
 		else
 		{
-			(*it)->m_beingRendered = false;
+			go->m_beingRendered = false;
 		}
 	}
 	return ret;

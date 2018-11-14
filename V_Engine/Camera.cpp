@@ -22,9 +22,10 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, ComponentType::camera)
 	positionOffset = float3::zero;
 	if (m_gameObject)
 	{
-		if (m_gameObject->m_aabb.IsFinite())
+		AABB goAABB = m_gameObject->GetAABB();
+		if (goAABB.IsFinite())
 		{
-			positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
+			positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 		}
 	}
 	frustum.nearPlaneDistance = 4;
@@ -66,9 +67,10 @@ void Camera::Draw(const ViewPort & port)
 
 void Camera::UpdateCamMatrix()
 {
-	if (m_gameObject->m_aabb.IsFinite())
+	AABB goAABB = m_gameObject->GetAABB();
+	if (goAABB.IsFinite())
 	{
-		positionOffset = m_gameObject->m_aabb.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
+		positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 	}
 	UpdateOrientation();
 	UpdatePos();

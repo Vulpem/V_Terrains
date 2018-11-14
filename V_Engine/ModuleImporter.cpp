@@ -848,7 +848,6 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					It += bytes;
 					std::string meshName = App->m_resourceManager->GetMetaData(fileName,ComponentType::mesh, meshUID)->name;
 					ret->AddComponent(ComponentType::mesh, meshName);
-					ret->SetOriginalAABB();
 				}
 
 				if (hasMaterial != 0)

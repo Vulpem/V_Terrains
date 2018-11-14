@@ -18,8 +18,6 @@ GameObject::GameObject()
 	: m_transform(this)
 {
 	m_uid = GenerateUUID();
-	m_aabb.SetNegativeInfinity();
-	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
 	App->m_goManager->m_dynamicGO.push_back(this);
 }
@@ -28,8 +26,6 @@ GameObject::GameObject(uint64_t Uid)
 	: m_transform(this)
 {
 	m_uid = Uid;
-	m_aabb.SetNegativeInfinity();
-	m_originalAABB.SetNegativeInfinity();
 	strcpy(m_name, "Unnamed");
 	App->m_goManager->m_dynamicGO.push_back(this);
 }
@@ -197,7 +193,8 @@ void GameObject::DrawOnEditor()
 	}
 }
 
-void GameObject::DrawLocator()
+//TODO move this into the transform
+void GameObject::DrawLocator() const
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
@@ -230,10 +227,11 @@ void GameObject::DrawAABB()
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
-		if (m_aabb.IsFinite())
+		AABB aabb = GetAABB();
+		if (aabb.IsFinite())
 		{
 			math::float3 corners[8];
-			m_aabb.GetCornerPoints(corners);
+			aabb.GetCornerPoints(corners);
 			App->m_renderer3D->DrawBox(corners);
 		}
 	}
@@ -243,10 +241,11 @@ void GameObject::DrawOBB()
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
-		if (m_obb.IsFinite())
+		OBB obb = GetOBB();
+		if (obb.IsFinite())
 		{
 			math::float3 corners[8];
-			m_obb.GetCornerPoints(corners);
+			obb.GetCornerPoints(corners);
 			App->m_renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
 		}
 	}
@@ -277,47 +276,9 @@ void GameObject::Unselect()
 	}
 }
 
-void GameObject::SetOriginalAABB()
-{
-	if (HasComponent<Mesh>())
-	{
-		m_originalAABB.SetNegativeInfinity();
-		std::vector<Mesh*> meshes;
-		meshes.reserve(2);
-		GetComponents<Mesh>(meshes);
-
-		for (std::vector<Mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
-		{
-			m_originalAABB.Enclose((*it)->GetAABB().maxPoint);
-			m_originalAABB.Enclose((*it)->GetAABB().minPoint);
-		}
-	}
-	else
-	{
-		m_originalAABB.minPoint = float3{ -0.25f,-0.25f,-0.25f };
-		m_originalAABB.maxPoint = float3{ 0.25f,0.25f,0.25f };
-	}
-
-	UpdateAABB();
-}
-
-void GameObject::UpdateAABB()
-{
-	m_aabb.SetNegativeInfinity();
-	m_obb.SetNegativeInfinity();
-	if (m_originalAABB.IsFinite())
-	{
-		m_obb = m_originalAABB;
-		m_obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
-		m_aabb.Enclose(m_obb);
-	}
-}
-
 void GameObject::UpdateTransformMatrix()
 {
 	GetTransform()->UpdateGlobalTransform();
-
-	UpdateAABB();
 
 	//Updating cameras position
 	if (HasComponent<Camera>())
@@ -422,10 +383,6 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 		{
 			m_components.push_back(toAdd);
 			App->m_goManager->m_components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));
-			if (toAdd->GetType() == ComponentType::mesh)
-			{
-				SetOriginalAABB();
-			}
 		}
 		else
 		{
@@ -438,6 +395,11 @@ Component* GameObject::AddComponent(ComponentType type, std::string res, bool fo
 }
 
 Transform* GameObject::GetTransform()
+{
+	return &m_transform;
+}
+
+const Transform* GameObject::GetTransform() const
 {
 	return &m_transform;
 }
@@ -504,4 +466,30 @@ void GameObject::RemoveComponent(Component * comp)
 			return;
 		}
 	}
+}
+
+AABB GameObject::GetObjectSpaceAABB() const
+{
+	AABB objectSpaceAABB;
+	objectSpaceAABB.SetNegativeInfinity();
+	std::vector<Mesh*> meshes;
+	GetComponents<Mesh>(meshes);
+	if (meshes.empty() == false)
+	{
+		for (auto mesh : meshes)
+		{
+			objectSpaceAABB.Enclose(mesh->GetAABB());
+		}
+	}
+	return objectSpaceAABB;
+}
+
+AABB GameObject::GetAABB() const
+{
+	return GetOBB().MinimalEnclosingAABB();
+}
+
+OBB GameObject::GetOBB() const
+{
+	return GetObjectSpaceAABB().Transform(GetTransform()->GetGlobalTransform().Transposed());
 }

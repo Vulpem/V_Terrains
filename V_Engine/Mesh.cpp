@@ -151,6 +151,5 @@ void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 
 		wires = myNode.attribute("Wired").as_bool();
 		texMaterialIndex = myNode.attribute("TextureIndex").as_int();
-		m_gameObject->SetOriginalAABB();
 	}
 }

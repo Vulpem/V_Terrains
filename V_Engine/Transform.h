@@ -19,7 +19,7 @@ public:
 	math::float4x4 GetLocalTransformMatrix();
 
 	void UpdateGlobalTransform();
-	math::float4x4 GetGlobalTransform();
+	math::float4x4 GetGlobalTransform() const;
 
 	void UpdateEditorValues();
 
@@ -29,7 +29,7 @@ public:
 
 	void SetGlobalPos(float x, float y, float z);
 	void SetGlobalPos(float3 pos);
-	math::float3 GetGlobalPos();
+	math::float3 GetGlobalPos() const;
 	void Translate(float x, float y, float z);
 	void Translate(float3 m);
 
@@ -70,12 +70,12 @@ public:
 	GameObject* GetGameobject();
 
 	void SetParent(Transform* parent);
-	Transform* GetParent();
+	Transform* GetParent() const;
 
 	void AddChild(Transform* newChild);
-	std::vector<Transform*> GetChilds();
+	std::vector<Transform*> GetChilds() const;
 
-	void Draw(const ViewPort & port);
+	void Draw(const ViewPort & port) const;
 	void EditorContent();
 
 	bool m_allowRotation = true;
