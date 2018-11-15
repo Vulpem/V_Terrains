@@ -176,36 +176,6 @@ void GameObject::DrawOnEditor()
 	}
 }
 
-//TODO move this into the transform
-void GameObject::DrawLocator() const
-{
-	if (Time.PlayMode != PlayMode::Play)
-	{
-		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
-		if (m_selected)
-		{
-			if (GetTransform()->GetParent()->GetGameobject()->m_selected)
-			{
-				color = float4(0, 0.5f, 0.5f, 1);
-			}
-			else {
-				color = float4(0, 0.8f, 0.8f, 1);
-			}
-		}
-		App->m_renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
-
-		std::vector<Transform*> childs = GetTransform()->GetChilds();
-		for (auto child : childs)
-		{
-			if (child->GetGameobject()->HasComponent<Mesh>() == false)
-			{
-				math::float3 childPos(child->GetGlobalPos());
-				App->m_renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
-			}
-		}
-	}
-}
-
 void GameObject::DrawAABB()
 {
 	if (Time.PlayMode != PlayMode::Play)

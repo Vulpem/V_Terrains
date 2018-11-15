@@ -1,7 +1,9 @@
 #include "Transform.h"
 
-#include "GameObject.h"
+#include "Application.h"
+#include "ModuleRenderer3D.h"
 
+#include "GameObject.h"
 #include "Camera.h"
 
 #include "imGUI\imgui.h"
@@ -68,7 +70,28 @@ void Transform::LoadSpecifics(pugi::xml_node & myNode)
 
 void Transform::Draw(const ViewPort & port) const
 {
-	m_gameObject->DrawLocator();
+	if (Time.PlayMode != PlayMode::Play)
+	{
+		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
+		if (m_gameObject->m_selected)
+		{
+			if (GetParent()->GetGameobject()->m_selected)
+			{
+				color = float4(0, 0.5f, 0.5f, 1);
+			}
+			else {
+				color = float4(0, 0.8f, 0.8f, 1);
+			}
+		}
+		App->m_renderer3D->DrawLocator(GetGlobalTransform(), color);
+
+		std::vector<Transform*> childs = GetChilds();
+		for (auto child : childs)
+		{
+			math::float3 childPos(child->GetGlobalPos());
+			App->m_renderer3D->DrawLine(GetGlobalPos(), childPos, color);
+		}
+	}
 
 	if (port.m_renderBoundingBoxes)
 	{

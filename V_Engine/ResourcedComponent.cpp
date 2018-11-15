@@ -2,7 +2,6 @@
 
 #include "Application.h"
 
-
 void ResourcedComponent::LoadResource(std::string resourceToLoad)
 {
 	if (m_resource != 0)

@@ -22,7 +22,6 @@ public:
 	const uint64_t GetUID() { return m_uid; }
 
 	void DrawOnEditor();
-	void DrawLocator() const;
 	void DrawAABB();
 	void DrawOBB();
 
