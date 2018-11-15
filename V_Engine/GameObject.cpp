@@ -57,7 +57,6 @@ GameObject::~GameObject()
 	std::vector<Transform*> childs = GetTransform()->GetChilds();
 	if (childs.empty() == false)
 	{
-		std::vector<Transform*>::iterator iterator = childs.begin();
 		for (auto child : childs)
 		{
 			delete child->GetGameobject();
