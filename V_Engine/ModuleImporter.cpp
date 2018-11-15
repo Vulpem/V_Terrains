@@ -847,7 +847,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					memcpy(&meshUID, It, bytes);
 					It += bytes;
 					std::string meshName = App->m_resourceManager->GetMetaData(fileName,ComponentType::mesh, meshUID)->name;
-					ret->AddComponent(ComponentType::mesh, meshName);
+					ret->CreateComponent(ComponentType::mesh, meshName);
 				}
 
 				if (hasMaterial != 0)
@@ -856,7 +856,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 					bytes = sizeof(char) * 256;
 					memcpy(&materialName, It, bytes);
 					It += bytes;
-					ret->AddComponent(ComponentType::material, materialName);
+					ret->CreateComponent(ComponentType::material, materialName);
 				}
 
 				//Num childs

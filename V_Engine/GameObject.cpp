@@ -47,6 +47,7 @@ GameObject::~GameObject()
 		App->m_goManager->m_quadTree.Remove(this);
 	}
 
+	App->m_editor->UnselectGameObject(this);
 	for(auto component : m_components)
 	{
 		App->m_goManager->DeleteComponent(component);
@@ -82,7 +83,7 @@ void GameObject::DrawOnEditor()
 					{
 						if (ImGui::MenuItem(it->data()))
 						{
-							AddComponent(ComponentType::mesh, *it);
+							CreateComponent(ComponentType::mesh, *it);
 							break;
 						}
 					}
@@ -110,7 +111,7 @@ void GameObject::DrawOnEditor()
 						{
 							if (ImGui::MenuItem(it->data()))
 							{
-								AddComponent(ComponentType::material, *it);
+								CreateComponent(ComponentType::material, *it);
 								break;
 							}
 						}
@@ -122,13 +123,13 @@ void GameObject::DrawOnEditor()
 		}
 		if (ImGui::MenuItem("Camera##add"))
 		{
-			AddComponent(ComponentType::camera);
+			CreateComponent(ComponentType::camera);
 		}
 		if (HasComponent<Billboard>() == false)
 		{
 			if (ImGui::MenuItem("Billboard##add"))
 			{
-				AddComponent(ComponentType::billboard);
+				CreateComponent(ComponentType::billboard);
 			}
 		}
 		ImGui::EndPopup();
@@ -292,12 +293,12 @@ void GameObject::SetName(const char * newName)
 	strcpy(m_name, newName);
 }
 
-const char * GameObject::GetName()
+const char * GameObject::GetName() const
 {
 	return m_name;
 }
 
-Component* GameObject::AddComponent(ComponentType type, std::string res, bool forceCreation)
+Component* GameObject::CreateComponent(ComponentType type, std::string res, bool forceCreation)
 {
 	Component* toAdd = nullptr;
 	switch (type)
@@ -355,12 +356,6 @@ Transform* GameObject::GetTransform()
 const Transform* GameObject::GetTransform() const
 {
 	return &m_transform;
-}
-
-void GameObject::Delete()
-{
-	App->m_editor->UnselectGameObject(this);
-	App->m_goManager->DeleteGameObject(this);
 }
 
 void GameObject::Save(pugi::xml_node& node)

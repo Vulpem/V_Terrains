@@ -212,7 +212,7 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 GameObject* ModuleGoManager::CreateCamera(const char* name)
 {
 	GameObject* m_camera = CreateEmpty(name);
-	m_camera->AddComponent(ComponentType::camera);
+	m_camera->CreateComponent(ComponentType::camera);
 	return m_camera;
 }
 
@@ -381,7 +381,7 @@ void ModuleGoManager::LoadSceneNow()
 						std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
 						if (go != UIDlib.end())
 						{
-							Component* c = go->second->AddComponent(type, "", true);
+							Component* c = go->second->CreateComponent(type, "", true);
 							if (c != nullptr)
 							{
 								c->LoadSpecifics(comp.child("Specific"));

@@ -1,7 +1,7 @@
 #ifndef __GO__
 #define __GO__
 
-#define NAME_MAX_LEN 1024
+#define NAME_MAX_LEN 255
 
 #include "Globals.h"
 
@@ -37,20 +37,18 @@ public:
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive();
 
-	void SetStatic(bool Stat) { m_static = Stat; }
+	void SetStatic(bool Static) { m_static = Static; }
 	bool IsStatic() const { return m_static; }
 
 	void SetName(const char* newName);
-	const char* GetName();
+	const char* GetName() const;
 
-	Component* AddComponent(ComponentType type, std::string resource = std::string(""), bool forceCreation = false);
+	Component* CreateComponent(ComponentType type, std::string resource = std::string(""), bool forceCreation = false);
 
 	template <typename typeComp>
 	bool HasComponent() const;
 	Transform* GetTransform();
 	const Transform* GetTransform() const;
-
-	void Delete();
 
 	void Save(pugi::xml_node& node);
 
