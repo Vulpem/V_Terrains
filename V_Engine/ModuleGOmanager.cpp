@@ -255,7 +255,7 @@ void ModuleGoManager::DeleteComponent(Component * toErase)
 			toErase->GetOwner()->m_components.erase(std::find(toErase->GetOwner()->m_components.begin(), toErase->GetOwner()->m_components.end(), toErase));
 			RELEASE(toErase);
 			App->m_goManager->m_components.erase(it);
-			break;
+			return;
 		}
 	}
 }
@@ -559,7 +559,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 		if (mat->MarkedForDeletion() == false)
 		{
 			ret.m_meshColor = mat->GetColor();
-			ret.m_textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
+			ret.m_textureBuffer = mat->GetTexture(getFrom->m_textureIndex);
 			ret.m_alphaType = mat->GetAlphaType();
 			ret.m_alphaTest = mat->GetAlphaTest();
 			ret.m_blendType = mat->GetBlendType();

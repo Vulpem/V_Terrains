@@ -43,7 +43,6 @@ public:
 	bool m_displayHiddenOutlinerGameobjects = false;
 
 	bool m_show0Plane = true;
-	bool m_renderNormals = false;
     std::string m_shaderResult;
 
 	uint m_singleViewportID = 0;

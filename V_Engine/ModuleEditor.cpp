@@ -265,7 +265,7 @@ void ModuleEditor::SelectGameObject(GameObject* node)
 	}
 	if (node)
 	{
-		node->Select(m_renderNormals);
+		node->Select();
 	}
 	m_selectedGameObject = node;
 }
@@ -340,10 +340,6 @@ UpdateStatus ModuleEditor::MenuBar()
 			ImGui::Checkbox("ImGui TestBox", &m_isTestWindowOpen);
 			ImGui::Checkbox("InGame Plane", &m_show0Plane);
 			ImGui::Checkbox("QuadTree", &App->m_goManager->m_drawQuadTree);
-			if (ImGui::Checkbox("Render Normals", &m_renderNormals))
-			{
-				SelectGameObject(m_selectedGameObject);
-			}
 			ImGui::EndMenu();
 		}
 

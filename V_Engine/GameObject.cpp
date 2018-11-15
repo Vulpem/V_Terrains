@@ -204,10 +204,9 @@ void GameObject::DrawOBB()
 	}
 }
 
-void GameObject::Select(bool _renderNormals)
+void GameObject::Select()
 {
 	m_selected = true;
-	m_drawNormals = _renderNormals;
 
 	GetTransform()->UpdateEditorValues();
 
@@ -221,7 +220,6 @@ void GameObject::Select(bool _renderNormals)
 void GameObject::Unselect()
 {
 	m_selected = false;
-	m_drawNormals = false;
 	std::vector<Transform*> childs = GetTransform()->GetChilds();
 	for (auto child : childs)
 	{

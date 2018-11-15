@@ -11,9 +11,10 @@ public:
 	Mesh(std::string resource, GameObject* linkedTo);
 
 public:
-	int texMaterialIndex = -1;
+	int m_textureIndex = -1;
 
-	bool wires = false;
+	bool m_drawWired = false;
+	bool m_drawNormals = false;
 
 	Mesh_RenderInfo GetMeshInfo();
 

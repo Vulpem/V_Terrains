@@ -93,19 +93,13 @@ template<typename C>
 inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 {
 	std::vector<GameObject*> ret = m_quadTree.FilterCollisions(col);
-	ret.reserve(ret.size() + m_dynamicGO.size());
 
 	for (auto go : m_dynamicGO)
 	{
 		AABB goAABB = go->GetAABB();
-		if (go->IsActive() && goAABB.IsFinite() && goAABB.Intersects(col) == true)
+		if (go->IsActive() && goAABB.IsFinite() && goAABB.Intersects(col))
 		{
 			ret.push_back(go);
-			go->m_beingRendered = true;
-		}
-		else
-		{
-			go->m_beingRendered = false;
 		}
 	}
 	return ret;

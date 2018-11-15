@@ -29,7 +29,7 @@ public:
 	void HideFromOutliner() { m_hiddenOnOutliner = true; }
 	bool HiddenFromOutliner() { return m_hiddenOnOutliner; }
 
-	void Select(bool renderNormals = false);
+	void Select();
 	void Unselect();
 
 	void UpdateTransformMatrix();
@@ -68,8 +68,6 @@ public:
 
 	std::vector<Component*> m_components;
 	bool m_selected = false;
-	bool m_drawNormals = false;
-	bool m_beingRendered = false;
 private:
 	uint64_t m_uid;
 	Transform m_transform;
