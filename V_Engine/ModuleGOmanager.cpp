@@ -247,18 +247,17 @@ void ModuleGoManager::DeleteGameObject(GameObject* toErase)
 
 void ModuleGoManager::DeleteComponent(Component * toErase)
 {
-	//TODO finish
 	std::multimap<ComponentType, Component*>::iterator it = m_components.find(toErase->GetType());
 	for (; it->first == toErase->GetType(); it++)
 	{
-		if (it->second->GetUID() == toErase->GetUID())
+		if (it->second == toErase)
 		{
+			toErase->GetOwner()->m_components.erase(std::find(toErase->GetOwner()->m_components.begin(), toErase->GetOwner()->m_components.end(), toErase));
+			RELEASE(toErase);
 			App->m_goManager->m_components.erase(it);
 			break;
 		}
 	}
-
-	delete toErase;
 }
 
 

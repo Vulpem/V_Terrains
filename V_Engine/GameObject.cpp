@@ -430,24 +430,10 @@ void GameObject::Save(pugi::xml_node& node)
 
 void GameObject::RemoveComponent(Component * comp)
 {
-	std::vector<Component*>::iterator it = m_components.begin();
-	for (; it != m_components.end(); it++)
+	auto it = std::find(m_components.begin(), m_components.end(), comp);
+	if (it != m_components.end())
 	{
-		if ((*it) == comp)
-		{
-			std::map<ComponentType, Component*>::iterator mapIt = App->m_goManager->m_components.find((*it)->GetType());
-			for (; mapIt != App->m_goManager->m_components.end() && mapIt->first == (*it)->GetType(); mapIt++)
-			{
-				if (mapIt->second == comp)
-				{
-					App->m_goManager->m_components.erase(mapIt);
-					break;
-				}
-			}
-			RELEASE(*it);
-			m_components.erase(it);
-			return;
-		}
+		App->m_goManager->DeleteComponent(comp);
 	}
 }
 
