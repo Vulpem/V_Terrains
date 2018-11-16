@@ -638,8 +638,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 	for (const GameObject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
-		const Transform* trans = go->GetTransform();//->Draw(port);
-		//trans->Draw(port);
+		//go->GetTransform()->Draw(port);
 		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes;
