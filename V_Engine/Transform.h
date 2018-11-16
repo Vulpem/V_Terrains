@@ -80,6 +80,7 @@ public:
 	void EditorContent();
 
 	bool m_allowRotation = true;
+	bool m_hiddenOnOutliner = false;
 private:
 
 	math::Quat m_localRotation = math::Quat::identity;

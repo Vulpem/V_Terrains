@@ -8,7 +8,6 @@
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleFileSystem.h"
-#include "Mesh.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -175,7 +174,7 @@ UpdateStatus ModuleGoManager::PostUpdate()
 void ModuleGoManager::Render(const ViewPort& port) const
 {
 	App->m_goManager->RenderGOs(port);
-	if (m_drawQuadTree)
+	if (port.m_renderQuadTree)
 	{
 		TIMER_START("QuadTree drawTime");
 		m_quadTree.Draw();
@@ -266,7 +265,7 @@ void ModuleGoManager::ClearSceneNow()
 {
 	for (auto child : m_root->GetTransform()->GetChilds())
 	{
-		if (child->GetGameobject()->HiddenFromOutliner() == false)
+		if (child->m_hiddenOnOutliner == false)
 		{
 			m_toDelete.push_back(child->GetGameobject());
 		}
@@ -293,7 +292,8 @@ void ModuleGoManager::SaveSceneNow()
 	std::multimap<ComponentType, Component*>::iterator comp = m_components.begin();
 	for (; comp != m_components.end(); comp++)
 	{
-		if (comp->second->GetOwner()->HiddenFromOutliner() == false)
+		//TODO "HiddenFromOutliner" should not affect which entitites are saved
+		if (comp->second->GetOwner()->GetTransform()->m_hiddenOnOutliner == false)
 		{
 			comp->second->Save(Components_node.append_child("Component"));
 		}
@@ -547,7 +547,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 }
 
 
-Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
+Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom) const
 {
 	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
 
@@ -578,7 +578,7 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom)
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(const ViewPort & port)
+void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 {
 		//Call the Draw function of all the components, so they do what they need to
 		for (auto component : m_components)
@@ -598,20 +598,20 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)
 		std::vector<GameObject*> toRender;
 		bool aCamHadCulling = false;
 		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
-		std::multimap<ComponentType, Component*>::iterator it = m_components.find(ComponentType::camera);
-		for (; it != m_components.end() && it->first == ComponentType::camera; it++)
+		std::vector<Camera*> cameras = GetComponentsByType<Camera>(ComponentType::camera);
+		for(auto camera : cameras)
 		{
-			if (((Camera*)(it->second))->HasCulling())
+			if (camera->HasCulling())
 			{
 				aCamHadCulling = true;
 				//If a m_camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
-				if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+				if (camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 				{
-					toRender = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+					toRender = FilterCollisions(*camera->GetFrustum());
 				}
 				else
 				{
-					toRender = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+					toRender = FilterCollisions(camera->GetFrustum()->MinimalEnclosingAABB());
 				}
 			}
 		}
@@ -633,7 +633,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)
 
 	TIMER_START("GO render longest");
 	TIMER_RESET_STORED("Mesh slowest");
-	for(GameObject* go : toRender)
+	for(const GameObject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
 		//go->GetTransform()->Draw(port);

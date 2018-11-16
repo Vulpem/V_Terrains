@@ -26,6 +26,7 @@ struct ViewPort
 	bool m_renderTerrainCollisions = false;
 	bool m_renderBoundingBoxes = false;
 	bool m_renderChunkBorders = false;
+	bool m_renderQuadTree = false;
 
 	Camera* m_camera = nullptr;
 	float2 m_pos = float2::zero;

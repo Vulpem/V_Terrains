@@ -21,7 +21,7 @@ public:
 	bool Remove(GameObject* GO);
 
 	template <typename C>
-	std::vector<GameObject*> FilterCollisions(C col);
+	std::vector<GameObject*> FilterCollisions(C col) const;
 
 	void Draw() const;
 
@@ -51,7 +51,7 @@ public:
 	void Remove(GameObject* GO);
 
 	template <typename c>
-	std::vector<GameObject*> FilterCollisions(c col);
+	std::vector<GameObject*> FilterCollisions(c col) const;
 
 	void Draw() const;
 private:
@@ -60,7 +60,7 @@ private:
 
 //QuadNode
 template<typename C>
-inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
+inline std::vector<GameObject*> QuadNode::FilterCollisions(C col) const
 {
 	std::vector<GameObject*> ret;
 	if (m_box.Intersects(col))
@@ -94,7 +94,7 @@ inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
 
 //QuadTree
 template<typename c>
-inline std::vector<GameObject*> Quad_Tree::FilterCollisions(c col)
+inline std::vector<GameObject*> Quad_Tree::FilterCollisions(c col) const
 {
 	return m_root.FilterCollisions(col);
 }

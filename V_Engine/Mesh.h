@@ -16,7 +16,7 @@ public:
 	bool m_drawWired = false;
 	bool m_drawNormals = false;
 
-	Mesh_RenderInfo GetMeshInfo();
+	Mesh_RenderInfo GetMeshInfo() const;
 
 	const float3* GetVertices() const;
 	const uint GetNumVertices();

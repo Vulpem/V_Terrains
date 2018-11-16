@@ -357,7 +357,7 @@ const Transform* GameObject::GetTransform() const
 
 void GameObject::Save(pugi::xml_node& node)
 {
-	if (m_hiddenOnOutliner == false)
+	if (GetTransform()->m_hiddenOnOutliner == false)
 	{
 		pugi::xml_node GO = node.append_child("GO");
 		GO.append_attribute("Active") = m_active;
@@ -422,5 +422,10 @@ AABB GameObject::GetAABB() const
 
 OBB GameObject::GetOBB() const
 {
-	return GetObjectSpaceAABB().Transform(GetTransform()->GetGlobalTransform().Transposed());
+	AABB objectAABB = GetObjectSpaceAABB();
+	if (objectAABB.minPoint.x != -inf && objectAABB.minPoint.y != -inf && objectAABB.minPoint.z != -inf)
+	{
+		return GetObjectSpaceAABB().Transform(GetTransform()->GetGlobalTransform().Transposed());
+	}
+	return OBB(AABB(float3(0,0,0), float3(0,0,0)));
 }

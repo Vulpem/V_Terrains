@@ -59,7 +59,7 @@ float3 Camera::GetPosition()
 
 void Camera::Draw(const ViewPort & port)
 {
-	if (m_gameObject->HiddenFromOutliner() == false)
+	if (m_gameObject->GetTransform()->m_hiddenOnOutliner == false)
 	{
 		DrawFrustum();
 	}

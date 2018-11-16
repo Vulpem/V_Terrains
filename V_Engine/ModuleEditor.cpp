@@ -224,33 +224,33 @@ void ModuleEditor::ClearConsole()
 	m_scrollToBottom = true;
 }
 
-void ModuleEditor::SceneTreeGameObject(GameObject* node)
+void ModuleEditor::SceneTreeGameObject(const Transform* node)
 {
-	if (node->HiddenFromOutliner() == false || m_displayHiddenOutlinerGameobjects == true)
+	if (node->m_hiddenOnOutliner == false || m_displayHiddenOutlinerGameobjects == true)
 	{
 		ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-		if (m_selectedGameObject == node)
+		if (m_selectedGameObject == node->GetGameobject())
 		{
 			node_flags += ImGuiTreeNodeFlags_Selected;
 		}
-		if (node->GetTransform()->GetChilds().empty())
+		if (node->GetChilds().empty())
 		{
 			node_flags += ImGuiTreeNodeFlags_Leaf;
 		}
 		char name[256];
-		sprintf(name, "%s##%llu", node->GetName(), node->GetUID());
+		sprintf(name, "%s##%llu", node->GetGameobject()->GetName(), node->GetGameobject()->GetUID());
 
 		if (ImGui::TreeNodeEx(name, node_flags))
 		{
 			if (ImGui::IsItemClicked())
 			{
-				SelectGameObject(node);
+				SelectGameObject(node->GetGameobject());
 			}
 
-			std::vector<Transform*> childs = node->GetTransform()->GetChilds();
+			std::vector<Transform*> childs = node->GetChilds();
 			for (auto child : childs)
 			{
-				SceneTreeGameObject(child->GetGameobject());
+				SceneTreeGameObject(child);
 			}
 			ImGui::TreePop();
 		}
@@ -339,7 +339,6 @@ UpdateStatus ModuleEditor::MenuBar()
 			//ImGui::Checkbox("Edit default shaders", &m_openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &m_isTestWindowOpen);
 			ImGui::Checkbox("InGame Plane", &m_show0Plane);
-			ImGui::Checkbox("QuadTree", &App->m_goManager->m_drawQuadTree);
 			ImGui::EndMenu();
 		}
 
@@ -612,7 +611,7 @@ void ModuleEditor::Outliner()
 		ImGui::Checkbox("Show hidden objects", &m_displayHiddenOutlinerGameobjects);
 		for (auto node : App->m_goManager->GetRoot()->GetTransform()->GetChilds())
 		{
-			SceneTreeGameObject(node->GetGameobject());
+			SceneTreeGameObject(node);
 		}
 		ImGui::End();
 	}
@@ -690,6 +689,7 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			ImGui::Checkbox("Render Terrain Collision", &editPort->m_renderTerrainCollisions);
 			ImGui::Checkbox("Render Chunk Borders", &editPort->m_renderChunkBorders);
 			ImGui::Checkbox("Render Bounding boxes", &editPort->m_renderBoundingBoxes);
+			ImGui::Checkbox("Render QuadTree", &editPort->m_renderQuadTree);
 
 			ImGui::EndMenu();
 		}

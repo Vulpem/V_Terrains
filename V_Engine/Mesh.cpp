@@ -22,7 +22,7 @@ Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(linke
 	m_textureIndex = existingMeshes.size();
 }
 
-Mesh_RenderInfo Mesh::GetMeshInfo()
+Mesh_RenderInfo Mesh::GetMeshInfo() const
 {
 	Mesh_RenderInfo ret;
 	if (m_gameObject->IsActive())
@@ -99,6 +99,7 @@ const float3 * Mesh::GetNormals() const
 
 AABB Mesh::GetAABB()
 {
+	//TODO investigate crash on closing application
 	return ReadRes<R_Mesh>()->m_aabb;
 }
 

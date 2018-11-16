@@ -25,10 +25,6 @@ public:
 	void DrawAABB();
 	void DrawOBB();
 
-	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
-	void HideFromOutliner() { m_hiddenOnOutliner = true; }
-	bool HiddenFromOutliner() { return m_hiddenOnOutliner; }
-
 	void Select();
 	void Unselect();
 
@@ -74,7 +70,6 @@ private:
 
 	bool m_active = true;
 	bool m_publicActive = true;
-	bool m_hiddenOnOutliner = false;
 	bool m_static = false;
 };
 
@@ -109,13 +104,6 @@ typeComp* GameObject::GetComponent() const
 template <typename typeComp>
 bool GameObject::HasComponent() const
 {
-	for (Component* component : m_components)
-	{
-		if (dynamic_cast<typeComp*>(component) != nullptr)
-		{
-			return true;
-		}
-	}
-	return false;
+	return (GetComponent<typeComp>() != nullptr);
 }
 #endif

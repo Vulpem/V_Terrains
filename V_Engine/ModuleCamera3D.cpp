@@ -25,7 +25,7 @@ void ModuleCamera3D::Start()
 	m_defaultCameraGO = App->m_goManager->CreateCamera("DefaultEditorCamera");
 	m_defaultCamera = m_defaultCameraGO->GetComponent<Camera>();
 	m_defaultCamera->SetFarPlane(50000.0);
-	m_defaultCameraGO->HideFromOutliner();
+	m_defaultCameraGO->GetTransform()->m_hiddenOnOutliner = true;
 
 	m_topView = App->m_goManager->CreateCamera("TopViewCamera");
 	m_topView->GetTransform()->SetLocalPos(0, 1000, 0);
@@ -34,7 +34,7 @@ void ModuleCamera3D::Start()
 	m_topView->GetComponent<Camera>()->SetFarPlane(50000.000);
 	m_topView->GetComponent<Camera>()->SwitchViewType();
     m_topView->GetComponent<Camera>()->SetHorizontalFOV(50000);
-	m_topView->HideFromOutliner();
+	m_topView->GetTransform()->m_hiddenOnOutliner = true;
 
 	m_frontView = App->m_goManager->CreateCamera("FrontViewCamera");
 	m_frontView->GetTransform()->SetLocalPos(0, 0, -1000);
@@ -42,7 +42,7 @@ void ModuleCamera3D::Start()
 	m_frontView->GetTransform()->m_allowRotation = false;
 	m_frontView->GetComponent<Camera>()->SetFarPlane(2000);
 	m_frontView->GetComponent<Camera>()->SwitchViewType();
-	m_frontView->HideFromOutliner();
+	m_frontView->GetTransform()->m_hiddenOnOutliner = true;
 
 	m_rightView = App->m_goManager->CreateCamera("RightViewCamera");
 	m_rightView->GetTransform()->SetLocalPos(-1000, 0, 0);
@@ -50,7 +50,7 @@ void ModuleCamera3D::Start()
 	m_rightView->GetTransform()->m_allowRotation = false;
 	m_rightView->GetComponent<Camera>()->SetFarPlane(2000);
 	m_rightView->GetComponent<Camera>()->SwitchViewType();
-	m_rightView->HideFromOutliner();
+	m_rightView->GetTransform()->m_hiddenOnOutliner = true;
 }
 
 

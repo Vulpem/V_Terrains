@@ -10,6 +10,7 @@
 #include "ImGui\imgui.h"
 
 class GameObject;
+class Transform;
 
 class ModuleEditor : public Module
 {
@@ -58,7 +59,7 @@ private:
 	void Outliner();
 	bool SaveLoadPopups();
 
-	void SceneTreeGameObject(GameObject* node);
+	void SceneTreeGameObject(const Transform* node);
 
 	void SelectByViewPort();
 	void SelectGameObject(GameObject* node);

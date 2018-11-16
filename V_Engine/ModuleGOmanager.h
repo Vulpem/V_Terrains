@@ -46,18 +46,20 @@ public:
 	void ClearScene() { m_wantToClearScene = true; }
 
 	template <typename C>
-	std::vector<GameObject*> FilterCollisions(C col);
+	std::vector<GameObject*> FilterCollisions(C col) const;
 	bool RayCast(const LineSegment& ray, GameObject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL, bool onlyMeshes = true);
 
 	GameObject* GetRoot() { return m_root; }
 
-	void RenderGOs(const ViewPort& ViewPort);
+	void RenderGOs(const ViewPort& ViewPort) const;
 
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 
+	template<typename CompType>
+	std::vector<CompType*> GetComponentsByType(ComponentType type) const;
+
 	std::multimap<ComponentType, Component*> m_components;
 	Quad_Tree m_quadTree;
-	bool m_drawQuadTree = false;
 	std::vector<GameObject*> m_dynamicGO;
 
 	//TODO: wth is this?
@@ -69,7 +71,7 @@ private:
 	void LoadSceneNow();
 	void ClearSceneNow();
 
-	Mesh_RenderInfo GetMeshData(Mesh* getFrom);
+	Mesh_RenderInfo GetMeshData(Mesh* getFrom) const;
 
 	void AddGOtoRoot(GameObject* GO);
 	void CreateRootGameObject();
@@ -90,7 +92,7 @@ private:
 
 template<typename C>
 //Returns a vector of all the GOs that collided with the shape passed
-inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
+inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col) const
 {
 	std::vector<GameObject*> ret = m_quadTree.FilterCollisions(col);
 
@@ -103,6 +105,18 @@ inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 		}
 	}
 	return ret;
+}
+
+//TODO remove this function and the double ComponentType sending
+template<typename CompType>
+inline std::vector<CompType*> ModuleGoManager::GetComponentsByType(ComponentType type) const
+{
+	std::vector<CompType*> toReturn;
+	for (auto iterator = m_components.find(type); iterator != m_components.end() && iterator->second->GetType() == type; iterator++)
+	{
+		toReturn.push_back(dynamic_cast<CompType*>(iterator->second));
+	}
+	return toReturn;
 }
 
 #endif
