@@ -36,7 +36,7 @@ public:
 public:
 	float m_camSpeed = 30.0f;
 	float m_camSprintMultiplier = 3.0f;
-	bool m_followCamera = true;
+	bool m_followCamera = false;
 
 private:
 	void MoveWithKeys();

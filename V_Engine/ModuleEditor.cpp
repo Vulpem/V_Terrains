@@ -710,14 +710,12 @@ void ModuleEditor::ViewPortUI(const ViewPort & port) const
 			}
 			if (ImGui::BeginMenu("Link new camera"))
 			{
-				std::multimap<ComponentType, Component*>::iterator comp = App->m_goManager->m_components.find(ComponentType::camera);
-				for (; comp != App->m_goManager->m_components.end() && comp->first == ComponentType::camera; comp++)
+				std::vector<Camera*> cameras = App->m_goManager->GetComponentsByType<Camera>(ComponentType::camera);
+				for(auto cam : cameras)
 				{
-					Camera* cam = (Camera*)&*comp->second;
 					if (ImGui::MenuItem(cam->GetOwner()->m_name))
 					{
 						App->m_renderer3D->FindViewPort(port.m_ID)->m_camera = cam;
-						int a = 0;
 					}
 				}
 				ImGui::EndMenu();

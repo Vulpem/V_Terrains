@@ -605,7 +605,7 @@ void ModuleTerrain::DrawUI()
 			if (App->m_editor->m_multipleViewportsIDs)
 			{
 				ImGui::Spacing();
-				ImGui::Checkbox("Auto follow top cam", &App->m_camera->m_followCamera);
+				ImGui::Checkbox("Top cap, follow default camera", &App->m_camera->m_followCamera);
 			}
 			ImGui::InputFloat("ForwardSpeedDebug", &m_forwardSpeed);
 			ImGui::InputFloat("VerticalSpeedDebug", &m_verticalSpeed);

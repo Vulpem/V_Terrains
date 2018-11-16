@@ -10,10 +10,12 @@
 #include "ModuleFileSystem.h"
 #include "imGUI\imgui.h"
 
+#include "AllComponents.h"
+
+#include "Transform.h"
+
 #include "Mesh_RenderInfo.h"
 #include "ViewPort.h"
-
-#include "AllComponents.h"
 
 #include <unordered_set>
 #include <algorithm>
@@ -580,71 +582,71 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(Mesh * getFrom) const
 
 void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 {
-		//Call the Draw function of all the components, so they do what they need to
-		for (auto component : m_components)
+	//Call the Draw function of all the components, so they do what they need to
+	for (auto component : m_components)
+	{
+		if (component.second->GetOwner()->IsActive())
 		{
-			if (component.second->GetOwner()->IsActive())
+			component.second->Draw(port);
+			if (component.second->GetOwner()->HasComponent<Billboard>())
 			{
-				component.second->Draw(port);
-				if (component.second->GetOwner()->HasComponent<Billboard>())
-				{
-					Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
-					component.second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
-				}
+				Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
+				component.second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
 			}
 		}
-		TIMER_START("Cam culling longest");
+	}
+	TIMER_START("Cam culling longest");
 
-		std::vector<GameObject*> toRender;
-		bool aCamHadCulling = false;
-		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
-		std::vector<Camera*> cameras = GetComponentsByType<Camera>(ComponentType::camera);
-		for(auto camera : cameras)
+	std::vector<GameObject*> toRender;
+	bool aCamHadCulling = false;
+	//Finding all the cameras that have culling on, and collecting all the GOs we need to render
+	std::vector<Camera*> cameras = GetComponentsByType<Camera>(ComponentType::camera);
+	for (auto camera : cameras)
+	{
+		if (camera->HasCulling())
 		{
-			if (camera->HasCulling())
+			aCamHadCulling = true;
+			//If a m_camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
+			if (camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 			{
-				aCamHadCulling = true;
-				//If a m_camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
-				if (camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
-				{
-					toRender = FilterCollisions(*camera->GetFrustum());
-				}
-				else
-				{
-					toRender = FilterCollisions(camera->GetFrustum()->MinimalEnclosingAABB());
-				}
-			}
-		}
-
-		//If no cameras had culling active, we'll cull from the Current Active m_camera
-		if (aCamHadCulling == false)
-		{
-			std::vector<GameObject*> GOs;
-			if (port.m_camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
-			{
-				toRender = FilterCollisions(*port.m_camera->GetFrustum());
+				toRender = FilterCollisions(*camera->GetFrustum());
 			}
 			else
 			{
-				toRender = FilterCollisions(port.m_camera->GetFrustum()->MinimalEnclosingAABB());
+				toRender = FilterCollisions(camera->GetFrustum()->MinimalEnclosingAABB());
 			}
 		}
-		TIMER_READ_MS_MAX("Cam culling longest");
+	}
+
+	//If no cameras had culling active, we'll cull from the Current Active m_camera
+	if (aCamHadCulling == false)
+	{
+		std::vector<GameObject*> GOs;
+		if (port.m_camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+		{
+			toRender = FilterCollisions(*port.m_camera->GetFrustum());
+		}
+		else
+		{
+			toRender = FilterCollisions(port.m_camera->GetFrustum()->MinimalEnclosingAABB());
+		}
+	}
+	TIMER_READ_MS_MAX("Cam culling longest");
 
 	TIMER_START("GO render longest");
 	TIMER_RESET_STORED("Mesh slowest");
-	for(const GameObject* go : toRender)
+	for (const GameObject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
-		//go->GetTransform()->Draw(port);
+		const Transform* trans = go->GetTransform();//->Draw(port);
+		//trans->Draw(port);
 		if (go->HasComponent<Mesh>())
 		{
 			std::vector<Mesh*> meshes;
-			meshes.reserve(3);
 			go->GetComponents<Mesh>(meshes);
 			if (meshes.empty() == false)
 			{
-				for(auto mesh : meshes)
+				for (auto mesh : meshes)
 				{
 					if (mesh->IsEnabled() && mesh->MarkedForDeletion() == false)
 					{
