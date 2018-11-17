@@ -65,6 +65,11 @@ void Camera::Draw(const ViewPort & port)
 	}
 }
 
+void Camera::PositionChanged()
+{
+	UpdateCamMatrix();
+}
+
 void Camera::UpdateCamMatrix()
 {
 	AABB goAABB = m_gameObject->GetAABB();

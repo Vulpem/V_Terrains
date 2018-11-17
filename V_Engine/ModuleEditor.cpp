@@ -624,7 +624,7 @@ void ModuleEditor::AttributeWindow()
 		ImGui::SetWindowSize(ImVec2(330, m_screenH - 20));
 		if (m_selectedGameObject)
 		{
-			m_selectedGameObject->DrawOnEditor();
+			m_selectedGameObject->DrawAttributeEditorContent();
 			ImGui::Separator();
 				if (ImGui::Button("Look at"))
 				{

@@ -19,16 +19,14 @@ public:
 
 	~GameObject();
 
-	const uint64_t GetUID() { return m_uid; }
+	const uint64_t GetUID() const { return m_uid; }
 
-	void DrawOnEditor();
-	void DrawAABB();
-	void DrawOBB();
+	void DrawAttributeEditorContent();
 
-	void UpdateTransformMatrix();
+	void PositionChanged();
 
 	void SetActive(bool state, bool justPublic = false);
-	bool IsActive();
+	bool IsActive() const;
 
 	void SetName(const char* newName);
 	const char* GetName() const;
@@ -40,7 +38,7 @@ public:
 	Transform* GetTransform();
 	const Transform* GetTransform() const;
 
-	void Save(pugi::xml_node& node);
+	void Save(pugi::xml_node& node) const;
 
 	void RemoveComponent(Component* comp);
 
@@ -53,8 +51,10 @@ public:
 	AABB GetObjectSpaceAABB() const;
 	AABB GetAABB() const;
 	OBB GetOBB() const;
+	void DrawAABB() const;
+	void DrawOBB() const;
 
-	bool IsSelected();
+	bool IsSelected() const;
 
 	char m_name[NAME_MAX_LEN];
 //TODO move everything that can be in a component in there, clean GameObject

@@ -36,6 +36,7 @@ public:
 	virtual void PostUpdate() {};
 	virtual void Draw(const ViewPort & port) {};
 	virtual void DrawOnEditor();
+	virtual void PositionChanged() {};
 
 	virtual ComponentType GetType() const = 0;
 	bool IsEnabled() { return m_enabled; }

@@ -48,7 +48,7 @@ GameObject::~GameObject()
 }
 
 //TODO distribute this on every component
-void GameObject::DrawOnEditor()
+void GameObject::DrawAttributeEditorContent()
 {
 	if (ImGui::BeginPopup("Add Component"))
 	{
@@ -143,7 +143,7 @@ void GameObject::DrawOnEditor()
 	}
 }
 
-void GameObject::DrawAABB()
+void GameObject::DrawAABB() const
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
@@ -157,7 +157,7 @@ void GameObject::DrawAABB()
 	}
 }
 
-void GameObject::DrawOBB()
+void GameObject::DrawOBB() const
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
@@ -171,26 +171,19 @@ void GameObject::DrawOBB()
 	}
 }
 
-void GameObject::UpdateTransformMatrix()
+void GameObject::PositionChanged()
 {
 	GetTransform()->UpdateGlobalTransform();
 
 	//Updating cameras position
-	if (HasComponent<Camera>())
+	for (auto component : m_components)
 	{
-		std::vector<Camera*> cams;
-		GetComponents<Camera>(cams);
-		std::vector<Camera*>::iterator it = cams.begin();
-		while (it != cams.end())
-		{
-			(*it)->UpdateCamMatrix();
-			it++;
-		}
+		component->PositionChanged();
 	}
 
 	for (auto child : GetTransform()->GetChilds())
 	{
-		child->GetGameobject()->UpdateTransformMatrix();
+		child->GetGameobject()->PositionChanged();
 	}
 }
 
@@ -219,7 +212,7 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 }
 
-bool GameObject::IsActive()
+bool GameObject::IsActive() const
 {
 	if (m_active == false)
 	{
@@ -299,7 +292,7 @@ const Transform* GameObject::GetTransform() const
 	return &m_transform;
 }
 
-void GameObject::Save(pugi::xml_node& node)
+void GameObject::Save(pugi::xml_node& node) const
 {
 	if (GetTransform()->m_hiddenOnOutliner == false)
 	{
@@ -373,7 +366,7 @@ OBB GameObject::GetOBB() const
 	return OBB(AABB(float3(0,0,0), float3(0,0,0)));
 }
 
-bool GameObject::IsSelected()
+bool GameObject::IsSelected() const
 {
 	return (App->m_editor->GetSelectedGameObject() == this);
 }

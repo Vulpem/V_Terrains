@@ -244,7 +244,7 @@ void Transform::SetLocalPos(float x, float y, float z)
 		m_localPosition.y = y;
 		m_localPosition.z = z;
 
-		m_gameObject->UpdateTransformMatrix();
+		m_gameObject->PositionChanged();
 
 		if (m_gameObject->HasComponent<Camera>())
 		{
@@ -327,7 +327,7 @@ void Transform::SetLocalRot(float x, float y, float z)
 
 		m_localRotation = math::Quat::FromEulerXYZ(x, y, z);
 
-		m_gameObject->UpdateTransformMatrix();
+		m_gameObject->PositionChanged();
 		UpdateEditorValues();
 	}
 }
@@ -343,7 +343,7 @@ void Transform::SetLocalRot(float x, float y, float z, float w)
 	{
 		m_localRotation.Set(x, y, z, w);
 
-		m_gameObject->UpdateTransformMatrix();
+		m_gameObject->PositionChanged();
 	}
 }
 
@@ -395,7 +395,7 @@ void Transform::RotateLocal(float3 rotation)
 	if(rotation.x != 0.f || rotation.y != 0.f || rotation.z != 0.f)
 	{
 		m_localRotation = m_localRotation * Quat::FromEulerXYZ(rotation.x * DEGTORAD, rotation.y* DEGTORAD, rotation.z* DEGTORAD);
-		m_gameObject->UpdateTransformMatrix();
+		m_gameObject->PositionChanged();
 		UpdateEditorValues();
 	}
 }
@@ -426,7 +426,7 @@ void Transform::SetLocalScale(float x, float y, float z)
 		{
 			m_localScale.Set(x, y, z);
 
-			m_gameObject->UpdateTransformMatrix();
+			m_gameObject->PositionChanged();
 		}
 	}
 }

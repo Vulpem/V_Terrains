@@ -23,6 +23,7 @@ public:
 	void SaveSpecifics(pugi::xml_node& myNode);
 	void LoadSpecifics(pugi::xml_node& myNode);
 
+	void PositionChanged() override;
 	void UpdateCamMatrix();
 	void UpdatePos();
 	void UpdateOrientation();
