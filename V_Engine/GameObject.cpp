@@ -28,7 +28,10 @@ GameObject::GameObject(uint64_t uid)
 
 GameObject::~GameObject()
 {
-	App->m_editor->UnselectGameObject(this);
+	if (IsSelected())
+	{
+		App->m_editor->UnselectGameObject();
+	}
 	for(auto component : m_components)
 	{
 		App->m_goManager->DeleteComponent(component);
@@ -165,29 +168,6 @@ void GameObject::DrawOBB()
 			obb.GetCornerPoints(corners);
 			App->m_renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
 		}
-	}
-}
-
-void GameObject::Select()
-{
-	m_selected = true;
-
-	GetTransform()->UpdateEditorValues();
-
-	std::vector<Transform*> childs = GetTransform()->GetChilds();
-	for (auto child : childs)
-	{
-		child->GetGameobject()->Select();
-	}
-}
-
-void GameObject::Unselect()
-{
-	m_selected = false;
-	std::vector<Transform*> childs = GetTransform()->GetChilds();
-	for (auto child : childs)
-	{
-		child->GetGameobject()->Unselect();
 	}
 }
 
@@ -391,4 +371,9 @@ OBB GameObject::GetOBB() const
 		return GetObjectSpaceAABB().Transform(GetTransform()->GetGlobalTransform().Transposed());
 	}
 	return OBB(AABB(float3(0,0,0), float3(0,0,0)));
+}
+
+bool GameObject::IsSelected()
+{
+	return (App->m_editor->GetSelectedGameObject() == this);
 }

@@ -259,15 +259,12 @@ void ModuleEditor::SceneTreeGameObject(const Transform* node)
 
 void ModuleEditor::SelectGameObject(GameObject* node)
 {
-	if (m_selectedGameObject)
-	{
-		m_selectedGameObject->Unselect();
-	}
-	if (node)
-	{
-		node->Select();
-	}
 	m_selectedGameObject = node;
+}
+
+void ModuleEditor::UnselectGameObject()
+{
+	m_selectedGameObject = nullptr;
 }
 
 
@@ -643,15 +640,6 @@ void ModuleEditor::AttributeWindow()
 				}
 		}
 		ImGui::End();
-	}
-}
-
-void ModuleEditor::UnselectGameObject(GameObject * go)
-{
-	if (m_selectedGameObject == go)
-	{
-		go->Unselect();
-		m_selectedGameObject = nullptr;
 	}
 }
 

@@ -34,7 +34,9 @@ public:
 
 	void HandleInput(SDL_Event* event);
     void SwitchViewPorts();
-	void UnselectGameObject(GameObject* go);
+	void SelectGameObject(GameObject* node);
+	void UnselectGameObject();
+	GameObject* GetSelectedGameObject() { return m_selectedGameObject; }
 
 	void Log(const char* input);
 	void ClearConsole();
@@ -62,7 +64,7 @@ private:
 	void SceneTreeGameObject(const Transform* node);
 
 	void SelectByViewPort();
-	void SelectGameObject(GameObject* node);
+
 private:
 	int m_screenW = 0;
 	int m_screenH = 0;

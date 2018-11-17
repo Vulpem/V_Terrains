@@ -27,7 +27,7 @@ Mesh_RenderInfo Mesh::GetMeshInfo() const
 	Mesh_RenderInfo ret;
 	if (m_gameObject->IsActive())
 	{
-		if (m_drawWired == true || m_gameObject->m_selected)
+		if (m_drawWired == true || GetOwner()->IsSelected())
 		{
 			ret.m_drawWired = true;
 			if (m_drawWired == true)
@@ -35,9 +35,9 @@ Mesh_RenderInfo Mesh::GetMeshInfo() const
 				ret.m_drawDoubleSidedFaces = true;
 				ret.m_wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
 			}
-			if (m_gameObject->m_selected)
+			if (GetOwner()->IsSelected())
 			{
-				if (m_gameObject->GetTransform()->GetParent() != nullptr && m_gameObject->GetTransform()->GetParent()->GetGameobject()->m_selected)
+				if (m_gameObject->GetTransform()->GetParent() != nullptr && m_gameObject->GetTransform()->GetParent()->GetGameobject()->IsSelected())
 				{
 					ret.m_wiresColor = float4(0, 0.5f, 0.5f, 1);
 				}

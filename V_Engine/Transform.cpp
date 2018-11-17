@@ -98,9 +98,9 @@ void Transform::Draw(const ViewPort & port) const
 	if (Time.PlayMode != PlayMode::Play)
 	{
 		float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
-		if (m_gameObject->m_selected)
+		if (GetGameobject()->IsSelected())
 		{
-			if (GetParent()->GetGameobject()->m_selected)
+			if (GetParent()->GetGameobject()->IsSelected())
 			{
 				color = float4(0, 0.5f, 0.5f, 1);
 			}

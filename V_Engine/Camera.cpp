@@ -246,7 +246,7 @@ void Camera::LoadSpecifics(pugi::xml_node & myNode)
 
 void Camera::DrawFrustum()
 {
-	if (m_gameObject->m_selected)
+	if (GetOwner()->IsSelected())
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);

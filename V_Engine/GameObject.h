@@ -25,9 +25,6 @@ public:
 	void DrawAABB();
 	void DrawOBB();
 
-	void Select();
-	void Unselect();
-
 	void UpdateTransformMatrix();
 
 	void SetActive(bool state, bool justPublic = false);
@@ -56,11 +53,13 @@ public:
 	AABB GetObjectSpaceAABB() const;
 	AABB GetAABB() const;
 	OBB GetOBB() const;
+
+	bool IsSelected();
+
 	char m_name[NAME_MAX_LEN];
 //TODO move everything that can be in a component in there, clean GameObject
 
 	std::vector<Component*> m_components;
-	bool m_selected = false;
 private:
 	uint64_t m_uid;
 	Transform m_transform;
