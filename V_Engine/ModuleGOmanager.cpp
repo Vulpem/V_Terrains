@@ -347,9 +347,6 @@ void ModuleGoManager::LoadSceneNow()
 					GameObject* toAdd = new GameObject();
 					toAdd->SetName(go_name.data());
 
-					bool isStatic = GOs.attribute("Static").as_bool();
-					toAdd->SetStatic(isStatic);
-
 					bool isActive = GOs.attribute("Active").as_bool();
 					toAdd->SetActive(isActive);
 
@@ -411,9 +408,9 @@ void ModuleGoManager::LoadSceneNow()
 //Set a single GO to the passed Static value
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 {
-	if (Static != GO->IsStatic())
+	if (Static != GO->GetTransform()->IsStatic())
 	{
-		GO->SetStatic(Static);
+		GO->GetTransform()->SetStatic(Static);
 		if (Static)
 		{
 			if (GO->GetTransform()->GetParent() != nullptr)

@@ -79,14 +79,18 @@ public:
 	void Draw(const ViewPort & port) const;
 	void EditorContent();
 
+	void SetStatic(bool Static) { m_static = Static; }
+	bool IsStatic() const { return m_static; }
+
 	bool m_allowRotation = true;
 	bool m_hiddenOnOutliner = false;
+	bool m_static = false;
 private:
 
 	math::Quat m_localRotation = math::Quat::identity;
 	math::float3 m_localPosition = math::float3::zero;
 	math::float3 m_localScale = math::float3::zero;
-	//TMP - Needed to fix the attribute editor display
+	//Needed to fix the attribute editor display
 	math::float3 m_editorRot = math::float3::zero;
 	math::float3 m_editorGlobalRot = math::float3::zero;
 

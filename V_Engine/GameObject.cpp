@@ -28,31 +28,11 @@ GameObject::GameObject(uint64_t uid)
 
 GameObject::~GameObject()
 {
-	if (IsStatic() == false)
-	{
-		if (App->m_goManager->m_dynamicGO.empty() == false)
-		{
-			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
-			{
-				if ((*it) == this)
-				{
-					App->m_goManager->m_dynamicGO.erase(it);
-					break;
-				}
-			}
-		}
-	}
-	else
-	{
-		App->m_goManager->m_quadTree.Remove(this);
-	}
-
 	App->m_editor->UnselectGameObject(this);
 	for(auto component : m_components)
 	{
 		App->m_goManager->DeleteComponent(component);
 	}
-	m_components.clear();
 
 	std::vector<Transform*> childs = GetTransform()->GetChilds();
 	if (childs.empty() == false)
@@ -149,26 +129,10 @@ void GameObject::DrawOnEditor()
 	{
 		ImGui::OpenPopup("Add Component");
 	}
-	ImGui::SameLine();
-	ImGui::Text("m_static: ");
-	ImGui::SameLine();
-	bool isStatic = m_static;
-	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != m_static && App->m_goManager->m_setting == nullptr)
-	{
-		if (GetTransform()->GetChilds().empty() == true)
-		{
-			App->m_goManager->SetStatic(isStatic, this);
-		}
-		else
-		{
-			App->m_goManager->m_setting = this;
-			App->m_goManager->m_settingStatic = isStatic;
-		}
-	}
+	
 	if (ImGui::CollapsingHeader("Transform"))
 	{
-	m_transform.EditorContent();
+		m_transform.EditorContent();
 	}
 	for (std::vector<Component*>::iterator it = m_components.begin(); it != m_components.end(); it++)
 	{
@@ -361,7 +325,6 @@ void GameObject::Save(pugi::xml_node& node)
 	{
 		pugi::xml_node GO = node.append_child("GO");
 		GO.append_attribute("Active") = m_active;
-		GO.append_attribute("m_static") = m_static;
 		GO.append_attribute("m_name") = m_name;
 		if (GetTransform()->GetParent() != nullptr)
 		{

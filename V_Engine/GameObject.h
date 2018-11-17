@@ -33,9 +33,6 @@ public:
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive();
 
-	void SetStatic(bool Static) { m_static = Static; }
-	bool IsStatic() const { return m_static; }
-
 	void SetName(const char* newName);
 	const char* GetName() const;
 
@@ -70,7 +67,6 @@ private:
 
 	bool m_active = true;
 	bool m_publicActive = true;
-	bool m_static = false;
 };
 
 template <typename typeComp>

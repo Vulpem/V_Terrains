@@ -5,6 +5,9 @@
 
 #include "GameObject.h"
 #include "Camera.h"
+#include "Application.h"
+#include "Globals.h"
+#include "ModuleGOmanager.h"
 
 #include "imGUI\imgui.h"
 #include "ViewPort.h"
@@ -20,11 +23,31 @@ Transform::Transform(GameObject* linkedTo)
 Transform::~Transform()
 {
 	SetParent(nullptr);
+
+	if (IsStatic() == false)
+	{
+		if (App->m_goManager->m_dynamicGO.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
+			{
+				if ((*it) == GetGameobject())
+				{
+					App->m_goManager->m_dynamicGO.erase(it);
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		App->m_goManager->m_quadTree.Remove(GetGameobject());
+	}
 }
 
 void Transform::SaveSpecifics(pugi::xml_node& myNode) const
 {
 	myNode.append_attribute("AllowRotation") = m_allowRotation;
+	myNode.append_attribute("m_static") = m_static;
 	pugi::xml_node node = myNode.append_child("LocalRotation");
 	node.append_attribute("x") = m_localRotation.x;
 	node.append_attribute("y") = m_localRotation.y;
@@ -45,6 +68,8 @@ void Transform::SaveSpecifics(pugi::xml_node& myNode) const
 void Transform::LoadSpecifics(pugi::xml_node & myNode)
 {
 	m_allowRotation = myNode.attribute("AllowRotation").as_bool();
+	bool setToStatic = myNode.attribute("m_static").as_bool();
+	//TODO set to static
 	float tmp[4];
 
 	pugi::xml_node rot = myNode.child("LocalRotation");
@@ -102,6 +127,23 @@ void Transform::Draw(const ViewPort & port) const
 
 void Transform::EditorContent()
 {
+	ImGui::Text("m_static: ");
+	ImGui::SameLine();
+	bool isStatic = m_static;
+	ImGui::Checkbox("##isObjectStatic", &isStatic);
+	if (isStatic != m_static && App->m_goManager->m_setting == nullptr)
+	{
+		if (GetChilds().empty() == true)
+		{
+			App->m_goManager->SetStatic(isStatic, GetGameobject());
+		}
+		else
+		{
+			App->m_goManager->m_setting = GetGameobject();
+			App->m_goManager->m_settingStatic = isStatic;
+		}
+	}
+
 	float tmp[3];
 	tmp[0] = m_localPosition.x;
 	tmp[1] = m_localPosition.y;
@@ -196,7 +238,7 @@ void Transform::UpdateEditorValues()
 
 void Transform::SetLocalPos(float x, float y, float z)
 {
-	if (m_gameObject->IsStatic() == false)
+	if (IsStatic() == false)
 	{
 		m_localPosition.x = x;
 		m_localPosition.y = y;
@@ -229,7 +271,7 @@ math::float3 Transform::GetLocalPos() const
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	if (m_gameObject->IsStatic() == false)
+	if (IsStatic() == false)
 	{
 		if (m_gameObject->GetTransform()->GetParent() != nullptr)
 		{
@@ -274,7 +316,7 @@ void Transform::Translate(float3 m)
 
 void Transform::SetLocalRot(float x, float y, float z)
 {
-	if (m_gameObject->IsStatic() == false && m_allowRotation)
+	if (IsStatic() == false && m_allowRotation)
 	{
 		x = x - FloorInt(x / 360) * 360;
 		y = y - FloorInt(y / 360) * 360;
@@ -297,7 +339,7 @@ void Transform::SetLocalRot(float3 rot)
 
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	if (m_gameObject->IsStatic() == false && m_allowRotation)
+	if (IsStatic() == false && m_allowRotation)
 	{
 		m_localRotation.Set(x, y, z, w);
 
@@ -322,7 +364,7 @@ Quat Transform::GetLocalRotQuat() const
 
 void Transform::SetGlobalRot(float x, float y, float z)
 {
-	if (m_gameObject->IsStatic() == false && m_allowRotation)
+	if (IsStatic() == false && m_allowRotation)
 	{
 		if (m_gameObject->GetTransform()->GetParent() != nullptr)
 		{
@@ -378,7 +420,7 @@ math::float3 Transform::GetGlobalRot() const
 
 void Transform::SetLocalScale(float x, float y, float z)
 {
-	if (m_gameObject->IsStatic() == false)
+	if (IsStatic() == false)
 	{
 		if (x != 0 && y != 0 && z != 0)
 		{
@@ -401,7 +443,7 @@ math::float3 Transform::GetGlobalScale() const
 
 void Transform::LookAt(const float3 & Spot, float3 worldUp)
 {
-	if (m_gameObject->IsStatic() == false)
+	if (IsStatic() == false)
 	{
 		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0,0,1), float3(0,1,0), worldUp);
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
