@@ -257,7 +257,7 @@ void ModuleEditor::SceneTreeGameObject(const Transform* node)
 	}
 }
 
-void ModuleEditor::SelectGameObject(GameObject* node)
+void ModuleEditor::SelectGameObject(Gameobject* node)
 {
 	m_selectedGameObject = node;
 }
@@ -825,7 +825,7 @@ void ModuleEditor::SelectByViewPort()
 			//Generating the LineSegment we'll check for collisions
 			m_selectionRay = port->m_camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
 
-			GameObject* out_go = NULL;
+			Gameobject* out_go = NULL;
 			
 			if (App->m_goManager->RayCast(m_selectionRay, &out_go, &m_selectedRayPos, &m_selectRayNormal, false))
 			{

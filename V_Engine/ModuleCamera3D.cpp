@@ -151,7 +151,7 @@ void ModuleCamera3D::SetCameraToFront(Camera* toSet)
 	SetCameraToCamera(m_frontView, toSet);
 }
 
-void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
+void ModuleCamera3D::SetCameraToCamera(Gameobject * setTo, Camera* toSet)
 {
 	if (setTo->HasComponent<Camera>())
 	{

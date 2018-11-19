@@ -195,9 +195,9 @@ void ModuleGoManager::CleanUp()
 
 
 //Create an empty GameObject
-GameObject * ModuleGoManager::CreateEmpty(const char* name)
+Gameobject * ModuleGoManager::CreateEmpty(const char* name)
 {
-	GameObject* empty = new GameObject();
+	Gameobject* empty = new Gameobject();
 	
 	if (name != NULL && name != "")
 	{
@@ -210,18 +210,18 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 }
 
 //Create a gameobject with just a Camera attached to it
-GameObject* ModuleGoManager::CreateCamera(const char* name)
+Gameobject* ModuleGoManager::CreateCamera(const char* name)
 {
-	GameObject* m_camera = CreateEmpty(name);
+	Gameobject* m_camera = CreateEmpty(name);
 	m_camera->CreateComponent(ComponentType::camera);
 	return m_camera;
 }
 
 //Load a vGO avaliable in the resources
-std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
+std::vector<Gameobject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	GameObject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
-	std::vector<GameObject*> ret;
+	Gameobject* sceneRoot = App->m_importer->LoadVgo(fileName, "RootNode");
+	std::vector<Gameobject*> ret;
 	std::vector<Transform*> sceneRootChilds = sceneRoot->GetTransform()->GetChilds();
 	if (sceneRoot && sceneRootChilds.empty() == false)
 	{
@@ -241,7 +241,7 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 	return ret;
 }
 
-void ModuleGoManager::DeleteGameObject(GameObject* toErase)
+void ModuleGoManager::DeleteGameObject(Gameobject* toErase)
 {
 	m_toDelete.push_back(toErase);
 }
@@ -315,7 +315,7 @@ void ModuleGoManager::SaveSceneNow()
 
 void ModuleGoManager::LoadSceneNow()
 {
-	std::map<uint64_t, GameObject*> UIDlib;
+	std::map<uint64_t, Gameobject*> UIDlib;
 
 	char scenePath[526];
 	sprintf(scenePath, "Assets/Scenes/%s%s", m_sceneName.data(), SCENE_FORMAT);
@@ -344,7 +344,7 @@ void ModuleGoManager::LoadSceneNow()
 					
 					uint64_t UID = GOs.attribute("UID").as_ullong();
 
-					GameObject* toAdd = new GameObject();
+					Gameobject* toAdd = new Gameobject();
 					toAdd->SetName(go_name.data());
 
 					bool isActive = GOs.attribute("Active").as_bool();
@@ -352,12 +352,12 @@ void ModuleGoManager::LoadSceneNow()
 
 					toAdd->GetTransform()->LoadSpecifics(GOs.child("Transform"));
 
-					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
+					std::map<uint64_t, Gameobject*>::iterator parent = UIDlib.find(parentUID);
 					if (parent != UIDlib.end())
 					{
 						toAdd->GetTransform()->SetParent(parent->second->GetTransform());
 					}
-					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
+					UIDlib.insert(std::pair<uint64_t, Gameobject*>(UID, toAdd));
 					if (UID != 0)
 					{
 						m_dynamicGO.push_back(toAdd);
@@ -377,7 +377,7 @@ void ModuleGoManager::LoadSceneNow()
 					bool enabled = general.attribute("enabled").as_bool();
 					if (GO != 0)
 					{
-						std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
+						std::map<uint64_t, Gameobject*>::iterator go = UIDlib.find(GO);
 						if (go != UIDlib.end())
 						{
 							Component* c = go->second->CreateComponent(type, "", true);
@@ -389,7 +389,7 @@ void ModuleGoManager::LoadSceneNow()
 					}
 				}
 
-				GameObject* sceneRoot = UIDlib.find(0)->second;
+				Gameobject* sceneRoot = UIDlib.find(0)->second;
 				std::vector<Transform*> childs = sceneRoot->GetTransform()->GetChilds();
 				for (auto child : childs)
 				{
@@ -406,7 +406,7 @@ void ModuleGoManager::LoadSceneNow()
 
 
 //Set a single GO to the passed Static value
-void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
+void ModuleGoManager::SetStatic(bool Static, Gameobject * GO)
 {
 	if (Static != GO->GetTransform()->IsStatic())
 	{
@@ -418,7 +418,7 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 				SetStatic(true, GO->GetTransform()->GetParent()->GetGameobject());
 			}
 			App->m_goManager->m_quadTree.Add(GO);
-			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
+			for (std::vector<Gameobject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
 			{
 				if ((*it) == GO)
 				{
@@ -441,7 +441,7 @@ void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 }
 
 //Set a GO and all his childs to the passed Static value
-void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
+void ModuleGoManager::SetChildsStatic(bool Static, Gameobject * GO)
 {
 	SetStatic(Static, GO);
 	if (Static == true)
@@ -460,18 +460,18 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 -OUT_Gameobject: gameobject the ray collided with. If there's none, nullptr is returned
 -OUT_position: the position where the ray collided. If it didn't, it will return (-1,-1).
 -OUT_normal: the direction of the normal of the surface where the ray collided. If it didn't, it will return (-1,-1).*/
-bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal, bool onlyMeshes)
+bool ModuleGoManager::RayCast(const LineSegment & ray, Gameobject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal, bool onlyMeshes)
 {
 	TIMER_RESET_STORED("Raycast");
 	TIMER_START("Raycast");
 	bool collided = false;
-	GameObject* out_go = NULL;
+	Gameobject* out_go = NULL;
 	float3 out_pos = float3::zero;
 	float3 out_normal = float3::zero;
 
 	//Obtaining all the AABB collisions, and sorting them by distance of the AABB
-	std::vector<GameObject*> colls = App->m_goManager->FilterCollisions(ray);
-	std::map<float, GameObject*> candidates;
+	std::vector<Gameobject*> colls = App->m_goManager->FilterCollisions(ray);
+	std::map<float, Gameobject*> candidates;
 	for (auto candidateGO : colls)
 	{
 		float distanceNear;
@@ -479,12 +479,12 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
 		if (candidateGO->GetOBB().Intersects(ray, distanceNear, distanceFar) == true)
 		{
-			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), candidateGO));
+			candidates.insert(std::pair<float, Gameobject*>(MIN(distanceNear, distanceFar), candidateGO));
 		}
 	}
 
 	//Checking all the possible collisions in order
-	for (std::map<float, GameObject*>::iterator check = candidates.begin(); check != candidates.end() && collided == false && candidates.empty() == false; check++)
+	for (std::map<float, Gameobject*>::iterator check = candidates.begin(); check != candidates.end() && collided == false && candidates.empty() == false; check++)
 	{
 		float collisionDistance = floatMax;
 		//One object may have more than a single mesh, so we'll check them one by one
@@ -594,7 +594,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 	}
 	TIMER_START("Cam culling longest");
 
-	std::vector<GameObject*> toRender;
+	std::vector<Gameobject*> toRender;
 	bool aCamHadCulling = false;
 	//Finding all the cameras that have culling on, and collecting all the GOs we need to render
 	std::vector<Camera*> cameras = GetComponentsByType<Camera>(ComponentType::camera);
@@ -618,7 +618,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 	//If no cameras had culling active, we'll cull from the Current Active m_camera
 	if (aCamHadCulling == false)
 	{
-		std::vector<GameObject*> GOs;
+		std::vector<Gameobject*> GOs;
 		if (port.m_camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
 			toRender = FilterCollisions(*port.m_camera->GetFrustum());
@@ -632,7 +632,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 
 	TIMER_START("GO render longest");
 	TIMER_RESET_STORED("Mesh slowest");
-	for (const GameObject* go : toRender)
+	for (const Gameobject* go : toRender)
 	{
 		//TODO fix linker issue of Transform Draw
 		//go->GetTransform()->Draw(port);
@@ -663,7 +663,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 	TIMER_READ_MS_MAX("GO render longest");
 }
 
-void ModuleGoManager::AddGOtoRoot(GameObject * GO)
+void ModuleGoManager::AddGOtoRoot(Gameobject * GO)
 {
 	GO->GetTransform()->SetParent(m_root->GetTransform());
 }
@@ -673,7 +673,7 @@ void ModuleGoManager::CreateRootGameObject()
 	if (m_root == nullptr)
 	{
 		LOG("Creating root node for scene");
-		m_root = new GameObject();
+		m_root = new Gameobject();
 		m_root->SetName("Root");
 		m_root->GetTransform()->SetParent(nullptr);
 	}

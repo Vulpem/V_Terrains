@@ -8,7 +8,7 @@ struct Mesh_RenderInfo;
 class Mesh : public  ResourcedComponent
 {
 public:
-	Mesh(std::string resource, GameObject* linkedTo);
+	Mesh(std::string resource, Gameobject* linkedTo);
 
 	Mesh_RenderInfo GetMeshInfo() const;
 

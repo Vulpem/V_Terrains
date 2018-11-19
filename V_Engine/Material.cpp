@@ -7,7 +7,7 @@
 
 #include "imGUI\imgui.h"
 
-Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(linkedTo, ComponentType::material)
+Material::Material(std::string res, Gameobject* linkedTo) : ResourcedComponent(linkedTo, ComponentType::material)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Material##%i", m_uid);

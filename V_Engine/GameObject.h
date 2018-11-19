@@ -11,13 +11,13 @@
 #include "Component.h"
 #include "Transform.h"
 
-class GameObject
+class Gameobject
 {
 public:
-	GameObject();
-	GameObject(uint64_t Uid);
+	Gameobject();
+	Gameobject(uint64_t Uid);
 
-	~GameObject();
+	~Gameobject();
 
 	const uint64_t GetUID() const { return m_uid; }
 
@@ -69,7 +69,7 @@ private:
 };
 
 template <typename typeComp>
-void GameObject::GetComponents(std::vector<typeComp*>& out) const
+void Gameobject::GetComponents(std::vector<typeComp*>& out) const
 {
 	for (Component* component : m_components)
 	{
@@ -82,7 +82,7 @@ void GameObject::GetComponents(std::vector<typeComp*>& out) const
 }
 
 template <typename typeComp>
-typeComp* GameObject::GetComponent() const
+typeComp* Gameobject::GetComponent() const
 {
 	for (Component* component : m_components)
 	{
@@ -97,7 +97,7 @@ typeComp* GameObject::GetComponent() const
 }
 
 template <typename typeComp>
-bool GameObject::HasComponent() const
+bool Gameobject::HasComponent() const
 {
 	return (GetComponent<typeComp>() != nullptr);
 }

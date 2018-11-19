@@ -13,7 +13,7 @@
 #include "ViewPort.h"
 
 
-Transform::Transform(GameObject* linkedTo)
+Transform::Transform(Gameobject* linkedTo)
 	: m_gameObject(linkedTo)
 	, m_localPosition(0,0,0)
 	, m_localScale(1,1,1)
@@ -28,7 +28,7 @@ Transform::~Transform()
 	{
 		if (App->m_goManager->m_dynamicGO.empty() == false)
 		{
-			for (std::vector<GameObject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
+			for (std::vector<Gameobject*>::iterator it = App->m_goManager->m_dynamicGO.begin(); it != App->m_goManager->m_dynamicGO.end(); it++)
 			{
 				if ((*it) == GetGameobject())
 				{
@@ -513,7 +513,7 @@ float3 Transform::WorldBackward()
 	return float3(0, 0,-1);
 }
 
-GameObject * Transform::GetGameobject() const
+Gameobject * Transform::GetGameobject() const
 {
 	return m_gameObject;
 }

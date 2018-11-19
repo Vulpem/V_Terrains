@@ -7,7 +7,7 @@
 class Material :public ResourcedComponent
 {
 public:
-	Material(std::string res, GameObject* linkedTo);
+	Material(std::string res, Gameobject* linkedTo);
 
 	void PreUpdate() override;
 

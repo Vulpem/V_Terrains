@@ -13,7 +13,7 @@
 
 //------------------------- Camera --------------------------------------------------------------------------------
 
-Camera::Camera(GameObject* linkedTo):Component(linkedTo, ComponentType::camera)
+Camera::Camera(Gameobject* linkedTo):Component(linkedTo, ComponentType::camera)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Camera##%i", m_uid);

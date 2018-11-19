@@ -759,28 +759,21 @@ void ModuleResourceManager::UnlinkResource(std::string fileName, ComponentType t
 
 void ModuleResourceManager::DeleteNow()
 {
-	if (m_toDelete.empty() == false)
+	for (auto toDeleteUID : m_toDelete)
 	{
-		std::vector<uint64_t> tmp = m_toDelete;
-		m_toDelete.clear();
-		while (tmp.empty() == false)
+		//Erasing the resource itself
+		std::map<uint64_t, Resource*>::iterator it = m_resources.find(toDeleteUID);
+		if (it != m_resources.end())
 		{
-			uint64_t uid = tmp.back();
-
-			//Erasing the resource itself
-			std::map<uint64_t, Resource*>::iterator it = m_resources.find(uid);
-			if (it != m_resources.end())
+			if (it->second->m_numReferences <= 0)
 			{
-				if (it->second->m_numReferences <= 0)
-				{
-					RELEASE(it->second);
-					m_resources.erase(it);
-				}
+				LOG("Freeing resource: %s", it->second->m_name);
+				RELEASE(it->second);
+				m_resources.erase(it);
 			}
-
-			tmp.pop_back();
 		}
 	}
+	m_toDelete.clear();
 }
 
 void ModuleResourceManager::ReloadNow()

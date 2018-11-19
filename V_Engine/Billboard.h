@@ -6,7 +6,7 @@
 class Billboard :public Component
 {
 public:
-	Billboard(GameObject* linkedTo);
+	Billboard(Gameobject* linkedTo);
 
 	void UpdateDirection(const float3& lookAt, const float3& up = float3::zero);
 	void EditorContent() override;

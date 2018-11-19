@@ -6,7 +6,7 @@
 
 #include "ImGui\imgui.h"
 
-Component::Component(GameObject* linkedTo, ComponentType type): m_name("Empty component"), m_type(type)
+Component::Component(Gameobject* linkedTo, ComponentType type): m_name("Empty component"), m_type(type)
 {
 	m_gameObject = linkedTo;
 	m_uid = GenerateUUID();
@@ -104,7 +104,7 @@ void Component::Save(pugi::xml_node& myNode)
 	SaveSpecifics(myNode.append_child("Specific"));
 }
 
-GameObject * Component::GetOwner() const
+Gameobject * Component::GetOwner() const
 {
 	return m_gameObject;
 }

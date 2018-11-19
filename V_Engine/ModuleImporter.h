@@ -13,7 +13,7 @@
 struct aiScene;
 struct aiMesh;
 struct aiNode;
-class GameObject;
+class Gameobject;
 class Material;
 class Mesh;
 class R_Mesh;
@@ -50,7 +50,7 @@ private:
 	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid = 0);
 public:
 	// ------------------------------- LOADING ------------------------------- 
-	GameObject* LoadVgo(const char* fileName, const char* vGoName, GameObject* parent = nullptr);
+	Gameobject* LoadVgo(const char* fileName, const char* vGoName, Gameobject* parent = nullptr);
 
 	R_Mesh* LoadMesh(const char* resName);
 	R_Material* LoadMaterial(const char* resName);

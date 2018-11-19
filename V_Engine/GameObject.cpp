@@ -14,11 +14,11 @@
 #include "ModuleEditor.h"
 
 
-GameObject::GameObject()
-	: GameObject(GenerateUUID())
+Gameobject::Gameobject()
+	: Gameobject(GenerateUUID())
 { }
 
-GameObject::GameObject(uint64_t uid)
+Gameobject::Gameobject(uint64_t uid)
 	: m_transform(this)
 	, m_uid(uid)
 	, m_name("Unnamed")
@@ -26,7 +26,7 @@ GameObject::GameObject(uint64_t uid)
 	App->m_goManager->m_dynamicGO.push_back(this);
 }
 
-GameObject::~GameObject()
+Gameobject::~Gameobject()
 {
 	if (IsSelected())
 	{
@@ -48,7 +48,7 @@ GameObject::~GameObject()
 }
 
 //TODO distribute this on every component
-void GameObject::DrawAttributeEditorContent()
+void Gameobject::DrawAttributeEditorContent()
 {
 	if (ImGui::BeginPopup("Add Component"))
 	{
@@ -143,7 +143,7 @@ void GameObject::DrawAttributeEditorContent()
 	}
 }
 
-void GameObject::DrawAABB() const
+void Gameobject::DrawAABB() const
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
@@ -157,7 +157,7 @@ void GameObject::DrawAABB() const
 	}
 }
 
-void GameObject::DrawOBB() const
+void Gameobject::DrawOBB() const
 {
 	if (Time.PlayMode != PlayMode::Play)
 	{
@@ -171,7 +171,7 @@ void GameObject::DrawOBB() const
 	}
 }
 
-void GameObject::PositionChanged()
+void Gameobject::PositionChanged()
 {
 	GetTransform()->UpdateGlobalTransform();
 
@@ -187,7 +187,7 @@ void GameObject::PositionChanged()
 	}
 }
 
-void GameObject::SetActive(bool state, bool justPublic)
+void Gameobject::SetActive(bool state, bool justPublic)
 {
 	if (state == m_publicActive)
 	{
@@ -212,7 +212,7 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 }
 
-bool GameObject::IsActive() const
+bool Gameobject::IsActive() const
 {
 	if (m_active == false)
 	{
@@ -222,17 +222,17 @@ bool GameObject::IsActive() const
 }
 
 
-void GameObject::SetName(const char * newName)
+void Gameobject::SetName(const char * newName)
 {
 	strcpy(m_name, newName);
 }
 
-const char * GameObject::GetName() const
+const char * Gameobject::GetName() const
 {
 	return m_name;
 }
 
-Component* GameObject::CreateComponent(ComponentType type, std::string res, bool forceCreation)
+Component* Gameobject::CreateComponent(ComponentType type, std::string res, bool forceCreation)
 {
 	Component* toAdd = nullptr;
 	switch (type)
@@ -282,17 +282,17 @@ Component* GameObject::CreateComponent(ComponentType type, std::string res, bool
 	return toAdd;
 }
 
-Transform* GameObject::GetTransform()
+Transform* Gameobject::GetTransform()
 {
 	return &m_transform;
 }
 
-const Transform* GameObject::GetTransform() const
+const Transform* Gameobject::GetTransform() const
 {
 	return &m_transform;
 }
 
-void GameObject::Save(pugi::xml_node& node) const
+void Gameobject::Save(pugi::xml_node& node) const
 {
 	if (GetTransform()->m_hiddenOnOutliner == false)
 	{
@@ -326,7 +326,7 @@ void GameObject::Save(pugi::xml_node& node) const
 	}
 }
 
-void GameObject::RemoveComponent(Component * comp)
+void Gameobject::RemoveComponent(Component * comp)
 {
 	auto it = std::find(m_components.begin(), m_components.end(), comp);
 	if (it != m_components.end())
@@ -335,7 +335,7 @@ void GameObject::RemoveComponent(Component * comp)
 	}
 }
 
-AABB GameObject::GetObjectSpaceAABB() const
+AABB Gameobject::GetObjectSpaceAABB() const
 {
 	AABB objectSpaceAABB;
 	objectSpaceAABB.SetNegativeInfinity();
@@ -351,12 +351,12 @@ AABB GameObject::GetObjectSpaceAABB() const
 	return objectSpaceAABB;
 }
 
-AABB GameObject::GetAABB() const
+AABB Gameobject::GetAABB() const
 {
 	return GetOBB().MinimalEnclosingAABB();
 }
 
-OBB GameObject::GetOBB() const
+OBB Gameobject::GetOBB() const
 {
 	AABB objectAABB = GetObjectSpaceAABB();
 	if (objectAABB.minPoint.x != -inf && objectAABB.minPoint.y != -inf && objectAABB.minPoint.z != -inf)
@@ -366,7 +366,7 @@ OBB GameObject::GetOBB() const
 	return OBB(AABB(float3(0,0,0), float3(0,0,0)));
 }
 
-bool GameObject::IsSelected() const
+bool Gameobject::IsSelected() const
 {
 	return (App->m_editor->GetSelectedGameObject() == this);
 }

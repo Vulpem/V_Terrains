@@ -28,7 +28,7 @@ public:
 	void SetCameraToTop(Camera* toSet);
 	void SetCameraToRight(Camera* toSet);
 	void SetCameraToFront(Camera* toSet);
-	void SetCameraToCamera(GameObject* setTo, Camera* toSet);
+	void SetCameraToCamera(Gameobject* setTo, Camera* toSet);
 
 	Camera* GetMovingCamera();
 	void SetMovingCamera(Camera* cam = nullptr);
@@ -43,12 +43,12 @@ private:
 
 private:
 	Camera* m_movingCamera = nullptr;
-	GameObject* m_defaultCameraGO = nullptr;
+	Gameobject* m_defaultCameraGO = nullptr;
 	Camera* m_defaultCamera = nullptr;
 
-	GameObject* m_topView = nullptr;
-	GameObject* m_rightView = nullptr;
-	GameObject* m_frontView = nullptr;
+	Gameobject* m_topView = nullptr;
+	Gameobject* m_rightView = nullptr;
+	Gameobject* m_frontView = nullptr;
 public:
 };
 

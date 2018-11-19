@@ -280,6 +280,17 @@ void Application::Stop()
 	for (Module* m : m_modules) {m->OnStop(); };
 }
 
+void Application::Log(const char * str)
+{
+	if (m_gameRunning == true)
+	{
+		if (m_editor != nullptr && m_editor->IsEnabled())
+		{
+			m_editor->Log(str);
+		}
+	}
+}
+
 void Application::AddModule(Module* mod)
 {
 	m_modules.push_back(mod);

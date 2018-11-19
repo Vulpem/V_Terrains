@@ -9,7 +9,7 @@
 
 #include "ImGui\imgui.h"
 
-class GameObject;
+class Gameobject;
 class Transform;
 
 class ModuleEditor : public Module
@@ -34,9 +34,9 @@ public:
 
 	void HandleInput(SDL_Event* event);
     void SwitchViewPorts();
-	void SelectGameObject(GameObject* node);
+	void SelectGameObject(Gameobject* node);
 	void UnselectGameObject();
-	GameObject* GetSelectedGameObject() { return m_selectedGameObject; }
+	Gameobject* GetSelectedGameObject() { return m_selectedGameObject; }
 
 	void Log(const char* input);
 	void ClearConsole();
@@ -75,7 +75,7 @@ private:
 	uint m_multipleViewportsIndex[2] = { 0,0 };
 	uint m_fullScreenViewportIndex = 0;
 
-	GameObject* m_selectedGameObject = nullptr;
+	Gameobject* m_selectedGameObject = nullptr;
 	float m_selectedGoPos[3] = { 0,0,0 };
 	float m_selectedGoScale[3] = { 1,1,1 };
 	float m_selectedGoEuler[3] = { 0,0,0 };

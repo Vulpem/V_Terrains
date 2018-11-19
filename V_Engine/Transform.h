@@ -5,13 +5,13 @@
 #include "Math.h"
 #include "PugiXml\src\pugixml.hpp"
 
-class GameObject;
+class Gameobject;
 class ViewPort;
 
 class Transform
 {
 public:
-	Transform(GameObject* linkedTo);
+	Transform(Gameobject* linkedTo);
 	~Transform();
 
 	void SaveSpecifics(pugi::xml_node& myNode) const;
@@ -68,7 +68,7 @@ public:
 	static float3 WorldForward();
 	static float3 WorldBackward();
 
-	GameObject* GetGameobject() const;
+	Gameobject* GetGameobject() const;
 
 	void SetParent(Transform* parent);
 	Transform* GetParent() const;
@@ -96,7 +96,7 @@ private:
 
 	math::float4x4 m_globalTransform = math::float4x4::identity;
 
-	GameObject* m_gameObject;
+	Gameobject* m_gameObject;
 
 	std::vector<Transform*> m_childs;
 	Transform* m_parent = nullptr;

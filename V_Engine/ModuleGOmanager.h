@@ -33,37 +33,37 @@ public:
 	void CleanUp();
 
 
-	GameObject* CreateEmpty(const char* name = NULL);
-	GameObject* CreateCamera(const char* name = NULL);
-	void DeleteGameObject(GameObject* toErase);
+	Gameobject* CreateEmpty(const char* name = NULL);
+	Gameobject* CreateCamera(const char* name = NULL);
+	void DeleteGameObject(Gameobject* toErase);
 	void DeleteComponent(Component* toErase);
 
-	void SetStatic(bool Static, GameObject* GO);
-	void SetChildsStatic(bool Static, GameObject* GO);
+	void SetStatic(bool Static, Gameobject* GO);
+	void SetChildsStatic(bool Static, Gameobject* GO);
 
 	void SaveScene(char* name) { m_wantToSaveScene = true; m_sceneName = name; }
 	void LoadScene(char* name) { m_wantToLoadScene = true; m_sceneName = name;	m_wantToClearScene = true; }
 	void ClearScene() { m_wantToClearScene = true; }
 
 	template <typename C>
-	std::vector<GameObject*> FilterCollisions(C col) const;
-	bool RayCast(const LineSegment& ray, GameObject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL, bool onlyMeshes = true);
+	std::vector<Gameobject*> FilterCollisions(C col) const;
+	bool RayCast(const LineSegment& ray, Gameobject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL, bool onlyMeshes = true);
 
-	GameObject* GetRoot() { return m_root; }
+	Gameobject* GetRoot() { return m_root; }
 
 	void RenderGOs(const ViewPort& ViewPort) const;
 
-	std::vector<GameObject*> LoadGO(const char* file_noFormat);
+	std::vector<Gameobject*> LoadGO(const char* file_noFormat);
 
 	template<typename CompType>
 	std::vector<CompType*> GetComponentsByType(ComponentType type) const;
 
 	std::multimap<ComponentType, Component*> m_components;
 	Quad_Tree m_quadTree;
-	std::vector<GameObject*> m_dynamicGO;
+	std::vector<Gameobject*> m_dynamicGO;
 
 	//TODO: wth is this?
-	GameObject* m_setting = nullptr;
+	Gameobject* m_setting = nullptr;
 	bool m_settingStatic = true;
 
 private:
@@ -73,13 +73,13 @@ private:
 
 	Mesh_RenderInfo GetMeshData(Mesh* getFrom) const;
 
-	void AddGOtoRoot(GameObject* GO);
+	void AddGOtoRoot(Gameobject* GO);
 	void CreateRootGameObject();
 	void DeleteGOs();
 
-	std::vector<GameObject*> m_toDelete;
+	std::vector<Gameobject*> m_toDelete;
 
-	GameObject * m_root = nullptr;
+	Gameobject * m_root = nullptr;
 
 	std::string m_sceneName;
 	bool m_wantToSaveScene = false;
@@ -92,9 +92,9 @@ private:
 
 template<typename C>
 //Returns a vector of all the GOs that collided with the shape passed
-inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col) const
+inline std::vector<Gameobject*> ModuleGoManager::FilterCollisions(C col) const
 {
-	std::vector<GameObject*> ret = m_quadTree.FilterCollisions(col);
+	std::vector<Gameobject*> ret = m_quadTree.FilterCollisions(col);
 
 	for (auto go : m_dynamicGO)
 	{

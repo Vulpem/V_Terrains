@@ -6,7 +6,7 @@
 
 #include "imGUI\imgui.h"
 
-Billboard::Billboard(GameObject* linkedTo) : Component(linkedTo, ComponentType::billboard)
+Billboard::Billboard(Gameobject* linkedTo) : Component(linkedTo, ComponentType::billboard)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Billboard##%i", m_uid);

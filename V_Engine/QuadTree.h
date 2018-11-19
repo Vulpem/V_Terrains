@@ -17,11 +17,11 @@ public:
 	/*Try to add a GO to this Node.
 	Won't be added and return false if the object's m_aabb doesn't collide with this node
 	Will return true if it's added*/
-	bool Add(GameObject* GO);
-	bool Remove(GameObject* GO);
+	bool Add(Gameobject* GO);
+	bool Remove(Gameobject* GO);
 
 	template <typename C>
-	std::vector<GameObject*> FilterCollisions(C col) const;
+	std::vector<Gameobject*> FilterCollisions(C col) const;
 
 	void Draw() const;
 
@@ -37,7 +37,7 @@ private:
 	std::vector<QuadNode> m_childs;
 	AABB m_box;
 
-	std::vector<GameObject*> m_GOs;
+	std::vector<Gameobject*> m_GOs;
 };
 
 
@@ -47,11 +47,11 @@ public:
 	Quad_Tree(float3 minPoint, float3 maxPoint);
 	~Quad_Tree();
 
-	void Add(GameObject* GO);
-	void Remove(GameObject* GO);
+	void Add(Gameobject* GO);
+	void Remove(Gameobject* GO);
 
 	template <typename c>
-	std::vector<GameObject*> FilterCollisions(c col) const;
+	std::vector<Gameobject*> FilterCollisions(c col) const;
 
 	void Draw() const;
 private:
@@ -60,9 +60,9 @@ private:
 
 //QuadNode
 template<typename C>
-inline std::vector<GameObject*> QuadNode::FilterCollisions(C col) const
+inline std::vector<Gameobject*> QuadNode::FilterCollisions(C col) const
 {
-	std::vector<GameObject*> ret;
+	std::vector<Gameobject*> ret;
 	if (m_box.Intersects(col))
 	{
 		if (m_GOs.empty() == false)
@@ -80,7 +80,7 @@ inline std::vector<GameObject*> QuadNode::FilterCollisions(C col) const
 		{
 			for (auto child : m_childs)
 			{
-				std::vector<GameObject*> toAdd = child.FilterCollisions(col);
+				std::vector<Gameobject*> toAdd = child.FilterCollisions(col);
 				for (auto goToAdd : toAdd)
 				{
 					ret.push_back(goToAdd);
@@ -94,7 +94,7 @@ inline std::vector<GameObject*> QuadNode::FilterCollisions(C col) const
 
 //QuadTree
 template<typename c>
-inline std::vector<GameObject*> Quad_Tree::FilterCollisions(c col) const
+inline std::vector<Gameobject*> Quad_Tree::FilterCollisions(c col) const
 {
 	return m_root.FilterCollisions(col);
 }

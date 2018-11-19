@@ -19,7 +19,7 @@ QuadNode::~QuadNode()
 {
 }
 
-bool QuadNode::Add(GameObject* GO)
+bool QuadNode::Add(Gameobject* GO)
 {
 	if (m_box.Intersects(GO->GetAABB()))
 	{
@@ -56,11 +56,11 @@ bool QuadNode::Add(GameObject* GO)
 	return false;
 }
 
-bool QuadNode::Remove(GameObject * GO)
+bool QuadNode::Remove(Gameobject * GO)
 {
 	if (m_GOs.empty() == false)
 	{
-		for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
+		for (std::vector<Gameobject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
 		{
 			if ((*it) == GO)
 			{
@@ -179,10 +179,10 @@ void QuadNode::CreateChilds()
 		m_childs.back().SetBox(n, newCenterPoint);
 	}
 
-	std::vector<GameObject*> tmp = m_GOs;
+	std::vector<Gameobject*> tmp = m_GOs;
 	m_GOs.clear();
 
-	for (std::vector<GameObject*>::iterator it = tmp.begin(); it != tmp.end(); it++)
+	for (std::vector<Gameobject*>::iterator it = tmp.begin(); it != tmp.end(); it++)
 	{
 		Add(*it);
 	}
@@ -191,7 +191,7 @@ void QuadNode::CreateChilds()
 void QuadNode::Clean()
 {
 	bool childsHaveChilds = false;
-	std::vector<GameObject*> childsGOs;
+	std::vector<Gameobject*> childsGOs;
 	for (std::vector<QuadNode>::iterator it = m_childs.begin(); it != m_childs.end(); it++)
 	{
 		if (it->m_childs.empty() == false)
@@ -200,7 +200,7 @@ void QuadNode::Clean()
 			childsHaveChilds = true;
 			break;
 		}
-		for (std::vector<GameObject*>::iterator childIt = it->m_GOs.begin(); childIt != it->m_GOs.end(); childIt++)
+		for (std::vector<Gameobject*>::iterator childIt = it->m_GOs.begin(); childIt != it->m_GOs.end(); childIt++)
 		{
 			childsGOs.push_back(*childIt);
 		}
@@ -214,7 +214,7 @@ void QuadNode::Clean()
 		}
 		else if (childsGOs.size() + m_GOs.size() <= QUAD_GO_SIZE)
 		{
-			for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
+			for (std::vector<Gameobject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
 			{
 				m_GOs.push_back(*it);
 			}
@@ -238,7 +238,7 @@ Quad_Tree::~Quad_Tree()
 {
 }
 
-void Quad_Tree::Add(GameObject * GO)
+void Quad_Tree::Add(Gameobject * GO)
 {
 	if (GO->GetAABB().IsFinite())
 	{
@@ -246,7 +246,7 @@ void Quad_Tree::Add(GameObject * GO)
 	}
 }
 
-void Quad_Tree::Remove(GameObject * GO)
+void Quad_Tree::Remove(Gameobject * GO)
 {
 	if (GO->GetAABB().IsFinite())
 	{

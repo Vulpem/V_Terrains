@@ -6,7 +6,7 @@
 
 #include "PugiXml\src\pugixml.hpp"
 
-class GameObject;
+class Gameobject;
 class ViewPort;
 
 enum class ComponentType
@@ -25,7 +25,7 @@ enum class ComponentType
 class Component
 {
 public:
-	Component(GameObject* linkedTo, ComponentType type);
+	Component(Gameobject* linkedTo, ComponentType type);
 	virtual ~Component();
 	
 	virtual void Enable();
@@ -43,7 +43,7 @@ public:
 	virtual bool MissingComponent() { return false; }
 
 	void Save(pugi::xml_node& myNode);
-	GameObject* GetOwner() const;
+	Gameobject* GetOwner() const;
 	bool MarkedForDeletion() const;
 
 	virtual void LoadSpecifics(pugi::xml_node& myNode) {}
@@ -66,7 +66,7 @@ protected:
 	ComponentType m_type;
 	uint64_t m_uid;
 	bool m_toDelete = false;
-	GameObject* m_gameObject;
+	Gameobject* m_gameObject;
 private:
 	bool m_enabled = true;
 };

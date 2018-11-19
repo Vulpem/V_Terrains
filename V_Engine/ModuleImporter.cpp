@@ -776,7 +776,7 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 // ------------------------------- LOADING ------------------------------- 
 
 //The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
-GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
+Gameobject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, Gameobject* parent)
 {
 	const MetaInf* meta = App->m_resourceManager->GetMetaData(fileName, ComponentType::GO, vGoName);
 	if (meta != nullptr)
@@ -801,7 +801,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 				char* It = file;
 
 				//Creating basic components for a GameObject
-				GameObject* ret = new GameObject;
+				Gameobject* ret = new Gameobject;
 
 				//Setting name
 				ret->SetName(meta->name.data());
@@ -885,7 +885,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 						const MetaInf* inf = App->m_resourceManager->GetMetaData(fileName, ComponentType::GO, *childsUID);
 						if (inf != nullptr)
 						{
-							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
+							Gameobject* child = LoadVgo(fileName, inf->name.data(), ret);
 							if (child)
 							{
 								ret->GetTransform()->AddChild(child->GetTransform());

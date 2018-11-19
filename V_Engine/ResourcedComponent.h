@@ -8,7 +8,7 @@
 class ResourcedComponent : public Component
 {
 public:
-	ResourcedComponent(GameObject* linkedTo, ComponentType type) : Component(linkedTo, type)
+	ResourcedComponent(Gameobject* linkedTo, ComponentType type) : Component(linkedTo, type)
 	{ }
 
 	~ResourcedComponent()

@@ -45,6 +45,7 @@ public:
 	void OnScreenResize(int width, int heigth);
 	void Play(bool debug = false);
 	void Stop();
+	void Log(const char* str);
 
 public:
 	//All accessible modules

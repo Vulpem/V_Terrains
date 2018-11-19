@@ -11,7 +11,7 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-Mesh::Mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(linkedTo, ComponentType::mesh)
+Mesh::Mesh(std::string resource, Gameobject* linkedTo): ResourcedComponent(linkedTo, ComponentType::mesh)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Mesh##%i", m_uid);
