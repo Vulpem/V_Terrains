@@ -588,7 +588,7 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 			if (component.second->GetOwner()->HasComponent<Billboard>())
 			{
 				Transform* camTransform = port.m_camera->GetOwner()->GetTransform();
-				component.second->GetOwner()->GetComponent<Billboard>()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+				component.second->GetOwner()->GetComponent<Billboard>()->UpdateDirection(camTransform->GetGlobalPos(), camTransform->Up());
 			}
 		}
 	}

@@ -141,7 +141,7 @@ void Material::EditorContent()
 			sprintf(tmp, "X##%u", n);
 			if (ImGui::Button(tmp))
 			{
-				texturesToRemove.push_back(n);
+				m_texturesToRemove.push_back(n);
 			}
 			Resource* resText = App->m_resourceManager->Peek(res->m_textures.at(n));
 			if (resText != nullptr)
@@ -198,7 +198,7 @@ uint Material::NofTextures()
 
 int Material::GetTexture(uint n)
 {
-	if (IsEnabled() && texturesToRemove.empty() == true)
+	if (IsEnabled() && m_texturesToRemove.empty() == true)
 	{
 		if (n >= 0 && n < ReadRes<R_Material>()->m_textures.size())
 		{
@@ -273,17 +273,17 @@ Shader Material::GetShader()
 
 void Material::RemoveTexturesNow()
 {
-	if (texturesToRemove.empty() == false)
+	if (m_texturesToRemove.empty() == false)
 	{
 		R_Material* matRes = ReadRes<R_Material>();
 		if (matRes != nullptr)
 		{
-			for (int n = 0; n < texturesToRemove.size(); n++)
+			for (int n = 0; n < m_texturesToRemove.size(); n++)
 			{
 				std::vector<uint64>::iterator it = matRes->m_textures.begin();
 				for (int m = 0; it != matRes->m_textures.end(); it++)
 				{
-					if (m == texturesToRemove[n])
+					if (m == m_texturesToRemove[n])
 					{
 						App->m_resourceManager->UnlinkResource(matRes->m_textures[m]);
 						matRes->m_textures.erase(it);
@@ -293,6 +293,6 @@ void Material::RemoveTexturesNow()
 				}
 			}
 		}
-		texturesToRemove.clear();
+		m_texturesToRemove.clear();
 	}
 }

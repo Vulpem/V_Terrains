@@ -19,21 +19,21 @@ Camera::Camera(GameObject* linkedTo):Component(linkedTo, ComponentType::camera)
 	sprintf(tmp, "Camera##%i", m_uid);
 	m_name = tmp;
 
-	positionOffset = float3::zero;
+	m_positionOffset = float3::zero;
 	if (m_gameObject)
 	{
 		AABB goAABB = m_gameObject->GetAABB();
 		if (goAABB.IsFinite())
 		{
-			positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
+			m_positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 		}
 	}
-	frustum.nearPlaneDistance = 4;
-	frustum.farPlaneDistance = 50000.0;
-	frustum.type = FrustumType::PerspectiveFrustum;
+	m_frustum.nearPlaneDistance = 4;
+	m_frustum.farPlaneDistance = 50000.0;
+	m_frustum.type = FrustumType::PerspectiveFrustum;
 
 	float2 screenSize = App->m_window->GetWindowSize();
-	aspectRatio = (screenSize.x / screenSize.y);
+	m_aspectRatio = (screenSize.x / screenSize.y);
 
 	SetHorizontalFOV(60*DEGTORAD);
 	UpdateCamMatrix();
@@ -49,7 +49,7 @@ Camera::~Camera()
 
 void Camera::PreUpdate()
 {
-	frustum.Update();
+	m_frustum.Update();
 }
 
 float3 Camera::GetPosition()
@@ -75,7 +75,7 @@ void Camera::UpdateCamMatrix()
 	AABB goAABB = m_gameObject->GetAABB();
 	if (goAABB.IsFinite())
 	{
-		positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
+		m_positionOffset = goAABB.CenterPoint() - m_gameObject->GetTransform()->GetGlobalPos();
 	}
 	UpdateOrientation();
 	UpdatePos();
@@ -83,7 +83,7 @@ void Camera::UpdateCamMatrix()
 
 void Camera::UpdatePos()
 {
-	frustum.pos = m_gameObject->GetTransform()->GetGlobalPos() + positionOffset;
+	m_frustum.pos = m_gameObject->GetTransform()->GetGlobalPos() + m_positionOffset;
 }
 
 void Camera::UpdateOrientation()
@@ -91,8 +91,8 @@ void Camera::UpdateOrientation()
 	float3 rotation = m_gameObject->GetTransform()->GetGlobalRot();
 	rotation *= DEGTORAD;
 	float4x4 toSend = float4x4::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
-	frustum.SetWorldMatrix(toSend.Float3x4Part());
-	frustum.front = m_gameObject->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
+	m_frustum.SetWorldMatrix(toSend.Float3x4Part());
+	m_frustum.front = m_gameObject->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
 }
 
 FrustumCollision Camera::Collides(AABB boundingBox)
@@ -104,7 +104,7 @@ FrustumCollision Camera::Collides(AABB boundingBox)
 	{
 		for (int n = 0; n < 8; n++)
 		{
-			if (frustum.GetPlane(p).IsOnPositiveSide(points[n]) == false)
+			if (m_frustum.GetPlane(p).IsOnPositiveSide(points[n]) == false)
 			{
 				break;
 			}
@@ -120,7 +120,7 @@ FrustumCollision Camera::Collides(AABB boundingBox)
 FrustumCollision Camera::Collides(float3 point)
 {
 	Plane planes[6];
-	frustum.GetPlanes(planes);
+	m_frustum.GetPlanes(planes);
 
 	for (int n = 0; n < 6; n++)
 	{
@@ -134,27 +134,26 @@ FrustumCollision Camera::Collides(float3 point)
 
 math::FrustumType Camera::SwitchViewType()
 {
-	frustumChanged = true;
-	if (frustum.type == FrustumType::PerspectiveFrustum)
+	if (m_frustum.type == FrustumType::PerspectiveFrustum)
 	{
-		otherFOV.x = frustum.horizontalFov;
-		otherFOV.y = frustum.verticalFov;
-		frustum.type = FrustumType::OrthographicFrustum;
-		SetHorizontalFOV(frustum.horizontalFov * 100.0f);
+		m_otherFOV.x = m_frustum.horizontalFov;
+		m_otherFOV.y = m_frustum.verticalFov;
+		m_frustum.type = FrustumType::OrthographicFrustum;
+		SetHorizontalFOV(m_frustum.horizontalFov * 100.0f);
 		return FrustumType::OrthographicFrustum;
 	}
-	frustum.type = FrustumType::PerspectiveFrustum;
-	aspectRatio = otherFOV.x / otherFOV.y;
-	SetHorizontalFOV(otherFOV.x);
+	m_frustum.type = FrustumType::PerspectiveFrustum;
+	m_aspectRatio = m_otherFOV.x / m_otherFOV.y;
+	SetHorizontalFOV(m_otherFOV.x);
 	return FrustumType::PerspectiveFrustum;
 }
 
 void Camera::EditorContent()
 {
-	ImGui::Checkbox("Culling", &hasCulling);
+	ImGui::Checkbox("Culling", &m_forceDebugCulling);
 	bool persp = true;
 	bool ortho = false;
-	if (frustum.type == FrustumType::OrthographicFrustum)
+	if (m_frustum.type == FrustumType::OrthographicFrustum)
 	{
 		persp = false;
 		ortho = true;
@@ -169,21 +168,21 @@ void Camera::EditorContent()
 
 
 	ImGui::Text("Position:");
-	ImGui::Text("X: %.2f, Y: %.2f, Z: %.2f", frustum.pos.x, frustum.pos.y, frustum.pos.z);
+	ImGui::Text("X: %.2f, Y: %.2f, Z: %.2f", m_frustum.pos.x, m_frustum.pos.y, m_frustum.pos.z);
 	ImGui::Text("Position Offset");
-	if (ImGui::DragFloat3("##posOffset", positionOffset.ptr(), 0.1f))
+	if (ImGui::DragFloat3("##posOffset", m_positionOffset.ptr(), 0.1f))
 	{
 		UpdatePos();
 	}
 
 	ImGui::Text("AspectRatio");
-	if (ImGui::DragFloat("##Aspect_ratio", &aspectRatio, 0.1f, 0.1f, 5.0f))
+	if (ImGui::DragFloat("##Aspect_ratio", &m_aspectRatio, 0.1f, 0.1f, 5.0f))
 	{
-		SetHorizontalFOV(frustum.horizontalFov);
+		SetHorizontalFOV(m_frustum.horizontalFov);
 	}
-	float tmp = frustum.horizontalFov * RADTODEG;
+	float tmp = m_frustum.horizontalFov * RADTODEG;
 	float maxFOV = 180;
-	if (frustum.type == FrustumType::OrthographicFrustum)
+	if (m_frustum.type == FrustumType::OrthographicFrustum)
 	{
 		maxFOV = floatMax;
 	}
@@ -191,62 +190,62 @@ void Camera::EditorContent()
 	{
 		SetHorizontalFOV(tmp * DEGTORAD);
 	}
-	tmp = frustum.verticalFov * RADTODEG;
+	tmp = m_frustum.verticalFov * RADTODEG;
 	if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, maxFOV))
 	{
-		SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
+		SetHorizontalFOV(tmp * m_aspectRatio * DEGTORAD);
 	}
 
-	if (ImGui::DragFloat("NearPlane", &frustum.nearPlaneDistance, 0.1f, 0.1f, frustum.farPlaneDistance - 1.0f))
+	if (ImGui::DragFloat("NearPlane", &m_frustum.nearPlaneDistance, 0.1f, 0.1f, m_frustum.farPlaneDistance - 1.0f))
 	{
-		SetHorizontalFOV(frustum.horizontalFov);
+		SetHorizontalFOV(m_frustum.horizontalFov);
 	}
-	if (ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 400000.0f, "%.3f", 3));
+	if (ImGui::DragFloat("FarPlane", &m_frustum.farPlaneDistance, 1.0f, m_frustum.nearPlaneDistance + 1.0f, 400000.0f, "%.3f", 3));
 	{
-		SetHorizontalFOV(frustum.horizontalFov);
+		SetHorizontalFOV(m_frustum.horizontalFov);
 	}
 }
 
 void Camera::SaveSpecifics(pugi::xml_node& myNode)
 {
 	pugi::xml_node frust = myNode.append_child("Frustum");
-	frust.append_attribute("FarPlaneDistance") = frustum.farPlaneDistance;
-	frust.append_attribute("NearPlaneDistance") = frustum.nearPlaneDistance;
-	frust.append_attribute("HorizontalFOV") = frustum.horizontalFov;
-	frust.append_attribute("AspectRatio") = aspectRatio;
-	frust.append_attribute("FrustumType") =	frustum.type;
-	frust.append_attribute("FrontX") = frustum.front.x;
-	frust.append_attribute("FrontY") = frustum.front.y;
-	frust.append_attribute("FrontZ") = frustum.front.z;
-	frust.append_attribute("UpX") = frustum.up.x;
-	frust.append_attribute("UpY") = frustum.up.y;
-	frust.append_attribute("UpZ") = frustum.up.z;
-	frust.append_attribute("HasCulling") = hasCulling;
-	frust.append_attribute("otherFOV") = otherFOV.x;
+	frust.append_attribute("FarPlaneDistance") = m_frustum.farPlaneDistance;
+	frust.append_attribute("NearPlaneDistance") = m_frustum.nearPlaneDistance;
+	frust.append_attribute("HorizontalFOV") = m_frustum.horizontalFov;
+	frust.append_attribute("AspectRatio") = m_aspectRatio;
+	frust.append_attribute("FrustumType") =	m_frustum.type;
+	frust.append_attribute("FrontX") = m_frustum.front.x;
+	frust.append_attribute("FrontY") = m_frustum.front.y;
+	frust.append_attribute("FrontZ") = m_frustum.front.z;
+	frust.append_attribute("UpX") = m_frustum.up.x;
+	frust.append_attribute("UpY") = m_frustum.up.y;
+	frust.append_attribute("UpZ") = m_frustum.up.z;
+	frust.append_attribute("HasCulling") = m_forceDebugCulling;
+	frust.append_attribute("otherFOV") = m_otherFOV.x;
 }
 
 void Camera::LoadSpecifics(pugi::xml_node & myNode)
 {
 	pugi::xml_node frust = myNode.child("Frustum");
 
-	frustum.farPlaneDistance = frust.attribute("FarPlaneDistance").as_float();
-	frustum.nearPlaneDistance = frust.attribute("NearPlaneDistance").as_float();
-	frustum.type = (FrustumType)frust.attribute("FrustumType").as_int();
+	m_frustum.farPlaneDistance = frust.attribute("FarPlaneDistance").as_float();
+	m_frustum.nearPlaneDistance = frust.attribute("NearPlaneDistance").as_float();
+	m_frustum.type = (FrustumType)frust.attribute("FrustumType").as_int();
 	
-	aspectRatio = frust.attribute("AspectRatio").as_float();
+	m_aspectRatio = frust.attribute("AspectRatio").as_float();
 	SetHorizontalFOV(frust.attribute("HorizontalFOV").as_float());
 
-	frustum.front.x = frust.attribute("FrontX").as_float();
-	frustum.front.y = frust.attribute("FrontY").as_float();
-	frustum.front.z = frust.attribute("FrontZ").as_float();
+	m_frustum.front.x = frust.attribute("FrontX").as_float();
+	m_frustum.front.y = frust.attribute("FrontY").as_float();
+	m_frustum.front.z = frust.attribute("FrontZ").as_float();
 
-	frustum.up.x = frust.attribute("UpX").as_float();
-	frustum.up.y = frust.attribute("UpY").as_float();
-	frustum.up.z = frust.attribute("UpZ").as_float();
+	m_frustum.up.x = frust.attribute("UpX").as_float();
+	m_frustum.up.y = frust.attribute("UpY").as_float();
+	m_frustum.up.z = frust.attribute("UpZ").as_float();
 
-	hasCulling = frust.attribute("HasCulling").as_bool();
-	otherFOV.x = frust.attribute("otherFOV").as_float();
-	otherFOV.y = otherFOV.x * aspectRatio;
+	m_forceDebugCulling = frust.attribute("HasCulling").as_bool();
+	m_otherFOV.x = frust.attribute("otherFOV").as_float();
+	m_otherFOV.y = m_otherFOV.x * m_aspectRatio;
 }
 
 void Camera::DrawFrustum()
@@ -254,40 +253,39 @@ void Camera::DrawFrustum()
 	if (GetOwner()->IsSelected())
 	{
 		float3 corners[8];
-		frustum.GetCornerPoints(corners);
+		m_frustum.GetCornerPoints(corners);
 		App->m_renderer3D->DrawBox(corners, float4(0.49f, 0.85f, 1.0f, 1.0f));
 	}
 }
 
 void Camera::SetHorizontalFOV(float horizontalFOV)
 {
-	frustum.horizontalFov = horizontalFOV;
-	frustum.verticalFov = horizontalFOV / aspectRatio;
-	frustumChanged = true;
+	m_frustum.horizontalFov = horizontalFOV;
+	m_frustum.verticalFov = horizontalFOV / m_aspectRatio;
 }
 
 void Camera::SetFarPlane(float farPlaneDistance)
 {
-	if (farPlaneDistance > frustum.nearPlaneDistance)
+	if (farPlaneDistance > m_frustum.nearPlaneDistance)
 	{
-		frustum.farPlaneDistance = farPlaneDistance;
+		m_frustum.farPlaneDistance = farPlaneDistance;
 	}
 }
 
 void Camera::SetNearPlane(float nearPlaneDistance)
 {
-	if (nearPlaneDistance < frustum.farPlaneDistance)
+	if (nearPlaneDistance < m_frustum.farPlaneDistance)
 	{
-		frustum.nearPlaneDistance = nearPlaneDistance;
+		m_frustum.nearPlaneDistance = nearPlaneDistance;
 	}
 }
 
 float4x4 Camera::GetViewMatrix()
 {
-	return float4x4(frustum.ViewMatrix()).Transposed();
+	return float4x4(m_frustum.ViewMatrix()).Transposed();
 }
 
 float4x4 Camera::GetProjectionMatrix()
 {
-	return frustum.ProjectionMatrix().Transposed();
+	return m_frustum.ProjectionMatrix().Transposed();
 }

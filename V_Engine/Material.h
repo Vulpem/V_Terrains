@@ -9,12 +9,12 @@ class Material :public ResourcedComponent
 public:
 	Material(std::string res, GameObject* linkedTo);
 
-	void PreUpdate();
+	void PreUpdate() override;
 
-	void EditorContent();
+	void EditorContent() override;
 
-	void SaveSpecifics(pugi::xml_node& myNode);
-	void LoadSpecifics(pugi::xml_node& myNode);
+	void SaveSpecifics(pugi::xml_node& myNode) override;
+	void LoadSpecifics(pugi::xml_node& myNode) override;
 
 	uint NofTextures();
 	int GetTexture(uint n);
@@ -35,9 +35,9 @@ public:
 	void SetBlendType(int blendType);
 
 	Shader GetShader();
+private:
 
-	std::vector<uint> texturesToRemove;
-
+	std::vector<uint> m_texturesToRemove;
 	void RemoveTexturesNow();
 };
 

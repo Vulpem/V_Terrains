@@ -8,11 +8,11 @@ class Billboard :public Component
 public:
 	Billboard(GameObject* linkedTo);
 
-	void UpdateNow(const float3& point, const float3& up = float3::zero);
-	void EditorContent();
+	void UpdateDirection(const float3& lookAt, const float3& up = float3::zero);
+	void EditorContent() override;
 
-	void SaveSpecifics(pugi::xml_node& myNode);
-	void LoadSpecifics(pugi::xml_node& myNode);
+	void SaveSpecifics(pugi::xml_node& myNode) override;
+	void LoadSpecifics(pugi::xml_node& myNode) override;
 
 	ComponentType GetType() const override { return ComponentType::billboard; }
 

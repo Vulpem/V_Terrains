@@ -38,7 +38,7 @@ struct ViewPort
 	{
 		if (m_camera != nullptr)
 		{
-			m_camera->aspectRatio = m_size.x / m_size.y;
+			m_camera->m_aspectRatio = m_size.x / m_size.y;
 			m_camera->SetHorizontalFOV(m_camera->GetFrustum()->horizontalFov);
 		}
 	}

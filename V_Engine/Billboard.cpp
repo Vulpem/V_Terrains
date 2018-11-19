@@ -13,7 +13,7 @@ Billboard::Billboard(GameObject* linkedTo) : Component(linkedTo, ComponentType::
 	m_name = tmp;
 }
 
-void Billboard::UpdateNow(const float3& point, const float3& _up)
+void Billboard::UpdateDirection(const float3& point, const float3& _up)
 {
 	if (_up.IsZero() == false)
 	{

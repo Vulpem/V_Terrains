@@ -10,12 +10,6 @@ class Mesh : public  ResourcedComponent
 public:
 	Mesh(std::string resource, GameObject* linkedTo);
 
-public:
-	int m_textureIndex = -1;
-
-	bool m_drawWired = false;
-	bool m_drawNormals = false;
-
 	Mesh_RenderInfo GetMeshInfo() const;
 
 	const float3* GetVertices() const;
@@ -26,13 +20,18 @@ public:
 
 	AABB GetAABB();
 
-	void EditorContent();
+	void EditorContent() override;
 
-	void SaveSpecifics(pugi::xml_node& myNode);
+	void SaveSpecifics(pugi::xml_node& myNode) override;
 
-	void LoadSpecifics(pugi::xml_node & myNode);
+	void LoadSpecifics(pugi::xml_node & myNode) override;
 
 	ComponentType GetType() const override { return ComponentType::mesh; }
+
+	int m_textureIndex = -1;
+
+	bool m_drawWired = false;
+	bool m_drawNormals = false;
 };
 
 #endif
