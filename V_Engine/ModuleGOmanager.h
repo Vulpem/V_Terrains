@@ -59,7 +59,7 @@ public:
 	std::vector<CompType*> GetComponentsByType(ComponentType type) const;
 
 	std::multimap<ComponentType, Component*> m_components;
-	Quad_Tree m_quadTree;
+	Quadtree m_quadTree;
 	std::vector<Gameobject*> m_dynamicGO;
 
 	//TODO: wth is this?

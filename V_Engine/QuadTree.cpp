@@ -1,4 +1,4 @@
-#include "QuadTree.h"
+#include "Quadtree.h"
 
 #include "Application.h"
 #include "ModuleRenderer3D.h"
@@ -11,7 +11,7 @@ QuadNode::QuadNode(float3 minPoint, float3 maxPoint)
 
 QuadNode::QuadNode(QuadNode* _parent)
 	: m_parent(_parent)
-	, m_box(m_parent->GetBox())
+	, m_box(m_parent->GetWorldSize())
 {
 }
 
@@ -95,9 +95,9 @@ void QuadNode::Draw() const
 	}
 }
 
-void QuadNode::SetBox(int n, float3 breakPoint)
+void QuadNode::SetBoxFromParentAndIndex(int n, float3 breakPoint)
 {
-	AABB parentBox = m_parent->GetBox();
+	AABB parentBox = m_parent->GetWorldSize();
 	switch (n)
 	{
 	case 0:
@@ -137,46 +137,12 @@ void QuadNode::SetBox(int n, float3 breakPoint)
 
 void QuadNode::CreateChilds()
 {
-	float3 centerPoint = float3::zero;
-	/*int n = 0;
-	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
-	{
-		centerPoint.x += (*it)->aabb.CenterPoint().x;
-		centerPoint.y += (*it)->aabb.CenterPoint().z;
-		n++;
-	}
-	centerPoint /= n;
-
-	
-	//Checking if m_GOs collide with the X plane
-	float2 newCenterPoint = centerPoint;
-	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
-	{
-		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(0, 0, 1)).Intersects((*it)->aabb) == true)
-		{
-			newCenterPoint.y++;
-		}
-	}
-	//Checking if m_GOs collide with the Y plane
-	for (std::vector<GameObject*>::iterator it = m_GOs.begin(); it != m_GOs.end(); it++)
-	{
-		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(1, 0, 0)).Intersects((*it)->aabb) == true)
-		{
-			newCenterPoint.x++;
-		}
-	}
-
-	if (newCenterPoint.x >= m_box.maxPoint.x || newCenterPoint.y >= m_box.maxPoint.z)
-	{
-		newCenterPoint.x = m_box.CenterPoint().x;
-		newCenterPoint.y = m_box.CenterPoint().z;
-	}*/
 	float3 newCenterPoint = m_box.CenterPoint();
 
 	for (int n = 0; n < 4; n++)
 	{
 		m_childs.push_back(QuadNode(this));
-		m_childs.back().SetBox(n, newCenterPoint);
+		m_childs.back().SetBoxFromParentAndIndex(n, newCenterPoint);
 	}
 
 	std::vector<Gameobject*> tmp = m_GOs;
@@ -229,16 +195,16 @@ void QuadNode::Clean()
 }
 
 
-Quad_Tree::Quad_Tree(float3 minPoint, float3 maxPoint)
+Quadtree::Quadtree(float3 minPoint, float3 maxPoint)
 	: m_root(minPoint, maxPoint)
 {
 }
 
-Quad_Tree::~Quad_Tree()
+Quadtree::~Quadtree()
 {
 }
 
-void Quad_Tree::Add(Gameobject * GO)
+void Quadtree::Add(Gameobject * GO)
 {
 	if (GO->GetAABB().IsFinite())
 	{
@@ -246,7 +212,7 @@ void Quad_Tree::Add(Gameobject * GO)
 	}
 }
 
-void Quad_Tree::Remove(Gameobject * GO)
+void Quadtree::Remove(Gameobject * GO)
 {
 	if (GO->GetAABB().IsFinite())
 	{
@@ -255,7 +221,7 @@ void Quad_Tree::Remove(Gameobject * GO)
 }
 
 
-void Quad_Tree::Draw() const
+void Quadtree::Draw() const
 {
 	m_root.Draw();
 }

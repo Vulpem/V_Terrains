@@ -10,13 +10,9 @@ class QuadNode
 public:
 	//Just for the root node!
 	QuadNode(float3 minPoint, float3 maxPoint);
-	//Default constructor
 	QuadNode(QuadNode* parent);
 	~QuadNode();
 
-	/*Try to add a GO to this Node.
-	Won't be added and return false if the object's m_aabb doesn't collide with this node
-	Will return true if it's added*/
 	bool Add(Gameobject* GO);
 	bool Remove(Gameobject* GO);
 
@@ -25,14 +21,13 @@ public:
 
 	void Draw() const;
 
-	AABB GetBox() { return m_box; }
-	void SetBox(int n, float3 breakPoint);
+	AABB GetWorldSize() { return m_box; }
+	void SetBoxFromParentAndIndex(int n, float3 breakPoint);
 
 private:
 	void CreateChilds();
 	void Clean();
 
-private:
 	QuadNode* m_parent;
 	std::vector<QuadNode> m_childs;
 	AABB m_box;
@@ -41,11 +36,11 @@ private:
 };
 
 
-class Quad_Tree
+class Quadtree
 {
 public:
-	Quad_Tree(float3 minPoint, float3 maxPoint);
-	~Quad_Tree();
+	Quadtree(float3 minPoint, float3 maxPoint);
+	~Quadtree();
 
 	void Add(Gameobject* GO);
 	void Remove(Gameobject* GO);
@@ -94,7 +89,7 @@ inline std::vector<Gameobject*> QuadNode::FilterCollisions(C col) const
 
 //QuadTree
 template<typename c>
-inline std::vector<Gameobject*> Quad_Tree::FilterCollisions(c col) const
+inline std::vector<Gameobject*> Quadtree::FilterCollisions(c col) const
 {
 	return m_root.FilterCollisions(col);
 }
