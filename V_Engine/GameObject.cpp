@@ -267,7 +267,7 @@ Component* Gameobject::CreateComponent(ComponentType type, std::string res, bool
 
 	if (toAdd != nullptr)
 	{
-		if (toAdd->MissingComponent() == false || forceCreation)
+		if (toAdd->IsResourceMissing() == false || forceCreation)
 		{
 			m_components.push_back(toAdd);
 			App->m_goManager->m_components.insert(std::pair<ComponentType, Component*>(toAdd->GetType(), toAdd));

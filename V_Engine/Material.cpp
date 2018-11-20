@@ -160,7 +160,7 @@ void Material::EditorContent()
 	}
 }
 
-void Material::SaveSpecifics(pugi::xml_node& myNode)
+void Material::SaveSpecifics(pugi::xml_node& myNode) const
 {
 	if (m_resource)
 	{
@@ -191,12 +191,12 @@ void Material::LoadSpecifics(pugi::xml_node & myNode)
 	}
 }
 
-uint Material::NofTextures()
+uint Material::NofTextures() const
 {
 	return ReadRes<R_Material>()->m_textures.size();
 }
 
-int Material::GetTexture(uint n)
+int Material::GetTexture(uint n) const
 {
 	if (IsEnabled() && m_texturesToRemove.empty() == true)
 	{
@@ -231,12 +231,12 @@ void Material::SetColor(float r, float g, float b, float a)
 	ReadRes<R_Material>()->m_color[3] = a;
 }
 
-math::float4 Material::GetColor()
+math::float4 Material::GetColor() const
 {
 	return math::float4(ReadRes<R_Material>()->m_color);
 }
 
-AlphaTestTypes Material::GetAlphaType()
+AlphaTestTypes Material::GetAlphaType() const
 {
 	return ReadRes<R_Material>()->m_alphaType;
 }
@@ -246,7 +246,7 @@ void Material::SetAlphaType(AlphaTestTypes type)
 	ReadRes<R_Material>()->m_alphaType = type;
 }
 
-float Material::GetAlphaTest()
+float Material::GetAlphaTest() const
 {
 	return ReadRes<R_Material>()->m_alphaTest;
 }
@@ -256,7 +256,7 @@ void Material::SetAlphaTest(float alphaTest)
 	ReadRes<R_Material>()->m_alphaTest = alphaTest;
 }
 
-int Material::GetBlendType()
+int Material::GetBlendType() const
 {
 	return ReadRes<R_Material>()->m_blendType;
 }
@@ -266,7 +266,7 @@ void Material::SetBlendType(int blendType)
 	ReadRes<R_Material>()->m_blendType = blendType;
 }
 
-Shader Material::GetShader()
+Shader Material::GetShader() const
 {
 	return ReadRes<R_Material>()->GetShaderProgram();
 }

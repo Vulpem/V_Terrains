@@ -9,19 +9,18 @@ class ResourcedComponent : public Component
 {
 public:
 	ResourcedComponent(Gameobject* linkedTo, ComponentType type) : Component(linkedTo, type)
-	{ }
+	{}
 
 	~ResourcedComponent()
-	{
-		UnLinkResource();
-	}
+	{ UnLinkResource(); }
 
 	void LoadResource(std::string resourceToLoad);
 
 	template <typename T>
-	T* ReadRes() const { return (T*)App->m_resourceManager->Peek(m_resource); }
+	T* ReadRes() const
+	{ return (T*)App->m_resourceManager->Peek(m_resource); }
 
-	virtual bool MissingComponent() { return (m_resource == 0); }
+	virtual bool IsResourceMissing() const override { return (m_resource == 0); }
 
 protected:
 	unsigned long long m_resource = 0;

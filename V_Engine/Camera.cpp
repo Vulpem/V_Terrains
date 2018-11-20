@@ -206,7 +206,7 @@ void Camera::EditorContent()
 	}
 }
 
-void Camera::SaveSpecifics(pugi::xml_node& myNode)
+void Camera::SaveSpecifics(pugi::xml_node& myNode) const
 {
 	pugi::xml_node frust = myNode.append_child("Frustum");
 	frust.append_attribute("FarPlaneDistance") = m_frustum.farPlaneDistance;

@@ -13,30 +13,30 @@ public:
 
 	void EditorContent() override;
 
-	void SaveSpecifics(pugi::xml_node& myNode) override;
+	void SaveSpecifics(pugi::xml_node& myNode) const override;
 	void LoadSpecifics(pugi::xml_node& myNode) override;
 
-	uint NofTextures();
-	int GetTexture(uint n);
+	uint NofTextures() const;
+	int GetTexture(uint n) const;
 	bool AddTexture(std::string fileName);
 
 	void SetColor(float r, float g, float b, float a = 1.0f);
-	math::float4 GetColor();
+	math::float4 GetColor() const;
 
 	ComponentType GetType() const override { return ComponentType::material; }
 
-	AlphaTestTypes GetAlphaType();
+	AlphaTestTypes GetAlphaType() const;
 	void SetAlphaType(AlphaTestTypes type);
 
-	float GetAlphaTest();
+	float GetAlphaTest() const;
 	void SetAlphaTest(float alphaTest);
 
-	int GetBlendType();
+	int GetBlendType() const;
 	void SetBlendType(int blendType);
 
-	Shader GetShader();
-private:
+	Shader GetShader() const;
 
+private:
 	std::vector<uint> m_texturesToRemove;
 	void RemoveTexturesNow();
 };

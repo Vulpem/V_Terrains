@@ -77,7 +77,7 @@ const float3* Mesh::GetVertices() const
 	return ReadRes<R_Mesh>()->m_vertices;
 }
 
-const uint Mesh::GetNumVertices()
+uint Mesh::GetNumVertices() const
 {
 	return ReadRes<R_Mesh>()->m_numVertices;
 }
@@ -87,7 +87,7 @@ const uint* Mesh::GetIndices() const
 	return ReadRes<R_Mesh>()->m_indices;
 }
 
-const uint Mesh::GetNumIndices()
+uint Mesh::GetNumIndices() const
 {
 	return ReadRes<R_Mesh>()->m_numIndices;
 }
@@ -97,9 +97,8 @@ const float3 * Mesh::GetNormals() const
 	return ReadRes<R_Mesh>()->m_normals;
 }
 
-AABB Mesh::GetAABB()
+AABB Mesh::GetAABB() const
 {
-	//TODO investigate crash on closing application
 	return ReadRes<R_Mesh>()->m_aabb;
 }
 
@@ -136,7 +135,7 @@ void Mesh::EditorContent()
 	ImGui::InputInt(tmp, &m_textureIndex);
 }
 
-void Mesh::SaveSpecifics(pugi::xml_node& myNode)
+void Mesh::SaveSpecifics(pugi::xml_node& myNode) const
 {
 	if (m_resource)
 	{

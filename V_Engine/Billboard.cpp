@@ -37,7 +37,7 @@ void Billboard::EditorContent()
 	ImGui::DragFloat3("##DragLocalFront", m_localForward.ptr(), 0.05f, -1, 1);
 }
 
-void Billboard::SaveSpecifics(pugi::xml_node& myNode)
+void Billboard::SaveSpecifics(pugi::xml_node& myNode) const
 {
 }
 

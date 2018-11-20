@@ -20,7 +20,7 @@ public:
 
 	void EditorContent() override;
 
-	void SaveSpecifics(pugi::xml_node& myNode) override;
+	void SaveSpecifics(pugi::xml_node& myNode) const override;
 	void LoadSpecifics(pugi::xml_node& myNode) override;
 
 	void PositionChanged() override;

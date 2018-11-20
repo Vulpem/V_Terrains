@@ -67,7 +67,7 @@ void Component::DrawOnEditor()
 
 	if (open && m_enabled)
 	{
-		if (MissingComponent() == false)
+		if (IsResourceMissing() == false)
 		{
 			EditorContent();
 		}
@@ -79,7 +79,7 @@ void Component::DrawOnEditor()
 	}
 }
 
-void Component::Save(pugi::xml_node& myNode)
+void Component::Save(pugi::xml_node& myNode) const
 {
 	pugi::xml_node node = myNode.append_child("General");
 	char tmpName[256];
