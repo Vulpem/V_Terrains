@@ -12,7 +12,7 @@
 
 #pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 
-ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleFileSystem::ModuleFileSystem() : Module()
 {
 	// need to be created before Awake so other modules can use it
 	char* base_path = SDL_GetBasePath();
@@ -64,7 +64,7 @@ bool ModuleFileSystem::Init()
 }
 
 // Called before quitting
-void ModuleFileSystem::CleanUp()
+void ModuleFileSystem::OnDisable()
 {
 	//LOG("Freeing File System subsystem");
 	if (AssimpIO != nullptr)

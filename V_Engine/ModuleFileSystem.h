@@ -29,12 +29,12 @@ class ModuleFileSystem : public Module
 {
 public:
 
-	ModuleFileSystem(Application* app, bool start_enabled = true);
+	ModuleFileSystem();
 
 	virtual ~ModuleFileSystem();
 
 	bool Init() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	bool AddPath(const char* path_or_zip, const char* mount_point = nullptr);
 	bool Exists(const char* file) const;

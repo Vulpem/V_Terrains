@@ -17,13 +17,12 @@ enum KEY_STATE
 class ModuleInput : public Module
 {
 public:
-	
-	ModuleInput(Application* app, bool start_enabled = true);
+	ModuleInput();
 	~ModuleInput();
 
 	bool Init() override;
 	UpdateStatus PreUpdate() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	KEY_STATE GetKey(int id) const { return m_keyboardStates[id]; }
 	KEY_STATE GetMouseButton(int id) const { return m_mouseButtons[id]; }

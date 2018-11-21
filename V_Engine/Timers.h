@@ -1,12 +1,9 @@
 #ifndef __TIMERMANAGER__
 #define __TIMERMANAGER__
 
-#include <map>
-#include <vector>
 #include "Globals.h"
-
-class Timer;
-class PerfTimer;
+#include "Timer.h"
+#include "PerfTimer.h"
 
 class TimerManager
 {

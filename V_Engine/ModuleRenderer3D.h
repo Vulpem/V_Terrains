@@ -15,13 +15,13 @@ class Camera;
 class ModuleRenderer3D : public Module
 {
 public:
-	ModuleRenderer3D(Application* app, bool start_enabled = true);
+	ModuleRenderer3D();
 	~ModuleRenderer3D();
 
 	bool Init() override;
 	UpdateStatus PreUpdate() override;
 	UpdateStatus PostUpdate() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	void OnScreenResize(int width, int heigth) override;
 	void UpdateProjectionMatrix(Camera* cam);
@@ -42,7 +42,7 @@ public:
 	ViewPort* FindViewPort(uint ID);
 	bool DeleteViewPort(uint ID);
 
-	void SetViewPort(ViewPort& port);
+	void SetCurrentViewPort(ViewPort& port);
 public:
 	std::vector<ViewPort> m_viewPorts;
 	Light m_lights[MAX_LIGHTS];

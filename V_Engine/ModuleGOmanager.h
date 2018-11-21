@@ -21,7 +21,7 @@ class ModuleGoManager : public Module
 public:
 	
 	// ----------------------- Module Defaults ------------------------------
-	ModuleGoManager(Application* app, bool start_enabled = true);
+	ModuleGoManager();
 	~ModuleGoManager();
 
 	bool Init() override;
@@ -30,7 +30,7 @@ public:
 	UpdateStatus PostUpdate() override;
 
 	void Render(const ViewPort& port) const override;
-	void CleanUp();
+	void OnDisable();
 
 
 	Gameobject* CreateEmpty(const char* name = NULL);

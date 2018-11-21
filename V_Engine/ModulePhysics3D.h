@@ -34,14 +34,14 @@ public:
 class ModulePhysics3D : public Module
 {
 public:
-	ModulePhysics3D(Application* app, bool start_enabled = true);
+	ModulePhysics3D();
 	~ModulePhysics3D();
 
 	bool Init() override;
-	void Start() override;
+	void OnEnable() override;
 	UpdateStatus PreUpdate() override;
 	UpdateStatus Update() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	PhysBody3D* AddBody(const P_Sphere& sphere, float mass = 1.0f);
 	PhysBody3D* AddBody(const P_Cube& cube, float mass = 1.0f);

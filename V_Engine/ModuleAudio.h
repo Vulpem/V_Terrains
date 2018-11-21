@@ -10,11 +10,11 @@ class ModuleAudio : public Module
 {
 public:
 
-	ModuleAudio(Application* app, bool start_enabled = true);
+	ModuleAudio();
 	~ModuleAudio();
 
 	bool Init() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	bool PlayMusic(const char* path, float fade_time = DEFAULT_MUSIC_FADE_TIME);
 

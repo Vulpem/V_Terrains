@@ -11,13 +11,11 @@ struct ViewPort;
 class Module
 {
 public:
-	Module(Application* app, bool start_enabled = true)
-		: App(app)
-		, m_enabled(start_enabled)
+	Module()
+		: m_enabled(false)
 	{}
 
-	virtual ~Module()
-	{}
+	virtual ~Module() {}
 
 	bool IsEnabled() const
 	{ return m_enabled; }
@@ -27,7 +25,7 @@ public:
 		if (m_enabled == false)
 		{
 			m_enabled = true;
-			Start();
+			OnEnable();
 		}
 	}
 
@@ -36,15 +34,12 @@ public:
 		if (m_enabled == true)
 		{
 			m_enabled = false;
-			CleanUp();
+			OnDisable();
 		}
 	}
 
 	virtual bool Init() 
 	{ return true; }
-
-	virtual void Start()
-	{ }
 
 	virtual UpdateStatus PreUpdate()
 	{ return UpdateStatus::Continue; }
@@ -52,24 +47,20 @@ public:
 	virtual UpdateStatus Update()
 	{ return UpdateStatus::Continue; }
 
-	virtual void Render(const ViewPort& port) const
-	{}
+	virtual void Render(const ViewPort& port) const {}
 
 	virtual UpdateStatus PostUpdate()
 	{ return UpdateStatus::Continue; }
 
-	virtual void CleanUp()
-	{ }
+	virtual void OnEnable() {}
+	virtual void OnDisable() {}
 
 	virtual void OnPlay() {}
 	virtual void OnStop() {}
 
-	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)
-	{}
+	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2) {}
 
 	virtual void OnScreenResize(int width, int heigth) {  };
-
-	Application* App;
 private:
 	bool m_enabled;
 };

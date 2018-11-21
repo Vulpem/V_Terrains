@@ -8,11 +8,11 @@
 // ---------------------------------------------
 Timer::Timer()
 {
-	Start();
+	OnEnable();
 }
 
 // ---------------------------------------------
-void Timer::Start()
+void Timer::OnEnable()
 {
 	m_running = true;
 	m_startedAt = SDL_GetTicks();

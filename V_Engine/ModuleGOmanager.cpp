@@ -23,7 +23,7 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), m_quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
+ModuleGoManager::ModuleGoManager() : Module(), m_quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
 }
 
@@ -35,11 +35,8 @@ ModuleGoManager::~ModuleGoManager()
 // Called before render is available
 bool ModuleGoManager::Init()
 {
-	bool ret = true;
-
 	CreateRootGameObject();
-		
-	return ret;
+	return true;
 }
 
 // Called every draw update
@@ -185,7 +182,7 @@ void ModuleGoManager::Render(const ViewPort& port) const
 }
 
 // Called before quitting
-void ModuleGoManager::CleanUp()
+void ModuleGoManager::OnDisable()
 {
 	if (m_root)
 	{

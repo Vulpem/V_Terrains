@@ -24,7 +24,7 @@
 #pragma comment (lib, "Glew/libx86/glew32.lib") /* link Microsoft OpenGL lib   */
 
 
-ModuleRenderer3D::ModuleRenderer3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleRenderer3D::ModuleRenderer3D() : Module()
 {
 }
 
@@ -194,11 +194,10 @@ UpdateStatus ModuleRenderer3D::PostUpdate()
 		for (std::vector<ViewPort>::iterator port = m_viewPorts.begin(); port != m_viewPorts.end(); port++)
 		{
 			TIMER_START_PERF("ViewPorts slowest");
-			if (port->m_active && port->m_autoRender)
+			if (port->m_active && port->m_camera != nullptr)
 			{
-				SetViewPort(*port);
+				SetCurrentViewPort(*port);
 				App->Render(*port);
-				RenderBlendObjects();
 			}
 			TIMER_READ_MS_MAX("ViewPorts slowest");
 		}
@@ -218,7 +217,7 @@ UpdateStatus ModuleRenderer3D::PostUpdate()
 }
 
 // Called before quitting
-void ModuleRenderer3D::CleanUp()
+void ModuleRenderer3D::OnDisable()
 {
 	LOG("Destroying 3D Renderer");
 	SDL_GL_DeleteContext(m_GLcontext);
@@ -496,7 +495,7 @@ bool ModuleRenderer3D::DeleteViewPort(uint m_ID)
 	return false;
 }
 
-void ModuleRenderer3D::SetViewPort(ViewPort& port)
+void ModuleRenderer3D::SetCurrentViewPort(ViewPort& port)
 {
 	m_currentViewPort = &port;
 	port.SetCameraMatrix();

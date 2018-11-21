@@ -8,7 +8,7 @@
 
 #include "Transform.h"
 
-ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleCamera3D::ModuleCamera3D() : Module()
 {
 }
 
@@ -16,7 +16,7 @@ ModuleCamera3D::~ModuleCamera3D()
 {}
 
 // -----------------------------------------------------------------
-void ModuleCamera3D::Start()
+void ModuleCamera3D::OnEnable()
 {
 	LOG("Setting up the camera");
 	m_camSpeed = 200.f;

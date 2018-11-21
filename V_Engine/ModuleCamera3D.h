@@ -9,10 +9,10 @@
 class ModuleCamera3D : public Module
 {
 public:
-	ModuleCamera3D(Application* app, bool start_enabled = true);
+	ModuleCamera3D();
 	~ModuleCamera3D();
 
-	void Start() override;
+	void OnEnable() override;
 	UpdateStatus Update() override;
 
 	void LookAt(const float3 &Spot);

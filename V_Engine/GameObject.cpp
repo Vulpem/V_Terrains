@@ -23,7 +23,11 @@ Gameobject::Gameobject(uint64_t uid)
 	, m_uid(uid)
 	, m_name("Unnamed")
 {
-	App->m_goManager->m_dynamicGO.push_back(this);
+	//TODO: To fix, init being called before M-GoManager is assigned
+	if (App->m_goManager)
+	{
+		App->m_goManager->m_dynamicGO.push_back(this);
+	}
 }
 
 Gameobject::~Gameobject()

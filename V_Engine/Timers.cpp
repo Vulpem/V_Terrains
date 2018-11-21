@@ -23,7 +23,7 @@ void TimerManager::CreatePerfTimer(std::string key)
 	std::pair<uint, PerfTimer> timer(id, PerfTimer());
 	perfTimers.insert(timer);
 	std::map<uint, PerfTimer>::iterator it = perfTimers.find(id);
-	it->second.Start();
+	it->second.OnEnable();
 
 	//map with ID and a pair(key, lastReadTime)
 	lastReads.insert(std::pair<uint, std::pair<std::string, float>>(id, std::pair<std::string, float>(key, 0.0f)));
@@ -37,7 +37,7 @@ void TimerManager::CreateTimer(std::string key)
 	std::pair<uint, Timer> timer(id, Timer());
 	stdTimers.insert(timer);
 	std::map<uint, Timer>::iterator it = stdTimers.find(id);
-	it->second.Start();
+	it->second.OnEnable();
 
 	//map with ID and a pair(key, lastReadTime)
 	lastReads.insert(std::pair<uint, std::pair<std::string, float>>(id, std::pair<std::string, float>(key, 0.0f)));
@@ -51,14 +51,14 @@ void TimerManager::StartTimer(std::string key)
 		std::map<uint, Timer>::iterator it = stdTimers.find(IDit->second);
 		if (it != stdTimers.end())
 		{
-			it->second.Start();
+			it->second.OnEnable();
 		}
 		else
 		{
 			std::map<uint, PerfTimer>::iterator stdIt = perfTimers.find(IDit->second);
 			if (stdIt != perfTimers.end())
 			{
-				stdIt->second.Start();
+				stdIt->second.OnEnable();
 			}
 			else
 			{
@@ -80,14 +80,14 @@ void TimerManager::StartTimerPerf(std::string key)
 		std::map<uint, PerfTimer>::iterator it = perfTimers.find(IDit->second);
 		if (it != perfTimers.end())
 		{
-			it->second.Start();
+			it->second.OnEnable();
 		}
 		else
 		{
 			std::map<uint, Timer>::iterator stdIt = stdTimers.find(IDit->second);
 			if (stdIt != stdTimers.end())
 			{
-				stdIt->second.Start();
+				stdIt->second.OnEnable();
 			}
 			else
 			{

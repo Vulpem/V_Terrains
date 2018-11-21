@@ -16,16 +16,16 @@ class ModuleEditor : public Module
 {
 public:
 	
-	ModuleEditor(Application* app, bool start_enabled = true);
+	ModuleEditor();
 	~ModuleEditor();
 
 	bool Init() override;
 
-	void Start() override;
+	void OnEnable() override;
 	UpdateStatus PreUpdate() override;
 	UpdateStatus Update() override;
 	UpdateStatus PostUpdate() override;
-	void CleanUp() override;
+	void OnDisable() override;
 	void Render(const ViewPort& port) const override;
 
 	void OnPlay() override;

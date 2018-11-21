@@ -24,46 +24,6 @@ Application::Application()
 	: m_gameRunning(false)
 	, m_title(TITLE)
 {
-	m_window = new ModuleWindow(this);
-	m_input = new ModuleInput(this);
-	m_audio = new ModuleAudio(this, true);
-	m_fileSystem = new ModuleFileSystem(this);
-
-	m_renderer3D = new ModuleRenderer3D(this);
-	m_camera = new ModuleCamera3D(this);
-	m_physics = new ModulePhysics3D(this);
-#if USE_EDITOR
-	m_editor = new ModuleEditor(this);
-#endif
-	m_resourceManager = new ModuleResourceManager(this);
-	m_goManager = new ModuleGoManager(this);
-	m_importer = new ModuleImporter(this);
-	m_terrain = new ModuleTerrain(this);
-
-	m_timers = new TimerManager();
-
-	// The order of calls is very important!
-	// Modules will Init() Start() and Update in this order
-	// They will CleanUp() in reverse order
-
-	// Main Modules
-	AddModule(m_window);
-	AddModule(m_input);
-	AddModule(m_camera);
-#if USE_EDITOR
-		AddModule(m_editor);
-#endif
-	AddModule(m_fileSystem);
-	AddModule(m_audio);
-	AddModule(m_physics);
-	AddModule(m_importer);
-	AddModule(m_resourceManager);
-	AddModule(m_goManager);
-    AddModule(m_terrain);
-
-	// Renderer last!
-	AddModule(m_renderer3D);
-
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES; n++)
 	{
 		m_msFrame[n] = 0;
@@ -87,29 +47,38 @@ Application::~Application()
 
 bool Application::Init()
 {
-	for(Module* m : m_modules)
-	{
-		if (m->Init() == false)
-		{
-			return false;
-		}
-	};
+	// The order of calls is important
+	// Modules will Init() OnEnable() and Update in this order
+	// They will OnDisable() in reverse order
 
-	// After all Init calls we call Start() in all modules
+	CreateModule<ModuleWindow>(m_window);
+	CreateModule<ModuleInput>(m_input);
+	CreateModule<ModuleCamera3D>(m_camera);
+#if USE_EDITOR
+	CreateModule<ModuleEditor>(m_editor);
+#endif
+	CreateModule<ModuleFileSystem>(m_fileSystem);
+	CreateModule<ModuleAudio>(m_audio);
+	CreateModule<ModulePhysics3D>(m_physics);
+	CreateModule<ModuleImporter>(m_importer);
+	CreateModule<ModuleResourceManager>(m_resourceManager);
+	CreateModule<ModuleGoManager>(m_goManager);
+	CreateModule<ModuleTerrain>(m_terrain);
+	// Renderer last!
+	CreateModule<ModuleRenderer3D>(m_renderer3D);
+
+	// After all Init calls we call OnEnable() in all modules
 	LOG("Application Start --------------");
 	//Variable used to determine if LOG's can be shown on console
 	m_gameRunning = true;
 	for (Module* m : m_modules)
 	{
-		if (m->IsEnabled())
-		{
-			m->Start();
-		}
-	};
+		m->Enable();
+	}
 	m_maxFps = 0;
-	m_msTimer.Start();
-	m_fpsTimer.Start();
-	m_totalTime.Start();
+	m_msTimer.OnEnable();
+	m_fpsTimer.OnEnable();
+	m_totalTime.OnEnable();
 
 	//TMP
 	TIMER_CREATE("__Timer");
@@ -140,7 +109,7 @@ void Application::PrepareUpdate()
 	Time.AppRuntime = m_totalTime.Read() / 1000.0f;
 	//
 
-	m_msTimer.Start();
+	m_msTimer.OnEnable();
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 	{
@@ -157,7 +126,7 @@ void Application::PrepareUpdate()
 		}
 		m_framerate[EDITOR_FRAME_SAMPLES-1] = m_frameCount;
 		m_frameCount = 0;
-		m_fpsTimer.Start();
+		m_fpsTimer.OnEnable();
 	}
 	
 	if (m_maxFps != m_previousMaxFps)
@@ -221,15 +190,14 @@ UpdateStatus Application::Update()
 	return ret;
 }
 
-void Application::CleanUp()
+void Application::OnDisable()
 {
 	m_gameRunning = false;
 	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
 	for (Module* m : m_modules)
 	{
-		m->CleanUp();
+		m->OnDisable();
 	};
-	RELEASE(m_timers);
 }
 
 void Application::Render(const ViewPort& port) const
@@ -289,9 +257,4 @@ void Application::Log(const char * str)
 			m_editor->Log(str);
 		}
 	}
-}
-
-void Application::AddModule(Module* mod)
-{
-	m_modules.push_back(mod);
 }

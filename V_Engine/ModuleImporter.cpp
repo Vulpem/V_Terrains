@@ -29,7 +29,7 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleImporter::ModuleImporter(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleImporter::ModuleImporter() : Module()
 {
 }
 
@@ -63,13 +63,13 @@ bool ModuleImporter::Init()
 	return ret;
 }
 
-void ModuleImporter::Start()
+void ModuleImporter::OnEnable()
 {
 	ilutRenderer(ILUT_OPENGL);
 }
 
 // Called before quitting
-void ModuleImporter::CleanUp()
+void ModuleImporter::OnDisable()
 {
 	aiDetachAllLogStreams();
 }

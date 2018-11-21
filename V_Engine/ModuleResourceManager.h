@@ -36,14 +36,14 @@ class ModuleResourceManager : public Module
 {
 public:
 	
-	ModuleResourceManager(Application* app, bool start_enabled = true);
+	ModuleResourceManager();
 	~ModuleResourceManager();
 
-	void Start();
+	void OnEnable();
 	UpdateStatus PreUpdate() override;
 	UpdateStatus Update();
 	UpdateStatus PostUpdate();
-	void CleanUp();
+	void OnDisable();
 
 	void Refresh();
 	void ReimportAll();

@@ -3,7 +3,7 @@
 #include "ModuleWindow.h"
 #include "Math.h"
 
-ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleWindow::ModuleWindow() : Module()
 {
 	m_window = nullptr;
 	m_screenSurface = nullptr;
@@ -81,7 +81,7 @@ bool ModuleWindow::Init()
 }
 
 // Called before quitting
-void ModuleWindow::CleanUp()
+void ModuleWindow::OnDisable()
 {
 	LOG("Destroying SDL window and quitting all SDL systems");
 

@@ -11,7 +11,7 @@ public:
 	// Constructor
 	Timer();
 
-	void Start();
+	void OnEnable();
 	void Stop();
 
 	Uint32 Read();

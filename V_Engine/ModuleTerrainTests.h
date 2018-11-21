@@ -16,11 +16,11 @@ void ShowError(const char* message);
 class ModuleTerrain : public Module
 {
 public:
-    ModuleTerrain(Application* app, bool start_enabled = true);
+    ModuleTerrain();
 	~ModuleTerrain();
 
 	bool Init();
-	void Start();
+	void OnEnable();
     UpdateStatus Update() override;
 
 	void SaveTerrainConfig(std::string configName);

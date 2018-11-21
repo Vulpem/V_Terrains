@@ -5,7 +5,7 @@
 #include "SDL_mixer/include/SDL_mixer.h"
 #pragma comment( lib, "SDL_mixer/lib/x86/SDL2_mixer.lib" )
 
-ModuleAudio::ModuleAudio(Application* app, bool start_enabled) : Module(app, start_enabled)//, music(NULL)
+ModuleAudio::ModuleAudio() : Module()//, music(NULL)
 {
 }
 
@@ -47,7 +47,7 @@ bool ModuleAudio::Init()
 }
 
 // Called before quitting
-void ModuleAudio::CleanUp()
+void ModuleAudio::OnDisable()
 {
 	/*LOG("Freeing sound FX, closing Mixer and Audio subsystem");
 

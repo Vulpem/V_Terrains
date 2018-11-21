@@ -11,7 +11,7 @@ public:
 	// Constructor
 	PerfTimer();
 
-	void Start();
+	void OnEnable();
 	double ReadMs() const;
 	uint64 ReadTicks() const;
 

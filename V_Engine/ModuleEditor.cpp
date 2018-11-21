@@ -19,7 +19,7 @@
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"
 
-ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleEditor::ModuleEditor() : Module()
 {
 }
 
@@ -39,7 +39,7 @@ bool ModuleEditor::Init()
 	return true;
 }
 
-void ModuleEditor::Start()
+void ModuleEditor::OnEnable()
 {
 	//ImGui_ImplSdlGL3_NewFrame(App->m_window->GetWindow());
 
@@ -129,7 +129,7 @@ UpdateStatus ModuleEditor::PostUpdate()
 }
 
 // Called before quitting
-void ModuleEditor::CleanUp()
+void ModuleEditor::OnDisable()
 {
 	ClearConsole();
 	ImGui_ImplSdlGL3_Shutdown();
@@ -552,7 +552,7 @@ void ModuleEditor::Editor()
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
 		{
-			std::vector<std::pair<std::string, float>> timers = App->m_timers->GetLastReads();
+			std::vector<std::pair<std::string, float>> timers = App->m_timers.GetLastReads();
 			if (timers.empty() == false)
 			{
 				char lastLetter = '0';

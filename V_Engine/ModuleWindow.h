@@ -10,11 +10,11 @@ class ModuleWindow : public Module
 {
 public:
 
-	ModuleWindow(Application* app, bool start_enabled = true);
+	ModuleWindow();
 	~ModuleWindow();
 
 	bool Init() override;
-	void CleanUp() override;
+	void OnDisable() override;
 
 	void SetTitle(const char* title);
 

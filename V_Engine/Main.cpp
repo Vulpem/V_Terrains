@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
 		case MainStates::Finish:
 
 			LOG("-------------- Application CleanUp --------------");
-			App->CleanUp();
+			App->OnDisable();
 			main_return = EXIT_SUCCESS;
 			state = MainStates::Exit;
 			break;

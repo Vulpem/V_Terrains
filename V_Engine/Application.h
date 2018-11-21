@@ -2,8 +2,7 @@
 #define __APP__
 
 #include "Globals.h"
-#include "Timer.h"
-#include "PerfTimer.h"
+#include "Timers.h"
 
 #include <vector>
 #include <list>
@@ -20,7 +19,6 @@ class ModulePhysics3D;
 class ModuleFileSystem;
 class ModuleImporter;
 class ModuleResourceManager;
-class TimerManager;
 class ModuleTerrain;
 
 struct ViewPort;
@@ -35,7 +33,7 @@ public:
 
 	bool Init();
 	UpdateStatus Update();
-	void CleanUp();
+	void OnDisable();
 
 	void Render(const ViewPort& port) const;
 
@@ -69,12 +67,12 @@ public:
 	float m_framerate[EDITOR_FRAME_SAMPLES];
 	int m_maxFps = 30;
 
-	TimerManager* m_timers;
+	TimerManager m_timers;
 	Timer m_totalTime;
 
 private:
-
-	void AddModule(Module* mod);
+	template <typename ModuleType>
+	void CreateModule(ModuleType*& modulePointer);
 	void PrepareUpdate();
 	void FinishUpdate();
 
@@ -91,5 +89,13 @@ private:
 };
 
 extern Application* App;
+
+template<typename ModuleType>
+void Application::CreateModule(ModuleType*& modulePointer)
+{
+	modulePointer = new ModuleType();
+	m_modules.push_back(modulePointer);
+	modulePointer->Init();
+}
 
 #endif

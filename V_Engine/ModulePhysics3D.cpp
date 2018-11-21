@@ -15,7 +15,7 @@
 	#pragma comment (lib, "Bullet/libx86/LinearMath.lib")
 #endif
 
-ModulePhysics3D::ModulePhysics3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModulePhysics3D::ModulePhysics3D() : Module()
 {
 	m_debugDisplay = false;
 
@@ -46,7 +46,7 @@ bool ModulePhysics3D::Init()
 }
 
 // ---------------------------------------------------------
-void ModulePhysics3D::Start()
+void ModulePhysics3D::OnEnable()
 {
 	LOG("Creating Physics environment");
 
@@ -109,7 +109,7 @@ UpdateStatus ModulePhysics3D::Update()
 }
 
 // Called before quitting 
-void ModulePhysics3D::CleanUp()
+void ModulePhysics3D::OnDisable()
 {
 	LOG("Destroying 3D Physics simulation");
 	//world->removeRigidBody(ground);

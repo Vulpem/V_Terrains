@@ -10,7 +10,7 @@
 
 #define MAX_KEYS SDL_NUM_SCANCODES
 
-ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleInput::ModuleInput() : Module()
 {
 	m_keyboardStates = new KEY_STATE[MAX_KEYS + 1];
 	memset(m_keyboardStates, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
@@ -162,7 +162,7 @@ UpdateStatus ModuleInput::PreUpdate()
 }
 
 // Called before quitting
-void ModuleInput::CleanUp()
+void ModuleInput::OnDisable()
 {
 	LOG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);

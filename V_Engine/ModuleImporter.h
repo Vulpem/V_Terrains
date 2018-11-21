@@ -29,13 +29,13 @@ class ModuleImporter : public Module
 {
 public:
 	
-	ModuleImporter(Application* app, bool start_enabled = true);
+	ModuleImporter();
 	~ModuleImporter();
 
 	bool Init() override;
 
-	void Start() override;
-	void CleanUp() override;
+	void OnEnable() override;
+	void OnDisable() override;
 
 // ------------------------------- IMPORTING ------------------------------- 
 	std::vector<MetaInf> Import(const char* path, bool overWritting = false);

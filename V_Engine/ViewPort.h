@@ -16,7 +16,6 @@ struct ViewPort
 
 	bool m_active = true;
 	bool m_withUI = true;
-	bool m_autoRender = true;
 
 	bool m_useLighting = true;
 	bool m_useSingleSidedFaces = true;

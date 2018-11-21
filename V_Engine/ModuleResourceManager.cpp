@@ -13,7 +13,7 @@
 #include "OpenGL.h"
 
 
-ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
+ModuleResourceManager::ModuleResourceManager() : Module()//, resBaseFolder("Assets", "Assets")
 {
 }
 
@@ -23,7 +23,7 @@ ModuleResourceManager::~ModuleResourceManager()
 }
 
 // Called before render is available
-void ModuleResourceManager::Start()
+void ModuleResourceManager::OnEnable()
 {
 	m_defaultVertexBuf = std::string(
 		"#version 330 core\n"
@@ -135,7 +135,7 @@ UpdateStatus ModuleResourceManager::PostUpdate()
 }
 
 // Called before quitting
-void ModuleResourceManager::CleanUp()
+void ModuleResourceManager::OnDisable()
 {
 	SaveMetaData();
 	for(auto resource : m_resources)

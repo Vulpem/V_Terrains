@@ -26,8 +26,8 @@ void ShowError(const char * message)
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, nullptr);
 }
 
-ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
-	Module(app, start_enabled)
+ModuleTerrain::ModuleTerrain()
+	: Module()
 	, m_frequency(RPGT::config.noise.frequency)
 	, m_octaves(RPGT::config.noise.octaves)
 	, m_lacunarity(RPGT::config.noise.lacunarity)
@@ -66,7 +66,6 @@ ModuleTerrain::ModuleTerrain(Application* app, bool start_enabled) :
 	RPGT::config.globalLight[0] = tmp.x;
 	RPGT::config.globalLight[1] = tmp.y;
 	RPGT::config.globalLight[2] = tmp.z;
-	App->m_renderer3D->m_sunDirection = tmp;
 }
 
 // Destructor
@@ -81,7 +80,7 @@ bool ModuleTerrain::Init()
 	return ret;
 }
 
-void ModuleTerrain::Start()
+void ModuleTerrain::OnEnable()
 {
 	RPGT::Init();
     App->m_camera->GetDefaultCam()->GetOwner()->GetTransform()->SetGlobalPos(0.f, m_maxHeight, 0.f);
@@ -154,7 +153,7 @@ UpdateStatus ModuleTerrain::Update()
 		m_wantRegen = false;
 		m_generatedMap = false;
 		m_regening = true;
-		m_smoothRegen.Start();
+		m_smoothRegen.OnEnable();
 		m_variableFogDistance = m_fogDistance;
 	}
 
@@ -993,7 +992,7 @@ void ModuleTerrain::GenMap()
 void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
-	m_regenTimer.Start();
+	m_regenTimer.OnEnable();
 	previousFogColor = wantedFogColor = App->m_renderer3D->m_clearColor;
 }
 
