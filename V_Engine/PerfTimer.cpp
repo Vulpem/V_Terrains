@@ -14,11 +14,11 @@ PerfTimer::PerfTimer()
 	if (frequency == 0)
 		frequency = SDL_GetPerformanceFrequency();
 
-	OnEnable();
+	Start();
 }
 
 // ---------------------------------------------
-void PerfTimer::OnEnable()
+void PerfTimer::Start()
 {
 	m_startedAt = SDL_GetPerformanceCounter();
 }
@@ -27,10 +27,4 @@ void PerfTimer::OnEnable()
 double PerfTimer::ReadMs() const
 {
 	return 1000.0 * (double(SDL_GetPerformanceCounter() - m_startedAt) / double(frequency));
-}
-
-// ---------------------------------------------
-uint64 PerfTimer::ReadTicks() const
-{
-	return SDL_GetPerformanceCounter() - m_startedAt;
 }

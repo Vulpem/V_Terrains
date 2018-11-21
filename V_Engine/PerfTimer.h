@@ -7,13 +7,10 @@
 class PerfTimer
 {
 public:
-
-	// Constructor
 	PerfTimer();
 
-	void OnEnable();
+	void Start();
 	double ReadMs() const;
-	uint64 ReadTicks() const;
 
 private:
 	uint64	m_startedAt;

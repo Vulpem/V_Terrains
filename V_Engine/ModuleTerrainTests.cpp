@@ -99,7 +99,7 @@ UpdateStatus ModuleTerrain::Update()
 
 	if (m_regening)
 	{
-		int ms = m_smoothRegen.Read();
+		int ms = m_smoothRegen.ReadMs();
 		if (ms < 750)
 		{
 			RPGT::config.fogDistance = m_fogDistance * (float)(1 - ms / 750.f);
@@ -147,13 +147,12 @@ UpdateStatus ModuleTerrain::Update()
 	}
 	TIMER_READ_MS("0 Terrain Update");
 
-	if (m_wantRegen && m_regenTimer.Read() > 2000.0f)
+	if (m_wantRegen && m_regenTimer.ReadMs() > 2000.0f)
 	{
-		m_regenTimer.Stop();
 		m_wantRegen = false;
 		m_generatedMap = false;
 		m_regening = true;
-		m_smoothRegen.OnEnable();
+		m_smoothRegen.Start();
 		m_variableFogDistance = m_fogDistance;
 	}
 
@@ -992,7 +991,7 @@ void ModuleTerrain::GenMap()
 void ModuleTerrain::WantRegen()
 {
 	m_wantRegen = true;
-	m_regenTimer.OnEnable();
+	m_regenTimer.Start();
 	previousFogColor = wantedFogColor = App->m_renderer3D->m_clearColor;
 }
 

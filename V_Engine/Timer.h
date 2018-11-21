@@ -7,20 +7,14 @@
 class Timer
 {
 public:
-
-	// Constructor
 	Timer();
 
-	void OnEnable();
-	void Stop();
-
-	Uint32 Read();
+	void Start();
+	Uint32 ReadMs();
 
 private:
-
 	bool	m_running;
 	Uint32	m_startedAt;
-	Uint32	m_stoppedAt;
 };
 
 #endif //__TIMER_H__

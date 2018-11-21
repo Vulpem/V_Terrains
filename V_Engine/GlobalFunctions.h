@@ -73,16 +73,7 @@ uint64_t GenerateUUID();
 
 // ------------ TIMER FUNCTIONS -------------------------
 
-//Each time a timer is "read" it will store it's last returned value
-
-//Create a slower but more accurate timer associated with the key sent
-#define TIMER_CREATE_PERF(key) CreatePerfTimer(key)
-void CreatePerfTimer(std::string key);
-
-//Create a timer associated with the key sent
-#define TIMER_CREATE(key) CreateTimer(key)
-void CreateTimer(std::string key);
-
+//Each time "read" is called, the returned value will be stored
 
 //Sets the timer to 0, faster for normal timers. If it doesn't exist, it will create a timer
 #define TIMER_START(key) StartTimer(key)
@@ -92,28 +83,27 @@ void StartTimer(std::string key);
 #define TIMER_START_PERF(key) StartTimerPerf(key)
 void StartTimerPerf(std::string key);
 
-//Sets the timer stored value to 0.0f
-#define TIMER_RESET_STORED(key) ResetTimerStoredVal(key)
-void ResetTimerStoredVal(std::string key);
-
-
-//Returns the timer value in MS, and stores the result
-#define TIMER_READ_MS(key) ReadMs(key)
-float ReadMs(std::string key);
 
 //Returns the timer value in seconds, and stores the result
 #define TIMER_READ_SECONDS(key) ReadSec(key)
 unsigned int ReadSec(std::string key);
 
+//Returns the timer value in MS, and stores the result
+#define TIMER_READ_MS(key) ReadMs(key)
+float ReadMs(std::string key);
+
 //Returns the higher value between the last read the timer had and the current read and stores it
 #define TIMER_READ_MS_MAX(key) ReadMs_Max(key)
 float ReadMs_Max(std::string key);
+
 
 //Returns the timer stored value (last read)
 #define TIMER_READ_STORED(key) ReadMsStoredVal(key)
 float ReadMsStoredVal(std::string key);
 
-// ------------ TIMER FUNCTIONS -------------------------
+//Sets the timer stored value to 0.0f
+#define TIMER_RESET_STORED(key) ResetTimerStoredVal(key)
+void ResetTimerStoredVal(std::string key);
 
 #endif // !__GLOBALTIME__
 

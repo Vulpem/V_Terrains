@@ -74,14 +74,8 @@ bool Application::Init()
 		m->Enable();
 	}
 	m_maxFps = 0;
-	TIMER_CREATE("Total Runtime");
-	TIMER_CREATE("FPS Calculation Timer");
-
-	//TMP
-	TIMER_CREATE("__Timer");
-	TIMER_CREATE_PERF("__PerfTimer");
-	TIMER_CREATE_PERF("Timer Test");
-	TIMER_CREATE_PERF("TimerPerf Test");
+	TIMER_START("Total Runtime");
+	TIMER_START("FPS Calculation Timer");
 
 	return true;
 }
