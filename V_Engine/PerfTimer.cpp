@@ -6,7 +6,7 @@
 #include "PerfTimer.h"
 #include "SDL\include\SDL_timer.h"
 
-uint64 PerfTimer::frequency = 0;
+unsigned __int64 PerfTimer::frequency = 0;
 
 // ---------------------------------------------
 PerfTimer::PerfTimer()

@@ -1,9 +1,6 @@
 #ifndef __PERFTIMER__
 #define __PERFTIMER__
 
-#include "Globals.h"
-
-
 class PerfTimer
 {
 public:
@@ -13,8 +10,8 @@ public:
 	double ReadMs() const;
 
 private:
-	uint64	m_startedAt;
-	static uint64 frequency;
+	unsigned __int64 m_startedAt;
+	static unsigned __int64 frequency;
 };
 
-#endif //__j1PERFTIMER_H__
+#endif //__PERFTIMER_H__

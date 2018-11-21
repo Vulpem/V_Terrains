@@ -4,6 +4,7 @@
 // ----------------------------------------------------
 
 #include "Timer.h"
+#include "SDL/include/SDL_timer.h"
 
 // ---------------------------------------------
 Timer::Timer()
@@ -18,7 +19,7 @@ void Timer::Start()
 }
 
 // ---------------------------------------------
-Uint32 Timer::ReadMs()
+unsigned __int32 Timer::ReadMs()
 {
 	return SDL_GetTicks() - m_startedAt;
 }

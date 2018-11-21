@@ -2,6 +2,7 @@
 #define __GLOBALS__ 
 
 #include "GlobalFunctions.h"
+#include "SDL/include/SDL.h"
 
 #include <map>
 #include <vector>
