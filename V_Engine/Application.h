@@ -47,20 +47,20 @@ public:
 
 public:
 	//All accessible modules
-	ModuleWindow * m_window;
-	ModuleInput* m_input;
-	ModuleAudio* m_audio;
-	ModuleFileSystem* m_fileSystem;
+	ModuleWindow * m_window = nullptr;
+	ModuleInput* m_input = nullptr;
+	ModuleAudio* m_audio = nullptr;
+	ModuleFileSystem* m_fileSystem = nullptr;
 
-	ModuleRenderer3D* m_renderer3D;
-	ModuleCamera3D* m_camera;
+	ModuleRenderer3D* m_renderer3D = nullptr;
+	ModuleCamera3D* m_camera = nullptr;
 
-	ModuleEditor* m_editor;
-	ModuleResourceManager* m_resourceManager;
-	ModuleImporter* m_importer;
-	ModuleGoManager* m_goManager;
-	ModulePhysics3D* m_physics;
-	ModuleTerrain* m_terrain;
+	ModuleEditor* m_editor = nullptr;
+	ModuleResourceManager* m_resourceManager = nullptr;
+	ModuleImporter* m_importer = nullptr;
+	ModuleGoManager* m_goManager = nullptr;
+	ModulePhysics3D* m_physics = nullptr;
+	ModuleTerrain* m_terrain = nullptr;
 
 	//Other variables
 	float m_msFrame[EDITOR_FRAME_SAMPLES];
@@ -83,7 +83,6 @@ private:
 	Timer	m_fpsTimer;
 	float m_frameTime = -1.0f;
 	int m_previousMaxFps = m_maxFps;
-	bool m_gameRunning = false;
 
 	std::string m_title;
 };

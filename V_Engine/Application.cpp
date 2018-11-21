@@ -21,8 +21,7 @@
 #include "Timers.h"
 
 Application::Application()
-	: m_gameRunning(false)
-	, m_title(TITLE)
+	: m_title(TITLE)
 {
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES; n++)
 	{
@@ -70,7 +69,6 @@ bool Application::Init()
 	// After all Init calls we call OnEnable() in all modules
 	LOG("Application Start --------------");
 	//Variable used to determine if LOG's can be shown on console
-	m_gameRunning = true;
 	for (Module* m : m_modules)
 	{
 		m->Enable();
@@ -192,8 +190,6 @@ UpdateStatus Application::Update()
 
 void Application::OnDisable()
 {
-	m_gameRunning = false;
-	std::vector<Module*>::reverse_iterator item = m_modules.rbegin();
 	for (Module* m : m_modules)
 	{
 		m->OnDisable();
@@ -250,11 +246,8 @@ void Application::Stop()
 
 void Application::Log(const char * str)
 {
-	if (m_gameRunning == true)
-	{
 		if (m_editor != nullptr && m_editor->IsEnabled())
 		{
 			m_editor->Log(str);
 		}
-	}
 }
