@@ -68,7 +68,6 @@ public:
 	int m_maxFps = 30;
 
 	TimerManager m_timers;
-	Timer m_totalTime;
 
 private:
 	template <typename ModuleType>
@@ -77,10 +76,8 @@ private:
 	void FinishUpdate();
 
 private:
-	PerfTimer	m_msTimer;
 	std::vector<Module*> m_modules;
 	int m_frameCount = 0;
-	Timer	m_fpsTimer;
 	float m_frameTime = -1.0f;
 	int m_previousMaxFps = m_maxFps;
 

@@ -74,9 +74,8 @@ bool Application::Init()
 		m->Enable();
 	}
 	m_maxFps = 0;
-	m_msTimer.OnEnable();
-	m_fpsTimer.OnEnable();
-	m_totalTime.OnEnable();
+	TIMER_CREATE("Total Runtime");
+	TIMER_CREATE("FPS Calculation Timer");
 
 	//TMP
 	TIMER_CREATE("__Timer");
@@ -94,7 +93,7 @@ void Application::PrepareUpdate()
 	m_frameCount++;
 
 	//Time managing
-	Time.dt = m_msTimer.ReadMs() / 1000.0f;
+	Time.dt = TIMER_READ_MS("ms count timer") / 1000.0f;
 	if (Time.PlayMode != PlayMode::Stop && Time.Pause == false)
 	{
 		Time.gdt = Time.dt / Time.gdtModifier;
@@ -104,10 +103,10 @@ void Application::PrepareUpdate()
 	{
 		Time.gdt = 0.0f;
 	}
-	Time.AppRuntime = m_totalTime.Read() / 1000.0f;
+	Time.AppRuntime = TIMER_READ_MS("Total Runtime")/1000.0f;
 	//
 
-	m_msTimer.OnEnable();
+	TIMER_START_PERF("ms count timer");
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 	{
@@ -115,8 +114,7 @@ void Application::PrepareUpdate()
 	}
 	m_msFrame[EDITOR_FRAME_SAMPLES - 1] = Time.dt;
 
-	float tmp = m_fpsTimer.Read();
-	if (m_fpsTimer.Read() > 1000.0f)
+	if (TIMER_READ_MS("FPS Calculation Timer") > 1000.0f)
 	{
 		for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 		{
@@ -124,7 +122,7 @@ void Application::PrepareUpdate()
 		}
 		m_framerate[EDITOR_FRAME_SAMPLES-1] = m_frameCount;
 		m_frameCount = 0;
-		m_fpsTimer.OnEnable();
+		TIMER_START("FPS Calculation Timer");
 	}
 	
 	if (m_maxFps != m_previousMaxFps)
@@ -181,7 +179,7 @@ UpdateStatus Application::Update()
 	FinishUpdate();
 	if (m_frameTime > 0.0001f)
 	{
-		while (m_msTimer.ReadMs() < m_frameTime)
+		while (TIMER_READ_MS("ms count timer") < m_frameTime)
 		{
 		}
 	}
