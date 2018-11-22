@@ -32,10 +32,15 @@ Gameobject::Gameobject(uint64_t uid)
 
 Gameobject::~Gameobject()
 {
+#if USE_EDITOR
 	if (IsSelected())
 	{
-		App->m_editor->UnselectGameObject();
+		if (App->m_editor)
+		{
+			App->m_editor->UnselectGameObject();
+		}
 	}
+#endif
 	for(auto component : m_components)
 	{
 		App->m_goManager->DeleteComponent(component);
@@ -372,5 +377,9 @@ OBB Gameobject::GetOBB() const
 
 bool Gameobject::IsSelected() const
 {
+#if USE_EDITOR
 	return (App->m_editor->GetSelectedGameObject() == this);
+#else
+	return false;
+#endif
 }
