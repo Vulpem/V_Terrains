@@ -11,7 +11,6 @@
 #include "ModuleGOmanager.h"
 #include "ModuleResourceManager.h"
 #include "ModuleTerrainTests.h"
-#include "Timers.h"
 
 #include "AllComponents.h"
 #include "AllResources.h"

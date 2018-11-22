@@ -3,7 +3,6 @@
 
 #include "Globals.h"
 #include "Timer.h"
-#include "PerfTimer.h"
 
 class TimerManager
 {
@@ -24,16 +23,13 @@ public:
 	std::vector<std::pair<std::string, float>> GetLastReads();
 
 private:
-	//Map that associates each ID with it's PerfTimer
-	std::map<uint, PerfTimer> perfTimers;
-	//Map that associates each ID with it's timer
-	std::map<uint, Timer> stdTimers;
+	std::map<uint, TimerInterface*> m_timers;
 
 	//Map that associates each ID with its key and stored value
-	std::map<uint, std::pair<std::string, float>> lastReads;
+	std::map<uint, std::pair<std::string, float>> m_storedValues;
 
 	//Map that associates each key with its ID
-	std::map<std::string, uint> timerIDs;
+	std::map<std::string, uint> m_timerIDs;
 };
 
 #endif // !__TIMERMANAGER__

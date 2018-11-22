@@ -18,8 +18,6 @@
 #include "ModuleTerrainTests.h"
 #include <algorithm>
 
-#include "Timers.h"
-
 Application::Application()
 	: m_title(TITLE)
 {
@@ -75,7 +73,7 @@ bool Application::Init()
 	}
 	m_maxFps = 0;
 	TIMER_START("Total Runtime");
-	TIMER_START("FPS Calculation Timer");
+	TIMER_START("Timer new second");
 
 	return true;
 }
@@ -87,7 +85,7 @@ void Application::PrepareUpdate()
 	m_frameCount++;
 
 	//Time managing
-	Time.dt = TIMER_READ_MS("ms count timer") / 1000.0f;
+	Time.dt = TIMER_READ_MS("frame time") / 1000.0f;
 	if (Time.PlayMode != PlayMode::Stop && Time.Pause == false)
 	{
 		Time.gdt = Time.dt / Time.gdtModifier;
@@ -100,7 +98,7 @@ void Application::PrepareUpdate()
 	Time.AppRuntime = TIMER_READ_MS("Total Runtime")/1000.0f;
 	//
 
-	TIMER_START_PERF("ms count timer");
+	TIMER_START_PERF("frame time");
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 	{
@@ -108,7 +106,7 @@ void Application::PrepareUpdate()
 	}
 	m_msFrame[EDITOR_FRAME_SAMPLES - 1] = Time.dt;
 
-	if (TIMER_READ_MS("FPS Calculation Timer") > 1000.0f)
+	if (TIMER_READ_MS("Timer new second") > 1000.0f)
 	{
 		for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 		{
@@ -116,7 +114,7 @@ void Application::PrepareUpdate()
 		}
 		m_framerate[EDITOR_FRAME_SAMPLES-1] = m_frameCount;
 		m_frameCount = 0;
-		TIMER_START("FPS Calculation Timer");
+		TIMER_START("Timer new second");
 	}
 	
 	if (m_maxFps != m_previousMaxFps)
@@ -173,7 +171,7 @@ UpdateStatus Application::Update()
 	FinishUpdate();
 	if (m_frameTime > 0.0001f)
 	{
-		while (TIMER_READ_MS("ms count timer") < m_frameTime)
+		while (TIMER_READ_MS("frame time") < m_frameTime)
 		{
 		}
 	}

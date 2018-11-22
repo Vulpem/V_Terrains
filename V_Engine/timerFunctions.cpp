@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
-#include "Timers.h"
+#include "TimerManager.h"
 
 void CreatePerfTimer(std::string key)
 {

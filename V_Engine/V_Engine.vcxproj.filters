@@ -363,12 +363,6 @@
     <ClInclude Include="ViewPort.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="PerfTimer.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="Timers.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalFunctions.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
@@ -431,6 +425,9 @@
     </ClInclude>
     <ClInclude Include="ModuleTerrainTests.h">
       <Filter>Terrains</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerManager.h">
+      <Filter>Sources\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -599,12 +596,6 @@
     <ClCompile Include="QuadTree.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="PerfTimer.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Timers.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="timerFunctions.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
@@ -643,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="ModuleTerrainTests.cpp">
       <Filter>Terrains</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerManager.cpp">
+      <Filter>Sources\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

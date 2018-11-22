@@ -102,7 +102,6 @@
     <ClInclude Include="Mesh_RenderInfo.h" />
     <ClInclude Include="ModuleResourceManager.h" />
     <ClInclude Include="ModuleTerrainTests.h" />
-    <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="PugiXml\src\pugiconfig.hpp" />
     <ClInclude Include="PugiXml\src\pugixml.hpp" />
     <ClInclude Include="QuadTree.h" />
@@ -200,7 +199,7 @@
     <ClInclude Include="R_Texture.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="Timers.h" />
+    <ClInclude Include="TimerManager.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="ViewPort.h" />
   </ItemGroup>
@@ -265,7 +264,6 @@
     <ClCompile Include="ModuleResourceManager.cpp" />
     <ClCompile Include="ModuleTerrainTests.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
-    <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="PhysBody3D.cpp" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="PugiXml\src\pugixml.cpp" />
@@ -273,7 +271,7 @@
     <ClCompile Include="ResourcedComponent.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="timerFunctions.cpp" />
-    <ClCompile Include="Timers.cpp" />
+    <ClCompile Include="TimerManager.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
