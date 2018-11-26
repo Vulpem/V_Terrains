@@ -342,7 +342,7 @@ UpdateStatus ModuleEditor::MenuBar()
 		{
 			if (ImGui::MenuItem("Empty##CreateEmpty") == true)
 			{
-				App->m_goManager->CreateEmpty();
+				App->m_goManager->CreateGameobject();
 			}
 			if (ImGui::MenuItem("Camera##CreateEmptyCam") == true)
 			{

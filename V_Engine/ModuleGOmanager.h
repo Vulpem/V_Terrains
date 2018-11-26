@@ -24,32 +24,18 @@ public:
 	ModuleGoManager();
 	~ModuleGoManager();
 
-	bool Init() override;
 	UpdateStatus PreUpdate() override;
 	UpdateStatus Update() override;
 	UpdateStatus PostUpdate() override;
 
-	void Render(const ViewPort& port) const override;
-	void OnDisable();
-
-
-	Gameobject* CreateEmpty(const char* name = NULL);
+	Gameobject* CreateGameobject(const char* name = NULL);
 	Gameobject* CreateCamera(const char* name = NULL);
+
 	void DeleteGameObject(Gameobject* toErase);
 	void DeleteComponent(Component* toErase);
 
 	void SetStatic(bool Static, Gameobject* GO);
 	void SetChildsStatic(bool Static, Gameobject* GO);
-
-	void SaveScene(char* name) { m_wantToSaveScene = true; m_sceneName = name; }
-	void LoadScene(char* name) { m_wantToLoadScene = true; m_sceneName = name;	m_wantToClearScene = true; }
-	void ClearScene() { m_wantToClearScene = true; }
-
-	template <typename C>
-	std::vector<Gameobject*> FilterCollisions(C col) const;
-	bool RayCast(const LineSegment& ray, Gameobject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL, bool onlyMeshes = true);
-
-	Gameobject* GetRoot() { return m_root; }
 
 	void RenderGOs(const ViewPort& ViewPort) const;
 
@@ -59,32 +45,20 @@ public:
 	std::vector<CompType*> GetComponentsByType(ComponentType type) const;
 
 	std::multimap<ComponentType, Component*> m_components;
-	Quadtree m_quadTree;
-	std::vector<Gameobject*> m_dynamicGO;
 
 	//TODO: wth is this?
 	Gameobject* m_setting = nullptr;
 	bool m_settingStatic = true;
 
 private:
+	//TODO: move into scene manager
 	void SaveSceneNow();
 	void LoadSceneNow();
-	void ClearSceneNow();
 
 	Mesh_RenderInfo GetMeshData(Mesh* getFrom) const;
-
-	void AddGOtoRoot(Gameobject* GO);
-	void CreateRootGameObject();
 	void DeleteGOs();
 
 	std::vector<Gameobject*> m_toDelete;
-
-	Gameobject * m_root = nullptr;
-
-	std::string m_sceneName;
-	bool m_wantToSaveScene = false;
-	bool m_wantToLoadScene = false;
-	bool m_wantToClearScene = false;
 
 	bool m_staticChildsPopUpIsOpen = false;
 };

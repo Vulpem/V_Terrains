@@ -23,20 +23,13 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleGoManager::ModuleGoManager() : Module(), m_quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
+ModuleGoManager::ModuleGoManager() : Module()
 {
 }
 
 ModuleGoManager::~ModuleGoManager()
 {
 
-}
-
-// Called before render is available
-bool ModuleGoManager::Init()
-{
-	CreateRootGameObject();
-	return true;
 }
 
 // Called every draw update
@@ -80,6 +73,7 @@ UpdateStatus ModuleGoManager::Update()
 			comp->second->Update();
 		}
 	}
+
 	TIMER_READ_MS("Components Update");
 	if (m_setting != nullptr)
 	{
@@ -133,66 +127,18 @@ UpdateStatus ModuleGoManager::PostUpdate()
 			comp->second->PostUpdate();
 		}
 	}
-
 	TIMER_READ_MS("Components PostUpdate");
-
 	TIMER_RESET_STORED("Cam culling longest");
 	TIMER_RESET_STORED("GO render longest");
 
-	bool alreadyWorkedOnScene = false;
-
-	if (m_wantToSaveScene && alreadyWorkedOnScene == false)
-	{
-		alreadyWorkedOnScene = true;
-		TIMER_START_PERF("Saving Scene");
-		SaveSceneNow();
-		m_wantToSaveScene = false;
-		TIMER_READ_MS("Saving Scene");
-	}
-
-	if (m_wantToClearScene && alreadyWorkedOnScene == false)
-	{
-		alreadyWorkedOnScene = true;
-		ClearSceneNow();
-		m_wantToClearScene = false;
-	}
-
 	DeleteGOs();
 
-	if (m_wantToLoadScene&& alreadyWorkedOnScene == false)
-	{
-		alreadyWorkedOnScene = true;
-		TIMER_START_PERF("Loading Scene");
-		LoadSceneNow();
-		m_wantToLoadScene = false;
-		TIMER_READ_MS("Loading Scene");
-	}
 	return UpdateStatus::Continue;
-}
-
-void ModuleGoManager::Render(const ViewPort& port) const
-{
-	App->m_goManager->RenderGOs(port);
-	if (port.m_renderQuadTree)
-	{
-		TIMER_START("QuadTree drawTime");
-		m_quadTree.Draw();
-		TIMER_READ_MS("QuadTree drawTime");
-	}
-}
-
-// Called before quitting
-void ModuleGoManager::OnDisable()
-{
-	if (m_root)
-	{
-		delete m_root;
-	}
 }
 
 
 //Create an empty GameObject
-Gameobject * ModuleGoManager::CreateEmpty(const char* name)
+Gameobject * ModuleGoManager::CreateGameobject(const char* name)
 {
 	Gameobject* empty = new Gameobject();
 	
@@ -209,7 +155,7 @@ Gameobject * ModuleGoManager::CreateEmpty(const char* name)
 //Create a gameobject with just a Camera attached to it
 Gameobject* ModuleGoManager::CreateCamera(const char* name)
 {
-	Gameobject* m_camera = CreateEmpty(name);
+	Gameobject* m_camera = CreateGameobject(name);
 	m_camera->CreateComponent(ComponentType::camera);
 	return m_camera;
 }
@@ -258,18 +204,6 @@ void ModuleGoManager::DeleteComponent(Component * toErase)
 	}
 }
 
-
-//Scene management
-void ModuleGoManager::ClearSceneNow()
-{
-	for (auto child : m_root->GetTransform()->GetChilds())
-	{
-		if (child->m_hiddenOnOutliner == false)
-		{
-			m_toDelete.push_back(child->GetGameobject());
-		}
-	}
-}
 
 void ModuleGoManager::SaveSceneNow()
 {
@@ -658,26 +592,6 @@ void ModuleGoManager::RenderGOs(const ViewPort & port)  const
 		}
 	}
 	TIMER_READ_MS_MAX("GO render longest");
-}
-
-void ModuleGoManager::AddGOtoRoot(Gameobject * GO)
-{
-	GO->GetTransform()->SetParent(m_root->GetTransform());
-}
-
-void ModuleGoManager::CreateRootGameObject()
-{
-	if (m_root == nullptr)
-	{
-		LOG("Creating root node for scene");
-		m_root = new Gameobject();
-		m_root->SetName("Root");
-		m_root->GetTransform()->SetParent(nullptr);
-	}
-	else
-	{
-		LOG("Can't create a second root node.");
-	}
 }
 
 void ModuleGoManager::DeleteGOs()

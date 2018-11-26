@@ -12,16 +12,13 @@ public:
 	~ModuleSceneManager();
 
 	bool Init() override;
-	UpdateStatus PreUpdate() override;
-	UpdateStatus Update() override;
-	UpdateStatus PostUpdate() override;
-
-	void OnEnable() override;
-	void OnDisable() override;
 
 	void Render(const ViewPort& port) const override;
 
 private:
+	void RenderGOs(const ViewPort& port) const;
+
+	Scene* m_activeRenderScene = nullptr;
 	std::vector<Scene> m_scenes;
 };
 

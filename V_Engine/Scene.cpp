@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Mesh.h"
+#include "ViewPort.h"
 
 Scene::Scene(std::string name)
 	: m_root()
@@ -18,6 +19,13 @@ Scene::~Scene()
 
 void Scene::Render(const ViewPort & port) const
 {
+	RenderGos(port);
+	if (port.m_renderQuadTree)
+	{
+		TIMER_START("QuadTree drawTime");
+		m_quadTree.Draw();
+		TIMER_READ_MS("QuadTree drawTime");
+	}
 }
 
 void Scene::AppendGameobject(Gameobject * toAppend)
@@ -107,4 +115,8 @@ bool Scene::RayCast(const LineSegment & ray, Gameobject *& OUT_gameobject, float
 
 	TIMER_READ_MS("Raycast");
 	return false;
+}
+
+void Scene::RenderGos(const ViewPort & port) const
+{
 }

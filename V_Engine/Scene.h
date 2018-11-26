@@ -24,10 +24,15 @@ public:
 	std::string m_name;
 	bool m_renderQuadtree = false;
 private:
+	void RenderGos(const ViewPort& port) const;
+
 	Gameobject m_root;
 	Quadtree m_quadTree;
 	std::vector<Gameobject*> m_dynamicGos;
 };
+
+
+
 
 // Returns objects whose AABB collides with the recieved collision object
 template<typename C>
