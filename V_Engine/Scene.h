@@ -16,6 +16,7 @@ public:
 
 	template <typename C>
 	std::vector<Gameobject*> FilterCollisions(C col) const;
+	std::map<float, Gameobject*> FilterOrderedCollisions(const LineSegment& ray) const;
 	bool RayCast(const LineSegment& ray, Gameobject*& OUT_gameobject, float3& OUT_position, float3& OUT_normal, bool collideWithAABBs = false);
 
 	std::string m_name;

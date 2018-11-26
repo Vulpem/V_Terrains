@@ -35,6 +35,24 @@ std::vector<Gameobject*> Scene::GetGameobjects() const
 	return gameobjects;
 }
 
+//Returns all the GameObjects and the distance at which their AABB collided with the ray
+std::map<float, Gameobject*> Scene::FilterOrderedCollisions(const LineSegment & ray) const
+{
+	std::vector<Gameobject*> aabbCollisions = FilterCollisions(ray);
+	std::map<float, Gameobject*> orderedCollisions;
+	for (auto go : aabbCollisions)
+	{
+		float nearDistance;
+		float farDistance;
+		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
+		if (go->GetOBB().Intersects(ray, nearDistance, farDistance) == true)
+		{
+			const float minDistance = MIN(nearDistance * ray.Length(), farDistance * ray.Length());
+			orderedCollisions.insert(std::pair<float, Gameobject*>(minDistance, go));
+		}
+	}
+}
+
 bool Scene::RayCast(const LineSegment & ray, Gameobject *& OUT_gameobject, float3& OUT_position, float3& OUT_normal, bool collideWithAABBs)
 {
 	TIMER_RESET_STORED("Raycast");
@@ -45,20 +63,7 @@ bool Scene::RayCast(const LineSegment & ray, Gameobject *& OUT_gameobject, float
 
 	float3 collisionPosition = float3::zero;
 	float3 collisionNormal = float3::zero;
-	std::map<float, Gameobject*> orderedCollisions;
-
-	std::vector<Gameobject*> aabbCollisions = FilterCollisions(ray);
-	//Ordering all the collisions by stuffing them into a map
-	for (auto go : aabbCollisions)
-	{
-		float nearDistance;
-		float farDistance;
-		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
-		if (go->GetOBB().Intersects(ray, nearDistance, farDistance) == true)
-		{
-			orderedCollisions.insert(std::pair<float, Gameobject*>(MIN(nearDistance, farDistance), go));
-		}
-	}
+	auto orderedCollisions = FilterOrderedCollisions(ray);
 
 	if (collideWithAABBs == false)
 	{
@@ -79,6 +84,7 @@ bool Scene::RayCast(const LineSegment & ray, Gameobject *& OUT_gameobject, float
 						OUT_gameobject = go.second;
 					}
 				}
+				//We keep this out of the loop, so all meshes of the GO are checked before returning anything
 				if (OUT_gameobject != nullptr)
 				{
 					TIMER_READ_MS("Raycast");
