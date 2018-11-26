@@ -15,6 +15,7 @@
 #include "ModuleFileSystem.h"
 #include "ModuleImporter.h"
 #include "ModuleResourceManager.h"
+#include "ModuleSceneManager.h"
 #include "ModuleTerrainTests.h"
 #include <algorithm>
 
@@ -59,6 +60,7 @@ bool Application::Init()
 	CreateModule<ModulePhysics3D>(m_physics);
 	CreateModule<ModuleImporter>(m_importer);
 	CreateModule<ModuleResourceManager>(m_resourceManager);
+	CreateModule<ModuleSceneManager>(m_scenes);
 	CreateModule<ModuleGoManager>(m_goManager);
 	CreateModule<ModuleTerrain>(m_terrain);
 	// Renderer last!

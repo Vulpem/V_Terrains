@@ -20,6 +20,7 @@ class ModuleFileSystem;
 class ModuleImporter;
 class ModuleResourceManager;
 class ModuleTerrain;
+class ModuleSceneManager;
 
 struct ViewPort;
 
@@ -58,6 +59,7 @@ public:
 	ModuleEditor* m_editor = nullptr;
 	ModuleResourceManager* m_resourceManager = nullptr;
 	ModuleImporter* m_importer = nullptr;
+	ModuleSceneManager* m_scenes = nullptr;
 	ModuleGoManager* m_goManager = nullptr;
 	ModulePhysics3D* m_physics = nullptr;
 	ModuleTerrain* m_terrain = nullptr;

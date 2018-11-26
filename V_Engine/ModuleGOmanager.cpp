@@ -139,29 +139,29 @@ UpdateStatus ModuleGoManager::PostUpdate()
 	TIMER_RESET_STORED("Cam culling longest");
 	TIMER_RESET_STORED("GO render longest");
 
-	bool worked = false;
+	bool alreadyWorkedOnScene = false;
 
-	if (m_wantToSaveScene && worked == false)
+	if (m_wantToSaveScene && alreadyWorkedOnScene == false)
 	{
-		worked = true;
+		alreadyWorkedOnScene = true;
 		TIMER_START_PERF("Saving Scene");
 		SaveSceneNow();
 		m_wantToSaveScene = false;
 		TIMER_READ_MS("Saving Scene");
 	}
 
-	if (m_wantToClearScene && worked == false)
+	if (m_wantToClearScene && alreadyWorkedOnScene == false)
 	{
-		worked = true;
+		alreadyWorkedOnScene = true;
 		ClearSceneNow();
 		m_wantToClearScene = false;
 	}
 
 	DeleteGOs();
 
-	if (m_wantToLoadScene&& worked == false)
+	if (m_wantToLoadScene&& alreadyWorkedOnScene == false)
 	{
-		worked = true;
+		alreadyWorkedOnScene = true;
 		TIMER_START_PERF("Loading Scene");
 		LoadSceneNow();
 		m_wantToLoadScene = false;

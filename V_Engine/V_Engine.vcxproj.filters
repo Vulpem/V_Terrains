@@ -64,6 +64,9 @@
     <Filter Include="Terrains">
       <UniqueIdentifier>{f1893366-4ee5-4852-b09e-30723e890294}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Scene">
+      <UniqueIdentifier>{a0adfbb0-d090-465f-a762-49036b31d1cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -429,6 +432,12 @@
     <ClInclude Include="TimerManager.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleSceneManager.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -637,6 +646,12 @@
     </ClCompile>
     <ClCompile Include="TimerManager.cpp">
       <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleSceneManager.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Sources\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

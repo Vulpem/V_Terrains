@@ -2,14 +2,12 @@
 #define __MODULE_RENDER_3D__
 
 #include "Module.h"
-#include "Globals.h"
 #include "Light.h"
 #include <map>
 
 #define MAX_LIGHTS 8
 
 struct Mesh_RenderInfo;
-struct ViewPort;
 class Camera;
 
 class ModuleRenderer3D : public Module
