@@ -6,7 +6,9 @@
 class Scene
 {
 public:
-	Scene();
+	Scene(std::string name);
+	Scene(const Scene&) = delete;
+	Scene& operator=(const Scene&) = delete;
 	~Scene();
 
 	void Render(const ViewPort& port) const;

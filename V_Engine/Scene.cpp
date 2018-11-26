@@ -1,10 +1,11 @@
 #include "Scene.h"
 #include "Mesh.h"
 
-Scene::Scene()
+Scene::Scene(std::string name)
 	: m_root()
-	, m_quadTree
-	(	float3(WORLD_WIDTH / -2, WORLD_HEIGHT / -2, WORLD_DEPTH / -2)
+	, m_name(name)
+	, m_quadTree(
+		float3(WORLD_WIDTH / -2, WORLD_HEIGHT / -2, WORLD_DEPTH / -2)
 	,	float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
 	m_root.SetName("Root");
@@ -51,6 +52,7 @@ std::map<float, Gameobject*> Scene::FilterOrderedCollisions(const LineSegment & 
 			orderedCollisions.insert(std::pair<float, Gameobject*>(minDistance, go));
 		}
 	}
+	return orderedCollisions;
 }
 
 bool Scene::RayCast(const LineSegment & ray, Gameobject *& OUT_gameobject, float3& OUT_position, float3& OUT_normal, bool collideWithAABBs)

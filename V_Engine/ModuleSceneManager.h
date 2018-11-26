@@ -3,6 +3,7 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include "Scene.h"
 
 class ModuleSceneManager : public Module
 {
@@ -19,6 +20,9 @@ public:
 	void OnDisable() override;
 
 	void Render(const ViewPort& port) const override;
+
+private:
+	std::vector<Scene> m_scenes;
 };
 
 #endif
