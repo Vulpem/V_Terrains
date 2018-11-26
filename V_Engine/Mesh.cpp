@@ -156,3 +156,36 @@ void Mesh::LoadSpecifics(pugi::xml_node & myNode)
 		m_textureIndex = myNode.attribute("TextureIndex").as_int();
 	}
 }
+
+bool Mesh::RayCast(const LineSegment & ray, float3 * OUT_collisionPoint, float3 * OUT_collisionNormal)
+{
+	float collisionDistance = floatMax;
+	bool collided = false;
+	LineSegment transformedRay = ray;
+	transformedRay.Transform(GetOwner()->GetTransform()->GetGlobalTransform().InverseTransposed());
+	//Generating the triangles the mes has, and checking them one by one
+	const float3* vertices = GetVertices();
+	const uint* index = GetIndices();
+	for (int n = 0; n < GetNumIndices(); n += 3)
+	{
+		Triangle tri(vertices[index[n]], vertices[index[n + 1]], vertices[index[n + 2]]);
+		float3 intersectionPoint;
+		float distance;
+		//If the triangle we collided with is further away than a previous collision, we'll ignore it
+		if (tri.Intersects(transformedRay, &distance, &intersectionPoint) == true)
+		{
+			collided = true;
+			if (distance < collisionDistance)
+			{
+				collisionDistance = distance;
+				float3 meshSpacePosition = intersectionPoint;
+				float3 meshSpaceNormal = tri.NormalCCW();
+				LineSegment positionWithNormal(meshSpacePosition, meshSpacePosition + meshSpaceNormal);
+				positionWithNormal.Transform(GetOwner()->GetTransform()->GetGlobalTransform().Transposed());
+				*OUT_collisionPoint = positionWithNormal.a;
+				*OUT_collisionNormal = positionWithNormal.b - positionWithNormal.a;
+			}
+		}
+	}
+	return collided;
+}

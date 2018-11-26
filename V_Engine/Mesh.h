@@ -19,6 +19,7 @@ public:
 	const float3* GetNormals() const;
 
 	AABB GetAABB() const;
+	bool RayCast(const LineSegment& ray, float3* OUT_collisionPoint = NULL, float3* OUT_collisionNormal = NULL);
 
 	void EditorContent() override;
 
