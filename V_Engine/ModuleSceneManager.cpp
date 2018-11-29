@@ -11,6 +11,8 @@ ModuleSceneManager::~ModuleSceneManager()
 
 bool ModuleSceneManager::Init()
 {
+	m_scenes.push_back(Scene("Global Scene"));
+	m_scenes.push_back(Scene("Default Scene"));
 	return true;
 }
 
